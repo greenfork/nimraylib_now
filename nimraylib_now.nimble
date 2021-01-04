@@ -11,6 +11,7 @@ backend = "c"
 # Dependencies
 
 requires "nim >= 1.4.2"
+requires "regex"
 
 task dorun, "run":
   exec "nim r src/nimraylib_now"
