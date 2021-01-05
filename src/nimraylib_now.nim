@@ -3,7 +3,6 @@ import strutils, strformat
 from sequtils import any
 from os import `/`, fileExists, extractFilename
 from osproc import execCmd
-from parseutils import skipWhitespace
 from sugar import `=>`
 import regex
 
@@ -43,35 +42,6 @@ if doDownload:
 
 # Parse files to (((Nim))) wrappers
 
-const arrayFieldName = re"([[:word:]]+)\[(\d+)\]"
-
-func convertType(t: string, varname: string): string =
-  var m: RegexMatch
-  result =
-    case t
-    of "const void", "void":
-      if varname[0] == '*': "pointer"
-      else: ""
-    of "long", "int": "int32"
-    of "float": "float32"
-    of "double": "float64"
-    of "const char": "cstring"
-    of "unsigned int": "uint32"
-    of "unsigned char": "uint8"
-    of "unsigned short": "uint16"
-    of "TraceLogCallback": "int"
-    of "const unsigned char": "UncheckedArray[byte]"
-    else:
-      if varname[0] == '*' and t == "char":
-        "cstringArray"
-      elif varname[0] == '*':
-        "ptr " & t.replace("const ", "ptr ")
-      elif varname.match(arrayFieldName, m):
-        fmt"array[{m.groupFirstCapture(1, varname)}, {t}]"
-      else:
-        t.replace("const ", "ptr ")
-  result = ": " & result
-
 # Formatting of identifiers
 func fmtConst(s: string): string =
   s.toLowerAscii.capitalizeAscii
@@ -80,19 +50,9 @@ func peekFirst(ss: seq[string]): string =
   if ss.len > 0: ss[0]
   else: ""
 
-func maybeChangeName(s: string): string =
-  result = s
-  if result in ["ptr", "type"]: result.add 'x'
-func maybeArrayField(s: string): string =
-  var m: RegexMatch
-  if s.match(arrayFieldName, m):
-    result = m.groupFirstCapture(0, s)
-  else:
-    result = s
-
 const
   ignoreDefines = [
-    "RLAPI",
+    "RLAPI", # used before C function definition
     "RL_MALLOC(sz)",
     "RL_CALLOC(n,sz)",
     "RL_REALLOC(ptr,sz)",
@@ -111,27 +71,21 @@ const
     "MAP_DIFFUSE", # deprecated?
     "MAP_SPECULAR", # deprecated?
   ]
-  raylibHeader = """
-const LEXT* = when defined(windows):".dll"
-elif defined(macosx):               ".dylib"
-else:                               ".so"
-{.pragma: RLAPI, cdecl, discardable, dynlib: "libraylib" & LEXT.}
-"""
 
-block attempt3:
-  const
-    # #define LIGHTGRAY  CLITERAL(Color){ 200, 200, 200, 255 }   // Light Gray
-    reDefineColor = re"^#define ([[:word:]]+)\s*CLITERAL\(Color\)\{ (\d+), (\d+), (\d+), (\d+) \}.*"
-    # typedef struct rAudioBuffer rAudioBuffer;
-    reEmptyStructDef = re"^typedef struct ([[:word:]]+) ([[:word:]]+);.*"
-    # typedef enum {
-    typedefEnumStart = re"^typedef enum \{.*"
-    # typedef enum { OPENGL_11 = 1, OPENGL_21, OPENGL_33, OPENGL_ES_20 } GlVersion;
-    typedefEnumOneline = re"^typedef enum \{.*\} ([[:word:]]+);.*"
-    # } ConfigFlag;
-    typedefEnd = re"^\} (\w+);"
-  const
-    raylibHeader = """
+const
+  # #define LIGHTGRAY  CLITERAL(Color){ 200, 200, 200, 255 }   // Light Gray
+  reDefineColor = re"^#define ([[:word:]]+)\s*CLITERAL\(Color\)\{ (\d+), (\d+), (\d+), (\d+) \}.*"
+  # typedef struct rAudioBuffer rAudioBuffer;
+  reEmptyStructDef = re"^typedef struct ([[:word:]]+) ([[:word:]]+);.*"
+  # typedef enum {
+  reTypedefEnumStart = re"^typedef enum \{.*"
+  # typedef enum { OPENGL_11 = 1, OPENGL_21, OPENGL_33, OPENGL_ES_20 } GlVersion;
+  reTypedefEnumOneline = re"^typedef enum \{.*\} ([[:word:]]+);.*"
+  # } ConfigFlag;
+  reTypedefEnd = re"^\} (\w+);"
+
+const
+  raylibHeader = """
 #ifdef C2NIM
 #  def RLAPI
 #  dynlib raylibdll
@@ -150,7 +104,7 @@ type VaList* {.importc, header: "<stdarg.h>".} = object
 @#
 #endif
 """
-    rlglHeader = """
+  rlglHeader = """
 #ifdef C2NIM
 #  def RLAPI
 #  dynlib raylibdll
@@ -172,389 +126,132 @@ import raylib
 @#
 #endif
 """
-  const
-    raylibFiles = [
-      ("raylib", raylibHeader),
-      ("rlgl", rlglHeader),
-    ]
-    selfModuleDeclarationName = ["RAYLIB_H", "RLGL_H"]
+
+const
+  raylibFiles = [
+    ("raylib", raylibHeader),
+    ("rlgl", rlglHeader),
+  ]
+  selfModuleDeclarationNames = ["RAYLIB_H", "RLGL_H"]
 
 
-  # Start processing all files
-  for (filename, c2nimheader) in raylibFiles:
+# Start processing all files
+for (filename, c2nimheader) in raylibFiles:
 
-    # Preprocessing of C header file before feeding it to c2nim
+  # Preprocessing of C header file before feeding it to c2nim
 
-    block preprocessing:
+  block preprocessing:
+    let
+      raylibh = readFile("raylib"/filename & ".h")
+      raylibhLines = raylibh.splitLines
+    var
+      rs: string
+      appendToVeryEnd: string # as Nim code
+      m: RegexMatch
+    rs.add c2nimheader
+    var i = 0
+    while i < raylibhLines.len:
       let
-        raylibh = readFile("raylib"/filename & ".h")
-        raylibhLines = raylibh.splitLines
-      var
-        rs: string
-        # As Nim code for C macros conversion to type-checked Nim constants
-        appendToVeryEnd: string
-        m: RegexMatch
-      rs.add c2nimheader
-      var i = 0
-      while i < raylibhLines.len:
+        line = raylibhLines[i]
+        words = line.splitWhitespace
+      if "RAYLIB_H" in words: discard # skip all self-header module definitions
+      if selfModuleDeclarationNames.any((name) => name in words):
+        echo "Ignore: " & line
+        discard # skip all self-header module definitions
+      elif line.match(reDefineColor, m):
         let
-          line = raylibhLines[i]
-          words = line.splitWhitespace
-        if "RAYLIB_H" in words: discard # skip all self-header module definitions
-        if selfModuleDeclarationName.any((name) => name in words):
-          echo "Ignore: " & line
-          discard # skip all self-header module definitions
-        elif line.match(reDefineColor, m):
-          let
-            colorName = m.groupFirstCapture(0, line)
-            red = m.groupFirstCapture(1, line)
-            green = m.groupFirstCapture(2, line)
-            blue = m.groupFirstCapture(3, line)
-            alpha = m.groupFirstCapture(4, line)
-          appendToVeryEnd.add fmt"const {colorName.fmtConst}* = " &
-            fmt("Color(r: {red}, g: {green}, b: {blue}, a: {alpha})\n")
-        elif line.match(reEmptyStructDef, m):
-          # c2nim can't parse it without {} in the middle
-          # this seems as a forward declaration of a struct but no further
-          # declaration actually happens
-          let typename = m.groupFirstCapture(0, line)
-          assert m.groupFirstCapture(1, line) == typename, "wrong typename: " & $i
-          rs.add fmt"typedef struct {typename} {{}} {typename};"
-        elif line.match(typedefEnumStart):
-          # C uses enums in place of int32 numbers, so every enum takes an
-          # appropriate converter to translate types in Nim implicitly
-          let enumName =
-            if line.match(typedefEnumOneline, m):
-              m.groupFirstCapture(0, line)
-            else:
-              var
-                enumEnd = i + 1
-                enumEndLine = raylibhLines[enumEnd]
-              while not enumEndLine.match(typedefEnd, m):
-                enumEnd.inc
-                enumEndLine = raylibhLines[enumEnd]
-              m.groupFirstCapture(0, enumEndLine)
-          appendToVeryEnd.add(
-            fmt("converter {enumName}ToInt32*(self: {enumName}): int32 = self.int32\n")
-          )
-          # Remember to still add this line
-          rs.add line & "\n"
-        elif words.len > 0 and (words[0] == "#if" or words[0] == "#ifndef"):
-          echo "Ignore branch: " & line
-          var nestLevels = 1
-          while nestLevels > 0:
-            i.inc
-            let firstWord = raylibhLines[i].splitWhitespace.peekFirst
-            if firstWord == "#endif":
-              nestLevels.dec
-            elif firstWord == "#if" or firstWord == "#ifndef":
-              nestLevels.inc
-        elif words.len > 1 and words[0] == "#define" and words[1] in ignoreDefines:
-          echo "Ignore: " & line
-        else:
-          rs.add line & "\n"
-        i.inc
+          colorName = m.groupFirstCapture(0, line)
+          red = m.groupFirstCapture(1, line)
+          green = m.groupFirstCapture(2, line)
+          blue = m.groupFirstCapture(3, line)
+          alpha = m.groupFirstCapture(4, line)
+        appendToVeryEnd.add fmt"const {colorName.fmtConst}* = " &
+          fmt("Color(r: {red}, g: {green}, b: {blue}, a: {alpha})\n")
+      elif line.match(reEmptyStructDef, m):
+        # c2nim can't parse it without {} in the middle
+        # this seems as a forward declaration of a struct but no further
+        # declaration actually happens
+        let typename = m.groupFirstCapture(0, line)
+        assert m.groupFirstCapture(1, line) == typename, "wrong typename: " & $i
+        rs.add fmt"typedef struct {typename} {{}} {typename};"
+      elif line.match(reTypedefEnumStart):
+        # C uses enums in place of int32 numbers, so every enum takes an
+        # appropriate converter to translate types in Nim implicitly
+        let enumName =
+          if line.match(reTypedefEnumOneline, m):
+            m.groupFirstCapture(0, line)
+          else:
+            var
+              enumEnd = i + 1
+              enumEndLine = raylibhLines[enumEnd]
+            while not enumEndLine.match(reTypedefEnd, m):
+              enumEnd.inc
+              enumEndLine = raylibhLines[enumEnd]
+            m.groupFirstCapture(0, enumEndLine)
+        appendToVeryEnd.add(
+          fmt("converter {enumName}ToInt32*(self: {enumName}): int32 = self.int32\n")
+        )
+        # Remember to still add this line
+        rs.add line & "\n"
+      elif words.len > 0 and (words[0] == "#if" or words[0] == "#ifndef"):
+        echo "Ignore branch: " & line
+        var nestLevels = 1
+        while nestLevels > 0:
+          i.inc
+          let firstWord = raylibhLines[i].splitWhitespace.peekFirst
+          if firstWord == "#endif":
+            nestLevels.dec
+          elif firstWord == "#if" or firstWord == "#ifndef":
+            nestLevels.inc
+      elif words.len > 1 and words[0] == "#define" and words[1] in ignoreDefines:
+        echo "Ignore: " & line
+      else:
+        rs.add line & "\n"
+      i.inc
 
-      rs.add fmt"""
+    rs.add fmt"""
 #ifdef C2NIM
 #@
 {appendToVeryEnd}
 @#
 #endif
 """
-      writeFile("raylib"/fmt"{filename}_modified.h", rs)
+    writeFile("raylib"/fmt"{filename}_modified.h", rs)
 
 
-    # Processing with c2nim
+  # Processing with c2nim
 
-    echo "\nExecuting c2nim\n"
-    assert execCmd("c2nim raylib"/fmt"{filename}_modified.h") == 0
-
-
-    # Postprocessing of generated nim file by c2nim
-
-    block postprocessing:
-      let
-        raylibnim = readFile("raylib"/fmt"{filename}_modified.nim")
-        raylibnimLines = raylibnim.splitLines
-      var
-        rs: string
-        appendToVeryEnd: string # e.g. for #define->const conversion
-        m: RegexMatch
-      var i = 0
-      while i < raylibnimLines.len:
-        var line = raylibnimLines[i].multiReplace(
-          # According to definitions in compiler Nim/lib/system.nim
-          ("cint", "int32"),
-          ("cschar", "int8"),
-          ("cshort", "int16"),
-          ("cint", "int32"),
-          ("csize", "int"),
-          ("csize_t", "uint"),
-          ("clonglong", "int64"),
-          ("cfloat", "float32"),
-          ("cdouble", "float64"),
-          ("clongdouble", "BiggestFloat"),
-          ("cuchar", "uint8"), # digression from how compiler defines it
-          ("cushort", "uint16"),
-          ("cuint", "uint32"),
-          ("culonglong", "uint64"),
-        )
-        rs.add line & "\n"
-        i.inc
-
-      writeFile("raylib"/fmt"{filename}.nim", rs)
-
-# block attempt2:
-#   const
-#     multilineCommentStart = re"^/\*"
-#     multilineCommentEnd = re"\*/$"
-#     onelineComment = re"^\s*(//).+"
-#     defineExpr = re"^\s*#define(?:\s+(\S+))+"
-#     typedefStructStart = re"^typedef struct ([[:word:]]+) \{.*"
-#     typedefEmptyStruct = re"^typedef struct ([[:word:]]+) ([[:word:]]+);"
-#     typedefAlias = re"^typedef ([[:word:]]+) ([[:word:]]+);.*"
-#     typedefEnumStart = re"^typedef enum \{.*"
-#     typedefEnd = re"^\} (\w+);"
-#     typedefFieldList = re"^\s*((?:[[:word:]]+)\s)+(?:([[:word:]*\[\]]+)(?:, )?)+;.*"
-#     typedefEnumEntry = re"^\s*([[:word:]]+)\s*(?:=\s((?:0x)?[[:xdigit:]]+),?)?.*"
-
-#   type
-#     RaylibParser = object
-#       filepath: string
-#       line: int
-#       buf: seq[string]
-
-#   proc parseFile(filepath: string, writeToFile = false) =
-#     let targetFile = filepath.replace(".h", ".nim")
-#     var
-#       parser = RaylibParser(
-#         filepath: filepath,
-#         buf: readFile(filepath).split("\n")
-#       )
-#       output: File
-#       m: RegexMatch # for future parsing
-#       trailingComment: string # auto-inserted in `o` proc
-#       appendToVeryEnd: string # e.g. for #define->const conversion there
-#                               # should be types above in the code
-#     if writeToFile: output = open(targetFile, fmWrite)
-
-#     # Output to file or stdout
-#     proc o(s: string) =
-#       var rs: string
-#       rs.add s
-#       if trailingComment.len > 0:
-#         if s.len > 0: rs.add ' '
-#         rs.add "#" & trailingComment
-#       if writeToFile:
-#         rs.add "\n"
-#         output.write rs
-#       else:
-#         echo rs
-
-#     func parseTrailingComment(line: string): string =
-#       var parsed = line.split("//")
-#       if parsed.len > 1:
-#         parsed[1..^1].join
-#       else:
-#         ""
-
-#     while parser.line < parser.buf.len:
-#       if parser.line < 0:
-#         parser.line.inc
-#         continue
-#       if parser.line > 874:
-#         break
-
-#       let line = parser.buf[parser.line]
-#       trailingComment = parseTrailingComment(line)
-
-#       if multilineCommentStart in line:
-#         while parser.line < parser.buf.len:
-#           let commentLine = parser.buf[parser.line]
-#           if multilineCommentEnd in commentLine:
-#             o '#' & commentLine
-#             break
-#           else:
-#             parser.line.inc
-#             o '#' & commentLine
-#       elif onelineComment in line:
-#         trailingComment = ""
-#         o line.replace("//", "#")
-#       elif line.match(defineExpr, m) and
-#            m.groupFirstCapture(0, line) notin ignoreDefines:
-#         let matches = m.group(0, line)
-#         if matches[0] == "RAYLIB_H":
-#           o raylibHeader
-#         elif matches.len > 1 and matches[1] == "CLITERAL(Color){":
-#           appendToVeryEnd.add fmt"const {matches[0].fmtConst}* = " &
-#             fmt("Color(r: {matches[2]} g: {matches[3]} b: {matches[4]} a: {matches[5]})\n")
-#         else:
-#           o fmt"template {matches[0]}*(): auto = {matches[1]}"
-#       elif line.match(typedefAlias, m):
-#         o fmt"type {m.groupFirstCapture(1, line)}* = {m.groupFirstCapture(0, line)}"
-#       elif line.match(typedefStructStart, m) or line.match(typedefEmptyStruct, m):
-#         let typename = m.groupFirstCapture(0, line)
-#         o fmt"type {typename}* {{.bycopy.}} = object"
-#         # If this is not empty struct definition
-#         if typedefEmptyStruct notin line:
-#           # Find where type definition ends
-#           var typedefEndLine = parser.line
-#           while not parser.buf[typedefEndLine].match(typedefEnd, m):
-#             typedefEndLine.inc
-#           assert typename == m.groupFirstCapture(0, parser.buf[typedefEndLine]),
-#                  "wrong typedef ending"
-#           # Convert fields
-#           for i in (parser.line+1)..<typedefEndLine:
-#             trailingComment = ""
-#             let typedefFieldsLine = parser.buf[i]
-#             if typedefFieldsLine.match(typedefFieldList, m):
-#               trailingComment = parseTrailingComment(typedefFieldsLine)
-#               let
-#                 fieldType = m.group(0, typedefFieldsLine).join.strip
-#                 firstFieldName = m.groupFirstCapture(1, typedefFieldsLine).strip
-#               var fields = "  "
-#               fields.add m.group(1, typedefFieldsLine)
-#                           .mapIt(it.strip(chars = {'*'})
-#                                    .maybeArrayField
-#                                    .maybeChangeName & '*')
-#                           .join(", ")
-#               fields.add convertType(fieldType, firstFieldName)
-#               o fields
-#             elif onelineComment in typedefFieldsLine:
-#               o typedefFieldsLine.replace("//", "#")
-#             elif typedefFieldsLine.len > 0:
-#               o '#' & typedefFieldsLine
-#             else:
-#               o ""
-#           parser.line = typedefEndLine
-#       elif line.match(typedefEnumStart, m):
-#         # Find where type definition ends
-#         var typedefEndLine = parser.line
-#         while not parser.buf[typedefEndLine].match(typedefEnd, m):
-#           typedefEndLine.inc
-#         let typename = m.groupFirstCapture(0, parser.buf[typedefEndLine])
-#         o fmt"type {typename}* = enum"
-#         # Convert fields
-#         for i in (parser.line+1)..<typedefEndLine:
-#           trailingComment = ""
-#           let typedefEnumLine = parser.buf[i]
-#           if typedefEnumLine.match(typedefEnumEntry, m):
-#             trailingComment = parseTrailingComment(typedefEnumLine)
-#             var entry = "  "
-#             var ident = m.groupFirstCapture(0, typedefEnumLine)
-#             ident[0] = ident[0].toLowerAscii
-#             ident = ident.nimIdentNormalize
-#             entry.add ident
-#             let value = m.groupFirstCapture(1, typedefEnumLine)
-#             if value.len > 0:
-#               entry.add fmt" = {value}"
-#             o entry
-#           elif onelineComment in typedefEnumLine:
-#             o typedefEnumLine.replace("//", "#")
-#           elif typedefEnumLine.len > 0:
-#             o '#' & typedefEnumLine
-#           else:
-#             o ""
-#         parser.line = typedefEndLine
-#         trailingComment = ""
-#         o fmt"converter {typename}Toint32* (self: {typename}): int32 = self.int32"
-#       elif line.len > 0:
-#         trailingComment = ""
-#         o "#" & line
-#       else:
-#         o ""
-
-#       parser.line.inc
-#     o appendToVeryEnd
-
-#   parseFile("raylib"/"raylib.h", true)
+  echo "\nExecuting c2nim\n"
+  assert execCmd("c2nim raylib"/fmt"{filename}_modified.h") == 0
 
 
-# block attempt1:
-#   type
-#     RaylibParser = object
-#       lineNumber: int
-#       multilineComment: bool
-#       filepath: string
+  # Postprocessing of generated nim file by c2nim
 
-#   iterator lines(p: var RaylibParser): string =
-#     for line in lines(p.filepath):
-#       p.lineNumber.inc
-#       yield line
+  block postprocessing:
+    let
+      raylibnim = readFile("raylib"/fmt"{filename}_modified.nim")
+      raylibnimLines = raylibnim.splitLines
+    var rs: string
+    var i = 0
+    while i < raylibnimLines.len:
+      var line = raylibnimLines[i].multiReplace(
+        # According to definitions in compiler Nim/lib/system.nim
+        ("cint", "int32"),
+        ("cschar", "int8"),
+        ("cshort", "int16"),
+        ("cint", "int32"),
+        ("csize_t", "uint"),
+        ("csize", "int"),
+        ("clonglong", "int64"),
+        ("cfloat", "float32"),
+        ("cdouble", "float64"),
+        ("clongdouble", "BiggestFloat"),
+        ("cuchar", "uint8"), # digression from how compiler defines it
+        ("cushort", "uint16"),
+        ("cuint", "uint32"),
+        ("culonglong", "uint64"),
+      )
+      rs.add line & "\n"
+      i.inc
 
-#   proc parseFile(filepath: string, writeToFile = false) =
-#     let targetFile = filepath.replace(".h", ".nim")
-#     var
-#       parser = RaylibParser(filepath: filepath)
-#       output: File
-#       multilineStatement: bool
-#     if writeToFile: output = open(targetFile, fmWrite)
-#     for line in lines(parser):
-#       if parser.lineNumber < 172: continue
-#       if parser.lineNumber > 219: break
-#       var
-#         line = line
-#         rs: string # resulting line
-#         copyVerbatim: bool # just prepend '#' and copy the line
-#       line = line[skipWhitespace(line)..^1]
-#       let
-#         words = line.splitWhitespace
-#         trailingComment = block:
-#           var parsed = line.split("//")
-#           if parsed.len > 1:
-#             parsed[1..^1].join
-#           else:
-#             ""
-#       # echo words
-
-#       if line == "":
-#         rs.add "\n"
-#       elif parser.multilineComment:
-#         rs.add '#'
-#         rs.add line
-#       elif line.startsWith("/*"):
-#         parser.multilineComment = true
-#         rs.add '#'
-#         rs.add line
-#       elif words[0] == "#define" and words[1] notin ignoreDefines:
-#         if words[1] == "RAYLIB_H":
-#           rs.add raylibHeader
-#         elif words.len > 2 and words[2] == "CLITERAL(Color){":
-#           rs.add fmt"template {words[1]}*(): auto = "
-#           rs.add fmt"Color(r: {words[3]} g: {words[4]} b: {words[5]} a: {words[6]})"
-#         else:
-#           rs.add fmt"template {words[1]}*(): auto = {words[2]}"
-#       elif words[0] == "typedef":
-#         case words[1]
-#         of "struct":
-#           assert words[3] == "{"
-#           rs.add fmt"type {words[2]}* {{.bycopy.}} = object"
-#           multilineStatement = true
-#         else:
-#           discard
-#       elif words[0] == "}":
-#         multilineStatement = false
-#       else:
-#         copyVerbatim = true
-#         rs.add '#'
-#         rs.add line
-
-#       if parser.multilineComment and line.endsWith("*/"):
-#         parser.multilineComment = false
-#       if not copyVerbatim and trailingComment.len > 0:
-#         if rs.len > 0:
-#           rs.add ' '
-#         rs.add '#'
-#         rs.add trailingComment
-
-#       if rs.len > 0:
-#         if writeToFile:
-#           output.write(rs)
-#           output.write "\n"
-#         else:
-#           echo rs
-
-#   # parseFile("raylib"/"raylib.h")
-
-
+    writeFile("raylib"/fmt"{filename}.nim", rs)
