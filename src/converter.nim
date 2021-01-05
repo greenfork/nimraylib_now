@@ -144,28 +144,6 @@ import raylib
 @#
 #endif
 """
-  rayguiHeader = """
-#ifdef C2NIM
-#  def RAYGUIDEF
-#  dynlib rayguidll
-#  cdecl
-#  nep1
-#  skipinclude
-#  prefix Gui
-#  prefix GUI_
-#  prefix gui
-#  if defined(windows)
-#    define rayguidll "libraygui.dll"
-#  elif defined(macosx)
-#    define rayguidll "libraygui.dylib"
-#  else
-#    define rayguidll "libraygui.so"
-#  endif
-#@
-import raylib
-@#
-#endif
-"""
   raymathHeader = """
 #ifdef C2NIM
 #  def RMDEF static inline
@@ -185,13 +163,40 @@ import raylib
 @#
 #endif
 """
+  rayguiHeader = """
+#ifdef C2NIM
+#  def RAYGUIDEF
+#  dynlib rayguidll
+#  cdecl
+#  nep1
+#  skipinclude
+#  prefix Gui
+#  prefix GUI_
+#  prefix gui
+#  if defined(windows)
+#    define rayguidll "libraygui.dll"
+#  elif defined(macosx)
+#    define rayguidll "libraygui.dylib"
+#  else
+#    define rayguidll "libraygui.so"
+#  endif
+#@
+import raylib
+# from os import parentDir, `/`
+# const
+#   RayguiSrcPath = currentSourcePath().parentDir().parentDir() / "raygui" / "src"
+# {.passC:"-fPIC -c -DRAYGUI_IMPLEMENTATION".}
+# {.compile: RayguiSrcPath/"raygui.h".}
+@#
+#endif
+"""
 
 const
   raylibFiles = [
     ("raylib"/"raylib.h", raylibHeader),
     ("raylib"/"rlgl.h", rlglHeader),
-    ("raygui"/"src"/"raygui.h", rayguiHeader),
     ("raylib"/"raymath.h", raymathHeader),
+    ("raygui"/"src"/"raygui.h", rayguiHeader),
   ]
   selfModuleDeclarationNames = ["RAYLIB_H", "RLGL_H", "RAYGUI_H", "RAYMATH_H"]
   # For converters which are written before c2nim conversion with proper

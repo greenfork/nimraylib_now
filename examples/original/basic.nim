@@ -2,14 +2,14 @@
 # Raylib Forever basic usage sample
 # Developed in 2*20 by Guevara-chan
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- #
-import ../../raylib/raylib, ../../raylib/raygui
+import nimraylib_now/raylib, nimraylib_now/raygui
 initWindow 800, 600, "RayLib/[nim]"
 60.setTargetFPS
 
 
 # Camera setup.
 var camera = Camera(position: Vector3(z: -15.0f, y: 10), up: Vector3(y: 0.5), fovy: 45.0)
-camera.setCameraMode CAMERA_ORBITAL
+camera.setCameraMode Orbital
 
 # ==Main code==
 while not windowShouldClose():
