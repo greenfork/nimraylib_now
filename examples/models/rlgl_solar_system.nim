@@ -1,8 +1,8 @@
 #******************************************************************************************
 #
-#   raylib [models] example - rlgl module usage with push/pop matrix transformations
+#   raylib [models] example - gl module usage with push/pop matrix transformations
 #
-#   This example uses [rlgl] module funtionality (pseudo-OpenGL 1.1 style coding)
+#   This example uses [gl] module funtionality (pseudo-OpenGL 1.1 style coding)
 #
 #   This example has been created using raylib 2.5 (www.raylib.com)
 #   raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
@@ -12,12 +12,12 @@
 #
 #*******************************************************************************************
 
-import raylib, rlgl, math, lenientops
+import ../../raylib/raylib, ../../raylib/rlgl, math, lenientops
 
 # ------------------------------------------------------------------------------------
 #  Module Functions Declaration
 # ------------------------------------------------------------------------------------
-proc DrawSphereBasic(color: Color) #  Draw sphere without any matrix transformation
+proc drawSphereBasic(color: Color) #  Draw sphere without any matrix transformation
 
 # ------------------------------------------------------------------------------------
 #  Program main entry point
@@ -25,7 +25,7 @@ proc DrawSphereBasic(color: Color) #  Draw sphere without any matrix transformat
 
 #  Initialization
 # --------------------------------------------------------------------------------------
-const 
+const
     screenWidth      = 800
     screenHeight     = 450
 
@@ -35,7 +35,7 @@ const
     moonRadius       = 0.16f
     moonOrbitRadius  = 1.5f
 
-InitWindow screenWidth, screenHeight, "raylib [models] example - rlgl module usage with push/pop matrix transformations"
+initWindow screenWidth, screenHeight, "raylib [models] example - gl module usage with push/pop matrix transformations"
 
 #  Define the camera to look into our 3d world
 var camera      = Camera()
@@ -43,11 +43,11 @@ camera.position = Vector3(x: 16.0f, y: 16.0f, z: 16.0f)
 camera.target   = Vector3(x: 0.0f, y: 0.0f, z: 0.0f)
 camera.up       = Vector3(x: 0.0f, y: 1.0f, z: 0.0f)
 camera.fovy     = 45.0f
-camera.typex    = CAMERA_PERSPECTIVE
+camera.`type`    = CAMERA_PERSPECTIVE
 
-camera.SetCameraMode CAMERA_FREE
+camera.setCameraMode CAMERA_FREE
 
-var 
+var
     rotationSpeed = 0.2f          #  General system rotation speed
 
     earthRotation      = 0.0f     #  Rotation of earth around itself (days) in degrees
@@ -55,14 +55,14 @@ var
     moonRotation       = 0.0f     #  Rotation of moon around itself
     moonOrbitRotation  = 0.0f     #  Rotation of moon around earth in degrees
 
-60.SetTargetFPS                   #  Set our game to run at 60 frames-per-second
+60.setTargetFPS                   #  Set our game to run at 60 frames-per-second
 # --------------------------------------------------------------------------------------
 
 #  Main game loop
-while not WindowShouldClose():    #  Detect window close button or ESC key
+while not windowShouldClose():    #  Detect window close button or ESC key
     #  Update
     # ----------------------------------------------------------------------------------
-    camera.addr.UpdateCamera
+    camera.addr.updateCamera
 
     earthRotation += (5.0f*rotationSpeed)
     earthOrbitRotation += (365/360.0f*(5.0f*rotationSpeed)*rotationSpeed)
@@ -72,52 +72,52 @@ while not WindowShouldClose():    #  Detect window close button or ESC key
 
     #  Draw
     # ----------------------------------------------------------------------------------
-    BeginDrawing()
+    beginDrawing()
 
-    ClearBackground RAYWHITE
+    clearBackground RAYWHITE
 
-    BeginMode3D camera
+    beginMode3D camera
 
-    rlPushMatrix()
-    rlScalef sunRadius, sunRadius, sunRadius           #  Scale Sun
-    GOLD.DrawSphereBasic                               #  Draw the Sun
-    rlPopMatrix()
+    pushMatrix()
+    scalef sunRadius, sunRadius, sunRadius           #  Scale Sun
+    Gold.drawSphereBasic                               #  Draw the Sun
+    popMatrix()
 
-    rlPushMatrix()
-    rlRotatef earthOrbitRotation, 0.0f, 1.0f, 0.0f     #  Rotation for Earth orbit around Sun
-    rlTranslatef earthOrbitRadius, 0.0f, 0.0f          #  Translation for Earth orbit
-    rlRotatef -earthOrbitRotation, 0.0f, 1.0f, 0.0f    #  Rotation for Earth orbit around Sun inverted
+    pushMatrix()
+    rotatef earthOrbitRotation, 0.0f, 1.0f, 0.0f     #  Rotation for Earth orbit around Sun
+    translatef earthOrbitRadius, 0.0f, 0.0f          #  Translation for Earth orbit
+    rotatef -earthOrbitRotation, 0.0f, 1.0f, 0.0f    #  Rotation for Earth orbit around Sun inverted
 
-    rlPushMatrix()
-    rlRotatef earthRotation, 0.25, 1.0, 0.0            #  Rotation for Earth itself
-    rlScalef earthRadius, earthRadius, earthRadius     #  Scale Earth
-    BLUE.DrawSphereBasic                               #  Draw the Earth
-    rlPopMatrix()
+    pushMatrix()
+    rotatef earthRotation, 0.25, 1.0, 0.0            #  Rotation for Earth itself
+    scalef earthRadius, earthRadius, earthRadius     #  Scale Earth
+    Blue.drawSphereBasic                               #  Draw the Earth
+    popMatrix()
 
-    rlRotatef moonOrbitRotation, 0.0f, 1.0f, 0.0f      #  Rotation for Moon orbit around Earth
-    rlTranslatef moonOrbitRadius, 0.0f, 0.0f           #  Translation for Moon orbit
-    rlRotatef -moonOrbitRotation, 0.0f, 1.0f, 0.0f     #  Rotation for Moon orbit around Earth inverted
-    rlRotatef moonRotation, 0.0f, 1.0f, 0.0f           #  Rotation for Moon itself
-    rlScalef moonRadius, moonRadius, moonRadius        #  Scale Moon
+    rotatef moonOrbitRotation, 0.0f, 1.0f, 0.0f      #  Rotation for Moon orbit around Earth
+    translatef moonOrbitRadius, 0.0f, 0.0f           #  Translation for Moon orbit
+    rotatef -moonOrbitRotation, 0.0f, 1.0f, 0.0f     #  Rotation for Moon orbit around Earth inverted
+    rotatef moonRotation, 0.0f, 1.0f, 0.0f           #  Rotation for Moon itself
+    scalef moonRadius, moonRadius, moonRadius        #  Scale Moon
 
-    LIGHTGRAY.DrawSphereBasic                          #  Draw the Moon
-    rlPopMatrix()
+    Lightgray.drawSphereBasic                          #  Draw the Moon
+    popMatrix()
 
     #  Some reference elements (not affected by previous matrix transformations)
-    DrawCircle3D Vector3(x: 0.0, y: 0.0, z: 0.0), earthOrbitRadius, Vector3(x: 1, y: 0, z: 0), 90.0f, Fade(RED, 0.5)
-    DrawGrid 20, 1.0f
+    drawCircle3D Vector3(x: 0.0, y: 0.0, z: 0.0), earthOrbitRadius, Vector3(x: 1, y: 0, z: 0), 90.0f, fade(RED, 0.5)
+    drawGrid 20, 1.0f
 
-    EndMode3D()
+    endMode3D()
 
-    DrawText "EARTH ORBITING AROUND THE SUN!", 400, 10, 20, MAROON 
-    DrawFPS 10, 10 
+    drawText "EARTH ORBITING AROUND THE SUN!", 400, 10, 20, MAROON
+    drawFPS 10, 10
 
-    EndDrawing()
+    endDrawing()
     # ----------------------------------------------------------------------------------
 
 #  De-Initialization
 # --------------------------------------------------------------------------------------
-CloseWindow()        #  Close window and OpenGL context
+closeWindow()        #  Close window and OpenGL context
 # --------------------------------------------------------------------------------------
 
 # --------------------------------------------------------------------------------------------
@@ -126,33 +126,33 @@ CloseWindow()        #  Close window and OpenGL context
 
 #  Draw sphere without any matrix transformation
 #  NOTE: Sphere is drawn in world position ( 0, 0, 0 ) with radius 1.0f
-proc DrawSphereBasic(color: Color) =
+proc drawSphereBasic(color: Color) =
     const
         rings = 16
         slices = 16
 
-    rlBegin RL_TRIANGLES
-    rlColor4ub color.r, color.g, color.b, color.a
+    begin Triangles
+    color4ub color.r, color.g, color.b, color.a
 
     for i in 0..<rings+2:
         for j in 0..<slices:
-            rlVertex3f(cos(DEG2RAD*(270+(180/(rings + 1))*i))*sin(DEG2RAD*(j*360/slices)),
-                       sin(DEG2RAD*(270+(180/(rings + 1))*i)),
-                       cos(DEG2RAD*(270+(180/(rings + 1))*i))*cos(DEG2RAD*(j*360/slices)))
-            rlVertex3f(cos(DEG2RAD*(270+(180/(rings + 1))*(i+1)))*sin(DEG2RAD*((j+1)*360/slices)),
-                       sin(DEG2RAD*(270+(180/(rings + 1))*(i+1))),
-                       cos(DEG2RAD*(270+(180/(rings + 1))*(i+1)))*cos(DEG2RAD*((j+1)*360/slices)))
-            rlVertex3f(cos(DEG2RAD*(270+(180/(rings + 1))*(i+1)))*sin(DEG2RAD*(j*360/slices)),
-                       sin(DEG2RAD*(270+(180/(rings + 1))*(i+1))),
-                       cos(DEG2RAD*(270+(180/(rings + 1))*(i+1)))*cos(DEG2RAD*(j*360/slices)))
+            vertex3f(cos(degToRad(270+(180/(rings + 1))*i))*sin(degToRad(j*360/slices)),
+                       sin(degToRad(270+(180/(rings + 1))*i)),
+                       cos(degToRad(270+(180/(rings + 1))*i))*cos(degToRad(j*360/slices)))
+            vertex3f(cos(degToRad(270+(180/(rings + 1))*(i+1)))*sin(degToRad((j+1)*360/slices)),
+                       sin(degToRad(270+(180/(rings + 1))*(i+1))),
+                       cos(degToRad(270+(180/(rings + 1))*(i+1)))*cos(degToRad((j+1)*360/slices)))
+            vertex3f(cos(degToRad(270+(180/(rings + 1))*(i+1)))*sin(degToRad(j*360/slices)),
+                       sin(degToRad(270+(180/(rings + 1))*(i+1))),
+                       cos(degToRad(270+(180/(rings + 1))*(i+1)))*cos(degToRad(j*360/slices)))
 
-            rlVertex3f(cos(DEG2RAD*(270+(180/(rings + 1))*i))*sin(DEG2RAD*(j*360/slices)),
-                       sin(DEG2RAD*(270+(180/(rings + 1))*i)),
-                       cos(DEG2RAD*(270+(180/(rings + 1))*i))*cos(DEG2RAD*(j*360/slices)))
-            rlVertex3f(cos(DEG2RAD*(270+(180/(rings + 1))*(i)))*sin(DEG2RAD*((j+1)*360/slices)),
-                       sin(DEG2RAD*(270+(180/(rings + 1))*(i))),
-                       cos(DEG2RAD*(270+(180/(rings + 1))*(i)))*cos(DEG2RAD*((j+1)*360/slices)))
-            rlVertex3f(cos(DEG2RAD*(270+(180/(rings + 1))*(i+1)))*sin(DEG2RAD*((j+1)*360/slices)),
-                       sin(DEG2RAD*(270+(180/(rings + 1))*(i+1))),
-                       cos(DEG2RAD*(270+(180/(rings + 1))*(i+1)))*cos(DEG2RAD*((j+1)*360/slices)))
-    rlEnd()
+            vertex3f(cos(degToRad(270+(180/(rings + 1))*i))*sin(degToRad(j*360/slices)),
+                       sin(degToRad(270+(180/(rings + 1))*i)),
+                       cos(degToRad(270+(180/(rings + 1))*i))*cos(degToRad(j*360/slices)))
+            vertex3f(cos(degToRad(270+(180/(rings + 1))*(i)))*sin(degToRad((j+1)*360/slices)),
+                       sin(degToRad(270+(180/(rings + 1))*(i))),
+                       cos(degToRad(270+(180/(rings + 1))*(i)))*cos(degToRad((j+1)*360/slices)))
+            vertex3f(cos(degToRad(270+(180/(rings + 1))*(i+1)))*sin(degToRad((j+1)*360/slices)),
+                       sin(degToRad(270+(180/(rings + 1))*(i+1))),
+                       cos(degToRad(270+(180/(rings + 1))*(i+1)))*cos(degToRad((j+1)*360/slices)))
+    rlgl.end()

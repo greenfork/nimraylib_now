@@ -1,8 +1,10 @@
 import httpclient, asyncdispatch
-import strutils, strformat, sequtils
+import strutils, strformat
+from sequtils import any
 from os import `/`, fileExists, extractFilename
 from osproc import execCmd
 from parseutils import skipWhitespace
+from sugar import `=>`
 import regex
 
 
@@ -103,6 +105,11 @@ const
     "PI", # already in math module
     "DEG2RAD", # already in math module
     "RAD2DEG", # already in math module
+    "SpriteFont", # deprecated?
+    "LOC_MAP_DIFFUSE", # deprecated?
+    "LOC_MAP_SPECULAR", # deprecated?
+    "MAP_DIFFUSE", # deprecated?
+    "MAP_SPECULAR", # deprecated?
   ]
   raylibHeader = """
 const LEXT* = when defined(windows):".dll"
@@ -116,9 +123,11 @@ block attempt3:
     # #define LIGHTGRAY  CLITERAL(Color){ 200, 200, 200, 255 }   // Light Gray
     reDefineColor = re"^#define ([[:word:]]+)\s*CLITERAL\(Color\)\{ (\d+), (\d+), (\d+), (\d+) \}.*"
     # typedef struct rAudioBuffer rAudioBuffer;
-    reEmptyStructDef = re"^typedef struct ([[:word:]]+) ([[:word:]]+);"
+    reEmptyStructDef = re"^typedef struct ([[:word:]]+) ([[:word:]]+);.*"
     # typedef enum {
     typedefEnumStart = re"^typedef enum \{.*"
+    # typedef enum { OPENGL_11 = 1, OPENGL_21, OPENGL_33, OPENGL_ES_20 } GlVersion;
+    typedefEnumOneline = re"^typedef enum \{.*\} ([[:word:]]+);.*"
     # } ConfigFlag;
     typedefEnd = re"^\} (\w+);"
   const
@@ -127,6 +136,8 @@ block attempt3:
 #  def RLAPI
 #  dynlib raylibdll
 #  cdecl
+#  nep1
+#  skipinclude
 #  if defined(windows)
 #    define raylibdll "libraylib.dll"
 #  elif defined(macosx)
@@ -135,20 +146,44 @@ block attempt3:
 #    define raylibdll "libraylib.so"
 #  endif
 #@
-# converter uint8ToCuchar*(self: uint8): cuchar = self.cuchar
-# converter CintToCuchar*(self: cint): cuchar = self.cuchar
-type va_list* = varargs[cstring, `$`]
+type VaList* {.importc, header: "<stdarg.h>".} = object
 @#
 #endif
 """
-  const ignoreDirectives = ["#define", "#include"]
-  const raylibFiles = [("raylib", raylibHeader)]
+    rlglHeader = """
+#ifdef C2NIM
+#  def RLAPI
+#  dynlib raylibdll
+#  cdecl
+#  nep1
+#  skipinclude
+#  prefix rlgl
+#  prefix rl
+#  prefix RL_
+#  if defined(windows)
+#    define raylibdll "libraylib.dll"
+#  elif defined(macosx)
+#    define raylibdll "libraylib.dylib"
+#  else
+#    define raylibdll "libraylib.so"
+#  endif
+#@
+import raylib
+@#
+#endif
+"""
+  const
+    raylibFiles = [
+      ("raylib", raylibHeader),
+      ("rlgl", rlglHeader),
+    ]
+    selfModuleDeclarationName = ["RAYLIB_H", "RLGL_H"]
 
 
   # Start processing all files
   for (filename, c2nimheader) in raylibFiles:
 
-    # Preprocessing
+    # Preprocessing of C header file before feeding it to c2nim
 
     block preprocessing:
       let
@@ -166,6 +201,9 @@ type va_list* = varargs[cstring, `$`]
           line = raylibhLines[i]
           words = line.splitWhitespace
         if "RAYLIB_H" in words: discard # skip all self-header module definitions
+        if selfModuleDeclarationName.any((name) => name in words):
+          echo "Ignore: " & line
+          discard # skip all self-header module definitions
         elif line.match(reDefineColor, m):
           let
             colorName = m.groupFirstCapture(0, line)
@@ -185,13 +223,17 @@ type va_list* = varargs[cstring, `$`]
         elif line.match(typedefEnumStart):
           # C uses enums in place of int32 numbers, so every enum takes an
           # appropriate converter to translate types in Nim implicitly
-          var
-            enumEnd = i + 1
-            enumEndLine = raylibhLines[enumEnd]
-          while not enumEndLine.match(typedefEnd, m):
-            enumEnd.inc
-            enumEndLine = raylibhLines[enumEnd]
-          let enumName = m.groupFirstCapture(0, enumEndLine)
+          let enumName =
+            if line.match(typedefEnumOneline, m):
+              m.groupFirstCapture(0, line)
+            else:
+              var
+                enumEnd = i + 1
+                enumEndLine = raylibhLines[enumEnd]
+              while not enumEndLine.match(typedefEnd, m):
+                enumEnd.inc
+                enumEndLine = raylibhLines[enumEnd]
+              m.groupFirstCapture(0, enumEndLine)
           appendToVeryEnd.add(
             fmt("converter {enumName}ToInt32*(self: {enumName}): int32 = self.int32\n")
           )
@@ -207,7 +249,7 @@ type va_list* = varargs[cstring, `$`]
               nestLevels.dec
             elif firstWord == "#if" or firstWord == "#ifndef":
               nestLevels.inc
-        elif words.len > 0 and words[0] in ignoreDirectives:
+        elif words.len > 1 and words[0] == "#define" and words[1] in ignoreDefines:
           echo "Ignore: " & line
         else:
           rs.add line & "\n"
@@ -229,7 +271,7 @@ type va_list* = varargs[cstring, `$`]
     assert execCmd("c2nim raylib"/fmt"{filename}_modified.h") == 0
 
 
-    # Postprocessing
+    # Postprocessing of generated nim file by c2nim
 
     block postprocessing:
       let
@@ -242,10 +284,21 @@ type va_list* = varargs[cstring, `$`]
       var i = 0
       while i < raylibnimLines.len:
         var line = raylibnimLines[i].multiReplace(
+          # According to definitions in compiler Nim/lib/system.nim
           ("cint", "int32"),
+          ("cschar", "int8"),
+          ("cshort", "int16"),
+          ("cint", "int32"),
+          ("csize", "int"),
+          ("csize_t", "uint"),
+          ("clonglong", "int64"),
           ("cfloat", "float32"),
-          ("cuchar", "uint8"),
+          ("cdouble", "float64"),
+          ("clongdouble", "BiggestFloat"),
+          ("cuchar", "uint8"), # digression from how compiler defines it
+          ("cushort", "uint16"),
           ("cuint", "uint32"),
+          ("culonglong", "uint64"),
         )
         rs.add line & "\n"
         i.inc
