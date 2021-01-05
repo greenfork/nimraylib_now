@@ -111,12 +111,14 @@ block attempt2:
     multilineCommentStart = re"^/\*"
     multilineCommentEnd = re"\*/$"
     onelineComment = re"^\s*(//).+"
-    defineExpr = re"\s*#define(?:\s+(\S+))+"
-    typedefStructStart = re"typedef struct ([[:word:]]+) \{.*"
-    typedefEmptyStruct = re"typedef struct ([[:word:]]+) ([[:word:]]+);"
-    typedefAlias = re"typedef ([[:word:]]+) ([[:word:]]+);.*"
-    typedefEnd = re"\} (\w+);"
-    typedefFieldList = re"\s*((?:[[:word:]]+)\s)+(?:([[:word:]*\[\]]+)(?:, )?)+;.*"
+    defineExpr = re"^\s*#define(?:\s+(\S+))+"
+    typedefStructStart = re"^typedef struct ([[:word:]]+) \{.*"
+    typedefEmptyStruct = re"^typedef struct ([[:word:]]+) ([[:word:]]+);"
+    typedefAlias = re"^typedef ([[:word:]]+) ([[:word:]]+);.*"
+    typedefEnumStart = re"^typedef enum \{.*"
+    typedefEnd = re"^\} (\w+);"
+    typedefFieldList = re"^\s*((?:[[:word:]]+)\s)+(?:([[:word:]*\[\]]+)(?:, )?)+;.*"
+    typedefEnumEntry = re"^\s*([[:word:]]+)\s*(?:=\s((?:0x)?[[:xdigit:]]+),?)?.*"
 
   type
     RaylibParser = object
@@ -162,7 +164,7 @@ block attempt2:
       if parser.line < 0:
         parser.line.inc
         continue
-      if parser.line > 483:
+      if parser.line > 874:
         break
 
       let line = parser.buf[parser.line]
@@ -178,6 +180,7 @@ block attempt2:
             parser.line.inc
             o '#' & commentLine
       elif onelineComment in line:
+        trailingComment = ""
         o line.replace("//", "#")
       elif line.match(defineExpr, m) and
            m.groupFirstCapture(0, line) notin ignoreDefines:
@@ -226,6 +229,37 @@ block attempt2:
             else:
               o ""
           parser.line = typedefEndLine
+      elif line.match(typedefEnumStart, m):
+        # Find where type definition ends
+        var typedefEndLine = parser.line
+        while not parser.buf[typedefEndLine].match(typedefEnd, m):
+          typedefEndLine.inc
+        let typename = m.groupFirstCapture(0, parser.buf[typedefEndLine])
+        o fmt"type {typename}* = enum"
+        # Convert fields
+        for i in (parser.line+1)..<typedefEndLine:
+          trailingComment = ""
+          let typedefEnumLine = parser.buf[i]
+          if typedefEnumLine.match(typedefEnumEntry, m):
+            trailingComment = parseTrailingComment(typedefEnumLine)
+            var entry = "  "
+            var ident = m.groupFirstCapture(0, typedefEnumLine)
+            ident[0] = ident[0].toLowerAscii
+            ident = ident.nimIdentNormalize
+            entry.add ident
+            let value = m.groupFirstCapture(1, typedefEnumLine)
+            if value.len > 0:
+              entry.add fmt" = {value}"
+            o entry
+          elif onelineComment in typedefEnumLine:
+            o typedefEnumLine.replace("//", "#")
+          elif typedefEnumLine.len > 0:
+            o '#' & typedefEnumLine
+          else:
+            o ""
+        parser.line = typedefEndLine
+        trailingComment = ""
+        o fmt"converter {typename}Toint32* (self: {typename}): int32 = self.int32"
       elif line.len > 0:
         trailingComment = ""
         o "#" & line
