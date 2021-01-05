@@ -10,7 +10,7 @@
 #
 #*******************************************************************************************
 
-import raylib, lenientops
+import ../../raylib/raylib, lenientops
 
 const MAX_CIRCLES = 64
 
@@ -40,12 +40,12 @@ var circles: array[MAX_CIRCLES, CircleWave]
 for i in (MAX_CIRCLES-1).countdown 0:
     circles[i].alpha = 0.0f;
     circles[i].radius = GetRandomValue(10, 40).float
-    circles[i].position.x = GetRandomValue(circles[i].radius.int, screenWidth - circles[i].radius.int).float
-    circles[i].position.y = GetRandomValue(circles[i].radius.int, screenHeight - circles[i].radius.int).float
+    circles[i].position.x = GetRandomValue(circles[i].radius.int32, screenWidth - circles[i].radius.int32).float
+    circles[i].position.y = GetRandomValue(circles[i].radius.int32, screenHeight - circles[i].radius.int32).float
     circles[i].speed = (float)GetRandomValue(1, 100)/2000.0f
     circles[i].color = colors[GetRandomValue(0, 13)]
 
-let music = LoadMusicStream("resources/mini1111.xm")
+let music = LoadMusicStream("./resources/mini1111.xm")
 
 PlayMusicStream music
 
@@ -88,8 +88,8 @@ while not WindowShouldClose():    #  Detect window close button or ESC key
         if (circles[i].alpha <= 0.0f):
             circles[i].alpha = 0.0f;
             circles[i].radius = GetRandomValue(10, 40).float
-            circles[i].position.x = GetRandomValue(circles[i].radius.int, screenWidth - circles[i].radius.int).float
-            circles[i].position.y = GetRandomValue(circles[i].radius.int, screenHeight - circles[i].radius.int).float
+            circles[i].position.x = GetRandomValue(circles[i].radius.int32, screenWidth - circles[i].radius.int32).float
+            circles[i].position.y = GetRandomValue(circles[i].radius.int32, screenHeight - circles[i].radius.int32).float
             circles[i].color = colors[GetRandomValue(0, 13)];
             circles[i].speed = (float)GetRandomValue(1, 100)/2000.0f;
     # ----------------------------------------------------------------------------------
@@ -105,7 +105,7 @@ while not WindowShouldClose():    #  Detect window close button or ESC key
 
     #  Draw time bar
     DrawRectangle 20, screenHeight - 20 - 12, screenWidth - 40, 12, LIGHTGRAY
-    DrawRectangle 20, screenHeight - 20 - 12, timePlayed.int, 12, MAROON
+    DrawRectangle 20, screenHeight - 20 - 12, timePlayed.int32, 12, MAROON
     DrawRectangleLines 20, screenHeight - 20 - 12, screenWidth - 40, 12, GRAY
 
     EndDrawing()

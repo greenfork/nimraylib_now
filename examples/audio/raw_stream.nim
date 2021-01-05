@@ -12,7 +12,7 @@
 #
 #*******************************************************************************************
 
-import raylib, math, lenientops
+import ../../raylib/raylib, math, lenientops
 
 const MAX_SAMPLES            = 512
 const MAX_SAMPLES_PER_UPDATE = 4096

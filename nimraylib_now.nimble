@@ -20,9 +20,5 @@ task dorun, "run":
 task c2nim, "run with c2nim":
   echo "Executing nim r\n"
   exec "nim r src/nimraylib_now"
-  # echo "\nExecuting c2nim\n"
-  # exec "c2nim raylib/raylib_modified.h -o:raylib/raylib.nim"
   echo "\nExecuting nim check\n"
   exec "nim check raylib/raylib.nim"
-  echo "\nRunning examples\n"
-  exec "nim r examples/core/input_keys.nim"

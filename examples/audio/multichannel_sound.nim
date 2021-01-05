@@ -12,7 +12,7 @@
 #
 #*******************************************************************************************
 
-import raylib
+import ../../raylib/raylib
 
 #  Initialization
 # --------------------------------------------------------------------------------------
@@ -45,7 +45,7 @@ while not WindowShouldClose():  #  Detect window close button or ESC key
     BeginDrawing()
 
     ClearBackground RAYWHITE
-    
+
     DrawText "MULTICHANNEL SOUND PLAYING", 20, 20, 20, GRAY
     DrawText "Press SPACE to play new ogg instance!", 200, 120, 20, LIGHTGRAY
     DrawText "Press ENTER to play new wav instance!", 200, 180, 20, LIGHTGRAY
