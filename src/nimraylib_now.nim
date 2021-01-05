@@ -1,6 +1,7 @@
 import httpclient, asyncdispatch
 import strutils, strformat, sequtils
 from os import `/`, fileExists, extractFilename
+from osproc import execCmd
 from parseutils import skipWhitespace
 import regex
 
@@ -73,6 +74,10 @@ func convertType(t: string, varname: string): string =
 func fmtConst(s: string): string =
   s.toLowerAscii.capitalizeAscii
 
+func peekFirst(ss: seq[string]): string =
+  if ss.len > 0: ss[0]
+  else: ""
+
 func maybeChangeName(s: string): string =
   result = s
   if result in ["ptr", "type"]: result.add 'x'
@@ -107,7 +112,140 @@ else:                               ".so"
 """
 
 block attempt3:
-  echo 1
+  const
+    # #define LIGHTGRAY  CLITERAL(Color){ 200, 200, 200, 255 }   // Light Gray
+    reDefineColor = re"^#define ([[:word:]]+)\s*CLITERAL\(Color\)\{ (\d+), (\d+), (\d+), (\d+) \}.*"
+    # typedef struct rAudioBuffer rAudioBuffer;
+    reEmptyStructDef = re"^typedef struct ([[:word:]]+) ([[:word:]]+);"
+    # typedef enum {
+    typedefEnumStart = re"^typedef enum \{.*"
+    # } ConfigFlag;
+    typedefEnd = re"^\} (\w+);"
+  const raylibHeader = """
+#ifdef C2NIM
+#  def RLAPI
+#  dynlib raylibdll
+#  cdecl
+#  if defined(windows)
+#    define raylibdll "libraylib.dll"
+#  elif defined(macosx)
+#    define raylibdll "libraylib.dylib"
+#  else
+#    define raylibdll "libraylib.so"
+#  endif
+#@
+# converter uint8ToCuchar*(self: uint8): cuchar = self.cuchar
+# converter CintToCuchar*(self: cint): cuchar = self.cuchar
+type va_list* = varargs[cstring, `$`]
+@#
+#endif
+"""
+  const ignoreDirectives = ["#define", "#include"]
+
+
+  # Preprocessing
+
+  block preprocessing:
+    let
+      raylibh = readFile("raylib"/"raylib.h")
+      raylibhLines = raylibh.splitLines
+    var
+      rs: string
+      appendToVeryEnd: string # e.g. for #define->const conversion
+      m: RegexMatch
+    rs.add raylibHeader
+    var i = 0
+    while i < raylibhLines.len:
+      # if i > 91: break
+      let
+        line = raylibhLines[i]
+        words = line.splitWhitespace
+      if "RAYLIB_H" in words: discard # skip all self-header module definitions
+      elif line.match(reDefineColor, m):
+        let
+          colorName = m.groupFirstCapture(0, line)
+          red = m.groupFirstCapture(1, line)
+          green = m.groupFirstCapture(2, line)
+          blue = m.groupFirstCapture(3, line)
+          alpha = m.groupFirstCapture(4, line)
+        appendToVeryEnd.add fmt"const {colorName.fmtConst}* = " &
+          fmt("Color(r: {red}, g: {green}, b: {blue}, a: {alpha})\n")
+      elif line.match(reEmptyStructDef, m):
+        # c2nim can't parse it without {} in the middle
+        # this seems as a forward declaration of a struct but no further
+        # declaration actually happens
+        let typename = m.groupFirstCapture(0, line)
+        assert m.groupFirstCapture(1, line) == typename, "wrong typename: " & $i
+        rs.add fmt"typedef struct {typename} {{}} {typename};"
+      elif line.match(typedefEnumStart):
+        # C uses enums in place of int32 numbers, so every enum takes an
+        # appropriate converter to translate types in Nim implicitly
+        var
+          enumEnd = i + 1
+          enumEndLine = raylibhLines[enumEnd]
+        while not enumEndLine.match(typedefEnd, m):
+          enumEnd.inc
+          enumEndLine = raylibhLines[enumEnd]
+        let enumName = m.groupFirstCapture(0, enumEndLine)
+        appendToVeryEnd.add(
+          fmt("converter {enumName}ToInt32*(self: {enumName}): int32 = self.int32\n")
+        )
+        # Remember to still add this line
+        rs.add line & "\n"
+      elif words.len > 0 and (words[0] == "#if" or words[0] == "#ifndef"):
+        echo "Ignore branch: " & line
+        var nestLevels = 1
+        while nestLevels > 0:
+          i.inc
+          let firstWord = raylibhLines[i].splitWhitespace.peekFirst
+          if firstWord == "#endif":
+            nestLevels.dec
+          elif firstWord == "#if" or firstWord == "#ifndef":
+            nestLevels.inc
+      elif words.len > 0 and words[0] in ignoreDirectives:
+        echo "Ignore: " & line
+      else:
+        rs.add line & "\n"
+      i.inc
+
+    rs.add fmt"""
+#ifdef C2NIM
+#@
+{appendToVeryEnd}
+@#
+#endif
+"""
+    writeFile("raylib"/"raylib_modified.h", rs)
+
+
+  # Processing with c2nim
+
+  echo "\nExecuting c2nim\n"
+  assert execCmd("c2nim raylib/raylib_modified.h") == 0
+
+
+  # Postprocessing
+
+  block postprocessing:
+    let
+      raylibnim = readFile("raylib"/"raylib_modified.nim")
+      raylibnimLines = raylibnim.splitLines
+    var
+      rs: string
+      appendToVeryEnd: string # e.g. for #define->const conversion
+      m: RegexMatch
+    var i = 0
+    while i < raylibnimLines.len:
+      var line = raylibnimLines[i].multiReplace(
+        ("cint", "int32"),
+        ("cfloat", "float32"),
+        ("cuchar", "uint8"),
+        ("cuint", "uint32"),
+      )
+      rs.add line & "\n"
+      i.inc
+
+    writeFile("raylib"/"raylib.nim", rs)
 
 # block attempt2:
 #   const
