@@ -106,170 +106,173 @@ else:                               ".so"
 {.pragma: RLAPI, cdecl, discardable, dynlib: "libraylib" & LEXT.}
 """
 
-block attempt2:
-  const
-    multilineCommentStart = re"^/\*"
-    multilineCommentEnd = re"\*/$"
-    onelineComment = re"^\s*(//).+"
-    defineExpr = re"^\s*#define(?:\s+(\S+))+"
-    typedefStructStart = re"^typedef struct ([[:word:]]+) \{.*"
-    typedefEmptyStruct = re"^typedef struct ([[:word:]]+) ([[:word:]]+);"
-    typedefAlias = re"^typedef ([[:word:]]+) ([[:word:]]+);.*"
-    typedefEnumStart = re"^typedef enum \{.*"
-    typedefEnd = re"^\} (\w+);"
-    typedefFieldList = re"^\s*((?:[[:word:]]+)\s)+(?:([[:word:]*\[\]]+)(?:, )?)+;.*"
-    typedefEnumEntry = re"^\s*([[:word:]]+)\s*(?:=\s((?:0x)?[[:xdigit:]]+),?)?.*"
+block attempt3:
+  echo 1
 
-  type
-    RaylibParser = object
-      filepath: string
-      line: int
-      buf: seq[string]
+# block attempt2:
+#   const
+#     multilineCommentStart = re"^/\*"
+#     multilineCommentEnd = re"\*/$"
+#     onelineComment = re"^\s*(//).+"
+#     defineExpr = re"^\s*#define(?:\s+(\S+))+"
+#     typedefStructStart = re"^typedef struct ([[:word:]]+) \{.*"
+#     typedefEmptyStruct = re"^typedef struct ([[:word:]]+) ([[:word:]]+);"
+#     typedefAlias = re"^typedef ([[:word:]]+) ([[:word:]]+);.*"
+#     typedefEnumStart = re"^typedef enum \{.*"
+#     typedefEnd = re"^\} (\w+);"
+#     typedefFieldList = re"^\s*((?:[[:word:]]+)\s)+(?:([[:word:]*\[\]]+)(?:, )?)+;.*"
+#     typedefEnumEntry = re"^\s*([[:word:]]+)\s*(?:=\s((?:0x)?[[:xdigit:]]+),?)?.*"
 
-  proc parseFile(filepath: string, writeToFile = false) =
-    let targetFile = filepath.replace(".h", ".nim")
-    var
-      parser = RaylibParser(
-        filepath: filepath,
-        buf: readFile(filepath).split("\n")
-      )
-      output: File
-      m: RegexMatch # for future parsing
-      trailingComment: string # auto-inserted in `o` proc
-      appendToVeryEnd: string # e.g. for #define->const conversion there
-                              # should be types above in the code
-    if writeToFile: output = open(targetFile, fmWrite)
+#   type
+#     RaylibParser = object
+#       filepath: string
+#       line: int
+#       buf: seq[string]
 
-    # Output to file or stdout
-    proc o(s: string) =
-      var rs: string
-      rs.add s
-      if trailingComment.len > 0:
-        if s.len > 0: rs.add ' '
-        rs.add "#" & trailingComment
-      if writeToFile:
-        rs.add "\n"
-        output.write rs
-      else:
-        echo rs
+#   proc parseFile(filepath: string, writeToFile = false) =
+#     let targetFile = filepath.replace(".h", ".nim")
+#     var
+#       parser = RaylibParser(
+#         filepath: filepath,
+#         buf: readFile(filepath).split("\n")
+#       )
+#       output: File
+#       m: RegexMatch # for future parsing
+#       trailingComment: string # auto-inserted in `o` proc
+#       appendToVeryEnd: string # e.g. for #define->const conversion there
+#                               # should be types above in the code
+#     if writeToFile: output = open(targetFile, fmWrite)
 
-    func parseTrailingComment(line: string): string =
-      var parsed = line.split("//")
-      if parsed.len > 1:
-        parsed[1..^1].join
-      else:
-        ""
+#     # Output to file or stdout
+#     proc o(s: string) =
+#       var rs: string
+#       rs.add s
+#       if trailingComment.len > 0:
+#         if s.len > 0: rs.add ' '
+#         rs.add "#" & trailingComment
+#       if writeToFile:
+#         rs.add "\n"
+#         output.write rs
+#       else:
+#         echo rs
 
-    while parser.line < parser.buf.len:
-      if parser.line < 0:
-        parser.line.inc
-        continue
-      if parser.line > 874:
-        break
+#     func parseTrailingComment(line: string): string =
+#       var parsed = line.split("//")
+#       if parsed.len > 1:
+#         parsed[1..^1].join
+#       else:
+#         ""
 
-      let line = parser.buf[parser.line]
-      trailingComment = parseTrailingComment(line)
+#     while parser.line < parser.buf.len:
+#       if parser.line < 0:
+#         parser.line.inc
+#         continue
+#       if parser.line > 874:
+#         break
 
-      if multilineCommentStart in line:
-        while parser.line < parser.buf.len:
-          let commentLine = parser.buf[parser.line]
-          if multilineCommentEnd in commentLine:
-            o '#' & commentLine
-            break
-          else:
-            parser.line.inc
-            o '#' & commentLine
-      elif onelineComment in line:
-        trailingComment = ""
-        o line.replace("//", "#")
-      elif line.match(defineExpr, m) and
-           m.groupFirstCapture(0, line) notin ignoreDefines:
-        let matches = m.group(0, line)
-        if matches[0] == "RAYLIB_H":
-          o raylibHeader
-        elif matches.len > 1 and matches[1] == "CLITERAL(Color){":
-          appendToVeryEnd.add fmt"const {matches[0].fmtConst}* = " &
-            fmt("Color(r: {matches[2]} g: {matches[3]} b: {matches[4]} a: {matches[5]})\n")
-        else:
-          o fmt"template {matches[0]}*(): auto = {matches[1]}"
-      elif line.match(typedefAlias, m):
-        o fmt"type {m.groupFirstCapture(1, line)}* = {m.groupFirstCapture(0, line)}"
-      elif line.match(typedefStructStart, m) or line.match(typedefEmptyStruct, m):
-        let typename = m.groupFirstCapture(0, line)
-        o fmt"type {typename}* {{.bycopy.}} = object"
-        # If this is not empty struct definition
-        if typedefEmptyStruct notin line:
-          # Find where type definition ends
-          var typedefEndLine = parser.line
-          while not parser.buf[typedefEndLine].match(typedefEnd, m):
-            typedefEndLine.inc
-          assert typename == m.groupFirstCapture(0, parser.buf[typedefEndLine]),
-                 "wrong typedef ending"
-          # Convert fields
-          for i in (parser.line+1)..<typedefEndLine:
-            trailingComment = ""
-            let typedefFieldsLine = parser.buf[i]
-            if typedefFieldsLine.match(typedefFieldList, m):
-              trailingComment = parseTrailingComment(typedefFieldsLine)
-              let
-                fieldType = m.group(0, typedefFieldsLine).join.strip
-                firstFieldName = m.groupFirstCapture(1, typedefFieldsLine).strip
-              var fields = "  "
-              fields.add m.group(1, typedefFieldsLine)
-                          .mapIt(it.strip(chars = {'*'})
-                                   .maybeArrayField
-                                   .maybeChangeName & '*')
-                          .join(", ")
-              fields.add convertType(fieldType, firstFieldName)
-              o fields
-            elif onelineComment in typedefFieldsLine:
-              o typedefFieldsLine.replace("//", "#")
-            elif typedefFieldsLine.len > 0:
-              o '#' & typedefFieldsLine
-            else:
-              o ""
-          parser.line = typedefEndLine
-      elif line.match(typedefEnumStart, m):
-        # Find where type definition ends
-        var typedefEndLine = parser.line
-        while not parser.buf[typedefEndLine].match(typedefEnd, m):
-          typedefEndLine.inc
-        let typename = m.groupFirstCapture(0, parser.buf[typedefEndLine])
-        o fmt"type {typename}* = enum"
-        # Convert fields
-        for i in (parser.line+1)..<typedefEndLine:
-          trailingComment = ""
-          let typedefEnumLine = parser.buf[i]
-          if typedefEnumLine.match(typedefEnumEntry, m):
-            trailingComment = parseTrailingComment(typedefEnumLine)
-            var entry = "  "
-            var ident = m.groupFirstCapture(0, typedefEnumLine)
-            ident[0] = ident[0].toLowerAscii
-            ident = ident.nimIdentNormalize
-            entry.add ident
-            let value = m.groupFirstCapture(1, typedefEnumLine)
-            if value.len > 0:
-              entry.add fmt" = {value}"
-            o entry
-          elif onelineComment in typedefEnumLine:
-            o typedefEnumLine.replace("//", "#")
-          elif typedefEnumLine.len > 0:
-            o '#' & typedefEnumLine
-          else:
-            o ""
-        parser.line = typedefEndLine
-        trailingComment = ""
-        o fmt"converter {typename}Toint32* (self: {typename}): int32 = self.int32"
-      elif line.len > 0:
-        trailingComment = ""
-        o "#" & line
-      else:
-        o ""
+#       let line = parser.buf[parser.line]
+#       trailingComment = parseTrailingComment(line)
 
-      parser.line.inc
-    o appendToVeryEnd
+#       if multilineCommentStart in line:
+#         while parser.line < parser.buf.len:
+#           let commentLine = parser.buf[parser.line]
+#           if multilineCommentEnd in commentLine:
+#             o '#' & commentLine
+#             break
+#           else:
+#             parser.line.inc
+#             o '#' & commentLine
+#       elif onelineComment in line:
+#         trailingComment = ""
+#         o line.replace("//", "#")
+#       elif line.match(defineExpr, m) and
+#            m.groupFirstCapture(0, line) notin ignoreDefines:
+#         let matches = m.group(0, line)
+#         if matches[0] == "RAYLIB_H":
+#           o raylibHeader
+#         elif matches.len > 1 and matches[1] == "CLITERAL(Color){":
+#           appendToVeryEnd.add fmt"const {matches[0].fmtConst}* = " &
+#             fmt("Color(r: {matches[2]} g: {matches[3]} b: {matches[4]} a: {matches[5]})\n")
+#         else:
+#           o fmt"template {matches[0]}*(): auto = {matches[1]}"
+#       elif line.match(typedefAlias, m):
+#         o fmt"type {m.groupFirstCapture(1, line)}* = {m.groupFirstCapture(0, line)}"
+#       elif line.match(typedefStructStart, m) or line.match(typedefEmptyStruct, m):
+#         let typename = m.groupFirstCapture(0, line)
+#         o fmt"type {typename}* {{.bycopy.}} = object"
+#         # If this is not empty struct definition
+#         if typedefEmptyStruct notin line:
+#           # Find where type definition ends
+#           var typedefEndLine = parser.line
+#           while not parser.buf[typedefEndLine].match(typedefEnd, m):
+#             typedefEndLine.inc
+#           assert typename == m.groupFirstCapture(0, parser.buf[typedefEndLine]),
+#                  "wrong typedef ending"
+#           # Convert fields
+#           for i in (parser.line+1)..<typedefEndLine:
+#             trailingComment = ""
+#             let typedefFieldsLine = parser.buf[i]
+#             if typedefFieldsLine.match(typedefFieldList, m):
+#               trailingComment = parseTrailingComment(typedefFieldsLine)
+#               let
+#                 fieldType = m.group(0, typedefFieldsLine).join.strip
+#                 firstFieldName = m.groupFirstCapture(1, typedefFieldsLine).strip
+#               var fields = "  "
+#               fields.add m.group(1, typedefFieldsLine)
+#                           .mapIt(it.strip(chars = {'*'})
+#                                    .maybeArrayField
+#                                    .maybeChangeName & '*')
+#                           .join(", ")
+#               fields.add convertType(fieldType, firstFieldName)
+#               o fields
+#             elif onelineComment in typedefFieldsLine:
+#               o typedefFieldsLine.replace("//", "#")
+#             elif typedefFieldsLine.len > 0:
+#               o '#' & typedefFieldsLine
+#             else:
+#               o ""
+#           parser.line = typedefEndLine
+#       elif line.match(typedefEnumStart, m):
+#         # Find where type definition ends
+#         var typedefEndLine = parser.line
+#         while not parser.buf[typedefEndLine].match(typedefEnd, m):
+#           typedefEndLine.inc
+#         let typename = m.groupFirstCapture(0, parser.buf[typedefEndLine])
+#         o fmt"type {typename}* = enum"
+#         # Convert fields
+#         for i in (parser.line+1)..<typedefEndLine:
+#           trailingComment = ""
+#           let typedefEnumLine = parser.buf[i]
+#           if typedefEnumLine.match(typedefEnumEntry, m):
+#             trailingComment = parseTrailingComment(typedefEnumLine)
+#             var entry = "  "
+#             var ident = m.groupFirstCapture(0, typedefEnumLine)
+#             ident[0] = ident[0].toLowerAscii
+#             ident = ident.nimIdentNormalize
+#             entry.add ident
+#             let value = m.groupFirstCapture(1, typedefEnumLine)
+#             if value.len > 0:
+#               entry.add fmt" = {value}"
+#             o entry
+#           elif onelineComment in typedefEnumLine:
+#             o typedefEnumLine.replace("//", "#")
+#           elif typedefEnumLine.len > 0:
+#             o '#' & typedefEnumLine
+#           else:
+#             o ""
+#         parser.line = typedefEndLine
+#         trailingComment = ""
+#         o fmt"converter {typename}Toint32* (self: {typename}): int32 = self.int32"
+#       elif line.len > 0:
+#         trailingComment = ""
+#         o "#" & line
+#       else:
+#         o ""
 
-  parseFile("raylib"/"raylib.h", true)
+#       parser.line.inc
+#     o appendToVeryEnd
+
+#   parseFile("raylib"/"raylib.h", true)
 
 
 # block attempt1:
