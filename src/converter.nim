@@ -182,6 +182,7 @@ const
   # For converters which are written before c2nim conversion with proper
   # name mangling. Should converters be written in postprocessing after c2nim?
   namePrefixes = ["rlgl", "rl", "RL_", "Gui", "GUI_", "gui"]
+  targetDirectory = "src"/"nimraylib_now"
 
 
 # Start processing all files
@@ -326,4 +327,4 @@ for (filename, c2nimheader) in raylibFiles:
       rs.add line & "\n"
       i.inc
 
-    writeFile("raylib"/fmt"{filename}.nim", rs)
+    writeFile(targetDirectory/fmt"{filename}.nim", rs)
