@@ -95,6 +95,21 @@ const
 #  cdecl
 #  nep1
 #  skipinclude
+#  prefix FLAG_
+#  prefix LOG_
+#  prefix KEY_
+#  prefix MOUSE_
+#  prefix GAMEPAD_
+#  prefix LOC_
+#  prefix UNIFORM_
+#  prefix MAP_
+#  prefix FILTER_
+#  prefix WRAP_
+#  prefix CUBEMAP_
+#  prefix FONT_
+#  prefix BLEND_
+#  prefix GESTURE_
+#  prefix CAMERA_
 #  if defined(windows)
 #    define raylibdll "libraylib.dll"
 #  elif defined(macosx)

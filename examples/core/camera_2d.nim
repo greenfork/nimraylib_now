@@ -51,13 +51,13 @@ while not windowShouldClose():
     # Update
     #----------------------------------------------------------------------------------
     # Player movement
-    if isKeyDown(KEY_RIGHT):  player.x += 2
-    elif isKeyDown(KEY_LEFT): player.x -= 2
+    if isKeyDown(RIGHT):  player.x += 2
+    elif isKeyDown(LEFT): player.x -= 2
     # Camera target follows player
     camera.target = Vector2(x: player.x + 20, y: player.y + 20)
     # Camera rotation controls
-    if isKeyDown(KEY_A):   camera.rotation -= 1
-    elif isKeyDown(KEY_S): camera.rotation += 1
+    if isKeyDown(A):   camera.rotation -= 1
+    elif isKeyDown(S): camera.rotation += 1
     # Limit camera rotation to 80 degrees (-40 to 40)
     if camera.rotation > 40:    camera.rotation = 40
     elif camera.rotation < -40: camera.rotation = -40
@@ -66,7 +66,7 @@ while not windowShouldClose():
     if camera.zoom > 3.0:   camera.zoom = 3.0
     elif camera.zoom < 0.1: camera.zoom = 0.1
     # Camera reset (zoom and rotation)
-    if isKeyPressed(KEY_R):
+    if isKeyPressed(R):
         camera.zoom     = 1.0
         camera.rotation = 0.0
     #----------------------------------------------------------------------------------

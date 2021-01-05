@@ -27,7 +27,7 @@ camera.position = Vector3(x: 4.0f, y: 2.0f, z: 4.0f)
 camera.target = Vector3(x: 0.0f, y: 1.8f, z: 0.0f)
 camera.up = Vector3(x: 0.0f, y: 1.0f, z: 0.0f)
 camera.fovy = 60.0f
-camera.`type` = CAMERA_PERSPECTIVE
+camera.`type` = Perspective
 
 #  Generates some random columns
 var
@@ -40,7 +40,7 @@ for i in 0..<MaxColumns:
     positions[i] = Vector3(x: getRandomValue(-15, 15).float, y: heights[i]/2, z: getRandomValue(-15, 15).float)
     colors[i] = Color(r: getRandomValue(20, 255).uint8, g: getRandomValue(10, 55).uint8, b: 30, a: 255)
 
-camera.setCameraMode CAMERA_FIRST_PERSON    #  Set a first person camera mode
+camera.setCameraMode FirstPerson    #  Set a first person camera mode
 
 setTargetFPS 60                             #  Set our game to run at 60 frames-per-second
 # --------------------------------------------------------------------------------------
@@ -56,28 +56,28 @@ while not windowShouldClose():              #  Detect window close button or ESC
     # ----------------------------------------------------------------------------------
     beginDrawing()
 
-    clearBackground RAYWHITE
+    clearBackground RayWhite
 
     beginMode3D camera
 
-    drawPlane Vector3(x: 0.0f, y: 0.0f, z: 0.0f), Vector2(x: 32.0f, y: 32.0f), LIGHTGRAY #  Draw ground
-    drawCube Vector3(x: -16.0f, y: 2.5f, z: 0.0f), 1.0f, 5.0f, 32.0f, BLUE               #  Draw a blue wall
-    drawCube Vector3(x: 16.0f, y: 2.5f, z: 0.0f), 1.0f, 5.0f, 32.0f, LIME                #  Draw a green wall
-    drawCube Vector3(x: 0.0f, y: 2.5f, z: 16.0f), 32.0f, 5.0f, 1.0f, GOLD                #  Draw a yellow wall
+    drawPlane Vector3(x: 0.0f, y: 0.0f, z: 0.0f), Vector2(x: 32.0f, y: 32.0f), Lightgray #  Draw ground
+    drawCube Vector3(x: -16.0f, y: 2.5f, z: 0.0f), 1.0f, 5.0f, 32.0f, Blue               #  Draw a blue wall
+    drawCube Vector3(x: 16.0f, y: 2.5f, z: 0.0f), 1.0f, 5.0f, 32.0f, Lime                #  Draw a green wall
+    drawCube Vector3(x: 0.0f, y: 2.5f, z: 16.0f), 32.0f, 5.0f, 1.0f, Gold                #  Draw a yellow wall
 
     #  Draw some cubes around
     for i in 0..<MaxColumns:
         drawCube positions[i], 2.0f, heights[i], 2.0f, colors[i]
-        drawCubeWires positions[i], 2.0f, heights[i], 2.0f, MAROON
+        drawCubeWires positions[i], 2.0f, heights[i], 2.0f, Maroon
 
     endMode3D()
 
-    drawRectangle 10, 10, 220, 70, fade(SKYBLUE, 0.5f)
-    drawRectangleLines 10, 10, 220, 70, BLUE
+    drawRectangle 10, 10, 220, 70, fade(Skyblue, 0.5f)
+    drawRectangleLines 10, 10, 220, 70, Blue
 
-    drawText "First person camera default controls:", 20, 20, 10, BLACK
-    drawText "- Move with keys: W, A, S, D", 40, 40, 10, DARKGRAY
-    drawText "- Mouse move to look around", 40, 60, 10, DARKGRAY
+    drawText "First person camera default controls:", 20, 20, 10, Black
+    drawText "- Move with keys: W, A, S, D", 40, 40, 10, Darkgray
+    drawText "- Mouse move to look around", 40, 60, 10, Darkgray
 
     endDrawing()
     # ----------------------------------------------------------------------------------

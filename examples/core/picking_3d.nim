@@ -25,7 +25,7 @@ camera.position = Vector3(x: 10.0f, y: 10.0f, z: 10.0f)    #  Camera position
 camera.target = Vector3(x: 0.0f, y: 0.0f, z: 0.0f)         #  Camera looking at point
 camera.up = Vector3(x: 0.0f, y: 1.0f, z: 0.0f)             #  Camera up vector (rotation towards target)
 camera.fovy = 45.0f                                        #  Camera field-of-view Y
-camera.`type` = CAMERA_PERSPECTIVE                          #  Camera mode type
+camera.`type` = Perspective                          #  Camera mode type
 
 var
     cubePosition = Vector3(x: 0.0f, y: 1.0f, z: 0.0f)
@@ -35,7 +35,7 @@ var
 
     collision = false
 
-camera.setCameraMode CAMERA_FREE    #  Set a free camera mode
+camera.setCameraMode Free    #  Set a free camera mode
 
 setTargetFPS(60);                   #  Set our game to run at 60 frames-per-second
 # --------------------------------------------------------------------------------------
@@ -46,7 +46,7 @@ while not windowShouldClose():      #  Detect window close button or ESC key
     # ----------------------------------------------------------------------------------
     camera.addr.updateCamera        #  Update camera
 
-    if MouseButton.MOUSE_LEFT_BUTTON.isMouseButtonPressed():
+    if MouseButton.LeftButton.isMouseButtonPressed():
         if not collision:
             let ray = getMouseRay(getMousePosition(), camera);
 

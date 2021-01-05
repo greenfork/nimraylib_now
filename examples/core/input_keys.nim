@@ -28,10 +28,10 @@ while not windowShouldClose():    # Detect window close button or ESC key
 
     #  Update
     # ----------------------------------------------------------------------------------
-    if KeyboardKey.KEY_RIGHT.isKeyDown: ballPosition.x += 2.0f
-    if KeyboardKey.KEY_LEFT.isKeyDown:  ballPosition.x -= 2.0f
-    if KeyboardKey.KEY_UP.isKeyDown:    ballPosition.y -= 2.0f
-    if KeyboardKey.KEY_DOWN.isKeyDown:  ballPosition.y += 2.0f
+    if isKeyDown(Right): ballPosition.x += 2.0f
+    if isKeyDown(Left):  ballPosition.x -= 2.0f
+    if isKeyDown(Up):    ballPosition.y -= 2.0f
+    if isKeyDown(Down):  ballPosition.y += 2.0f
     # ----------------------------------------------------------------------------------
 
     #  Draw
