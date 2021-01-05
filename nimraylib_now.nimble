@@ -14,11 +14,11 @@ requires "nim >= 1.4.2"
 requires "regex"
 requires "c2nim"
 
-task dorun, "run":
-  exec "nim r src/nimraylib_now"
-
-task c2nim, "run with c2nim":
-  echo "Executing nim r\n"
-  exec "nim r src/nimraylib_now"
+task convert, "run with c2nim":
+  echo "Running converter\n"
+  exec "nim r src/converter.nim"
   echo "\nExecuting nim check\n"
   exec "nim check raylib/raylib.nim"
+  exec "nim check raylib/raygui.nim"
+  exec "nim check raylib/rlgl.nim"
+  exec "nim check raylib/raymath.nim"

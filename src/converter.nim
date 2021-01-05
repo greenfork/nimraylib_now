@@ -151,14 +151,34 @@ import raylib
 @#
 #endif
 """
+  raymathHeader = """
+#ifdef C2NIM
+#  def RMDEF static inline
+#  dynlib raylibdll
+#  cdecl
+#  nep1
+#  skipinclude
+#  if defined(windows)
+#    define raylibdll "libraylib.dll"
+#  elif defined(macosx)
+#    define raylibdll "libraylib.dylib"
+#  else
+#    define raylibdll "libraylib.so"
+#  endif
+#@
+import raylib
+@#
+#endif
+"""
 
 const
   raylibFiles = [
-    # ("raylib", raylibHeader),
-    # ("rlgl", rlglHeader),
+    ("raylib", raylibHeader),
+    ("rlgl", rlglHeader),
     ("raygui", rayguiHeader),
+    ("raymath", raymathHeader),
   ]
-  selfModuleDeclarationNames = ["RAYLIB_H", "RLGL_H", "RAYGUI_H"]
+  selfModuleDeclarationNames = ["RAYLIB_H", "RLGL_H", "RAYGUI_H", "RAYMATH_H"]
   # For converters which are written before c2nim conversion with proper
   # name mangling. Should converters be written in postprocessing after c2nim?
   namePrefixes = ["rlgl", "rl", "RL_", "Gui", "GUI_", "gui"]
@@ -238,13 +258,21 @@ for (filename, c2nimheader) in raylibFiles:
             nestLevels.dec
           elif firstWord == "#if" or firstWord == "#ifndef":
             nestLevels.inc
+      elif line.startsWith("RMDEF"):
+        # raymath header file contains implementation and c2nim crashes
+        # trying to parse it. Here implementation is stripped away and only
+        # definition is left.
+        rs.add line & ";\n"
+        if i+1 < raylibhLines.len and raylibhLines[i+1] == "{":
+          while raylibhLines[i] != "}": i.inc
       elif words.len > 1 and words[0] == "#define" and words[1] in ignoreDefines:
         echo "Ignore: " & line
       else:
         rs.add line & "\n"
       i.inc
 
-    rs.add fmt"""
+    if appendToVeryEnd.len > 0:
+      rs.add fmt"""
 #ifdef C2NIM
 #@
 {appendToVeryEnd}

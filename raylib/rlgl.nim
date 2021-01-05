@@ -120,15 +120,15 @@ const
 ## ----------------------------------------------------------------------------------
 
 type
-  GlVersion* {.size: sizeof(int32).} = enum
+  GlVersion* {.size: sizeof(int32), pure.} = enum
     OPENGL_11 = 1, OPENGL_21, OPENGL_33, OPENGL_ES_20
-  FramebufferAttachType* {.size: sizeof(int32).} = enum
+  FramebufferAttachType* {.size: sizeof(int32), pure.} = enum
     ATTACHMENT_COLOR_CHANNEL0 = 0, ATTACHMENT_COLOR_CHANNEL1,
     ATTACHMENT_COLOR_CHANNEL2, ATTACHMENT_COLOR_CHANNEL3,
     ATTACHMENT_COLOR_CHANNEL4, ATTACHMENT_COLOR_CHANNEL5,
     ATTACHMENT_COLOR_CHANNEL6, ATTACHMENT_COLOR_CHANNEL7, ATTACHMENT_DEPTH = 100,
     ATTACHMENT_STENCIL = 200
-  FramebufferTexType* {.size: sizeof(int32).} = enum
+  FramebufferTexType* {.size: sizeof(int32), pure.} = enum
     ATTACHMENT_CUBEMAP_POSITIVE_X = 0, ATTACHMENT_CUBEMAP_NEGATIVE_X,
     ATTACHMENT_CUBEMAP_POSITIVE_Y, ATTACHMENT_CUBEMAP_NEGATIVE_Y,
     ATTACHMENT_CUBEMAP_POSITIVE_Z, ATTACHMENT_CUBEMAP_NEGATIVE_Z,
@@ -429,11 +429,6 @@ proc unloadMesh*(mesh: Mesh) {.cdecl, importc: "rlUnloadMesh", dynlib: raylibdll
 ##  Unload mesh data from CPU and GPU
 ##  NOTE: There is a set of shader related functions that are available to end user,
 ##  to avoid creating function wrappers through core module, they have been directly declared in raylib.h
-## **********************************************************************************
-##
-##    RLGL IMPLEMENTATION
-##
-## **********************************************************************************
 
 converter GlVersionToInt32*(self: GlVersion): int32 = self.int32
 converter FramebufferAttachTypeToInt32*(self: FramebufferAttachType): int32 = self.int32

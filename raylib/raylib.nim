@@ -465,7 +465,7 @@ type
 ##  By default all flags are set to 0
 
 type
-  ConfigFlag* {.size: sizeof(int32).} = enum
+  ConfigFlag* {.size: sizeof(int32), pure.} = enum
     FLAG_FULLSCREEN_MODE = 0x00000002, ##  Set to run program in fullscreen
     FLAG_WINDOW_RESIZABLE = 0x00000004, ##  Set to allow resizable window
     FLAG_WINDOW_UNDECORATED = 0x00000008, ##  Set to disable window decoration (frame and buttons)
@@ -485,7 +485,7 @@ type
 ##  Trace log type
 
 type
-  TraceLogType* {.size: sizeof(int32).} = enum
+  TraceLogType* {.size: sizeof(int32), pure.} = enum
     LOG_ALL = 0,                ##  Display all logs
     LOG_TRACE, LOG_DEBUG, LOG_INFO, LOG_WARNING, LOG_ERROR, LOG_FATAL, LOG_NONE ##  Disable logging
 
@@ -495,7 +495,7 @@ type
 ##  required keys for alternative layouts
 
 type                          ##  Alphanumeric keys
-  KeyboardKey* {.size: sizeof(int32).} = enum
+  KeyboardKey* {.size: sizeof(int32), pure.} = enum
     KEY_SPACE = 32, KEY_APOSTROPHE = 39, KEY_COMMA = 44, KEY_MINUS = 45, KEY_PERIOD = 46,
     KEY_SLASH = 47, KEY_ZERO = 48, KEY_ONE = 49, KEY_TWO = 50, KEY_THREE = 51, KEY_FOUR = 52,
     KEY_FIVE = 53, KEY_SIX = 54, KEY_SEVEN = 55, KEY_EIGHT = 56, KEY_NINE = 57,
@@ -523,21 +523,21 @@ type                          ##  Alphanumeric keys
 ##  Android buttons
 
 type
-  AndroidButton* {.size: sizeof(int32).} = enum
+  AndroidButton* {.size: sizeof(int32), pure.} = enum
     KEY_BACK = 4, KEY_VOLUME_UP = 24, KEY_VOLUME_DOWN = 25, KEY_MENU = 82
 
 
 ##  Mouse buttons
 
 type
-  MouseButton* {.size: sizeof(int32).} = enum
+  MouseButton* {.size: sizeof(int32), pure.} = enum
     MOUSE_LEFT_BUTTON = 0, MOUSE_RIGHT_BUTTON = 1, MOUSE_MIDDLE_BUTTON = 2
 
 
 ##  Mouse cursor types
 
 type
-  MouseCursor* {.size: sizeof(int32).} = enum
+  MouseCursor* {.size: sizeof(int32), pure.} = enum
     MOUSE_CURSOR_DEFAULT = 0, MOUSE_CURSOR_ARROW = 1, MOUSE_CURSOR_IBEAM = 2,
     MOUSE_CURSOR_CROSSHAIR = 3, MOUSE_CURSOR_POINTING_HAND = 4, MOUSE_CURSOR_RESIZE_EW = 5, ##  The horizontal resize/move arrow shape
     MOUSE_CURSOR_RESIZE_NS = 6, ##  The vertical resize/move arrow shape
@@ -550,14 +550,14 @@ type
 ##  Gamepad number
 
 type
-  GamepadNumber* {.size: sizeof(int32).} = enum
+  GamepadNumber* {.size: sizeof(int32), pure.} = enum
     GAMEPAD_PLAYER1 = 0, GAMEPAD_PLAYER2 = 1, GAMEPAD_PLAYER3 = 2, GAMEPAD_PLAYER4 = 3
 
 
 ##  Gamepad buttons
 
 type                          ##  This is here just for error checking
-  GamepadButton* {.size: sizeof(int32).} = enum
+  GamepadButton* {.size: sizeof(int32), pure.} = enum
     GAMEPAD_BUTTON_UNKNOWN = 0, ##  This is normally a DPAD
     GAMEPAD_BUTTON_LEFT_FACE_UP, GAMEPAD_BUTTON_LEFT_FACE_RIGHT,
     GAMEPAD_BUTTON_LEFT_FACE_DOWN, GAMEPAD_BUTTON_LEFT_FACE_LEFT, ##  This normally corresponds with PlayStation and Xbox controllers
@@ -578,7 +578,7 @@ type                          ##  This is here just for error checking
 ##  Gamepad axis
 
 type                          ##  Left stick
-  GamepadAxis* {.size: sizeof(int32).} = enum
+  GamepadAxis* {.size: sizeof(int32), pure.} = enum
     GAMEPAD_AXIS_LEFT_X = 0, GAMEPAD_AXIS_LEFT_Y = 1, ##  Right stick
     GAMEPAD_AXIS_RIGHT_X = 2, GAMEPAD_AXIS_RIGHT_Y = 3, ##  Pressure levels for the back triggers
     GAMEPAD_AXIS_LEFT_TRIGGER = 4, ##  [1..-1] (pressure-level)
@@ -588,7 +588,7 @@ type                          ##  Left stick
 ##  Shader location points
 
 type
-  ShaderLocationIndex* {.size: sizeof(int32).} = enum
+  ShaderLocationIndex* {.size: sizeof(int32), pure.} = enum
     LOC_VERTEX_POSITION = 0, LOC_VERTEX_TEXCOORD01, LOC_VERTEX_TEXCOORD02,
     LOC_VERTEX_NORMAL, LOC_VERTEX_TANGENT, LOC_VERTEX_COLOR, LOC_MATRIX_MVP,
     LOC_MATRIX_MODEL, LOC_MATRIX_VIEW, LOC_MATRIX_PROJECTION, LOC_VECTOR_VIEW,
@@ -602,7 +602,7 @@ type
 ##  Shader uniform data types
 
 type
-  ShaderUniformDataType* {.size: sizeof(int32).} = enum
+  ShaderUniformDataType* {.size: sizeof(int32), pure.} = enum
     UNIFORM_FLOAT = 0, UNIFORM_VEC2, UNIFORM_VEC3, UNIFORM_VEC4, UNIFORM_INT,
     UNIFORM_IVEC2, UNIFORM_IVEC3, UNIFORM_IVEC4, UNIFORM_SAMPLER2D
 
@@ -610,7 +610,7 @@ type
 ##  Material maps
 
 type
-  MaterialMapType* {.size: sizeof(int32).} = enum
+  MaterialMapType* {.size: sizeof(int32), pure.} = enum
     MAP_ALBEDO = 0,             ##  MAP_DIFFUSE
     MAP_METALNESS = 1,          ##  MAP_SPECULAR
     MAP_NORMAL = 2, MAP_ROUGHNESS = 3, MAP_OCCLUSION, MAP_EMISSION, MAP_HEIGHT, MAP_CUBEMAP, ##  NOTE: Uses GL_TEXTURE_CUBE_MAP
@@ -623,7 +623,7 @@ type
 ##  NOTE: Support depends on OpenGL version and platform
 
 type
-  PixelFormat* {.size: sizeof(int32).} = enum
+  PixelFormat* {.size: sizeof(int32), pure.} = enum
     UNCOMPRESSED_GRAYSCALE = 1, ##  8 bit per pixel (no alpha)
     UNCOMPRESSED_GRAY_ALPHA,  ##  8*2 bpp (2 channels)
     UNCOMPRESSED_R5G6B5,      ##  16 bpp
@@ -652,7 +652,7 @@ type
 ##  NOTE 2: Filter is accordingly set for minification and magnification
 
 type
-  TextureFilterMode* {.size: sizeof(int32).} = enum
+  TextureFilterMode* {.size: sizeof(int32), pure.} = enum
     FILTER_POINT = 0,           ##  No filter, just pixel aproximation
     FILTER_BILINEAR,          ##  Linear filtering
     FILTER_TRILINEAR,         ##  Trilinear filtering (linear with mipmaps)
@@ -664,7 +664,7 @@ type
 ##  Texture parameters: wrap mode
 
 type
-  TextureWrapMode* {.size: sizeof(int32).} = enum
+  TextureWrapMode* {.size: sizeof(int32), pure.} = enum
     WRAP_REPEAT = 0,            ##  Repeats texture in tiled mode
     WRAP_CLAMP,               ##  Clamps texture to edge pixel in tiled mode
     WRAP_MIRROR_REPEAT,       ##  Mirrors and repeats the texture in tiled mode
@@ -674,7 +674,7 @@ type
 ##  Cubemap layouts
 
 type
-  CubemapLayoutType* {.size: sizeof(int32).} = enum
+  CubemapLayoutType* {.size: sizeof(int32), pure.} = enum
     CUBEMAP_AUTO_DETECT = 0,    ##  Automatically detect layout type
     CUBEMAP_LINE_VERTICAL,    ##  Layout is defined by a vertical line with faces
     CUBEMAP_LINE_HORIZONTAL,  ##  Layout is defined by an horizontal line with faces
@@ -686,7 +686,7 @@ type
 ##  Font type, defines generation method
 
 type
-  FontType* {.size: sizeof(int32).} = enum
+  FontType* {.size: sizeof(int32), pure.} = enum
     FONT_DEFAULT = 0,           ##  Default font generation, anti-aliased
     FONT_BITMAP,              ##  Bitmap font generation, no anti-aliasing
     FONT_SDF                  ##  SDF font generation, requires external shader
@@ -695,7 +695,7 @@ type
 ##  Color blending modes (pre-defined)
 
 type
-  BlendMode* {.size: sizeof(int32).} = enum
+  BlendMode* {.size: sizeof(int32), pure.} = enum
     BLEND_ALPHA = 0,            ##  Blend textures considering alpha (default)
     BLEND_ADDITIVE,           ##  Blend textures adding colors
     BLEND_MULTIPLIED,         ##  Blend textures multiplying colors
@@ -708,7 +708,7 @@ type
 ##  NOTE: It could be used as flags to enable only some gestures
 
 type
-  GestureType* {.size: sizeof(int32).} = enum
+  GestureType* {.size: sizeof(int32), pure.} = enum
     GESTURE_NONE = 0, GESTURE_TAP = 1, GESTURE_DOUBLETAP = 2, GESTURE_HOLD = 4,
     GESTURE_DRAG = 8, GESTURE_SWIPE_RIGHT = 16, GESTURE_SWIPE_LEFT = 32,
     GESTURE_SWIPE_UP = 64, GESTURE_SWIPE_DOWN = 128, GESTURE_PINCH_IN = 256,
@@ -718,7 +718,7 @@ type
 ##  Camera system modes
 
 type
-  CameraMode* {.size: sizeof(int32).} = enum
+  CameraMode* {.size: sizeof(int32), pure.} = enum
     CAMERA_CUSTOM = 0, CAMERA_FREE, CAMERA_ORBITAL, CAMERA_FIRST_PERSON,
     CAMERA_THIRD_PERSON
 
@@ -726,14 +726,14 @@ type
 ##  Camera projection modes
 
 type
-  CameraType* {.size: sizeof(int32).} = enum
+  CameraType* {.size: sizeof(int32), pure.} = enum
     CAMERA_PERSPECTIVE = 0, CAMERA_ORTHOGRAPHIC
 
 
 ##  N-patch types
 
 type
-  NPatchType* {.size: sizeof(int32).} = enum
+  NPatchType* {.size: sizeof(int32), pure.} = enum
     NPT_9PATCH = 0,             ##  Npatch defined by 3x3 tiles
     NPT_3PATCH_VERTICAL,      ##  Npatch defined by 1x3 tiles
     NPT_3PATCH_HORIZONTAL     ##  Npatch defined by 3x1 tiles
