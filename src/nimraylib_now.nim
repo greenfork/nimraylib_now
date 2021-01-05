@@ -71,6 +71,9 @@ const
     "MAP_DIFFUSE", # deprecated?
     "MAP_SPECULAR", # deprecated?
   ]
+  allowIfs = [
+    "RAYGUI_SUPPORT_ICONS"
+  ]
 
 const
   # #define LIGHTGRAY  CLITERAL(Color){ 200, 200, 200, 255 }   // Light Gray
@@ -126,13 +129,39 @@ import raylib
 @#
 #endif
 """
+  rayguiHeader = """
+#ifdef C2NIM
+#  def RAYGUIDEF
+#  dynlib rayguidll
+#  cdecl
+#  nep1
+#  skipinclude
+#  prefix Gui
+#  prefix GUI_
+#  prefix gui
+#  if defined(windows)
+#    define rayguidll "libraygui.dll"
+#  elif defined(macosx)
+#    define rayguidll "libraygui.dylib"
+#  else
+#    define rayguidll "libraygui.so"
+#  endif
+#@
+import raylib
+@#
+#endif
+"""
 
 const
   raylibFiles = [
-    ("raylib", raylibHeader),
-    ("rlgl", rlglHeader),
+    # ("raylib", raylibHeader),
+    # ("rlgl", rlglHeader),
+    ("raygui", rayguiHeader),
   ]
-  selfModuleDeclarationNames = ["RAYLIB_H", "RLGL_H"]
+  selfModuleDeclarationNames = ["RAYLIB_H", "RLGL_H", "RAYGUI_H"]
+  # For converters which are written before c2nim conversion with proper
+  # name mangling. Should converters be written in postprocessing after c2nim?
+  namePrefixes = ["rlgl", "rl", "RL_", "Gui", "GUI_", "gui"]
 
 
 # Start processing all files
@@ -154,10 +183,11 @@ for (filename, c2nimheader) in raylibFiles:
       let
         line = raylibhLines[i]
         words = line.splitWhitespace
-      if "RAYLIB_H" in words: discard # skip all self-header module definitions
       if selfModuleDeclarationNames.any((name) => name in words):
-        echo "Ignore: " & line
-        discard # skip all self-header module definitions
+        if "#endif" in line: # this is the end of h file and start of implementation
+          echo "Reached end of header part: " & line
+          break
+        echo "Ignore: " & line # skip all self-header module definitions
       elif line.match(reDefineColor, m):
         let
           colorName = m.groupFirstCapture(0, line)
@@ -177,7 +207,7 @@ for (filename, c2nimheader) in raylibFiles:
       elif line.match(reTypedefEnumStart):
         # C uses enums in place of int32 numbers, so every enum takes an
         # appropriate converter to translate types in Nim implicitly
-        let enumName =
+        var enumName =
           if line.match(reTypedefEnumOneline, m):
             m.groupFirstCapture(0, line)
           else:
@@ -188,12 +218,17 @@ for (filename, c2nimheader) in raylibFiles:
               enumEnd.inc
               enumEndLine = raylibhLines[enumEnd]
             m.groupFirstCapture(0, enumEndLine)
+        for prefix in namePrefixes:
+          if enumName.startsWith(prefix):
+            enumName.removePrefix(prefix)
+            break
         appendToVeryEnd.add(
           fmt("converter {enumName}ToInt32*(self: {enumName}): int32 = self.int32\n")
         )
         # Remember to still add this line
         rs.add line & "\n"
-      elif words.len > 0 and (words[0] == "#if" or words[0] == "#ifndef"):
+      elif words.len > 0 and (words[0] == "#if" or words[0] == "#ifndef") and
+           allowIfs.any((ident) => ident notin line):
         echo "Ignore branch: " & line
         var nestLevels = 1
         while nestLevels > 0:
@@ -234,6 +269,10 @@ for (filename, c2nimheader) in raylibFiles:
     var rs: string
     var i = 0
     while i < raylibnimLines.len:
+      # Replace all C-style types to native Nim ones
+      # Until we use 9-qbit words for bytes, Nim definition should be
+      # same as C definition and it allows one to write code without
+      # constant conversions such as `let width = 640.cint`
       var line = raylibnimLines[i].multiReplace(
         # According to definitions in compiler Nim/lib/system.nim
         ("cint", "int32"),
@@ -251,6 +290,11 @@ for (filename, c2nimheader) in raylibFiles:
         ("cuint", "uint32"),
         ("culonglong", "uint64"),
       )
+      if "{.size: sizeof(int32).} = enum" in line: # add `pure` pragma to enums
+        line = line.replace(
+          "{.size: sizeof(int32).} = enum",
+          "{.size: sizeof(int32), pure.} = enum"
+        )
       rs.add line & "\n"
       i.inc
 
