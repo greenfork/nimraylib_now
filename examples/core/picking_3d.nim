@@ -17,7 +17,7 @@ import ../../raylib/raylib
 const screenWidth = 800
 const screenHeight = 450
 
-InitWindow(screenWidth, screenHeight, "raylib [core] example - 3d picking");
+initWindow(screenWidth, screenHeight, "raylib [core] example - 3d picking");
 
 #  Define the camera to look into our 3d world
 var camera = Camera()
@@ -35,23 +35,23 @@ var
 
     collision = false
 
-camera.SetCameraMode CAMERA_FREE    #  Set a free camera mode
+camera.setCameraMode CAMERA_FREE    #  Set a free camera mode
 
-SetTargetFPS(60);                   #  Set our game to run at 60 frames-per-second
+setTargetFPS(60);                   #  Set our game to run at 60 frames-per-second
 # --------------------------------------------------------------------------------------
 
 #  Main game loop
-while not WindowShouldClose():      #  Detect window close button or ESC key
+while not windowShouldClose():      #  Detect window close button or ESC key
     #  Update
     # ----------------------------------------------------------------------------------
-    camera.addr.UpdateCamera        #  Update camera
+    camera.addr.updateCamera        #  Update camera
 
-    if MOUSE_LEFT_BUTTON.IsMouseButtonPressed():
+    if MOUSE_LEFT_BUTTON.isMouseButtonPressed():
         if not collision:
-            let ray = GetMouseRay(GetMousePosition(), camera);
+            let ray = getMouseRay(getMousePosition(), camera);
 
             #  Check collision between ray and box
-            collision = CheckCollisionRayBox(ray,
+            collision = checkCollisionRayBox(ray,
                         BoundingBox(min: Vector3(x: cubePosition.x - cubeSize.x/2, y: cubePosition.y - cubeSize.y/2,
                                         z: cubePosition.z - cubeSize.z/2),
                                     max: Vector3(x: cubePosition.x + cubeSize.x/2, y: cubePosition.y + cubeSize.y/2,
@@ -61,37 +61,38 @@ while not WindowShouldClose():      #  Detect window close button or ESC key
 
     #  Draw
     # ----------------------------------------------------------------------------------
-    BeginDrawing()
+    beginDrawing()
 
-    ClearBackground RAYWHITE
+    clearBackground RAYWHITE
 
-    BeginMode3D camera
+    beginMode3D camera
 
     if collision:
-        DrawCube(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, RED)
-        DrawCubeWires(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, MAROON)
+        drawCube(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, RED)
+        drawCubeWires(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, MAROON)
 
-        DrawCubeWires(cubePosition, cubeSize.x + 0.2f, cubeSize.y + 0.2f, cubeSize.z + 0.2f, GREEN)
+        drawCubeWires(cubePosition, cubeSize.x + 0.2f, cubeSize.y + 0.2f, cubeSize.z + 0.2f, GREEN)
     else:
-        DrawCube(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, GRAY)
-        DrawCubeWires(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, DARKGRAY)
+        drawCube(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, GRAY)
+        drawCubeWires(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, DARKGRAY)
 
-    DrawRay(ray, MAROON)
-    DrawGrid(10, 1.0f)
+    drawRay(ray, MAROON)
+    drawGrid(10, 1.0f)
 
-    EndMode3D()
+    endMode3D()
 
-    DrawText("Try selecting the box with mouse!", 240, 10, 20, DARKGRAY)
+    drawText("Try selecting the box with mouse!", 240, 10, 20, DARKGRAY)
 
-    if collision: DrawText("BOX SELECTED", (screenWidth - MeasureText("BOX SELECTED", 30)) div 2, 
+    if collision:
+      drawText("BOX SELECTED", (screenWidth - measureText("BOX SELECTED", 30)) div 2,
         (screenHeight * 0.1f).int32, 30, GREEN)
 
-    DrawFPS(10, 10)
+    drawFPS(10, 10)
 
-    EndDrawing()
+    endDrawing()
     # ----------------------------------------------------------------------------------
 
 #  De-Initialization
 # --------------------------------------------------------------------------------------
-CloseWindow()         #  Close window and OpenGL context
+closeWindow()         #  Close window and OpenGL context
 # --------------------------------------------------------------------------------------

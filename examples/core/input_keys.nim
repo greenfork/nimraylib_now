@@ -16,37 +16,37 @@ import ../../raylib/raylib
 const screenWidth = 800
 const screenHeight = 450
 
-InitWindow screenWidth, screenHeight, "raylib [core] example - keyboard input"
+initWindow screenWidth, screenHeight, "raylib [core] example - keyboard input"
 
 var ballPosition = Vector2(x: screenWidth/2, y: screenHeight/2)
 
-60.SetTargetFPS                   # Set our game to run at 60 frames-per-second
+60.setTargetFPS                   # Set our game to run at 60 frames-per-second
 #--------------------------------------------------------------------------------------
 
 # Main game loop
-while not WindowShouldClose():    # Detect window close button or ESC key
+while not windowShouldClose():    # Detect window close button or ESC key
 
     #  Update
     # ----------------------------------------------------------------------------------
-    if KEY_RIGHT.IsKeyDown: ballPosition.x += 2.0f
-    if KEY_LEFT.IsKeyDown:  ballPosition.x -= 2.0f
-    if KEY_UP.IsKeyDown:    ballPosition.y -= 2.0f
-    if KEY_DOWN.IsKeyDown:  ballPosition.y += 2.0f
+    if KEY_RIGHT.isKeyDown: ballPosition.x += 2.0f
+    if KEY_LEFT.isKeyDown:  ballPosition.x -= 2.0f
+    if KEY_UP.isKeyDown:    ballPosition.y -= 2.0f
+    if KEY_DOWN.isKeyDown:  ballPosition.y += 2.0f
     # ----------------------------------------------------------------------------------
 
     #  Draw
     # ----------------------------------------------------------------------------------
-    BeginDrawing()
-    ClearBackground RAYWHITE
+    beginDrawing()
+    clearBackground RAYWHITE
 
-    DrawText "move the ball with arrow keys", 10, 10, 20, DARKGRAY
+    drawText "move the ball with arrow keys", 10, 10, 20, DARKGRAY
 
-    DrawCircleV ballPosition, 50, MAROON
+    drawCircleV ballPosition, 50, MAROON
 
-    EndDrawing()
+    endDrawing()
     # ----------------------------------------------------------------------------------
 
 # De-Initialization
 # --------------------------------------------------------------------------------------
-CloseWindow()        #  Close window and OpenGL context
+closeWindow()        #  Close window and OpenGL context
 # --------------------------------------------------------------------------------------

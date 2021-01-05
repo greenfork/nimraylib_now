@@ -12,14 +12,14 @@
 
 import ../../raylib/raylib
 
-const MAX_COLUMNS = 20
+const MaxColumns = 20
 
 #  Initialization
 # --------------------------------------------------------------------------------------
 const screenWidth = 800
 const screenHeight = 450
 
-InitWindow screenWidth, screenHeight, "raylib [core] example - 3d camera first person"
+initWindow screenWidth, screenHeight, "raylib [core] example - 3d camera first person"
 
 #  Define the camera to look into our 3d world (position, target, up vector)
 var camera = Camera()
@@ -31,58 +31,58 @@ camera.`type` = CAMERA_PERSPECTIVE
 
 #  Generates some random columns
 var
-    heights: array[0..MAX_COLUMNS, float]
-    positions: array[0..MAX_COLUMNS, Vector3]
-    colors: array[0..MAX_COLUMNS, Color]
+    heights: array[0..MaxColumns, float]
+    positions: array[0..MaxColumns, Vector3]
+    colors: array[0..MaxColumns, Color]
 
-for i in 0..<MAX_COLUMNS:
-    heights[i] = GetRandomValue(1, 12).float
-    positions[i] = Vector3(x: GetRandomValue(-15, 15).float, y: heights[i]/2, z: GetRandomValue(-15, 15).float)
-    colors[i] = Color(r: GetRandomValue(20, 255).uint8, g: GetRandomValue(10, 55).uint8, b: 30, a: 255)
+for i in 0..<MaxColumns:
+    heights[i] = getRandomValue(1, 12).float
+    positions[i] = Vector3(x: getRandomValue(-15, 15).float, y: heights[i]/2, z: getRandomValue(-15, 15).float)
+    colors[i] = Color(r: getRandomValue(20, 255).uint8, g: getRandomValue(10, 55).uint8, b: 30, a: 255)
 
-camera.SetCameraMode CAMERA_FIRST_PERSON    #  Set a first person camera mode
+camera.setCameraMode CAMERA_FIRST_PERSON    #  Set a first person camera mode
 
-SetTargetFPS 60                             #  Set our game to run at 60 frames-per-second
+setTargetFPS 60                             #  Set our game to run at 60 frames-per-second
 # --------------------------------------------------------------------------------------
 
 #  Main game loop
-while not WindowShouldClose():              #  Detect window close button or ESC key
+while not windowShouldClose():              #  Detect window close button or ESC key
     #  Update
     # ----------------------------------------------------------------------------------
-    camera.addr.UpdateCamera                #  Update camera
+    camera.addr.updateCamera                #  Update camera
     # ----------------------------------------------------------------------------------
 
     #  Draw
     # ----------------------------------------------------------------------------------
-    BeginDrawing()
+    beginDrawing()
 
-    ClearBackground RAYWHITE
+    clearBackground RAYWHITE
 
-    BeginMode3D camera
+    beginMode3D camera
 
-    DrawPlane Vector3(x: 0.0f, y: 0.0f, z: 0.0f), Vector2(x: 32.0f, y: 32.0f), LIGHTGRAY #  Draw ground
-    DrawCube Vector3(x: -16.0f, y: 2.5f, z: 0.0f), 1.0f, 5.0f, 32.0f, BLUE               #  Draw a blue wall
-    DrawCube Vector3(x: 16.0f, y: 2.5f, z: 0.0f), 1.0f, 5.0f, 32.0f, LIME                #  Draw a green wall
-    DrawCube Vector3(x: 0.0f, y: 2.5f, z: 16.0f), 32.0f, 5.0f, 1.0f, GOLD                #  Draw a yellow wall
+    drawPlane Vector3(x: 0.0f, y: 0.0f, z: 0.0f), Vector2(x: 32.0f, y: 32.0f), LIGHTGRAY #  Draw ground
+    drawCube Vector3(x: -16.0f, y: 2.5f, z: 0.0f), 1.0f, 5.0f, 32.0f, BLUE               #  Draw a blue wall
+    drawCube Vector3(x: 16.0f, y: 2.5f, z: 0.0f), 1.0f, 5.0f, 32.0f, LIME                #  Draw a green wall
+    drawCube Vector3(x: 0.0f, y: 2.5f, z: 16.0f), 32.0f, 5.0f, 1.0f, GOLD                #  Draw a yellow wall
 
     #  Draw some cubes around
-    for i in 0..<MAX_COLUMNS:
-        DrawCube positions[i], 2.0f, heights[i], 2.0f, colors[i]
-        DrawCubeWires positions[i], 2.0f, heights[i], 2.0f, MAROON
+    for i in 0..<MaxColumns:
+        drawCube positions[i], 2.0f, heights[i], 2.0f, colors[i]
+        drawCubeWires positions[i], 2.0f, heights[i], 2.0f, MAROON
 
-    EndMode3D()
+    endMode3D()
 
-    DrawRectangle 10, 10, 220, 70, Fade(SKYBLUE, 0.5f)
-    DrawRectangleLines 10, 10, 220, 70, BLUE
+    drawRectangle 10, 10, 220, 70, fade(SKYBLUE, 0.5f)
+    drawRectangleLines 10, 10, 220, 70, BLUE
 
-    DrawText "First person camera default controls:", 20, 20, 10, BLACK
-    DrawText "- Move with keys: W, A, S, D", 40, 40, 10, DARKGRAY
-    DrawText "- Mouse move to look around", 40, 60, 10, DARKGRAY
+    drawText "First person camera default controls:", 20, 20, 10, BLACK
+    drawText "- Move with keys: W, A, S, D", 40, 40, 10, DARKGRAY
+    drawText "- Mouse move to look around", 40, 60, 10, DARKGRAY
 
-    EndDrawing()
+    endDrawing()
     # ----------------------------------------------------------------------------------
 
 #  De-Initialization
 # --------------------------------------------------------------------------------------
-CloseWindow()         #  Close window and OpenGL context
+closeWindow()         #  Close window and OpenGL context
 # --------------------------------------------------------------------------------------
