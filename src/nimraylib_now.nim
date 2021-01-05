@@ -104,12 +104,13 @@ const LEXT* = when defined(windows):".dll"
 elif defined(macosx):               ".dylib"
 else:                               ".so"
 {.pragma: RLAPI, cdecl, discardable, dynlib: "libraylib" & LEXT.}
-  """
+"""
 
 block attempt2:
   const
     multilineCommentStart = re"^/\*"
     multilineCommentEnd = re"\*/$"
+    onelineComment = re"^\s*(//).+"
     defineExpr = re"\s*#define(?:\s+(\S+))+"
     typedefStructStart = re"typedef struct ([[:word:]]+) \{.*"
     typedefEmptyStruct = re"typedef struct ([[:word:]]+) ([[:word:]]+);"
@@ -150,23 +151,22 @@ block attempt2:
       else:
         echo rs
 
-    template setTrailingComment(line) =
-      `trailingComment` = block:
-        var parsed = line.split("//")
-        if parsed.len > 1:
-          parsed[1..^1].join
-        else:
-          ""
+    func parseTrailingComment(line: string): string =
+      var parsed = line.split("//")
+      if parsed.len > 1:
+        parsed[1..^1].join
+      else:
+        ""
 
     while parser.line < parser.buf.len:
       if parser.line < 0:
         parser.line.inc
         continue
-      if parser.line > 460:
+      if parser.line > 483:
         break
 
       let line = parser.buf[parser.line]
-      setTrailingComment(line)
+      trailingComment = parseTrailingComment(line)
 
       if multilineCommentStart in line:
         while parser.line < parser.buf.len:
@@ -177,6 +177,8 @@ block attempt2:
           else:
             parser.line.inc
             o '#' & commentLine
+      elif onelineComment in line:
+        o line.replace("//", "#")
       elif line.match(defineExpr, m) and
            m.groupFirstCapture(0, line) notin ignoreDefines:
         let matches = m.group(0, line)
@@ -202,9 +204,10 @@ block attempt2:
                  "wrong typedef ending"
           # Convert fields
           for i in (parser.line+1)..<typedefEndLine:
+            trailingComment = ""
             let typedefFieldsLine = parser.buf[i]
-            setTrailingComment(typedefFieldsLine)
             if typedefFieldsLine.match(typedefFieldList, m):
+              trailingComment = parseTrailingComment(typedefFieldsLine)
               let
                 fieldType = m.group(0, typedefFieldsLine).join.strip
                 firstFieldName = m.groupFirstCapture(1, typedefFieldsLine).strip
@@ -216,11 +219,12 @@ block attempt2:
                           .join(", ")
               fields.add convertType(fieldType, firstFieldName)
               o fields
+            elif onelineComment in typedefFieldsLine:
+              o typedefFieldsLine.replace("//", "#")
+            elif typedefFieldsLine.len > 0:
+              o '#' & typedefFieldsLine
             else:
-              if typedefFieldsLine.len > 0 and trailingComment.len == 0:
-                o "#" & typedefFieldsLine
-              else:
-                o ""
+              o ""
           parser.line = typedefEndLine
       elif line.len > 0:
         trailingComment = ""

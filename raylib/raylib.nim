@@ -76,12 +76,12 @@ const LEXT* = when defined(windows):".dll"
 elif defined(macosx):               ".dylib"
 else:                               ".so"
 {.pragma: RLAPI, cdecl, discardable, dynlib: "libraylib" & LEXT.}
-  
+
 
 ##include <stdarg.h>     // Required for: va_list - Only used by TraceLogCallback
 
 ##if defined(_WIN32)
-#    // Microsoft attibutes to tell compiler that symbols are imported/exported from a .dll
+    # Microsoft attibutes to tell compiler that symbols are imported/exported from a .dll # Microsoft attibutes to tell compiler that symbols are imported/exported from a .dll
 #    #if defined(BUILD_LIBTYPE_SHARED)
 #        #define RLAPI __declspec(dllexport)     // We are building raylib as a Win32 shared library (.dll)
 #    #elif defined(USE_LIBTYPE_SHARED)
@@ -93,9 +93,9 @@ else:                               ".so"
 #    #define RLAPI       // We are building or using raylib as a static library (or Linux shared library)
 ##endif
 
-#//----------------------------------------------------------------------------------
-#// Some basic Defines
-#//----------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------- #----------------------------------------------------------------------------------
+# Some basic Defines # Some basic Defines
+#---------------------------------------------------------------------------------- #----------------------------------------------------------------------------------
 ##ifndef PI
 #    #define PI 3.14159265358979323846f
 ##endif
@@ -103,7 +103,7 @@ else:                               ".so"
 ##define DEG2RAD (PI/180.0f)
 ##define RAD2DEG (180.0f/PI)
 
-#// Allow custom memory allocators
+# Allow custom memory allocators # Allow custom memory allocators
 ##ifndef RL_MALLOC
 #    #define RL_MALLOC(sz)       malloc(sz)
 ##endif
@@ -117,80 +117,80 @@ else:                               ".so"
 #    #define RL_FREE(ptr)        free(ptr)
 ##endif
 
-#// NOTE: MSC C++ compiler does not support compound literals (C99 feature)
-#// Plain structures in C++ (without constructors) can be initialized from { } initializers.
+# NOTE: MSC C++ compiler does not support compound literals (C99 feature) # NOTE: MSC C++ compiler does not support compound literals (C99 feature)
+# Plain structures in C++ (without constructors) can be initialized from { } initializers. # Plain structures in C++ (without constructors) can be initialized from { } initializers.
 ##if defined(__cplusplus)
 #    #define CLITERAL(type)      type
 ##else
 #    #define CLITERAL(type)      (type)
 ##endif
 
-#// Some Basic Colors
-#// NOTE: Custom raylib color palette for amazing visuals on WHITE background
+# Some Basic Colors # Some Basic Colors
+# NOTE: Custom raylib color palette for amazing visuals on WHITE background # NOTE: Custom raylib color palette for amazing visuals on WHITE background
 
 
-#// Temporal hack to avoid breaking old codebases using
-#// deprecated raylib implementation of these functions
+# Temporal hack to avoid breaking old codebases using # Temporal hack to avoid breaking old codebases using
+# deprecated raylib implementation of these functions # deprecated raylib implementation of these functions
 ##define FormatText      TextFormat
 ##define LoadText        LoadFileText
 ##define GetExtension    GetFileExtension
 ##define GetImageData    LoadImageColors
-#//#define Fade(c, a)  ColorAlpha(c, a)
+##define Fade(c, a)  ColorAlpha(c, a) ##define Fade(c, a)  ColorAlpha(c, a)
 
-#//----------------------------------------------------------------------------------
-#// Structures Definition
-#//----------------------------------------------------------------------------------
-#// Boolean type
+#---------------------------------------------------------------------------------- #----------------------------------------------------------------------------------
+# Structures Definition # Structures Definition
+#---------------------------------------------------------------------------------- #----------------------------------------------------------------------------------
+# Boolean type # Boolean type
 ##if defined(__STDC__) && __STDC_VERSION__ >= 199901L
 #    #include <stdbool.h>
 ##elif !defined(__cplusplus) && !defined(bool)
 #    typedef enum { false, true } bool;
 ##endif
 
-#// Vector2 type
+# Vector2 type # Vector2 type
 type Vector2* {.bycopy.} = object
   x*: float32
   y*: float32
 
-#// Vector3 type
+# Vector3 type # Vector3 type
 type Vector3* {.bycopy.} = object
   x*: float32
   y*: float32
   z*: float32
 
-#// Vector4 type
+# Vector4 type # Vector4 type
 type Vector4* {.bycopy.} = object
   x*: float32
   y*: float32
   z*: float32
   w*: float32
 
-#// Quaternion type, same as Vector4
+# Quaternion type, same as Vector4 # Quaternion type, same as Vector4
 type Quaternion* = Vector4
 
-#// Matrix type (OpenGL style 4x4 - right handed, column major)
+# Matrix type (OpenGL style 4x4 - right handed, column major) # Matrix type (OpenGL style 4x4 - right handed, column major)
 type Matrix* {.bycopy.} = object
   m0*, m4*, m8*, m12*: float32
   m1*, m5*, m9*, m13*: float32
   m2*, m6*, m10*, m14*: float32
   m3*, m7*, m11*, m15*: float32
 
-#// Color type, RGBA (32bit)
+# Color type, RGBA (32bit) # Color type, RGBA (32bit)
 type Color* {.bycopy.} = object
   r*: uint8
   g*: uint8
   b*: uint8
   a*: uint8
 
-#// Rectangle type
+# Rectangle type # Rectangle type
 type Rectangle* {.bycopy.} = object
   x*: float32
   y*: float32
   width*: float32
   height*: float32
 
-#// Image type, bpp always RGBA (32bit)
-#// NOTE: Data stored in CPU memory (RAM)
+# Image type, bpp always RGBA (32bit) # Image type, bpp always RGBA (32bit)
+# NOTE: Data stored in CPU memory (RAM) # NOTE: Data stored in CPU memory (RAM)
 type Image* {.bycopy.} = object
   data*: pointer # Image raw data
   width*: int32 # Image base width
@@ -198,8 +198,8 @@ type Image* {.bycopy.} = object
   mipmaps*: int32 # Mipmap levels, 1 by default
   format*: int32 # Data format (PixelFormat type)
 
-#// Texture type
-#// NOTE: Data stored in GPU memory
+# Texture type # Texture type
+# NOTE: Data stored in GPU memory # NOTE: Data stored in GPU memory
 type Texture* {.bycopy.} = object
   id*: uint32 # OpenGL texture id
   width*: int32 # Texture base width
@@ -207,22 +207,22 @@ type Texture* {.bycopy.} = object
   mipmaps*: int32 # Mipmap levels, 1 by default
   format*: int32 # Data format (PixelFormat type)
 
-#// Texture2D type, same as Texture
+# Texture2D type, same as Texture # Texture2D type, same as Texture
 type Texture2D* = Texture
 
-#// TextureCubemap type, actually, same as Texture
+# TextureCubemap type, actually, same as Texture # TextureCubemap type, actually, same as Texture
 type TextureCubemap* = Texture
 
-#// RenderTexture type, for texture rendering
+# RenderTexture type, for texture rendering # RenderTexture type, for texture rendering
 type RenderTexture* {.bycopy.} = object
   id*: uint32 # OpenGL Framebuffer Object (FBO) id
   texture*: Texture # Color buffer attachment texture
   depth*: Texture # Depth buffer attachment texture
 
-#// RenderTexture2D type, same as RenderTexture
+# RenderTexture2D type, same as RenderTexture # RenderTexture2D type, same as RenderTexture
 type RenderTexture2D* = RenderTexture
 
-#// N-Patch layout info
+# N-Patch layout info # N-Patch layout info
 type NPatchInfo* {.bycopy.} = object
   source*: Rectangle # Region in the texture
   left*: int32 # left border offset
@@ -231,7 +231,7 @@ type NPatchInfo* {.bycopy.} = object
   bottom*: int32 # bottom border offset
   typex*: int32 # layout of the n-patch: 3x3, 1x3 or 3x1
 
-#// Font character info
+# Font character info # Font character info
 type CharInfo* {.bycopy.} = object
   value*: int32 # Character value (Unicode)
   offsetX*: int32 # Character offset X when drawing
@@ -239,7 +239,7 @@ type CharInfo* {.bycopy.} = object
   advanceX*: int32 # Character advance position X
   image*: Image # Character image data
 
-#// Font type, includes texture and charSet array data
+# Font type, includes texture and charSet array data # Font type, includes texture and charSet array data
 type Font* {.bycopy.} = object
   baseSize*: int32 # Base size (default chars height)
   charsCount*: int32 # Number of characters
@@ -250,7 +250,7 @@ type Font* {.bycopy.} = object
 
 template SpriteFont*(): auto = Font # SpriteFont type fallback, defaults to Font
 
-#// Camera type, defines a camera position/orientation in 3d space
+# Camera type, defines a camera position/orientation in 3d space # Camera type, defines a camera position/orientation in 3d space
 type Camera3D* {.bycopy.} = object
   position*: Vector3 # Camera position
   target*: Vector3 # Camera target it looks-at
@@ -260,20 +260,20 @@ type Camera3D* {.bycopy.} = object
 
 type Camera* = Camera3D # Camera type fallback, defaults to Camera3D
 
-#// Camera2D type, defines a 2d camera
+# Camera2D type, defines a 2d camera # Camera2D type, defines a 2d camera
 type Camera2D* {.bycopy.} = object
   offset*: Vector2 # Camera offset (displacement from target)
   target*: Vector2 # Camera target (rotation and zoom origin)
   rotation*: float32 # Camera rotation in degrees
   zoom*: float32 # Camera zoom (scaling), should be 1.0f by default
 
-#// Vertex data definning a mesh
-#// NOTE: Data stored in CPU memory (and GPU)
+# Vertex data definning a mesh # Vertex data definning a mesh
+# NOTE: Data stored in CPU memory (and GPU) # NOTE: Data stored in CPU memory (and GPU)
 type Mesh* {.bycopy.} = object
   vertexCount*: int32 # Number of vertices stored in arrays
   triangleCount*: int32 # Number of triangles stored (indexed or not)
 
-# Default vertex data
+    # Default vertex data
   vertices*: float32 # Vertex position (XYZ - 3 components per vertex) (shader-location = 0)
   texcoords*: float32 # Vertex texture coordinates (UV - 2 components per vertex) (shader-location = 1)
   texcoords2*: float32 # Vertex second texture coordinates (useful for lightmaps) (shader-location = 5)
@@ -282,45 +282,45 @@ type Mesh* {.bycopy.} = object
   colors*: uint8 # Vertex colors (RGBA - 4 components per vertex) (shader-location = 3)
   indices*: uint16 # Vertex indices (in case vertex data comes indexed)
 
-# Animation vertex data
+    # Animation vertex data
   animVertices*: float32 # Animated vertex positions (after bones transformations)
   animNormals*: float32 # Animated normals (after bones transformations)
   boneIds*: int32 # Vertex bone ids, up to 4 bones influence by vertex (skinning)
   boneWeights*: float32 # Vertex bone weight, up to 4 bones influence by vertex (skinning)
 
-# OpenGL identifiers
+    # OpenGL identifiers
   vaoId*: uint32 # OpenGL Vertex Array Object id
   vboId*: uint32 # OpenGL Vertex Buffer Objects id (default vertex data)
 
-#// Shader type (generic)
+# Shader type (generic) # Shader type (generic)
 type Shader* {.bycopy.} = object
   id*: uint32 # Shader program id
   locs*: int32 # Shader locations array (MAX_SHADER_LOCATIONS)
 
-#// Material texture map
+# Material texture map # Material texture map
 type MaterialMap* {.bycopy.} = object
   texture*: Texture2D # Material map texture
   color*: Color # Material map color
   value*: float32 # Material map value
 
-#// Material type (generic)
+# Material type (generic) # Material type (generic)
 type Material* {.bycopy.} = object
   shader*: Shader # Material shader
   maps*: ptr MaterialMap # Material maps array (MAX_MATERIAL_MAPS)
   params*: float32 # Material generic parameters (if required)
 
-#// Transformation properties
+# Transformation properties # Transformation properties
 type Transform* {.bycopy.} = object
   translation*: Vector3 # Translation
   rotation*: Quaternion # Rotation
   scale*: Vector3 # Scale
 
-#// Bone information
+# Bone information # Bone information
 type BoneInfo* {.bycopy.} = object
   name*: array[32, char] # Bone name
   parent*: int32 # Bone parent
 
-#// Model type
+# Model type # Model type
 type Model* {.bycopy.} = object
   transform*: Matrix # Local transform matrix
 
@@ -330,36 +330,36 @@ type Model* {.bycopy.} = object
   materials*: ptr Material # Materials array
   meshMaterial*: int32 # Mesh material number
 
-# Animation data
+    # Animation data
   boneCount*: int32 # Number of bones
   bones*: ptr BoneInfo # Bones information (skeleton)
   bindPose*: ptr Transform # Bones base transformation (pose)
 
-#// Model animation
+# Model animation # Model animation
 type ModelAnimation* {.bycopy.} = object
   boneCount*: int32 # Number of bones
   frameCount*: int32 # Number of animation frames
   bones*: ptr BoneInfo # Bones information (skeleton)
   framePoses*: ptr Transform # Poses array by frame
 
-#// Ray type (useful for raycast)
+# Ray type (useful for raycast) # Ray type (useful for raycast)
 type Ray* {.bycopy.} = object
   position*: Vector3 # Ray position (origin)
   direction*: Vector3 # Ray direction
 
-#// Raycast hit information
+# Raycast hit information # Raycast hit information
 type RayHitInfo* {.bycopy.} = object
   hit*: bool # Did the ray hit something?
   distance*: float32 # Distance to nearest hit
   position*: Vector3 # Position of nearest hit
   normal*: Vector3 # Surface normal of hit
 
-#// Bounding box type
+# Bounding box type # Bounding box type
 type BoundingBox* {.bycopy.} = object
   min*: Vector3 # Minimum vertex box-corner
   max*: Vector3 # Maximum vertex box-corner
 
-#// Wave type, defines audio wave data
+# Wave type, defines audio wave data # Wave type, defines audio wave data
 type Wave* {.bycopy.} = object
   sampleCount*: uint32 # Total number of samples
   sampleRate*: uint32 # Frequency (samples per second)
@@ -369,8 +369,8 @@ type Wave* {.bycopy.} = object
 
 type rAudioBuffer* {.bycopy.} = object
 
-#// Audio stream type
-#// NOTE: Useful to create custom audio streams not bound to a specific file
+# Audio stream type # Audio stream type
+# NOTE: Useful to create custom audio streams not bound to a specific file # NOTE: Useful to create custom audio streams not bound to a specific file
 type AudioStream* {.bycopy.} = object
   buffer*: ptr rAudioBuffer # Pointer to internal data used by the audio system
 
@@ -378,13 +378,13 @@ type AudioStream* {.bycopy.} = object
   sampleSize*: uint32 # Bit depth (bits per sample): 8, 16, 32 (24 not supported)
   channels*: uint32 # Number of channels (1-mono, 2-stereo)
 
-#// Sound source type
+# Sound source type # Sound source type
 type Sound* {.bycopy.} = object
   stream*: AudioStream # Audio stream
   sampleCount*: uint32 # Total number of samples
 
-#// Music stream type (audio file streaming from memory)
-#// NOTE: Anything longer than ~10 seconds should be streamed
+# Music stream type (audio file streaming from memory) # Music stream type (audio file streaming from memory)
+# NOTE: Anything longer than ~10 seconds should be streamed # NOTE: Anything longer than ~10 seconds should be streamed
 type Music* {.bycopy.} = object
   stream*: AudioStream # Audio stream
   sampleCount*: uint32 # Total number of samples
@@ -393,7 +393,7 @@ type Music* {.bycopy.} = object
   ctxType*: int32 # Type of music context (audio filetype)
   ctxData*: pointer # Audio context data, depends on type
 
-#// Head-Mounted-Display device parameters
+# Head-Mounted-Display device parameters # Head-Mounted-Display device parameters
 type VrDeviceInfo* {.bycopy.} = object
   hResolution*: int32 # HMD horizontal resolution in pixels
   vResolution*: int32 # HMD vertical resolution in pixels
@@ -406,7 +406,30 @@ type VrDeviceInfo* {.bycopy.} = object
   lensDistortionValues*: float32 # HMD lens distortion constant parameters
   chromaAbCorrection*: float32 # HMD chromatic aberration correction parameters
 
-#//----------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------- #----------------------------------------------------------------------------------
+# Enumerators Definition # Enumerators Definition
+#---------------------------------------------------------------------------------- #----------------------------------------------------------------------------------
+# System/Window config flags # System/Window config flags
+# NOTE: Every bit registers one state (use it with bit masks) # NOTE: Every bit registers one state (use it with bit masks)
+# By default all flags are set to 0 # By default all flags are set to 0
+#typedef enum {
+#    FLAG_VSYNC_HINT         = 0x00000040,   // Set to try enabling V-Sync on GPU
+#    FLAG_FULLSCREEN_MODE    = 0x00000002,   // Set to run program in fullscreen
+#    FLAG_WINDOW_RESIZABLE   = 0x00000004,   // Set to allow resizable window
+#    FLAG_WINDOW_UNDECORATED = 0x00000008,   // Set to disable window decoration (frame and buttons)
+#    FLAG_WINDOW_HIDDEN      = 0x00000080,   // Set to hide window
+#    FLAG_WINDOW_MINIMIZED   = 0x00000200,   // Set to minimize window (iconify)
+#    FLAG_WINDOW_MAXIMIZED   = 0x00000400,   // Set to maximize window (expanded to monitor)
+#    FLAG_WINDOW_UNFOCUSED   = 0x00000800,   // Set to window non focused
+#    FLAG_WINDOW_TOPMOST     = 0x00001000,   // Set to window always on top
+#    FLAG_WINDOW_ALWAYS_RUN  = 0x00000100,   // Set to allow windows running while minimized
+#    FLAG_WINDOW_TRANSPARENT = 0x00000010,   // Set to allow transparent framebuffer
+#    FLAG_WINDOW_HIGHDPI     = 0x00002000,   // Set to support HighDPI
+#    FLAG_MSAA_4X_HINT       = 0x00000020,   // Set to try enabling MSAA 4X
+#    FLAG_INTERLACED_HINT    = 0x00010000    // Set to try enabling interlaced video format (for V3D)
+#} ConfigFlag;
+
+# Trace log type # Trace log type
 const Lightgray* = Color(r: 200, g: 200, b: 200, a: 255)
 const Gray* = Color(r: 130, g: 130, b: 130, a: 255)
 const Darkgray* = Color(r: 80, g: 80, b: 80, a: 255)
@@ -433,4 +456,4 @@ const Black* = Color(r: 0, g: 0, b: 0, a: 255)
 const Blank* = Color(r: 0, g: 0, b: 0, a: 0)
 const Magenta* = Color(r: 255, g: 0, b: 255, a: 255)
 const Raywhite* = Color(r: 245, g: 245, b: 245, a: 255)
-
+ # Trace log type
