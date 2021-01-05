@@ -10,7 +10,7 @@
 #
 #*******************************************************************************************/
 
-import ../../raylib/raylib
+import ../../src/nimraylib_now
 
 const
     MaxBuildings = 100

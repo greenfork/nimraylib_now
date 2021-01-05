@@ -10,7 +10,7 @@
 #
 #*******************************************************************************************
 
-import ../../raylib/raylib
+import ../../src/nimraylib_now
     # Initialization
     #--------------------------------------------------------------------------------------
 const screenWidth = 800
@@ -28,10 +28,10 @@ while not windowShouldClose():    # Detect window close button or ESC key
 
     #  Update
     # ----------------------------------------------------------------------------------
-    if KEY_RIGHT.isKeyDown: ballPosition.x += 2.0f
-    if KEY_LEFT.isKeyDown:  ballPosition.x -= 2.0f
-    if KEY_UP.isKeyDown:    ballPosition.y -= 2.0f
-    if KEY_DOWN.isKeyDown:  ballPosition.y += 2.0f
+    if KeyboardKey.KEY_RIGHT.isKeyDown: ballPosition.x += 2.0f
+    if KeyboardKey.KEY_LEFT.isKeyDown:  ballPosition.x -= 2.0f
+    if KeyboardKey.KEY_UP.isKeyDown:    ballPosition.y -= 2.0f
+    if KeyboardKey.KEY_DOWN.isKeyDown:  ballPosition.y += 2.0f
     # ----------------------------------------------------------------------------------
 
     #  Draw

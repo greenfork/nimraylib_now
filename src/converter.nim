@@ -1,7 +1,7 @@
 import httpclient, asyncdispatch
 import strutils, strformat
 from sequtils import any
-from os import `/`, fileExists, extractFilename
+from os import `/`, fileExists, extractFilename, changeFileExt
 from osproc import execCmd
 from sugar import `=>`
 import regex
@@ -83,7 +83,7 @@ const
   # typedef enum {
   reTypedefEnumStart = re"^typedef enum \{.*"
   # typedef enum { OPENGL_11 = 1, OPENGL_21, OPENGL_33, OPENGL_ES_20 } GlVersion;
-  reTypedefEnumOneline = re"^typedef enum \{.*\} ([[:word:]]+);.*"
+  reTypedefEnumOneline = re"^typedef enum \{[^}]*\} ([[:word:]]+);.*"
   # } ConfigFlag;
   reTypedefEnd = re"^\} (\w+);"
 
@@ -173,10 +173,10 @@ import raylib
 
 const
   raylibFiles = [
-    ("raylib", raylibHeader),
-    ("rlgl", rlglHeader),
-    ("raygui", rayguiHeader),
-    ("raymath", raymathHeader),
+    ("raylib"/"raylib.h", raylibHeader),
+    ("raylib"/"rlgl.h", rlglHeader),
+    ("raygui"/"src"/"raygui.h", rayguiHeader),
+    ("raylib"/"raymath.h", raymathHeader),
   ]
   selfModuleDeclarationNames = ["RAYLIB_H", "RLGL_H", "RAYGUI_H", "RAYMATH_H"]
   # For converters which are written before c2nim conversion with proper
@@ -186,13 +186,14 @@ const
 
 
 # Start processing all files
-for (filename, c2nimheader) in raylibFiles:
+for (filepath, c2nimheader) in raylibFiles:
+  let filename = filepath.extractFilename.changeFileExt("")
 
   # Preprocessing of C header file before feeding it to c2nim
 
   block preprocessing:
     let
-      raylibh = readFile("raylib"/filename & ".h")
+      raylibh = readFile(filepath)
       raylibhLines = raylibh.splitLines
     var
       rs: string

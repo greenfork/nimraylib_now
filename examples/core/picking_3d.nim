@@ -10,7 +10,7 @@
 #
 #*******************************************************************************************
 
-import ../../raylib/raylib
+import ../../src/nimraylib_now
 
 #  Initialization
 # --------------------------------------------------------------------------------------
@@ -46,7 +46,7 @@ while not windowShouldClose():      #  Detect window close button or ESC key
     # ----------------------------------------------------------------------------------
     camera.addr.updateCamera        #  Update camera
 
-    if MOUSE_LEFT_BUTTON.isMouseButtonPressed():
+    if MouseButton.MOUSE_LEFT_BUTTON.isMouseButtonPressed():
         if not collision:
             let ray = getMouseRay(getMousePosition(), camera);
 
