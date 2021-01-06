@@ -12,14 +12,15 @@
 #
 #*******************************************************************************************
 
-import raylib, math, lenientops
+import math, lenientops
+import ../../src/nimraylib_now/raylib
 
 #  Initialization
 # --------------------------------------------------------------------------------------
 const screenWidth = 800
 const screenHeight = 450
 
-InitWindow screenWidth, screenHeight, "raylib [models] example - waving cubes"
+initWindow screenWidth, screenHeight, "raylib [models] example - waving cubes"
 
 #  Initialize the camera
 var camera      = Camera3D()
@@ -27,21 +28,21 @@ camera.position = Vector3(x: 30.0f, y: 20.0f, z: 30.0f)
 camera.target   = Vector3(x: 0.0f, y: 0.0f, z: 0.0f)
 camera.up       = Vector3(x: 0.0f, y: 1.0f, z: 0.0f)
 camera.fovy     = 70.0f
-camera.typex    = CAMERA_PERSPECTIVE
+camera.`type`   = PERSPECTIVE
 
 #  Specify the amount of blocks in each direction
 const numBlocks = 15
 
-60.SetTargetFPS
+60.setTargetFPS
 # --------------------------------------------------------------------------------------
 
 #  Main game loop
-while not WindowShouldClose():    #  Detect window close button or ESC key
+while not windowShouldClose():    #  Detect window close button or ESC key
 
     #  Update
     # ----------------------------------------------------------------------------------
-    let 
-        time = GetTime()
+    let
+        time = getTime()
 
         #  Calculate time scale for cube position and size
         scale = (2.0f + sin(time))*0.7f
@@ -54,13 +55,13 @@ while not WindowShouldClose():    #  Detect window close button or ESC key
 
     #  Draw
     # ----------------------------------------------------------------------------------
-    BeginDrawing()
+    beginDrawing()
 
-    RAYWHITE.ClearBackground 
+    RAYWHITE.clearBackground
 
-    BeginMode3D camera
+    beginMode3D camera
 
-    DrawGrid 10, 5.0f
+    drawGrid 10, 5.0f
 
     for x in 0..<numBlocks:
         for y in 0..<numBlocks:
@@ -74,27 +75,27 @@ while not WindowShouldClose():    #  Detect window close button or ESC key
 
                     #  Calculate the cube position
                     cubePos = Vector3(
-                        x: (x - numBlocks/2)*(scale*3.0f) + scatter, 
+                        x: (x - numBlocks/2)*(scale*3.0f) + scatter,
                         y: (y - numBlocks/2)*(scale*2.0f) + scatter,
                         z: (z - numBlocks/2)*(scale*3.0f) + scatter)
 
                     #  Pick a color with a hue depending on cube position for the rainbow color effect
-                    cubeColor = ColorFromHSV Vector3(x: (((x + y + z)*18)%%360)/1.0, y: 0.75f, z: 0.9f)
+                    cubeColor = colorFromHSV((((x + y + z)*18)%%360)/1.0, 0.75f, 0.9f)
 
                     #  Calculate cube size
                     cubeSize = (2.4f - scale)*blockScale;
 
                 #  And finally, draw the cube!
-                DrawCube cubePos, cubeSize, cubeSize, cubeSize, cubeColor
-        
-    EndMode3D()
-    
-    DrawFPS 10, 10
+                drawCube cubePos, cubeSize, cubeSize, cubeSize, cubeColor
 
-    EndDrawing()
+    endMode3D()
+
+    drawFPS 10, 10
+
+    endDrawing()
 # ----------------------------------------------------------------------------------
 
 #  De-Initialization
 # --------------------------------------------------------------------------------------
-CloseWindow()        #  Close window and OpenGL context
+closeWindow()        #  Close window and OpenGL context
 # --------------------------------------------------------------------------------------
