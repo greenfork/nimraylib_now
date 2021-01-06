@@ -10,25 +10,25 @@
 #
 #*******************************************************************************************
 
-import raylib
+import ../../src/nimraylib_now/raylib
 
 #  Initialization
 # --------------------------------------------------------------------------------------
 const screenWidth = 800
 const screenHeight = 450
 
-InitWindow screenWidth, screenHeight, "raylib [text] example - text formatting"
+initWindow screenWidth, screenHeight, "raylib [text] example - text formatting"
 
 let
     score   = 100020
     hiscore = 200450
     lives   = 5
 
-SetTargetFPS(60)               #  Set our game to run at 60 frames-per-second
+setTargetFPS(60)               #  Set our game to run at 60 frames-per-second
 # --------------------------------------------------------------------------------------
 
 #  Main game loop
-while not WindowShouldClose(): #  Detect window close button or ESC key
+while not windowShouldClose(): #  Detect window close button or ESC key
     #  Update
     # ----------------------------------------------------------------------------------
     #  TODO: Update your variables here
@@ -36,22 +36,22 @@ while not WindowShouldClose(): #  Detect window close button or ESC key
 
     #  Draw
     # ----------------------------------------------------------------------------------
-    BeginDrawing()
+    beginDrawing()
 
-    ClearBackground RAYWHITE
+    clearBackground RAYWHITE
 
-    DrawText TextFormat("Score: %08i", score), 200, 80, 20, RED
+    drawText textFormat("Score: %08i", score), 200, 80, 20, RED
 
-    DrawText TextFormat("HiScore: %08i", hiscore), 200, 120, 20, GREEN
+    drawText textFormat("HiScore: %08i", hiscore), 200, 120, 20, GREEN
 
-    DrawText TextFormat("Lives: %02i", lives), 200, 160, 40, BLUE
+    drawText textFormat("Lives: %02i", lives), 200, 160, 40, BLUE
 
-    DrawText TextFormat("Elapsed Time: %02.02f ms", GetFrameTime()*1000), 200, 220, 20, BLACK
+    drawText textFormat("Elapsed Time: %02.02f ms", getFrameTime()*1000), 200, 220, 20, BLACK
 
-    EndDrawing()
+    endDrawing()
     # ----------------------------------------------------------------------------------
 
 #  De-Initialization
 # --------------------------------------------------------------------------------------
-CloseWindow()        #  Close window and OpenGL context
+closeWindow()        #  Close window and OpenGL context
 # --------------------------------------------------------------------------------------

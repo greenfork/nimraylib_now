@@ -12,14 +12,14 @@
 #
 #*******************************************************************************************
 
-import raylib
+import ../../src/nimraylib_now/raylib
 
 #  Initialization
 # --------------------------------------------------------------------------------------
 const screenWidth = 800
 const screenHeight = 450
 
-InitWindow screenWidth, screenHeight, "raylib [text] example - draw text inside a rectangle"
+initWindow screenWidth, screenHeight, "raylib [text] example - draw text inside a rectangle"
 
 let text = "Text cannot escape\tthis container\t...word wrap also works when active so here's" &
     "a long text for testing.\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod" &
@@ -38,29 +38,29 @@ const minHeight = 60
 const maxWidth  = screenWidth - 50
 const maxHeight = screenHeight - 160
 
-var 
+var
     lastMouse = Vector2(x: 0.0f, y: 0.0f) #  Stores last mouse coordinates
     borderColor = MAROON                 #  Container border color
-    font = GetFontDefault()              #  Get default system font
+    font = getFontDefault()              #  Get default system font
 
-60.SetTargetFPS                       #  Set our game to run at 60 frames-per-second
+60.setTargetFPS                       #  Set our game to run at 60 frames-per-second
 # --------------------------------------------------------------------------------------
 
 #  Main game loop
-while not WindowShouldClose():        #  Detect window close button or ESC key
+while not windowShouldClose():        #  Detect window close button or ESC key
     #  Update
     # ----------------------------------------------------------------------------------
-    if IsKeyPressed(KEY_SPACE): wordWrap = not wordWrap
+    if isKeyPressed(SPACE): wordWrap = not wordWrap
 
-    let mouse = GetMousePosition()
+    let mouse = getMousePosition()
 
     #  Check if the mouse is inside the container and toggle border color
-    if CheckCollisionPointRec(mouse, container): borderColor = Fade(MAROON, 0.4f)
+    if checkCollisionPointRec(mouse, container): borderColor = fade(MAROON, 0.4f)
     elif not resizing: borderColor = MAROON
 
     #  Container resizing logic
     if resizing:
-        if IsMouseButtonReleased(MOUSE_LEFT_BUTTON): resizing = false
+        if isMouseButtonReleased(LEFT_BUTTON): resizing = false
 
         let width = container.width + (mouse.x - lastMouse.x)
         container.width = if width > minWidth: (if width < maxWidth: width else: maxWidth) else: minWidth
@@ -69,7 +69,7 @@ while not WindowShouldClose():        #  Detect window close button or ESC key
         container.height = if height > minHeight: (if height < maxHeight: height else: maxHeight) else: minHeight
     else:
         #  Check if we're resizing
-        if IsMouseButtonDown(MOUSE_LEFT_BUTTON) and CheckCollisionPointRec(mouse, resizer): resizing = true
+        if isMouseButtonDown(LEFT_BUTTON) and checkCollisionPointRec(mouse, resizer): resizing = true
 
     #  Move resizer rectangle properly
     resizer.x = container.x + container.width - 17
@@ -80,35 +80,35 @@ while not WindowShouldClose():        #  Detect window close button or ESC key
 
     #  Draw
     # ----------------------------------------------------------------------------------
-    BeginDrawing()
+    beginDrawing()
 
-    ClearBackground RAYWHITE
+    clearBackground RAYWHITE
 
-    DrawRectangleLinesEx container, 3, borderColor  #  Draw container border
+    drawRectangleLinesEx container, 3, borderColor  #  Draw container border
 
     #  Draw text in container (add some padding)
-    DrawTextRec font, text,
+    drawTextRec font, text,
                Rectangle(x: container.x + 4, y: container.y + 4, width: container.width-4, height: container.height-4),
                20.0f, 2.0f, wordWrap, GRAY
 
-    DrawRectangleRec resizer, borderColor          #  Draw the resize box
+    drawRectangleRec resizer, borderColor          #  Draw the resize box
 
     #  Draw bottom info
-    DrawRectangle 0, screenHeight - 54, screenWidth, 54, GRAY
-    DrawRectangleRec Rectangle(x: 382, y: screenHeight - 34, width: 12, height: 12), MAROON
-    
-    DrawText "Word Wrap: ", 313, screenHeight-115, 20, BLACK
-    if wordWrap: DrawText "ON", 447, screenHeight - 115, 20, RED
-    else: DrawText "OFF", 447, screenHeight - 115, 20, BLACK
-    
-    DrawText "Press [SPACE] to toggle word wrap", 218, screenHeight - 86, 20, GRAY
+    drawRectangle 0, screenHeight - 54, screenWidth, 54, GRAY
+    drawRectangleRec Rectangle(x: 382, y: screenHeight - 34, width: 12, height: 12), MAROON
 
-    DrawText "Click hold & drag the    to resize the container", 155, screenHeight - 38, 20, RAYWHITE
-        
-    EndDrawing()
+    drawText "Word Wrap: ", 313, screenHeight-115, 20, BLACK
+    if wordWrap: drawText "ON", 447, screenHeight - 115, 20, RED
+    else: drawText "OFF", 447, screenHeight - 115, 20, BLACK
+
+    drawText "Press [SPACE] to toggle word wrap", 218, screenHeight - 86, 20, GRAY
+
+    drawText "Click hold & drag the    to resize the container", 155, screenHeight - 38, 20, RAYWHITE
+
+    endDrawing()
     # ----------------------------------------------------------------------------------
 
 #  De-Initialization
 # --------------------------------------------------------------------------------------
-CloseWindow()        #  Close window and OpenGL context
+closeWindow()        #  Close window and OpenGL context
 # --------------------------------------------------------------------------------------

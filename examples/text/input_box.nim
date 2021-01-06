@@ -10,7 +10,7 @@
 #
 #*******************************************************************************************
 
-include raylib
+import ../../src/nimraylib_now/raylib
 
 const MAX_INPUT_CHARS = 9
 
@@ -19,7 +19,7 @@ const MAX_INPUT_CHARS = 9
 const screenWidth = 800
 const screenHeight = 450
 
-InitWindow screenWidth, screenHeight, "raylib [text] example - input box"
+initWindow screenWidth, screenHeight, "raylib [text] example - input box"
 
 var
     name: array[MAX_INPUT_CHARS+1, char] #  NOTE: One extra space required for line ending char '\0'
@@ -30,18 +30,18 @@ var
 
     framesCounter = 0
 
-60.SetTargetFPS               #  Set our game to run at 60 frames-per-second
+60.setTargetFPS               #  Set our game to run at 60 frames-per-second
 # --------------------------------------------------------------------------------------
 
 #  Main game loop
-while not WindowShouldClose():#  Detect window close button or ESC key
+while not windowShouldClose():#  Detect window close button or ESC key
     #  Update
     # ----------------------------------------------------------------------------------
-    mouseOnText = CheckCollisionPointRec(GetMousePosition(), textBox)
+    mouseOnText = checkCollisionPointRec(getMousePosition(), textBox)
 
     if mouseOnText:
         #  Get pressed key (character) on the queue
-        var key = GetKeyPressed()
+        var key = getKeyPressed()
 
         #  Check if more characters have been pressed on the same frame
         while key > 0:
@@ -49,9 +49,9 @@ while not WindowShouldClose():#  Detect window close button or ESC key
             if key >= 32 and key <= 125 and letterCount < MAX_INPUT_CHARS:
                 name[letterCount] = key.char
                 letterCount.inc
-            key = GetKeyPressed()  #  Check next character in the queue
+            key = getKeyPressed()  #  Check next character in the queue
 
-        if KEY_BACKSPACE.IsKeyPressed:
+        if isKeyPressed(BACKSPACE):
             letterCount.dec
             if letterCount < 0: letterCount = 0
             name[letterCount] = '\0'
@@ -61,42 +61,42 @@ while not WindowShouldClose():#  Detect window close button or ESC key
 
     #  Draw
     # ----------------------------------------------------------------------------------
-    BeginDrawing()
+    beginDrawing()
 
-    ClearBackground RAYWHITE
+    clearBackground RAYWHITE
 
-    DrawText "PLACE MOUSE OVER INPUT BOX!", 240, 140, 20, GRAY
+    drawText "PLACE MOUSE OVER INPUT BOX!", 240, 140, 20, GRAY
 
-    DrawRectangleRec textBox, LIGHTGRAY
-    if mouseOnText: DrawRectangleLines textBox.x.int, textBox.y.int, textBox.width.int, textBox.height.int, RED
-    else: DrawRectangleLines textBox.x.int, textBox.y.int, textBox.width.int, textBox.height.int, DARKGRAY
+    drawRectangleRec textBox, LIGHTGRAY
+    if mouseOnText: drawRectangleLines textBox.x.int32, textBox.y.int32, textBox.width.int32, textBox.height.int32, RED
+    else: drawRectangleLines textBox.x.int32, textBox.y.int32, textBox.width.int32, textBox.height.int32, DARKGRAY
 
     let namestr = cast[cstring](addr name[0])
-    DrawText $namestr, textBox.x.int + 5, textBox.y.int + 8, 40, MAROON
+    drawText $namestr, textBox.x.int32 + 5, textBox.y.int32 + 8, 40, MAROON
 
-    DrawText TextFormat("INPUT CHARS: %i/%i", letterCount, MAX_INPUT_CHARS), 315, 250, 20, DARKGRAY
+    drawText textFormat("INPUT CHARS: %i/%i", letterCount, MAX_INPUT_CHARS), 315, 250, 20, DARKGRAY
 
     if mouseOnText:
         if letterCount < MAX_INPUT_CHARS:
             #  Draw blinking underscore char
             if (framesCounter div 20)%%2 == 0:
-                DrawText "_", textBox.x.int + 8 + MeasureText(namestr, 40), textBox.y.int + 12, 40, MAROON
-        else: DrawText "Press BACKSPACE to delete chars...", 230, 300, 20, GRAY
+                drawText "_", textBox.x.int32 + 8 + measureText(namestr, 40), textBox.y.int32 + 12, 40, MAROON
+        else: drawText "Press BACKSPACE to delete chars...", 230, 300, 20, GRAY
 
-    EndDrawing()
+    endDrawing()
     # ----------------------------------------------------------------------------------
 
 #  De-Initialization
 # --------------------------------------------------------------------------------------
-CloseWindow()        #  Close window and OpenGL context
+closeWindow()        #  Close window and OpenGL context
 # --------------------------------------------------------------------------------------
 
 #  Check if any key is pressed
 #  NOTE: We limit keys check to keys between 32 (KEY_SPACE) and 126
-proc IsAnyKeyPressed(): bool =
-    var 
+proc isAnyKeyPressed(): bool =
+    var
         keyPressed = false
-        key = GetKeyPressed()
+        key = getKeyPressed()
 
     if key >= 32 and key <= 126: keyPressed = true
 
