@@ -19,7 +19,7 @@
 #
 #*******************************************************************************************
 
-import raylib
+import ../../src/nimraylib_now/raylib
 
 const GLSL_VERSION = 330
 
@@ -73,64 +73,64 @@ const paletteText = [
 const screenWidth = 800
 const screenHeight = 450
 
-InitWindow screenWidth, screenHeight, "raylib [shaders] example - color palette switch"
+initWindow screenWidth, screenHeight, "raylib [shaders] example - color palette switch"
 
 #  Load shader to be used on some parts drawing
 #  NOTE 1: Using GLSL 330 shader version, on OpenGL ES 2.0 use GLSL 100 shader version
 #  NOTE 2: Defining 0 (NULL) for vertex shader forces usage of internal default vertex shader
-let 
-    shader = LoadShader(nil, TextFormat("resources/shaders/glsl%i/palette_switch.fs", GLSL_VERSION))
+let
+    shader = loadShader(nil, textFormat("resources/shaders/glsl%i/palette_switch.fs", GLSL_VERSION))
 #  Get variable (uniform) location on the shader to connect with the program
 #  NOTE: If uniform variable could not be found in the shader, function returns -1
-    paletteLoc = GetShaderLocation(shader, "palette")
+    paletteLoc = getShaderLocation(shader, "palette")
 
 var currentPalette = 0
 let lineHeight = screenHeight div COLORS_PER_PALETTE
 
-60.SetTargetFPS                        #  Set our game to run at 60 frames-per-second
+60.setTargetFPS                        #  Set our game to run at 60 frames-per-second
 # --------------------------------------------------------------------------------------
 
 #  Main game loop
-while not WindowShouldClose():         #  Detect window close button or ESC key
+while not windowShouldClose():         #  Detect window close button or ESC key
     #  Update
     # ----------------------------------------------------------------------------------
-    currentPalette += (if IsKeyPressed(KEY_RIGHT): 1 elif IsKeyPressed(KEY_LEFT): -1 else: 0)
+    currentPalette += (if isKeyPressed(RIGHT): 1 elif isKeyPressed(LEFT): -1 else: 0)
 
     if currentPalette >= MAX_PALETTES: currentPalette = 0
     elif currentPalette < 0: currentPalette = MAX_PALETTES - 1
 
     #  Send new value to the shader to be used on drawing.
     #  NOTE: We are sending RGB triplets w/o the alpha channel
-    SetShaderValueV shader, paletteLoc, palettes[currentPalette].addr, UNIFORM_IVEC3, COLORS_PER_PALETTE
+    setShaderValueV shader, paletteLoc, palettes[currentPalette].addr, IVEC3, COLORS_PER_PALETTE
     # ----------------------------------------------------------------------------------
 
     #  Draw
     # ----------------------------------------------------------------------------------
-    BeginDrawing()
+    beginDrawing()
 
-    ClearBackground RAYWHITE
+    clearBackground RAYWHITE
 
-    BeginShaderMode shader
+    beginShaderMode shader
 
     for i in 0..<COLORS_PER_PALETTE:
         #  Draw horizontal screen-wide rectangles with increasing "palette index"
         #  The used palette index is encoded in the RGB components of the pixel
-        DrawRectangle 0, lineHeight*i, GetScreenWidth(), lineHeight, Color(r: i.uint8, g: i.uint8, b: i.uint8, a: 255)
+        drawRectangle 0.int32, (int32)lineHeight*i, getScreenWidth(), lineHeight.int32, Color(r: i.uint8, g: i.uint8, b: i.uint8, a: 255)
 
-    EndShaderMode()
+    endShaderMode()
 
-    DrawText "< >", 10, 10, 30, DARKBLUE
-    DrawText "CURRENT PALETTE:", 60, 15, 20, RAYWHITE
-    DrawText paletteText[currentPalette], 300, 15, 20, RED
+    drawText "< >", 10, 10, 30, DARKBLUE
+    drawText "CURRENT PALETTE:", 60, 15, 20, RAYWHITE
+    drawText paletteText[currentPalette], 300, 15, 20, RED
 
-    DrawFPS 700, 15
+    drawFPS 700, 15
 
-    EndDrawing()
+    endDrawing()
     # ----------------------------------------------------------------------------------
 
 #  De-Initialization
 # --------------------------------------------------------------------------------------
-UnloadShader shader        #  Unload shader
+unloadShader shader        #  Unload shader
 
-CloseWindow()              #  Close window and OpenGL context
+closeWindow()              #  Close window and OpenGL context
 # --------------------------------------------------------------------------------------

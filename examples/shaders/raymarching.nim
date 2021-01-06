@@ -17,17 +17,17 @@
 #
 #*******************************************************************************************
 
-import raylib
+import ../../src/nimraylib_now/raylib
 const GLSL_VERSION = 330
 
 #  Initialization
 # --------------------------------------------------------------------------------------
 var
-    screenWidth = 800
-    screenHeight = 450
+  screenWidth = 800.int32
+  screenHeight = 450.int32
 
-SetConfigFlags FLAG_WINDOW_RESIZABLE.uint32
-InitWindow screenWidth, screenHeight, "raylib [shaders] example - raymarching shapes"
+setConfigFlags WINDOW_RESIZABLE
+initWindow screenWidth, screenHeight, "raylib [shaders] example - raymarching shapes"
 
 var camera = Camera()
 camera.position = Vector3(x: 2.5f, y: 2.5f, z: 3.0f)    #  Camera position
@@ -35,74 +35,74 @@ camera.target = Vector3(x: 0.0f, y: 0.0f, z: 0.7f)      #  Camera looking at poi
 camera.up = Vector3(x: 0.0f, y: 1.0f, z: 0.0f)          #  Camera up vector (rotation towards target)
 camera.fovy = 65.0f                                     #  Camera field-of-view Y
 
-SetCameraMode camera, CAMERA_FREE                       #  Set camera mode
+setCameraMode camera, FREE                       #  Set camera mode
 
 #  Load raymarching shader
 #  NOTE: Defining 0 (NULL) for vertex shader forces usage of internal default vertex shader
 let
-    shader = LoadShader(nil, TextFormat("resources/shaders/glsl%i/raymarching.fs", GLSL_VERSION))
+    shader = loadShader(nil, textFormat("resources/shaders/glsl%i/raymarching.fs", GLSL_VERSION))
 
 #  Get shader locations for required uniforms
-    viewEyeLoc      = GetShaderLocation(shader, "viewEye")
-    viewCenterLoc   = GetShaderLocation(shader, "viewCenter")
-    runTimeLoc      = GetShaderLocation(shader, "runTime")
-    resolutionLoc   = GetShaderLocation(shader, "resolution")
+    viewEyeLoc      = getShaderLocation(shader, "viewEye")
+    viewCenterLoc   = getShaderLocation(shader, "viewCenter")
+    runTimeLoc      = getShaderLocation(shader, "runTime")
+    resolutionLoc   = getShaderLocation(shader, "resolution")
 
 var resolution = [screenWidth.float32, screenHeight.float32]
-SetShaderValue shader, resolutionLoc, resolution.addr, UNIFORM_VEC2
+setShaderValue shader, resolutionLoc, resolution.addr, VEC2
 
 var runTime = 0.0f
 
-60.SetTargetFPS                         #  Set our game to run at 60 frames-per-second
+60.setTargetFPS                         #  Set our game to run at 60 frames-per-second
 # --------------------------------------------------------------------------------------
 
 #  Main game loop
-while not WindowShouldClose():          #  Detect window close button or ESC key
+while not windowShouldClose():          #  Detect window close button or ESC key
     #  Check if screen is resized
     # ----------------------------------------------------------------------------------
-    if IsWindowResized():
-        screenWidth  = GetScreenWidth()
-        screenHeight = GetScreenHeight()
+    if isWindowResized():
+        screenWidth  = getScreenWidth()
+        screenHeight = getScreenHeight()
         resolution   = [screenWidth.float32, screenHeight.float32]
-        SetShaderValue shader, resolutionLoc, resolution.addr, UNIFORM_VEC2
+        setShaderValue shader, resolutionLoc, resolution.addr, VEC2
 
     #  Update
     # ----------------------------------------------------------------------------------
-    camera.addr.UpdateCamera           #  Update camera
+    camera.addr.updateCamera           #  Update camera
 
     var
         cameraPos = [camera.position.x, camera.position.y, camera.position.z]
         cameraTarget = [camera.target.x, camera.target.y, camera.target.z]
 
-        deltaTime = GetFrameTime()
+        deltaTime = getFrameTime()
     runTime += deltaTime
 
     #  Set shader required uniform values
-    SetShaderValue shader, viewEyeLoc, cameraPos.addr, UNIFORM_VEC3
-    SetShaderValue shader, viewCenterLoc, cameraTarget.addr, UNIFORM_VEC3
-    SetShaderValue shader, runTimeLoc, runTime.addr, UNIFORM_FLOAT
+    setShaderValue shader, viewEyeLoc, cameraPos.addr, VEC3
+    setShaderValue shader, viewCenterLoc, cameraTarget.addr, VEC3
+    setShaderValue shader, runTimeLoc, runTime.addr, FLOAT
     # ----------------------------------------------------------------------------------
 
     #  Draw
     # ----------------------------------------------------------------------------------
-    BeginDrawing()
+    beginDrawing()
 
-    ClearBackground RAYWHITE
+    clearBackground RAYWHITE
 
     #  We only draw a white full-screen rectangle,
     #  frame is generated in shader using raymarching
-    BeginShaderMode shader
-    DrawRectangle 0, 0, screenWidth, screenHeight, WHITE
-    EndShaderMode()
+    beginShaderMode shader
+    drawRectangle 0, 0, screenWidth, screenHeight, WHITE
+    endShaderMode()
 
-    DrawText "(c) Raymarching shader by Iñigo Quilez. MIT License.", screenWidth - 280, screenHeight - 20, 10, BLACK
+    drawText "(c) Raymarching shader by Iñigo Quilez. MIT License.", screenWidth - 280, screenHeight - 20, 10, BLACK
 
-    EndDrawing()
+    endDrawing()
     # ----------------------------------------------------------------------------------
 
 #  De-Initialization
 # --------------------------------------------------------------------------------------
-UnloadShader shader            #  Unload shader
+unloadShader shader            #  Unload shader
 
-CloseWindow()                  #  Close window and OpenGL context
+closeWindow()                  #  Close window and OpenGL context
 # --------------------------------------------------------------------------------------
