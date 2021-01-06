@@ -10,13 +10,14 @@
 #
 #*******************************************************************************************
 
-import raylib, lenientops
+import lenientops
+import ../../src/nimraylib_now/raylib
 
 const MAX_PARTICLES = 200
 
 #  Particle structure with basic data
 type Particle = object
-    position: Vector2 
+    position: Vector2
     color: Color
     alpha: float
     size: float
@@ -28,7 +29,7 @@ type Particle = object
 const screenWidth = 800
 const screenHeight = 450
 
-InitWindow screenWidth, screenHeight, "raylib [textures] example - particles blending"
+initWindow screenWidth, screenHeight, "raylib [textures] example - particles blending"
 
 #  Particles pool, reuse them!
 var mouseTail: array[MAX_PARTICLES, Particle]
@@ -36,24 +37,24 @@ var mouseTail: array[MAX_PARTICLES, Particle]
 #  Initialize particles
 for i in 0..<MAX_PARTICLES:
     mouseTail[i].position = Vector2(x: 0, y: 0)
-    mouseTail[i].color = Color(r: GetRandomValue(0, 255).uint8, g: GetRandomValue(0, 255).uint8, 
-        b: GetRandomValue(0, 255).uint8, a: 255)
+    mouseTail[i].color = Color(r: getRandomValue(0, 255).uint8, g: getRandomValue(0, 255).uint8,
+        b: getRandomValue(0, 255).uint8, a: 255)
     mouseTail[i].alpha = 1.0f
-    mouseTail[i].size = GetRandomValue(1, 30).float / 20.0f
-    mouseTail[i].rotation = GetRandomValue(0, 360).float
+    mouseTail[i].size = getRandomValue(1, 30).float / 20.0f
+    mouseTail[i].rotation = getRandomValue(0, 360).float
     mouseTail[i].active = false
 
-let 
+let
     gravity = 3.0f
-    smoke = LoadTexture("resources/smoke.png")
+    smoke = loadTexture("resources/smoke.png")
 
-var blending = BLEND_ALPHA
+var blending = BlendMode.ALPHA
 
-60.SetTargetFPS
+60.setTargetFPS
 # --------------------------------------------------------------------------------------
 
 #  Main game loop
-while not WindowShouldClose():    #  Detect window close button or ESC key
+while not windowShouldClose():    #  Detect window close button or ESC key
     #  Update
     # ----------------------------------------------------------------------------------
 
@@ -66,7 +67,7 @@ while not WindowShouldClose():    #  Detect window close button or ESC key
         if not mouseTail[i].active:
             mouseTail[i].active = true
             mouseTail[i].alpha = 1.0f
-            mouseTail[i].position = GetMousePosition()
+            mouseTail[i].position = getMousePosition()
             break
 
     for i in 0..<MAX_PARTICLES:
@@ -76,40 +77,40 @@ while not WindowShouldClose():    #  Detect window close button or ESC key
             if mouseTail[i].alpha <= 0.0f: mouseTail[i].active = false
             mouseTail[i].rotation += 5.0f
 
-    if IsKeyPressed(KEY_SPACE):
-        blending = (if blending == BLEND_ALPHA: BLEND_ADDITIVE else: BLEND_ALPHA)
+    if isKeyPressed(SPACE):
+        blending = (if blending == ALPHA: ADDITIVE else: ALPHA)
     # ----------------------------------------------------------------------------------
 
     #  Draw
     # ----------------------------------------------------------------------------------
-    BeginDrawing()
+    beginDrawing()
 
-    ClearBackground DARKGRAY
+    clearBackground DARKGRAY
 
-    BeginBlendMode blending
+    beginBlendMode blending
 
         #  Draw active particles
     for i in 0..<MAX_PARTICLES:
-        if mouseTail[i].active: DrawTexturePro smoke, 
+        if mouseTail[i].active: drawTexturePro smoke,
             Rectangle(x: 0.0f, y: 0.0f, width: smoke.width.float, height: smoke.height.float),
-            Rectangle(x: mouseTail[i].position.x, y: mouseTail[i].position.y, width: smoke.width*mouseTail[i].size, 
+            Rectangle(x: mouseTail[i].position.x, y: mouseTail[i].position.y, width: smoke.width*mouseTail[i].size,
                 height: smoke.height*mouseTail[i].size),
             Vector2(x: smoke.width*mouseTail[i].size.float/2.0f, y: smoke.height*mouseTail[i].size.float/2.0f),
-            mouseTail[i].rotation, Fade(mouseTail[i].color, mouseTail[i].alpha)
+            mouseTail[i].rotation, fade(mouseTail[i].color, mouseTail[i].alpha)
 
-    EndBlendMode()
+    endBlendMode()
 
-    DrawText("PRESS SPACE to CHANGE BLENDING MODE", 180, 20, 20, BLACK)
+    drawText("PRESS SPACE to CHANGE BLENDING MODE", 180, 20, 20, BLACK)
 
-    if (blending == BLEND_ALPHA): DrawText "ALPHA BLENDING", 290, screenHeight - 40, 20, BLACK
-    else: DrawText "ADDITIVE BLENDING", 280, screenHeight - 40, 20, RAYWHITE
+    if (blending == ALPHA): drawText "ALPHA BLENDING", 290, screenHeight - 40, 20, BLACK
+    else: drawText "ADDITIVE BLENDING", 280, screenHeight - 40, 20, RAYWHITE
 
-    EndDrawing()
+    endDrawing()
     # ----------------------------------------------------------------------------------
 
 #  De-Initialization
 # --------------------------------------------------------------------------------------
-UnloadTexture smoke
+unloadTexture smoke
 
-CloseWindow()        #  Close window and OpenGL context
+closeWindow()        #  Close window and OpenGL context
 # --------------------------------------------------------------------------------------

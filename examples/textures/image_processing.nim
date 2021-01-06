@@ -12,7 +12,8 @@
 #
 #*******************************************************************************************
 
-import raylib, system/[ansi_c]
+import ../../src/nimraylib_now/raylib
+import system/[ansi_c]
 
 const NUM_PROCESSES = 8
 
@@ -42,13 +43,13 @@ const processText = [
 const screenWidth = 800
 const screenHeight = 450
 
-InitWindow screenWidth, screenHeight, "raylib [textures] example - image processing"
+initWindow screenWidth, screenHeight, "raylib [textures] example - image processing"
 
 #  NOTE: Textures MUST be loaded after Window initialization (OpenGL context is required)
 
-var image = LoadImage("resources/parrots.png") #  Loaded in CPU memory (RAM)
-ImageFormat image.addr, UNCOMPRESSED_R8G8B8A8  #  Format image to RGBA 32bit (required for texture update) <-- ISSUE
-let texture = LoadTextureFromImage image       #  Image converted to texture, GPU memory (VRAM)
+var image = loadImage("resources/parrots.png") #  Loaded in CPU memory (RAM)
+imageFormat image.addr, UNCOMPRESSED_R8G8B8A8  #  Format image to RGBA 32bit (required for texture update) <-- ISSUE
+let texture = loadTextureFromImage image       #  Image converted to texture, GPU memory (VRAM)
 
 var
     currentProcess = NONE
@@ -58,40 +59,40 @@ var
 for i in 0..<NUM_PROCESSES:
     selectRecs[i] = Rectangle(x: 40.0f, y: (50 + 32*i).float, width: 150.0f, height: 30.0f)
 
-60.SetTargetFPS
+60.setTargetFPS
 # ---------------------------------------------------------------------------------------
 
 #  Main game loop
-while not WindowShouldClose():    #  Detect window close button or ESC key
+while not windowShouldClose():    #  Detect window close button or ESC key
     #  Update
     # ----------------------------------------------------------------------------------
-    if IsKeyPressed(KEY_DOWN):
+    if isKeyPressed(DOWN):
         currentProcess = (if currentProcess.int == 7: 0 else: currentProcess.int + 1).ImageProcess
         textureReload = true
 
-    elif IsKeyPressed(KEY_UP):
+    elif isKeyPressed(UP):
         currentProcess = (if currentProcess.int == 0: 7 else: currentProcess.int - 1).ImageProcess
         textureReload = true
 
     if textureReload:
-        UnloadImage image                          #  Unload current image data
-        image = LoadImage("resources/parrots.png") #  Re-load image data
+        unloadImage image                          #  Unload current image data
+        image = loadImage("resources/parrots.png") #  Re-load image data
 
         #  NOTE: Image processing is a costly CPU process to be done every frame,
         #  If image processing is required in a frame-basis, it should be done
         #  with a texture and by shaders
         case currentProcess:
-            of COLOR_GRAYSCALE: ImageColorGrayscale image.addr
-            of COLOR_TINT:      ImageColorTint image.addr, GREEN
-            of COLOR_INVERT:    ImageColorInvert image.addr
-            of COLOR_CONTRAST:  ImageColorContrast image.addr, -40
-            of COLOR_BRIGHTNESS:ImageColorBrightness image.addr, -80
-            of FLIP_VERTICAL:   ImageFlipVertical image.addr
-            of FLIP_HORIZONTAL: ImageFlipHorizontal image.addr
+            of COLOR_GRAYSCALE: imageColorGrayscale image.addr
+            of COLOR_TINT:      imageColorTint image.addr, GREEN
+            of COLOR_INVERT:    imageColorInvert image.addr
+            of COLOR_CONTRAST:  imageColorContrast image.addr, -40
+            of COLOR_BRIGHTNESS:imageColorBrightness image.addr, -80
+            of FLIP_VERTICAL:   imageFlipVertical image.addr
+            of FLIP_HORIZONTAL: imageFlipHorizontal image.addr
             else: discard
 
-        let pixels = GetImageData(image) #  Get pixel data from image (RGBA 32bit)
-        UpdateTexture texture, pixels    #  Update texture with new image data
+        let pixels = loadImageColors(image) #  Get pixel data from image (RGBA 32bit)
+        updateTexture texture, pixels    #  Update texture with new image data
         pixels.c_free                    #  Unload pixels data from RAM
 
         textureReload = false
@@ -99,31 +100,30 @@ while not WindowShouldClose():    #  Detect window close button or ESC key
 
     #  Draw
     # ----------------------------------------------------------------------------------
-    BeginDrawing()
+    beginDrawing()
 
-    ClearBackground RAYWHITE
+    clearBackground RAYWHITE
 
-    DrawText "IMAGE PROCESSING:", 40, 30, 10, DARKGRAY
+    drawText "IMAGE PROCESSING:", 40, 30, 10, DARKGRAY
 
     #  Draw rectangles
     for i in 0..<NUM_PROCESSES:
-        DrawRectangleRec selectRecs[i], (if i == currentProcess.int: SKYBLUE else: LIGHTGRAY)
-        DrawRectangleLines selectRecs[i].x.int, selectRecs[i].y.int, selectRecs[i].width.int, 
-            selectRecs[i].height.int, (if i == currentProcess.int: BLUE else: GRAY)
-        DrawText processText[i], (selectRecs[i].x + selectRecs[i].width/2 - MeasureText(processText[i], 10)/2).int,
-            selectRecs[i].y.int + 11, 10, (if i == currentProcess.int: DARKBLUE else: DARKGRAY)
+        drawRectangleRec selectRecs[i], (if i == currentProcess.int32: SKYBLUE else: LIGHTGRAY)
+        drawRectangleLines selectRecs[i].x.int32, selectRecs[i].y.int32, selectRecs[i].width.int32,
+            selectRecs[i].height.int32, (if i == currentProcess.int32: BLUE else: GRAY)
+        drawText processText[i], (selectRecs[i].x + selectRecs[i].width/2 - measureText(processText[i], 10)/2).int32,
+            selectRecs[i].y.int32 + 11, 10, (if i == currentProcess.int32: DARKBLUE else: DARKGRAY)
 
-    DrawTexture texture, screenWidth - texture.width - 60, screenHeight div 2 - texture.height div 2, WHITE
-    DrawRectangleLines screenWidth - texture.width - 60, screenHeight div 2 - texture.height div 2, texture.width, 
-        texture.height, BLACK
+    drawTexture texture, screenWidth - texture.width - 60, screenHeight div 2 - texture.height div 2, WHITE
+    drawRectangleLines screenWidth - texture.width - 60, screenHeight div 2 - texture.height div 2, texture.width, texture.height, BLACK
 
-    EndDrawing()
+    endDrawing()
     # ----------------------------------------------------------------------------------
 
 #  De-Initialization
 # --------------------------------------------------------------------------------------
-UnloadTexture texture        #  Unload texture from VRAM
-UnloadImage image            #  Unload image from RAM
+unloadTexture texture        #  Unload texture from VRAM
+unloadImage image            #  Unload image from RAM
 
-CloseWindow()                #  Close window and OpenGL context
+closeWindow()                #  Close window and OpenGL context
 # --------------------------------------------------------------------------------------
