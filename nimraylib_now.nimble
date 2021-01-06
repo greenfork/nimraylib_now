@@ -23,7 +23,7 @@ task convert, "run with c2nim":
   exec "nim check src/nimraylib_now/rlgl.nim"
   exec "nim check src/nimraylib_now/raymath.nim"
 
-task raygui, "build raygui as a dynamic library":
+task buildRaygui, "build raygui as a dynamic library":
   exec "cc -x c -fPIC -c -o raygui.o -DRAYGUI_IMPLEMENTATION raygui/src/raygui.h"
   exec "cc -shared -o libraygui.so -lraylib raygui.o"
   rmFile "raygui.o"

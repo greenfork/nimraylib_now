@@ -18,7 +18,25 @@ Use this library if you want to write games using Raylib in [Nim].
 
 ## Install
 
-tobedone
+Install official [Raylib] library. For Arch Linux:
+```shell
+$ sudo pacman -Syu raylib
+```
+
+Install this wrapper:
+```shell
+$ git clone --recurse-submodules --shallow-submodules <repository/path>
+$ cd nimraylib_now
+$ nimble install --depsOnly
+$ nimble convert
+$ nimble buildRaygui # as it's not distributed as a dynamic library
+```
+
+Run example, for Linux:
+```shell
+# LD_LIBRARY_PATH is set so that executable sees built raygui library
+$ LD_LIBRARY_PATH=$(pwd) nim r examples/original/basic.nim
+```
 
 ## How to use
 
@@ -167,13 +185,7 @@ There are 4 steps:
 
 ## Develop
 
-```shell
-$ git clone --recurse-submodules --shallow-submodules <repository/path>
-$ cd nimraylib_now
-$ nimble install --depsOnly
-$ nimble convert
-$ nim r examples/original/basic.nim
-```
+tobedone
 
 ## Thanks
 
