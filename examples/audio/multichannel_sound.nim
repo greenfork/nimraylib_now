@@ -12,57 +12,57 @@
 #
 #*******************************************************************************************
 
-import ../../raylib/raylib
+import ../../src/nimraylib_now/raylib
 
 #  Initialization
 # --------------------------------------------------------------------------------------
 const screenWidth = 800
 const screenHeight = 450
 
-InitWindow screenWidth, screenHeight, "raylib [audio] example - Multichannel sound playing"
+initWindow screenWidth, screenHeight, "raylib [audio] example - Multichannel sound playing"
 
-InitAudioDevice()      #  Initialize audio device
+initAudioDevice()      #  Initialize audio device
 
 let
-    fxWav = LoadSound("resources/sound.wav")         #  Load WAV audio file
-    fxOgg = LoadSound("resources/tanatana.ogg")      #  Load OGG audio file
+    fxWav = loadSound("resources/sound.wav")         #  Load WAV audio file
+    fxOgg = loadSound("resources/tanatana.ogg")      #  Load OGG audio file
 
-SetSoundVolume fxWav, 0.2
+setSoundVolume fxWav, 0.2
 
-60.SetTargetFPS        #  Set our game to run at 60 frames-per-second
+60.setTargetFPS        #  Set our game to run at 60 frames-per-second
 # --------------------------------------------------------------------------------------
 
 #  Main game loop
-while not WindowShouldClose():  #  Detect window close button or ESC key
+while not windowShouldClose():  #  Detect window close button or ESC key
     #  Update
     # ----------------------------------------------------------------------------------
-    if IsKeyPressed(KEY_ENTER): PlaySoundMulti fxWav      #  Play a new wav sound instance
-    if IsKeyPressed(KEY_SPACE): PlaySoundMulti fxOgg      #  Play a new ogg sound instance
+    if isKeyPressed(ENTER): playSoundMulti fxWav      #  Play a new wav sound instance
+    if isKeyPressed(SPACE): playSoundMulti fxOgg      #  Play a new ogg sound instance
     # ----------------------------------------------------------------------------------
 
     #  Draw
     # ----------------------------------------------------------------------------------
-    BeginDrawing()
+    beginDrawing()
 
-    ClearBackground RAYWHITE
+    clearBackground RAYWHITE
 
-    DrawText "MULTICHANNEL SOUND PLAYING", 20, 20, 20, GRAY
-    DrawText "Press SPACE to play new ogg instance!", 200, 120, 20, LIGHTGRAY
-    DrawText "Press ENTER to play new wav instance!", 200, 180, 20, LIGHTGRAY
+    drawText "MULTICHANNEL SOUND PLAYING", 20, 20, 20, GRAY
+    drawText "Press SPACE to play new ogg instance!", 200, 120, 20, LIGHTGRAY
+    drawText "Press ENTER to play new wav instance!", 200, 180, 20, LIGHTGRAY
 
-    DrawText TextFormat("CONCURRENT SOUNDS PLAYING: %02i", GetSoundsPlaying()), 220, 280, 20, RED
+    drawText textFormat("CONCURRENT SOUNDS PLAYING: %02i", getSoundsPlaying()), 220, 280, 20, RED
 
-    EndDrawing()
+    endDrawing()
     # ----------------------------------------------------------------------------------
 
 #  De-Initialization
 # --------------------------------------------------------------------------------------
-StopSoundMulti()       #  We must stop the buffer pool before unloading
+stopSoundMulti()       #  We must stop the buffer pool before unloading
 
-UnloadSound fxWav      #  Unload sound data
-UnloadSound fxOgg      #  Unload sound data
+unloadSound fxWav      #  Unload sound data
+unloadSound fxOgg      #  Unload sound data
 
-CloseAudioDevice()     #  Close audio device
+closeAudioDevice()     #  Close audio device
 
-CloseWindow()          #  Close window and OpenGL context
+closeWindow()          #  Close window and OpenGL context
 # --------------------------------------------------------------------------------------

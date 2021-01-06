@@ -10,72 +10,72 @@
 #
 #*******************************************************************************************
 
-import ../../raylib/raylib
+import ../../src/nimraylib_now/raylib
 
 #  Initialization
 # --------------------------------------------------------------------------------------
 const screenWidth = 800
 const screenHeight = 450
 
-InitWindow screenWidth, screenHeight, "raylib [audio] example - music playing (streaming)"
+initWindow screenWidth, screenHeight, "raylib [audio] example - music playing (streaming)"
 
-InitAudioDevice()      #  Initialize audio device
+initAudioDevice()      #  Initialize audio device
 
-let music = LoadMusicStream("resources/guitar_noodling.ogg")         #  Load WAV audio file
+let music = loadMusicStream("resources/guitar_noodling.ogg")         #  Load WAV audio file
 
-PlayMusicStream(music)
+playMusicStream(music)
 
 var
     timePlayed = 0.0
     pause = false
 
-60.SetTargetFPS        #  Set our game to run at 60 frames-per-second
+60.setTargetFPS        #  Set our game to run at 60 frames-per-second
 # --------------------------------------------------------------------------------------
 
 #  Main game loop
-while not WindowShouldClose():  #  Detect window close button or ESC key
+while not windowShouldClose():  #  Detect window close button or ESC key
     #  Update
     # ----------------------------------------------------------------------------------
-    music.UpdateMusicStream()
+    music.updateMusicStream()
 
-    if KEY_SPACE.IsKeyPressed():
-        music.StopMusicStream()
-        music.PlayMusicStream()
+    if isKeyPressed(SPACE):
+        music.stopMusicStream()
+        music.playMusicStream()
 
-    if KEY_P.IsKeyPressed():
+    if isKeyPressed(P):
         pause = not pause
-        if pause: music.PauseMusicStream()
-        else: music.ResumeMusicStream()
+        if pause: music.pauseMusicStream()
+        else: music.resumeMusicStream()
 
-    timePlayed = music.GetMusicTimePlayed()/music.GetMusicTimeLength()*400
+    timePlayed = music.getMusicTimePlayed()/music.getMusicTimeLength()*400
 
-    if timePlayed > 400: music.StopMusicStream()
+    if timePlayed > 400: music.stopMusicStream()
     # ----------------------------------------------------------------------------------
 
     #  Draw
     # ----------------------------------------------------------------------------------
-    BeginDrawing()
+    beginDrawing()
 
-    ClearBackground(RAYWHITE)
+    clearBackground(RAYWHITE)
 
-    DrawText("MUSIC SHOULD BE PLAYING!", 255, 150, 20, LIGHTGRAY)
+    drawText("MUSIC SHOULD BE PLAYING!", 255, 150, 20, LIGHTGRAY)
 
-    DrawRectangle(200, 200, 400, 12, LIGHTGRAY)
-    DrawRectangle(200, 200, (int32)timePlayed, 12, MAROON)
-    DrawRectangleLines(200, 200, 400, 12, GRAY)
+    drawRectangle(200, 200, 400, 12, LIGHTGRAY)
+    drawRectangle(200, 200, (int32)timePlayed, 12, MAROON)
+    drawRectangleLines(200, 200, 400, 12, GRAY)
 
-    DrawText("PRESS SPACE TO RESTART MUSIC", 215, 250, 20, LIGHTGRAY)
-    DrawText("PRESS P TO PAUSE/RESUME MUSIC", 208, 280, 20, LIGHTGRAY)
+    drawText("PRESS SPACE TO RESTART MUSIC", 215, 250, 20, LIGHTGRAY)
+    drawText("PRESS P TO PAUSE/RESUME MUSIC", 208, 280, 20, LIGHTGRAY)
 
-    EndDrawing()
+    endDrawing()
     # ----------------------------------------------------------------------------------
 
 #  De-Initialization
 # --------------------------------------------------------------------------------------
 
-music.UnloadMusicStream() # Unload music stream buffers from RAM
+music.unloadMusicStream() # Unload music stream buffers from RAM
 
-CloseAudioDevice()     #  Close audio device
+closeAudioDevice()     #  Close audio device
 
-CloseWindow()          #  Close window and OpenGL context
+closeWindow()          #  Close window and OpenGL context
 # --------------------------------------------------------------------------------------

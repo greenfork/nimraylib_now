@@ -264,8 +264,11 @@ for (filepath, c2nimheader) in raylibFiles:
           if enumName.startsWith(prefix):
             enumName.removePrefix(prefix)
             break
+        let convertType =
+          if enumName == "ConfigFlag": "uint32"
+          else: "int32"
         appendToVeryEnd.add(
-          fmt("converter {enumName}ToInt32*(self: {enumName}): int32 = self.int32\n")
+          fmt("converter {enumName}ToInt32*(self: {enumName}): {convertType} = self.{convertType}\n")
         )
         # Remember to still add this line
         rs.add line & "\n"

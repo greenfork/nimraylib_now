@@ -10,7 +10,7 @@
 #
 #*******************************************************************************************
 
-import ../../raylib/raylib, lenientops
+import ../../src/nimraylib_now/raylib, lenientops
 
 const MAX_CIRCLES = 64
 
@@ -26,11 +26,11 @@ type CircleWave = object
 const screenWidth = 800
 const screenHeight = 450
 
-SetConfigFlags FLAG_MSAA_4X_HINT.uint32 #  NOTE: Try to enable MSAA 4X
+setConfigFlags MSAA_4X_HINT #  NOTE: Try to enable MSAA 4X
 
-InitWindow screenWidth, screenHeight, "raylib [audio] example - module playing (streaming)"
+initWindow screenWidth, screenHeight, "raylib [audio] example - module playing (streaming)"
 
-InitAudioDevice()                  #  Initialize audio device
+initAudioDevice()                  #  Initialize audio device
 
 let colors = [ORANGE, RED, GOLD, LIME, BLUE, VIOLET, BROWN, LIGHTGRAY, PINK, YELLOW, GREEN, SKYBLUE, PURPLE, BEIGE]
 
@@ -39,43 +39,43 @@ var circles: array[MAX_CIRCLES, CircleWave]
 
 for i in (MAX_CIRCLES-1).countdown 0:
     circles[i].alpha = 0.0f;
-    circles[i].radius = GetRandomValue(10, 40).float
-    circles[i].position.x = GetRandomValue(circles[i].radius.int32, screenWidth - circles[i].radius.int32).float
-    circles[i].position.y = GetRandomValue(circles[i].radius.int32, screenHeight - circles[i].radius.int32).float
-    circles[i].speed = (float)GetRandomValue(1, 100)/2000.0f
-    circles[i].color = colors[GetRandomValue(0, 13)]
+    circles[i].radius = getRandomValue(10, 40).float
+    circles[i].position.x = getRandomValue(circles[i].radius.int32, screenWidth - circles[i].radius.int32).float
+    circles[i].position.y = getRandomValue(circles[i].radius.int32, screenHeight - circles[i].radius.int32).float
+    circles[i].speed = (float)getRandomValue(1, 100)/2000.0f
+    circles[i].color = colors[getRandomValue(0, 13)]
 
-let music = LoadMusicStream("./resources/mini1111.xm")
+let music = loadMusicStream("./resources/mini1111.xm")
 
-PlayMusicStream music
+playMusicStream music
 
 var
     timePlayed = 0.0f
     pause = false
 
-60.SetTargetFPS                 #  Set our game to run at 60 frames-per-second
+60.setTargetFPS                 #  Set our game to run at 60 frames-per-second
 # --------------------------------------------------------------------------------------
 
 #  Main game loop
-while not WindowShouldClose():    #  Detect window close button or ESC key
+while not windowShouldClose():    #  Detect window close button or ESC key
 
     #  Update
     # ----------------------------------------------------------------------------------
-    UpdateMusicStream music       #  Update music buffer with new stream data
+    updateMusicStream music       #  Update music buffer with new stream data
 
     #  Restart music playing (stop and play)
-    if IsKeyPressed(KEY_SPACE):
-        StopMusicStream music
-        PlayMusicStream music
+    if isKeyPressed(SPACE):
+        stopMusicStream music
+        playMusicStream music
 
     #  Pause/Resume music playing
-    if IsKeyPressed(KEY_P):
+    if isKeyPressed(P):
         pause = not pause
-        if pause: PauseMusicStream music
-        else: ResumeMusicStream music
+        if pause: pauseMusicStream music
+        else: resumeMusicStream music
 
     #  Get timePlayed scaled to bar dimensions
-    timePlayed = GetMusicTimePlayed(music)/GetMusicTimeLength(music)*(screenWidth - 40)
+    timePlayed = getMusicTimePlayed(music)/getMusicTimeLength(music)*(screenWidth - 40)
 
     #  Color circles animation
     for i in (MAX_CIRCLES-1).countdown 0:
@@ -87,35 +87,35 @@ while not WindowShouldClose():    #  Detect window close button or ESC key
 
         if (circles[i].alpha <= 0.0f):
             circles[i].alpha = 0.0f;
-            circles[i].radius = GetRandomValue(10, 40).float
-            circles[i].position.x = GetRandomValue(circles[i].radius.int32, screenWidth - circles[i].radius.int32).float
-            circles[i].position.y = GetRandomValue(circles[i].radius.int32, screenHeight - circles[i].radius.int32).float
-            circles[i].color = colors[GetRandomValue(0, 13)];
-            circles[i].speed = (float)GetRandomValue(1, 100)/2000.0f;
+            circles[i].radius = getRandomValue(10, 40).float
+            circles[i].position.x = getRandomValue(circles[i].radius.int32, screenWidth - circles[i].radius.int32).float
+            circles[i].position.y = getRandomValue(circles[i].radius.int32, screenHeight - circles[i].radius.int32).float
+            circles[i].color = colors[getRandomValue(0, 13)];
+            circles[i].speed = (float)getRandomValue(1, 100)/2000.0f;
     # ----------------------------------------------------------------------------------
 
     #  Draw
     # ----------------------------------------------------------------------------------
-    BeginDrawing()
+    beginDrawing()
 
-    ClearBackground(RAYWHITE)
+    clearBackground(RAYWHITE)
 
     for i in (MAX_CIRCLES-1).countdown 0:
-        DrawCircleV circles[i].position, circles[i].radius, Fade(circles[i].color, circles[i].alpha)
+        drawCircleV circles[i].position, circles[i].radius, fade(circles[i].color, circles[i].alpha)
 
     #  Draw time bar
-    DrawRectangle 20, screenHeight - 20 - 12, screenWidth - 40, 12, LIGHTGRAY
-    DrawRectangle 20, screenHeight - 20 - 12, timePlayed.int32, 12, MAROON
-    DrawRectangleLines 20, screenHeight - 20 - 12, screenWidth - 40, 12, GRAY
+    drawRectangle 20, screenHeight - 20 - 12, screenWidth - 40, 12, LIGHTGRAY
+    drawRectangle 20, screenHeight - 20 - 12, timePlayed.int32, 12, MAROON
+    drawRectangleLines 20, screenHeight - 20 - 12, screenWidth - 40, 12, GRAY
 
-    EndDrawing()
+    endDrawing()
     # ----------------------------------------------------------------------------------
 
 #  De-Initialization
 # --------------------------------------------------------------------------------------
-UnloadMusicStream music           #  Unload music stream buffers from RAM
+unloadMusicStream music           #  Unload music stream buffers from RAM
 
-CloseAudioDevice()     #  Close audio device (music streaming is automatically stopped)
+closeAudioDevice()     #  Close audio device (music streaming is automatically stopped)
 
-CloseWindow()          #  Close window and OpenGL context
+closeWindow()          #  Close window and OpenGL context
 # --------------------------------------------------------------------------------------
