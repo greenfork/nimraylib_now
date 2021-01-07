@@ -27,3 +27,9 @@ task buildRaygui, "build raygui as a dynamic library":
   exec "cc -x c -fPIC -c -o raygui.o -DRAYGUI_IMPLEMENTATION raygui/src/raygui.h"
   exec "cc -shared -o libraygui.so -lraylib raygui.o"
   rmFile "raygui.o"
+
+task clean, "remove all build files":
+  echo "Clearing build/"
+  for file in listFiles("build/"):
+    if file == "build/.gitkeep": continue
+    rmFile(file)

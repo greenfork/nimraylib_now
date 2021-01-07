@@ -1,44 +1,26 @@
-import httpclient, asyncdispatch
 import strutils, strformat
 from sequtils import any
-from os import `/`, fileExists, extractFilename, changeFileExt
+from os import `/`, fileExists, extractFilename, changeFileExt, parentDir,
+  copyFileToDir
 from osproc import execCmd
 from sugar import `=>`
 import regex
 
-
-# Download header files
-# Skip downloading if all files are already present
-
 const
-  downloadDirectory = "raylib"
-  urlStart = "https://raw.githubusercontent.com/raysan5/"
-  filesToDownload = [
-    "raylib/master/src/raylib.h",
-    "raygui/master/src/raygui.h",
-    "raylib/master/src/rlgl.h",
-    "raylib/master/src/raymath.h",
+  projectDir = currentSourcePath().parentDir().parentDir()
+  raylibDir = projectDir/"raylib"
+  rayguiDir = projectDir/"raygui"
+  filesToConvert = [
+    raylibDir/"src/raylib.h",
+    raylibDir/"src/rlgl.h",
+    raylibDir/"src/raymath.h",
+    rayguiDir/"src/raygui.h",
   ]
+  buildDir = projectDir/"build"
+  targetDirectory = projectDir/"src"/"nimraylib_now"
 
-proc downloadSources() {.async.} =
-  var futures: seq[Future[void]]
-  for file in filesToDownload:
-    var client = newAsyncHttpClient()
-    let
-      url = urlStart & file
-      targetPath = downloadDirectory/file.extractFilename
-    futures.add client.downloadFile(url, targetPath)
-  for future in futures:
-    await future
-
-var doDownload = false
-for file in filesToDownload:
-  if not fileExists(downloadDirectory/file.extractFilename):
-    doDownload = true
-    break
-if doDownload:
-  waitFor downloadSources()
-
+for file in filesToConvert:
+  copyFileToDir(file, buildDir)
 
 # Parse files to (((Nim))) wrappers
 
@@ -193,16 +175,15 @@ import raylib
 
 const
   raylibFiles = [
-    ("raylib"/"raylib.h", raylibHeader),
-    ("raylib"/"rlgl.h", rlglHeader),
-    ("raylib"/"raymath.h", raymathHeader),
-    ("raygui"/"src"/"raygui.h", rayguiHeader),
+    (buildDir/"raylib.h", raylibHeader),
+    (buildDir/"rlgl.h", rlglHeader),
+    (buildDir/"raymath.h", raymathHeader),
+    (buildDir/"raygui.h", rayguiHeader),
   ]
   selfModuleDeclarationNames = ["RAYLIB_H", "RLGL_H", "RAYGUI_H", "RAYMATH_H"]
   # For converters which are written before c2nim conversion with proper
   # name mangling. Should converters be written in postprocessing after c2nim?
   namePrefixes = ["rlgl", "rl", "RL_", "Gui", "GUI_", "gui"]
-  targetDirectory = "src"/"nimraylib_now"
 
 
 # Start processing all files
@@ -304,20 +285,20 @@ for (filepath, c2nimheader) in raylibFiles:
 @#
 #endif
 """
-    writeFile("raylib"/fmt"{filename}_modified.h", rs)
+    writeFile(buildDir/fmt"{filename}_modified.h", rs)
 
 
   # Processing with c2nim
 
   echo "\nExecuting c2nim\n"
-  assert execCmd("c2nim raylib"/fmt"{filename}_modified.h") == 0
+  assert execCmd("c2nim " & (buildDir/fmt"{filename}_modified.h")) == 0
 
 
   # Postprocessing of generated nim file by c2nim
 
   block postprocessing:
     let
-      raylibnim = readFile("raylib"/fmt"{filename}_modified.nim")
+      raylibnim = readFile(buildDir/fmt"{filename}_modified.nim")
       raylibnimLines = raylibnim.splitLines
     var rs: string
     var i = 0
