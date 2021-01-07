@@ -99,3 +99,7 @@ if fileExists(nimFilename):
       ("culonglong", "uint64"),
     )
   writeFile(nimFilename, newFileContent)
+  discard tryRemoveFile(newFilename)
+else:
+  echo "Failed to convert " & filename & ", see mid-version in C file " &
+    newFilename
