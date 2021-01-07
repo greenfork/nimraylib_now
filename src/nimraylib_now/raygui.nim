@@ -9,11 +9,6 @@ else:
   const
     rayguidll* = "libraygui.so"
 import raylib
-# from os import parentDir, `/`
-# const
-#   RayguiSrcPath = currentSourcePath().parentDir().parentDir() / "raygui" / "src"
-# {.passC:"-fPIC -c -DRAYGUI_IMPLEMENTATION".}
-# {.compile: RayguiSrcPath/"raygui.h".}
 ## ******************************************************************************************
 ##
 ##    raygui v2.8 - A simple and easy-to-use immediate-mode gui library

@@ -57,7 +57,6 @@ const
     "RAYGUI_SUPPORT_ICONS"
   ]
 
-const
   # #define LIGHTGRAY  CLITERAL(Color){ 200, 200, 200, 255 }   // Light Gray
   reDefineColor = re"^#define ([[:word:]]+)\s*CLITERAL\(Color\)\{ (\d+), (\d+), (\d+), (\d+) \}.*"
   # typedef struct rAudioBuffer rAudioBuffer;
@@ -69,7 +68,6 @@ const
   # } ConfigFlag;
   reTypedefEnd = re"^\} (\w+);"
 
-const
   raylibHeader = """
 #ifdef C2NIM
 #  def RLAPI
@@ -164,16 +162,10 @@ import raylib
 #  endif
 #@
 import raylib
-# from os import parentDir, `/`
-# const
-#   RayguiSrcPath = currentSourcePath().parentDir().parentDir() / "raygui" / "src"
-# {.passC:"-fPIC -c -DRAYGUI_IMPLEMENTATION".}
-# {.compile: RayguiSrcPath/"raygui.h".}
 @#
 #endif
 """
 
-const
   raylibFiles = [
     (buildDir/"raylib.h", raylibHeader),
     (buildDir/"rlgl.h", rlglHeader),
