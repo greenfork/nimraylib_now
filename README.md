@@ -73,16 +73,39 @@ Naming is same. `#define` directives are mostly skipped, exceptions include
 colors and some top-level definitions which might be useful.
 
 ```c
-#define LIGHTGRAY  CLITERAL(Color){ 200, 200, 200, 255 }   // Light Gray
+#define LIGHTGRAY  CLITERAL(Color){ 200, 200, 200, 255 }
 ```
 to
 ```nim
-const Lightgray* = Color(r: 200, g: 200, b: 200, a: 255)
+const Lightgray*: Color = (r: 200, g: 200, b: 200, a: 255)
 ```
 
-### C structs/Nim objects
+### C structs/Nim objects and tuples
 Prefixes are stripped if any.
 
+```c
+typedef struct Image {
+    void *data;
+    int width;
+    int height;
+    int mipmaps;
+    int format;
+} Image;
+```
+to
+```nim
+type
+  Image* = object
+    data*: pointer
+    width*: int32
+    height*: int32
+    mipmaps*: int32
+    format*: int32
+```
+
+Vector2, Vector3, Vector4 (Quaternion), Matrix, Rectangle, Color are better
+fit as a tuple to save on typing as they have pretty much standard parameter
+sequence:
 ```c
 typedef struct Vector2 {
     float x;
@@ -92,9 +115,17 @@ typedef struct Vector2 {
 to
 ```nim
 type
-  Vector2* = object
-    x*: float32
-    y*: float32
+  Vector2* = tuple
+    x: float32
+    y: float32
+
+# All are valid:
+var v1: Vector2 = (x: 3.0, y: 5.0)
+var v2 = (x: 3.0, y: 5.0)
+var v3 = (3.0, 5.0)
+
+# But tuples can't be constructed as objects, following invalid:
+var invalid = Vector2(x: 3.0, y: 5.0)
 ```
 
 Be careful when invoking fields which are also reserved words in Nim:

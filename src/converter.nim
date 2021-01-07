@@ -193,6 +193,14 @@ for (filepath, c2nimheader) in raylibFiles:
       appendToVeryEnd: string # as Nim code
       m: RegexMatch
     rs.add c2nimheader
+    if filename == "raylib":
+      # Needs to be after Color type definition but before declarations of
+      # different colors in raylib.h. Allows to write color tuples
+      # without uint8 conversions like (0.uint8, 125.uint8, ...)
+      appendToVeryEnd.add """
+converter intToUint8InColor*(self: tuple[r,g,b,a: int]): Color =
+  (self.r.uint8, self.g.uint8, self.b.uint8, self.a.uint8)
+"""
     var i = 0
     while i < raylibhLines.len:
       let
@@ -210,8 +218,8 @@ for (filepath, c2nimheader) in raylibFiles:
           green = m.groupFirstCapture(2, line)
           blue = m.groupFirstCapture(3, line)
           alpha = m.groupFirstCapture(4, line)
-        appendToVeryEnd.add fmt"const {colorName.fmtConst}* = " &
-          fmt("Color(r: {red}, g: {green}, b: {blue}, a: {alpha})\n")
+        appendToVeryEnd.add fmt"const {colorName.fmtConst}*: Color = " &
+          fmt("(r: {red}, g: {green}, b: {blue}, a: {alpha})\n")
       elif line.match(reEmptyStructDef, m):
         # c2nim can't parse it without {} in the middle
         # this seems as a forward declaration of a struct but no further
@@ -289,17 +297,48 @@ for (filepath, c2nimheader) in raylibFiles:
   # Postprocessing of generated nim file by c2nim
 
   block postprocessing:
+    const
+      # By default C structs are converted to Nim objects but some structs
+      # are better described as Nim tuples
+      tupleStructs = [
+        "Vector2",
+        "Vector3",
+        "Vector4",
+        "Matrix",
+        "Rectangle",
+        "Color",
+      ]
+      # Conversions from float to float32 for Vector2, Vector3, Vector4,
+      # Matrix and Rectangle. Quaternion is same as Vector4, so works too.
+      tupleConverters = """
+converter floatToFloat32InVector2*(self: tuple[x,y: float]): Vector2 =
+  (self.x.float32, self.y.float32)
+converter floatToFloat32InVector3*(self: tuple[x,y,z: float]): Vector3 =
+  (self.x.float32, self.y.float32, self.z.float32)
+converter floatToFloat32InVector4*(self: tuple[x,y,z,w: float]): Vector4 =
+  (self.x.float32, self.y.float32, self.z.float32, self.w.float32)
+converter floatToFloat32InMatrix*(self:
+  tuple[m0,m4,m8, m12,
+        m1,m5,m9, m13,
+        m2,m6,m10,m14,
+        m3,m7,m11,m15: float]
+): Matrix =
+  (
+    self.m0.float32, self.m4.float32, self.m8.float32,  self.m12.float32,
+    self.m1.float32, self.m5.float32, self.m9.float32,  self.m13.float32,
+    self.m2.float32, self.m6.float32, self.m10.float32, self.m14.float32,
+    self.m3.float32, self.m7.float32, self.m11.float32, self.m15.float32,
+  )
+converter floatToFloat32InRectangle*(self: tuple[x,y,width,height: float]): Rectangle =
+  (self.x.float32, self.y.float32, self.width.float32, self.height.float32)
+"""
     let
       raylibnim = readFile(buildDir/fmt"{filename}_modified.nim")
-      raylibnimLines = raylibnim.splitLines
-    var rs: string
-    var i = 0
-    while i < raylibnimLines.len:
       # Replace all C-style types to native Nim ones
       # Until we use 9-qbit words for bytes, Nim definition should be
       # same as C definition and it allows one to write code without
       # constant conversions such as `let width = 640.cint`
-      var line = raylibnimLines[i].multiReplace(
+      raylibnimConvertedTypes = raylibnim.multiReplace(
         # According to definitions in compiler Nim/lib/system.nim
         ("cint", "int32"),
         ("cschar", "int8"),
@@ -316,12 +355,32 @@ for (filepath, c2nimheader) in raylibFiles:
         ("cuint", "uint32"),
         ("culonglong", "uint64"),
       )
+      raylibnimLines = raylibnimConvertedTypes.splitLines
+    var rs: string
+    var i = 0
+    while i < raylibnimLines.len:
+      var line = raylibnimLines[i]
       if "{.size: sizeof(int32).} = enum" in line: # add `pure` pragma to enums
         line = line.replace(
           "{.size: sizeof(int32).} = enum",
           "{.size: sizeof(int32), pure.} = enum"
         )
-      rs.add line & "\n"
-      i.inc
-
+        rs.add line & "\n"
+        i.inc
+      elif tupleStructs.any((ts) => ts & "* {.bycopy.} = object" in line):
+        rs.add line.replace("= object", "= tuple") & "\n"
+        i.inc
+        var cnt = 0
+        while raylibnimLines[i] != "": # this is the end of tuple definition
+          if cnt == 30: quit(1)
+          echo raylibnimLines[i]
+          # Tuples don't have visibility settings for fields, always visible
+          rs.add raylibnimLines[i].replace("*:", ":") & "\n"
+          i.inc
+          cnt.inc
+      else:
+        rs.add line & "\n"
+        i.inc
+    if filename == "raylib":
+      rs.add tupleConverters
     writeFile(targetDirectory/fmt"{filename}.nim", rs)

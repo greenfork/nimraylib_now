@@ -18,7 +18,7 @@ const screenHeight = 450
 
 initWindow screenWidth, screenHeight, "raylib [core] example - keyboard input"
 
-var ballPosition = Vector2(x: screenWidth/2, y: screenHeight/2)
+var ballPosition: Vector2 = (x: screenWidth/2, y: screenHeight/2)
 
 60.setTargetFPS                   # Set our game to run at 60 frames-per-second
 #--------------------------------------------------------------------------------------

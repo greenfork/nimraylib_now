@@ -10,7 +10,7 @@
 #
 #*******************************************************************************************/
 
-import ../../src/nimraylib_now
+import ../../src/nimraylib_now/raylib
 
 const
     MaxBuildings = 100
@@ -20,7 +20,7 @@ const
 initWindow(screenWidth, screenHeight, "Camera 2D")
 
 var
-    player  = Rectangle(x: 400, y: 280, width: 40, height: 40)
+    player: Rectangle  = (x: 400.0, y: 280.0, width: 40.0, height: 40.0)
     buildings:   array[MAX_BUILDINGS, Rectangle]
     buildColors: array[MAX_BUILDINGS, Color]
     spacing = 0
@@ -33,15 +33,15 @@ for i in 0..<MAX_BUILDINGS:
 
     spacing += buildings[i].width.int
 
-    buildColors[i] = Color(
+    buildColors[i] = (
       r: getRandomValue(200, 240).uint8,
       g: getRandomValue(200, 240).uint8,
       b: getRandomValue(200, 240).uint8,
-      a: 255
+      a: 255.uint8
     )
 var camera = Camera2D()
-camera.target = Vector2(x: player.x + 20, y: player.y + 20)
-camera.offset = Vector2(x: screenWidth / 2, y: screenHeight / 2)
+camera.target = (x: player.x + 20, y: player.y + 20)
+camera.offset = (x: screenWidth / 2, y: screenHeight / 2)
 camera.rotation = 0.0
 camera.zoom = 1.0
 
@@ -54,7 +54,7 @@ while not windowShouldClose():
     if isKeyDown(RIGHT):  player.x += 2
     elif isKeyDown(LEFT): player.x -= 2
     # Camera target follows player
-    camera.target = Vector2(x: player.x + 20, y: player.y + 20)
+    camera.target = (x: player.x + 20, y: player.y + 20)
     # Camera rotation controls
     if isKeyDown(A):   camera.rotation -= 1
     elif isKeyDown(S): camera.rotation += 1

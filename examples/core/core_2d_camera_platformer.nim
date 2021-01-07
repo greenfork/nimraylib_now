@@ -53,19 +53,19 @@ var screenWidth: int32 = 800
 var screenHeight: int32 = 450
 initWindow(screenWidth, screenHeight, "raylib [core] example - 2d camera")
 var player = Player()
-player.position = Vector2(x: 400, y: 280);
+player.position = (x: 400, y: 280);
 player.speed = 0
 player.canJump = false
 var envItems = [
-  EnvItem(rect: Rectangle(x: 0, y: 0, width: 1000, height: 400), blocking: 0, color: Lightgray),
-  EnvItem(rect: Rectangle(x: 0, y: 400, width: 1000, height: 200), blocking: 1, color: Gray),
-  EnvItem(rect: Rectangle(x: 300, y: 200, width: 400, height: 10), blocking: 1, color: Gray),
-  EnvItem(rect: Rectangle(x: 250, y: 300, width: 100, height: 10), blocking: 1, color: Gray),
-  EnvItem(rect: Rectangle(x: 650, y: 300, width: 100, height: 10), blocking: 1, color: Gray),
+  EnvItem(rect: (x: 0, y: 0, width: 1000, height: 400), blocking: 0, color: Lightgray),
+  EnvItem(rect: (x: 0, y: 400, width: 1000, height: 200), blocking: 1, color: Gray),
+  EnvItem(rect: (x: 300, y: 200, width: 400, height: 10), blocking: 1, color: Gray),
+  EnvItem(rect: (x: 250, y: 300, width: 100, height: 10), blocking: 1, color: Gray),
+  EnvItem(rect: (x: 650, y: 300, width: 100, height: 10), blocking: 1, color: Gray),
 ]
 var camera = Camera2D()
 camera.target = player.position
-camera.offset = Vector2(x: screenWidth/2, y: screenHeight/2)
+camera.offset = (x: screenWidth/2, y: screenHeight/2)
 camera.rotation = 0.0
 camera.zoom = 1.0
 ##  Store multiple update camera functions
@@ -94,7 +94,7 @@ while not windowShouldClose():
     camera.zoom = 0.25
   if isKeyPressed(R):
     camera.zoom = 1.0
-    player.position = Vector2(x: 400, y: 280);
+    player.position = (x: 400, y: 280);
   if isKeyPressed(C):
     cameraOption = (cameraOption + 1) mod cameraUpdaters.len
   cameraUpdaters[cameraOption](camera, player, envItems,
@@ -110,7 +110,7 @@ while not windowShouldClose():
   while i < envItems.len:
     drawRectangleRec(envItems[i].rect, envItems[i].color)
     inc(i)
-  var playerRect = Rectangle(x: player.position.x - 20, y: player.position.y - 40, width: 40, height: 40)
+  var playerRect = (x: player.position.x - 20, y: player.position.y - 40, width: 40.float32, height: 40.float32)
   drawRectangleRec(playerRect, Red)
   endMode2D()
   drawText("Controls:", 20, 20, 10, Black)
@@ -158,14 +158,14 @@ proc updatePlayer*(player: var Player; envItems: var openArray[EnvItem]; delta: 
 proc updateCameraCenter*(camera: var Camera2D; player: var Player;
                         envItems: var openArray[EnvItem]; delta: float32;
                         width: int32; height: int32) =
-  camera.offset = Vector2(x: width/2, y: height/2);
+  camera.offset = (x: width/2, y: height/2);
   camera.target = player.position
 
 proc updateCameraCenterInsideMap*(camera: var Camera2D; player: var Player;
                                  envItems: var openArray[EnvItem];
                                  delta: float32; width: int32; height: int32) =
   camera.target = player.position
-  camera.offset = Vector2(x: width/2, y: height/2);
+  camera.offset = (x: width/2, y: height/2);
   var
     minX: float32 = 1000
     minY: float32 = 1000
@@ -180,8 +180,8 @@ proc updateCameraCenterInsideMap*(camera: var Camera2D; player: var Player;
     maxY = max(ei.rect.y + ei.rect.height, maxY)
     inc(i)
   let
-    maxV = getWorldToScreen2D(Vector2(x: maxX, y: maxY), camera)
-    minV = getWorldToScreen2D(Vector2(x: minX, y: minY), camera)
+    maxV = getWorldToScreen2D((x: maxX, y: maxY), camera)
+    minV = getWorldToScreen2D((x: minX, y: minY), camera)
   if maxV.x < width:
     camera.offset.x = width - (maxV.x - width div 2)
   if maxV.y < height:
@@ -197,7 +197,7 @@ proc updateCameraCenterSmoothFollow*(camera: var Camera2D; player: var Player;
   var minSpeed: float32 = 30
   var minEffectLength: float32 = 10
   var fractionSpeed: float32 = 0.8
-  camera.offset = Vector2(x: width/2, y: height/2);
+  camera.offset = (x: width/2, y: height/2);
   var diff: Vector2 = vector2Subtract(player.position, camera.target)
   var length: float32 = vector2Length(diff)
   if length > minEffectLength:
@@ -211,7 +211,7 @@ proc updateCameraEvenOutOnLanding*(camera: var Camera2D; player: var Player;
                                   envItems: var openArray[EnvItem];
                                   delta: float32; width: int32; height: int32) =
   var evenOutSpeed: float32 = 700
-  camera.offset = Vector2(x: width/2, y: height/2);
+  camera.offset = (x: width/2, y: height/2);
   camera.target.x = player.position.x
   if eveningOut:
     if evenOutTarget > camera.target.y:
@@ -234,16 +234,16 @@ proc updateCameraPlayerBoundsPush*(camera: var Camera2D; player: var Player;
                                   envItems: var openArray[EnvItem];
                                   delta: float32; width: int32; height: int32) =
   var
-    bbox = Vector2(x: 0.2, y: 0.2)
+    bbox = (x: 0.2, y: 0.2)
     bboxWorldMin = getScreenToWorld2D(
-      Vector2(x: (1 - bbox.x)*0.5f*width, y: (1 - bbox.y)*0.5f*height),
+      (x: (1 - bbox.x)*0.5f*width, y: (1 - bbox.y)*0.5f*height),
       camera
     )
     bboxWorldMax = getScreenToWorld2D(
-      Vector2(x: (1 + bbox.x)*0.5f*width, y: (1 + bbox.y)*0.5f*height),
+      (x: (1 + bbox.x)*0.5f*width, y: (1 + bbox.y)*0.5f*height),
       camera
     )
-  camera.offset = Vector2(x: (1 - bbox.x)*0.5f * width, y: (1 - bbox.y)*0.5f*height);
+  camera.offset = (x: (1 - bbox.x)*0.5f * width, y: (1 - bbox.y)*0.5f*height);
   if player.position.x < bboxWorldMin.x:
     camera.target.x = player.position.x
   if player.position.y < bboxWorldMin.y:

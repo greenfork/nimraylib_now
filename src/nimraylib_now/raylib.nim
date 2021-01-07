@@ -100,28 +100,28 @@ type VaList* {.importc, header: "<stdarg.h>".} = object
 ##  Vector2 type
 
 type
-  Vector2* {.bycopy.} = object
-    x*: float32
-    y*: float32
+  Vector2* {.bycopy.} = tuple
+    x: float32
+    y: float32
 
 
 ##  Vector3 type
 
 type
-  Vector3* {.bycopy.} = object
-    x*: float32
-    y*: float32
-    z*: float32
+  Vector3* {.bycopy.} = tuple
+    x: float32
+    y: float32
+    z: float32
 
 
 ##  Vector4 type
 
 type
-  Vector4* {.bycopy.} = object
-    x*: float32
-    y*: float32
-    z*: float32
-    w*: float32
+  Vector4* {.bycopy.} = tuple
+    x: float32
+    y: float32
+    z: float32
+    w: float32
 
 
 ##  Quaternion type, same as Vector4
@@ -132,43 +132,43 @@ type
 ##  Matrix type (OpenGL style 4x4 - right handed, column major)
 
 type
-  Matrix* {.bycopy.} = object
-    m0*: float32
-    m4*: float32
-    m8*: float32
-    m12*: float32
-    m1*: float32
-    m5*: float32
-    m9*: float32
-    m13*: float32
-    m2*: float32
-    m6*: float32
-    m10*: float32
-    m14*: float32
-    m3*: float32
-    m7*: float32
-    m11*: float32
-    m15*: float32
+  Matrix* {.bycopy.} = tuple
+    m0: float32
+    m4: float32
+    m8: float32
+    m12: float32
+    m1: float32
+    m5: float32
+    m9: float32
+    m13: float32
+    m2: float32
+    m6: float32
+    m10: float32
+    m14: float32
+    m3: float32
+    m7: float32
+    m11: float32
+    m15: float32
 
 
 ##  Color type, RGBA (32bit)
 
 type
-  Color* {.bycopy.} = object
-    r*: uint8
-    g*: uint8
-    b*: uint8
-    a*: uint8
+  Color* {.bycopy.} = tuple
+    r: uint8
+    g: uint8
+    b: uint8
+    a: uint8
 
 
 ##  Rectangle type
 
 type
-  Rectangle* {.bycopy.} = object
-    x*: float32
-    y*: float32
-    width*: float32
-    height*: float32
+  Rectangle* {.bycopy.} = tuple
+    x: float32
+    y: float32
+    width: float32
+    height: float32
 
 
 ##  Image type, bpp always RGBA (32bit)
@@ -2697,32 +2697,34 @@ proc setAudioStreamBufferSizeDefault*(size: int32) {.cdecl,
     importc: "SetAudioStreamBufferSizeDefault", dynlib: raylibdll.}
 ##  Default size for new audio streams
 
-const Lightgray* = Color(r: 200, g: 200, b: 200, a: 255)
-const Gray* = Color(r: 130, g: 130, b: 130, a: 255)
-const Darkgray* = Color(r: 80, g: 80, b: 80, a: 255)
-const Yellow* = Color(r: 253, g: 249, b: 0, a: 255)
-const Gold* = Color(r: 255, g: 203, b: 0, a: 255)
-const Orange* = Color(r: 255, g: 161, b: 0, a: 255)
-const Pink* = Color(r: 255, g: 109, b: 194, a: 255)
-const Red* = Color(r: 230, g: 41, b: 55, a: 255)
-const Maroon* = Color(r: 190, g: 33, b: 55, a: 255)
-const Green* = Color(r: 0, g: 228, b: 48, a: 255)
-const Lime* = Color(r: 0, g: 158, b: 47, a: 255)
-const Darkgreen* = Color(r: 0, g: 117, b: 44, a: 255)
-const Skyblue* = Color(r: 102, g: 191, b: 255, a: 255)
-const Blue* = Color(r: 0, g: 121, b: 241, a: 255)
-const Darkblue* = Color(r: 0, g: 82, b: 172, a: 255)
-const Purple* = Color(r: 200, g: 122, b: 255, a: 255)
-const Violet* = Color(r: 135, g: 60, b: 190, a: 255)
-const Darkpurple* = Color(r: 112, g: 31, b: 126, a: 255)
-const Beige* = Color(r: 211, g: 176, b: 131, a: 255)
-const Brown* = Color(r: 127, g: 106, b: 79, a: 255)
-const Darkbrown* = Color(r: 76, g: 63, b: 47, a: 255)
-const White* = Color(r: 255, g: 255, b: 255, a: 255)
-const Black* = Color(r: 0, g: 0, b: 0, a: 255)
-const Blank* = Color(r: 0, g: 0, b: 0, a: 0)
-const Magenta* = Color(r: 255, g: 0, b: 255, a: 255)
-const Raywhite* = Color(r: 245, g: 245, b: 245, a: 255)
+converter intToUint8InColor*(self: tuple[r,g,b,a: int]): Color =
+  (self.r.uint8, self.g.uint8, self.b.uint8, self.a.uint8)
+const Lightgray*: Color = (r: 200, g: 200, b: 200, a: 255)
+const Gray*: Color = (r: 130, g: 130, b: 130, a: 255)
+const Darkgray*: Color = (r: 80, g: 80, b: 80, a: 255)
+const Yellow*: Color = (r: 253, g: 249, b: 0, a: 255)
+const Gold*: Color = (r: 255, g: 203, b: 0, a: 255)
+const Orange*: Color = (r: 255, g: 161, b: 0, a: 255)
+const Pink*: Color = (r: 255, g: 109, b: 194, a: 255)
+const Red*: Color = (r: 230, g: 41, b: 55, a: 255)
+const Maroon*: Color = (r: 190, g: 33, b: 55, a: 255)
+const Green*: Color = (r: 0, g: 228, b: 48, a: 255)
+const Lime*: Color = (r: 0, g: 158, b: 47, a: 255)
+const Darkgreen*: Color = (r: 0, g: 117, b: 44, a: 255)
+const Skyblue*: Color = (r: 102, g: 191, b: 255, a: 255)
+const Blue*: Color = (r: 0, g: 121, b: 241, a: 255)
+const Darkblue*: Color = (r: 0, g: 82, b: 172, a: 255)
+const Purple*: Color = (r: 200, g: 122, b: 255, a: 255)
+const Violet*: Color = (r: 135, g: 60, b: 190, a: 255)
+const Darkpurple*: Color = (r: 112, g: 31, b: 126, a: 255)
+const Beige*: Color = (r: 211, g: 176, b: 131, a: 255)
+const Brown*: Color = (r: 127, g: 106, b: 79, a: 255)
+const Darkbrown*: Color = (r: 76, g: 63, b: 47, a: 255)
+const White*: Color = (r: 255, g: 255, b: 255, a: 255)
+const Black*: Color = (r: 0, g: 0, b: 0, a: 255)
+const Blank*: Color = (r: 0, g: 0, b: 0, a: 0)
+const Magenta*: Color = (r: 255, g: 0, b: 255, a: 255)
+const Raywhite*: Color = (r: 245, g: 245, b: 245, a: 255)
 converter ConfigFlagToInt32*(self: ConfigFlag): uint32 = self.uint32
 converter TraceLogTypeToInt32*(self: TraceLogType): int32 = self.int32
 converter KeyboardKeyToInt32*(self: KeyboardKey): int32 = self.int32
@@ -2746,3 +2748,23 @@ converter CameraModeToInt32*(self: CameraMode): int32 = self.int32
 converter CameraTypeToInt32*(self: CameraType): int32 = self.int32
 converter NPatchTypeToInt32*(self: NPatchType): int32 = self.int32
 
+converter floatToFloat32InVector2*(self: tuple[x,y: float]): Vector2 =
+  (self.x.float32, self.y.float32)
+converter floatToFloat32InVector3*(self: tuple[x,y,z: float]): Vector3 =
+  (self.x.float32, self.y.float32, self.z.float32)
+converter floatToFloat32InVector4*(self: tuple[x,y,z,w: float]): Vector4 =
+  (self.x.float32, self.y.float32, self.z.float32, self.w.float32)
+converter floatToFloat32InMatrix*(self:
+  tuple[m0,m4,m8, m12,
+        m1,m5,m9, m13,
+        m2,m6,m10,m14,
+        m3,m7,m11,m15: float]
+): Matrix =
+  (
+    self.m0.float32, self.m4.float32, self.m8.float32,  self.m12.float32,
+    self.m1.float32, self.m5.float32, self.m9.float32,  self.m13.float32,
+    self.m2.float32, self.m6.float32, self.m10.float32, self.m14.float32,
+    self.m3.float32, self.m7.float32, self.m11.float32, self.m15.float32,
+  )
+converter floatToFloat32InRectangle*(self: tuple[x,y,width,height: float]): Rectangle =
+  (self.x.float32, self.y.float32, self.width.float32, self.height.float32)
