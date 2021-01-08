@@ -100,7 +100,10 @@ const
 #    define raylibdll "libraylib.so"
 #  endif
 #@
+# Functions on C varargs
+# Used only for TraceLogCallback type, see core_custom_logging example
 type va_list* {.importc: "va_list", header: "<stdarg.h>".} = object
+proc vprintf*(format: cstring, args: va_list) {.cdecl, importc: "vprintf", header: "<stdio.h>"}
 @#
 #endif
 """

@@ -8,7 +8,10 @@ elif defined(macosx):
 else:
   const
     raylibdll = "libraylib.so"
+# Functions on C varargs
+# Used only for TraceLogCallback type, see core_custom_logging example
 type va_list* {.importc: "va_list", header: "<stdarg.h>".} = object
+proc vprintf*(format: cstring, args: va_list) {.cdecl, importc: "vprintf", header: "<stdio.h>"}
 ## *********************************************************************************************
 ##
 ##    raylib - A simple and easy-to-use library to enjoy videogames programming (www.raylib.com)
