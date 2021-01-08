@@ -7,6 +7,7 @@
 #
 #   Copyright (c) 2013-2019 Ramon Santamaria (@raysan5)
 #   /Converted in 2*20 by Guevara-chan.
+#   Adapted in 2021 by greenfork
 #
 #*******************************************************************************************
 

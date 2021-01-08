@@ -9,6 +9,7 @@
 #
 #   Copyright (c) 2015-2019 Ramon Santamaria (@raysan5) and James Hofmann (@triplefox)
 #   /Converted in 2*20 by Guevara-chan.
+#   Adapted in 2021 by greenfork
 #
 #*******************************************************************************************
 
