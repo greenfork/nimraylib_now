@@ -224,6 +224,7 @@ A number of examples are not ported:
 * `core_input_multitouch.c` - probably requires a phone to test it?
 * `core_storage_values.c` - I can't compile the original C example, values
   are reset to 0,0 when I press Space
+* `core_basic_window_web.c` - need emscripten dev tools
 
 tobedone
 
