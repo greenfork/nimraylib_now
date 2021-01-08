@@ -1,14 +1,14 @@
  {.deadCodeElim: on.}
 when defined(windows):
   const
-    raylibdll* = "libraylib.dll"
+    raylibdll = "libraylib.dll"
 elif defined(macosx):
   const
-    raylibdll* = "libraylib.dylib"
+    raylibdll = "libraylib.dylib"
 else:
   const
-    raylibdll* = "libraylib.so"
-type VaList* {.importc, header: "<stdarg.h>".} = object
+    raylibdll = "libraylib.so"
+type va_list* {.importc: "va_list", header: "<stdarg.h>".} = object
 ## *********************************************************************************************
 ##
 ##    raylib - A simple and easy-to-use library to enjoy videogames programming (www.raylib.com)
@@ -727,7 +727,7 @@ type
 ##  Callbacks to be implemented by users
 
 type
-  TraceLogCallback* = proc (logType: int32; text: cstring; args: VaList) {.cdecl.}
+  TraceLogCallback* = proc (logType: int32; text: string; args: va_list) {.cdecl.}
 
 ## ------------------------------------------------------------------------------------
 ##  Global Variables Definition

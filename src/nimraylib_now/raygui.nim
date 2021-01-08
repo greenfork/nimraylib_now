@@ -1,13 +1,13 @@
  {.deadCodeElim: on.}
 when defined(windows):
   const
-    rayguidll* = "libraygui.dll"
+    rayguidll = "libraygui.dll"
 elif defined(macosx):
   const
-    rayguidll* = "libraygui.dylib"
+    rayguidll = "libraygui.dylib"
 else:
   const
-    rayguidll* = "libraygui.so"
+    rayguidll = "libraygui.so"
 import raylib
 ## ******************************************************************************************
 ##

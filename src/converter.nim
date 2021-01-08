@@ -90,6 +90,8 @@ const
 #  prefix BLEND_
 #  prefix GESTURE_
 #  prefix CAMERA_
+#  mangle va_list va_list
+#  private raylibdll
 #  if defined(windows)
 #    define raylibdll "libraylib.dll"
 #  elif defined(macosx)
@@ -98,7 +100,7 @@ const
 #    define raylibdll "libraylib.so"
 #  endif
 #@
-type VaList* {.importc, header: "<stdarg.h>".} = object
+type va_list* {.importc: "va_list", header: "<stdarg.h>".} = object
 @#
 #endif
 """
@@ -112,6 +114,7 @@ type VaList* {.importc, header: "<stdarg.h>".} = object
 #  prefix rlgl
 #  prefix rl
 #  prefix RL_
+#  private raylibdll
 #  if defined(windows)
 #    define raylibdll "libraylib.dll"
 #  elif defined(macosx)
@@ -131,6 +134,7 @@ import raylib
 #  cdecl
 #  nep1
 #  skipinclude
+#  private raylibdll
 #  if defined(windows)
 #    define raylibdll "libraylib.dll"
 #  elif defined(macosx)
@@ -153,6 +157,7 @@ import raylib
 #  prefix Gui
 #  prefix GUI_
 #  prefix gui
+#  private rayguidll
 #  if defined(windows)
 #    define rayguidll "libraygui.dll"
 #  elif defined(macosx)
