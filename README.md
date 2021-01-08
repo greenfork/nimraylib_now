@@ -15,6 +15,7 @@ Use this library if you want to write games using Raylib in [Nim].
 * Compiles raygui library for you
 * Conversion script is included in the library, no manual work is required
   to update the bindings`*`
+* A lot of examples converted to Nim
 
 `*` _minor changes at most_
 
@@ -25,24 +26,72 @@ Install official [Raylib] library. For Arch Linux:
 $ sudo pacman -Syu raylib
 ```
 
-Install this wrapper:
+Install this library:
+```shell
+$ nimble install nimraylib_now
+```
+
+If you want to use [raygui] library, compile it:
 ```shell
 $ git clone --recurse-submodules --shallow-submodules <repository/path>
 $ cd nimraylib_now
 $ nimble install --depsOnly
-$ nimble convert
 $ nimble buildRaygui # as it's not distributed as a dynamic library
-```
-
-Run example, for Linux:
-```shell
-# LD_LIBRARY_PATH is set so that executable sees built raygui library
+# Run example, for Linux, LD_LIBRARY_PATH is set so that executable sees built raygui library
 $ LD_LIBRARY_PATH=$(pwd) nim r examples/original/basic.nim
 ```
 
+[raygui]: https://github.com/raysan5/raygui
+
 ## How to use
 
-tobedone
+```nim
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- #
+# Raylib Forever basic usage sample
+# Developed in 2*20 by Guevara-chan
+# Adapted in 2021 by greenfork
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- #
+
+import nimraylib_now/[raylib, raygui]
+
+initWindow 800, 600, "[nim]RaylibNow!"
+60.setTargetFPS
+
+# Camera setup.
+var camera = Camera(
+  position: (x: 0f, y: 10f, z: -15f),
+  up: (x: 0f, y: 0.5f, z: 0f),
+  fovy: 45f
+)
+camera.setCameraMode Orbital
+
+# ==Main code==
+while not windowShouldClose():
+  camera.addr.updateCamera
+  beginDrawing()
+  label (x: 10f, y: 0f, width: 100f, height: 25f), "by V.A. Guevara"
+  clearBackground(Black)
+  beginMode3D(camera)
+  drawGrid 10, 1.0f
+  drawSphere (0f, 0f, 0f), 0.5f, Red
+  endMode3D()
+  let
+    slogan = "/Hello from Nim/"
+    size = 20.int32
+    width = measureText(slogan, size)
+  slogan.drawText(
+    (getScreenWidth() - width) div 2,
+    getScreenHeight() div 2 - 100,
+    size,
+    LightGray
+  )
+  drawRectangleV(
+    (x: 10f, y: 10f),
+    (x: (getScreenWidth() - 20).float32, y: (getScreenHeight() - 20).float32),
+    (r: 255, g: 0, b: 0, a: 20)
+  )
+  endDrawing()
+```
 
 ## Conversion and naming differences with C
 Naming is converted to more Nim-pleasing style. Although some definitions in
@@ -216,9 +265,24 @@ There are 4 steps:
 
 [c2nim]: https://github.com/nim-lang/c2nim
 
-## Contributing
+Since every step is done automatically, updating to the next version should
+be a comparatively easy task.
 
-A number of examples are not ported:
+## How to update this library
+1. Do `git pull` for all git submodules (see `.gitmodules`), which are
+   different Raylib libraries.
+2. Run `nimble convert`
+
+## Contribute
+
+Any ideas are welcome. Open an issue to ask a question or tell a suggestion.
+
+### Convert examples
+There's a helper script to do that `tools/example_converter.nim`. Compile it
+and run from terminal with a C file as an argument, then edit the resulting
+Nim file.
+
+I cannot port a number of examples:
 * `core_drop_files.c` - I can't test it on my machine (Wayland on Linux)
 * `core_input_gamepad.c` - I don't have a gamepad
 * `core_input_multitouch.c` - probably requires a phone to test it?
@@ -226,7 +290,7 @@ A number of examples are not ported:
   are reset to 0,0 when I press Space
 * `core_basic_window_web.c` - need emscripten dev tools
 
-tobedone
+Also see examples in original libraries, you can port the missing ones.
 
 ## Thanks
 
@@ -234,6 +298,9 @@ Many thanks to V.A. Guevara for the efforts on [Raylib-Forever] library which
 was the initial inspiration for this library.
 
 [Raylib-Forever]: https://github.com/Guevara-chan/Raylib-Forever
+
+Thanks to Nim community, it's very nice to get the answers to questions
+rather quickly.
 
 ## License
 

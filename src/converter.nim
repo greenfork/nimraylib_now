@@ -6,6 +6,9 @@ from osproc import execCmd
 from sugar import `=>`
 import regex
 
+
+# Copy header files from C sources to build directory
+
 const
   projectDir = currentSourcePath().parentDir().parentDir()
   raylibDir = projectDir/"raylib"
@@ -21,6 +24,7 @@ const
 
 for file in filesToConvert:
   copyFileToDir(file, buildDir)
+
 
 # Parse files to (((Nim))) wrappers
 
