@@ -727,7 +727,7 @@ type
 ##  Callbacks to be implemented by users
 
 type
-  TraceLogCallback* = proc (logType: int32; text: string; args: va_list) {.cdecl.}
+  TraceLogCallback* = proc (logType: int32; text: cstring; args: va_list) {.cdecl.}
 
 ## ------------------------------------------------------------------------------------
 ##  Global Variables Definition
