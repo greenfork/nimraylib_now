@@ -220,6 +220,7 @@ There are 4 steps:
 
 A number of examples are not ported:
 * `core_drop_files.c` - I can't test it on my machine (Linux running Wayland)
+* `core_input_gamepad.c` - I don't have a gamepad
 
 tobedone
 
