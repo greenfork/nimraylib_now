@@ -222,6 +222,8 @@ A number of examples are not ported:
 * `core_drop_files.c` - I can't test it on my machine (Wayland on Linux)
 * `core_input_gamepad.c` - I don't have a gamepad
 * `core_input_multitouch.c` - probably requires a phone to test it?
+* `core_storage_values.c` - I can't compile the original C example, values
+  are reset to 0,0 when I press Space
 
 tobedone
 
