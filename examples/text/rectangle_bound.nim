@@ -29,8 +29,8 @@ var
     resizing = false
     wordWrap = true
 
-    container = Rectangle(x: 25, y: 25, width: screenWidth - 50, height: screenHeight - 250)
-    resizer   = Rectangle(x: container.x+container.width-17, y: container.y+container.height-17, width: 14, height: 14)
+    container: Rectangle = (x: 25f, y: 25f, width: (float32) screenWidth - 50, height: (float32) screenHeight - 250)
+    resizer: Rectangle   = (x: container.x+container.width-17, y: container.y+container.height-17, width: 14f, height: 14f)
 
 #  Minimum width and heigh for the container rectangle
 const minWidth  = 60
@@ -39,7 +39,7 @@ const maxWidth  = screenWidth - 50
 const maxHeight = screenHeight - 160
 
 var
-    lastMouse = Vector2(x: 0.0f, y: 0.0f) #  Stores last mouse coordinates
+    lastMouse: Vector2 = (x: 0.0f, y: 0.0f) #  Stores last mouse coordinates
     borderColor = MAROON                 #  Container border color
     font = getFontDefault()              #  Get default system font
 
@@ -88,14 +88,14 @@ while not windowShouldClose():        #  Detect window close button or ESC key
 
     #  Draw text in container (add some padding)
     drawTextRec font, text,
-               Rectangle(x: container.x + 4, y: container.y + 4, width: container.width-4, height: container.height-4),
+               (x: container.x + 4, y: container.y + 4, width: container.width-4, height: container.height-4),
                20.0f, 2.0f, wordWrap, GRAY
 
     drawRectangleRec resizer, borderColor          #  Draw the resize box
 
     #  Draw bottom info
     drawRectangle 0, screenHeight - 54, screenWidth, 54, GRAY
-    drawRectangleRec Rectangle(x: 382, y: screenHeight - 34, width: 12, height: 12), MAROON
+    drawRectangleRec (x: 382f, y: screenHeight - 34f, width: 12f, height: 12f), MAROON
 
     drawText "Word Wrap: ", 313, screenHeight-115, 20, BLACK
     if wordWrap: drawText "ON", 447, screenHeight - 115, 20, RED

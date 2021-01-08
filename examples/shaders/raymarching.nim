@@ -30,9 +30,9 @@ setConfigFlags WINDOW_RESIZABLE
 initWindow screenWidth, screenHeight, "raylib [shaders] example - raymarching shapes"
 
 var camera = Camera()
-camera.position = Vector3(x: 2.5f, y: 2.5f, z: 3.0f)    #  Camera position
-camera.target = Vector3(x: 0.0f, y: 0.0f, z: 0.7f)      #  Camera looking at point
-camera.up = Vector3(x: 0.0f, y: 1.0f, z: 0.0f)          #  Camera up vector (rotation towards target)
+camera.position = (x: 2.5f, y: 2.5f, z: 3.0f)    #  Camera position
+camera.target = (x: 0.0f, y: 0.0f, z: 0.7f)      #  Camera looking at point
+camera.up = (x: 0.0f, y: 1.0f, z: 0.0f)          #  Camera up vector (rotation towards target)
 camera.fovy = 65.0f                                     #  Camera field-of-view Y
 
 setCameraMode camera, FREE                       #  Set camera mode

@@ -41,9 +41,9 @@ initWindow screenWidth, screenHeight, "raylib [models] example - gl module usage
 
 #  Define the camera to look into our 3d world
 var camera      = Camera()
-camera.position = Vector3(x: 16.0f, y: 16.0f, z: 16.0f)
-camera.target   = Vector3(x: 0.0f, y: 0.0f, z: 0.0f)
-camera.up       = Vector3(x: 0.0f, y: 1.0f, z: 0.0f)
+camera.position = (x: 16.0f, y: 16.0f, z: 16.0f)
+camera.target   = (x: 0.0f, y: 0.0f, z: 0.0f)
+camera.up       = (x: 0.0f, y: 1.0f, z: 0.0f)
 camera.fovy     = 45.0f
 camera.`type`    = Perspective
 
@@ -106,7 +106,7 @@ while not windowShouldClose():    #  Detect window close button or ESC key
     rl.popMatrix()
 
     #  Some reference elements (not affected by previous matrix transformations)
-    drawCircle3D Vector3(x: 0.0, y: 0.0, z: 0.0), earthOrbitRadius, Vector3(x: 1, y: 0, z: 0), 90.0f, fade(RED, 0.5)
+    drawCircle3D (x: 0.0, y: 0.0, z: 0.0), earthOrbitRadius, (x: 1f, y: 0f, z: 0f), 90.0f, fade(RED, 0.5)
     drawGrid 20, 1.0f
 
     endMode3D()

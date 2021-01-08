@@ -22,7 +22,7 @@ const screenHeight = 450
 initWindow screenWidth, screenHeight, "raylib [shapes] example - draw ring"
 
 var
-    center = Vector2(x: (getScreenWidth() - 300) / 2, y: getScreenHeight() / 2)
+    center = (x: (getScreenWidth() - 300) / 2, y: getScreenHeight() / 2)
 
     innerRadius = 80.0f
     outerRadius = 190.0f
@@ -63,17 +63,17 @@ while not windowShouldClose():  #  Detect window close button or ESC key
 
     #  Draw GUI controls
     # ------------------------------------------------------------------------------
-    startAngle = sliderBar(Rectangle(x: 600, y: 40, width: 120, height: 20), "StartAngle", "", startAngle, -450,450)
-    endAngle = sliderBar(Rectangle(x: 600, y: 70, width: 120, height: 20), "EndAngle", "", endAngle, -450,450)
+    startAngle = sliderBar((x: 600f, y: 40f, width: 120f, height: 20f), "StartAngle", "", startAngle, -450,450)
+    endAngle = sliderBar((x: 600f, y: 70f, width: 120f, height: 20f), "EndAngle", "", endAngle, -450,450)
 
-    innerRadius = sliderBar(Rectangle(x: 600, y: 140, width: 120, height: 20), "InnerRadius", "", innerRadius, 0,100)
-    outerRadius = sliderBar(Rectangle(x: 600, y: 170, width: 120, height: 20), "OuterRadius", "", outerRadius, 0,200)
+    innerRadius = sliderBar((x: 600f, y: 140f, width: 120f, height: 20f), "InnerRadius", "", innerRadius, 0,100)
+    outerRadius = sliderBar((x: 600f, y: 170f, width: 120f, height: 20f), "OuterRadius", "", outerRadius, 0,200)
 
-    segments = sliderBar(Rectangle(x: 600, y: 240, width: 120, height: 20), "Segments", "", segments.float, 0,100).int32
+    segments = sliderBar((x: 600f, y: 240f, width: 120f, height: 20f), "Segments", "", segments.float, 0,100).int32
 
-    doDrawRing = checkBox(Rectangle(x: 600, y: 320, width: 20, height: 20), "Draw Ring", doDrawRing)
-    doDrawRingLines = checkBox(Rectangle(x: 600, y: 350, width: 20, height: 20), "Draw RingLines", doDrawRingLines)
-    doDrawCircleLines = checkBox(Rectangle(x: 600, y: 380, width: 20, height: 20), "Draw CircleLines", doDrawCircleLines)
+    doDrawRing = checkBox((x: 600f, y: 320f, width: 20f, height: 20f), "Draw Ring", doDrawRing)
+    doDrawRingLines = checkBox((x: 600f, y: 350f, width: 20f, height: 20f), "Draw RingLines", doDrawRingLines)
+    doDrawCircleLines = checkBox((x: 600f, y: 380f, width: 20f, height: 20f), "Draw CircleLines", doDrawCircleLines)
     # ------------------------------------------------------------------------------
 
     drawText textFormat("MODE: %s", (if segments >= 4: "MANUAL" else: "AUTO")), 600, 270, 10,

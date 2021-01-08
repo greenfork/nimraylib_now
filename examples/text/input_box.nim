@@ -25,7 +25,7 @@ var
     name: array[MAX_INPUT_CHARS+1, char] #  NOTE: One extra space required for line ending char '\0'
     letterCount = 0
 
-    textBox = Rectangle(x: screenWidth/2 - 100, y: 180, width: 225, height: 50)
+    textBox: Rectangle = (x: (float32) screenWidth/2 - 100, y: 180f, width: 225f, height: 50f)
     mouseOnText = false
 
     framesCounter = 0

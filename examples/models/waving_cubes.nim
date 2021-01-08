@@ -24,9 +24,9 @@ initWindow screenWidth, screenHeight, "raylib [models] example - waving cubes"
 
 #  Initialize the camera
 var camera      = Camera3D()
-camera.position = Vector3(x: 30.0f, y: 20.0f, z: 30.0f)
-camera.target   = Vector3(x: 0.0f, y: 0.0f, z: 0.0f)
-camera.up       = Vector3(x: 0.0f, y: 1.0f, z: 0.0f)
+camera.position = (x: 30.0f, y: 20.0f, z: 30.0f)
+camera.target   = (x: 0.0f, y: 0.0f, z: 0.0f)
+camera.up       = (x: 0.0f, y: 1.0f, z: 0.0f)
 camera.fovy     = 70.0f
 camera.`type`   = PERSPECTIVE
 
@@ -74,7 +74,7 @@ while not windowShouldClose():    #  Detect window close button or ESC key
                     scatter = sin(blockScale*20.0f + (time*4.0f))
 
                     #  Calculate the cube position
-                    cubePos = Vector3(
+                    cubePos = (
                         x: (x - numBlocks/2)*(scale*3.0f) + scatter,
                         y: (y - numBlocks/2)*(scale*2.0f) + scatter,
                         z: (z - numBlocks/2)*(scale*3.0f) + scatter)

@@ -38,7 +38,7 @@ var writeBuf: array[MAX_SAMPLES_PER_UPDATE, uint16]
 playAudioStream stream         #  Start processing stream buffer (no data loaded currently)
 
 #  Position read in to determine next frequency
-var mousePosition = Vector2(x: -100.0f, y: -100.0f)
+var mousePosition = (x: -100.0f, y: -100.0f)
 
 #  Cycles per second (hz)
 var frequency = 440.0f
@@ -52,7 +52,7 @@ var readCursor = 0
 #  Computed size in samples of the sine wave
 var waveLength = 1
 
-var position = Vector2()
+var position: Vector2
 
 30.setTargetFPS                 #  Set our game to run at 30 frames-per-second
 # --------------------------------------------------------------------------------------

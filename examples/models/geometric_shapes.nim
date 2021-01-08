@@ -22,9 +22,9 @@ initWindow screenWidth, screenHeight, "raylib [models] example - geometric shape
 
 #  Define the camera to look into our 3d world
 var camera = Camera()
-camera.position = Vector3(x: 0.0f, y: 10.0f, z: 10.0f)
-camera.target   = Vector3(x: 0.0f, y: 0.0f, z: 0.0f)
-camera.up       = Vector3(x: 0.0f, y: 1.0f, z: 0.0f)
+camera.position = (x: 0.0f, y: 10.0f, z: 10.0f)
+camera.target   = (x: 0.0f, y: 0.0f, z: 0.0f)
+camera.up       = (x: 0.0f, y: 1.0f, z: 0.0f)
 camera.fovy     = 45.0f
 camera.`type`   = PERSPECTIVE
 
@@ -46,19 +46,19 @@ while not windowShouldClose(): #  Detect window close button or ESC key
 
     beginMode3D camera
 
-    drawCube Vector3(x: -4.0f, y: 0.0f, z: 2.0f), 2.0f, 5.0f, 2.0f, RED
-    drawCubeWires Vector3(x: -4.0f, y: 0.0f, z: 2.0f), 2.0f, 5.0f, 2.0f, GOLD
-    drawCubeWires Vector3(x: -4.0f, y: 0.0f, z: -2.0f), 3.0f, 6.0f, 2.0f, MAROON
+    drawCube (x: -4.0f, y: 0.0f, z: 2.0f), 2.0f, 5.0f, 2.0f, RED
+    drawCubeWires (x: -4.0f, y: 0.0f, z: 2.0f), 2.0f, 5.0f, 2.0f, GOLD
+    drawCubeWires (x: -4.0f, y: 0.0f, z: -2.0f), 3.0f, 6.0f, 2.0f, MAROON
 
-    drawSphere Vector3(x: -1.0f, y: 0.0f, z: -2.0f), 1.0f, GREEN
-    drawSphereWires Vector3(x: 1.0f, y: 0.0f, z: 2.0f), 2.0f, 16, 16, LIME
+    drawSphere (x: -1.0f, y: 0.0f, z: -2.0f), 1.0f, GREEN
+    drawSphereWires (x: 1.0f, y: 0.0f, z: 2.0f), 2.0f, 16, 16, LIME
 
-    drawCylinder Vector3(x: 4.0f, y: 0.0f, z: -2.0f), 1.0f, 2.0f, 3.0f, 4, SKYBLUE
-    drawCylinderWires Vector3(x: 4.0f, y: 0.0f, z: -2.0f), 1.0f, 2.0f, 3.0f, 4, DARKBLUE
-    drawCylinderWires Vector3(x: 4.5f, y: -1.0f, z: 2.0f), 1.0f, 1.0f, 2.0f, 6, BROWN
+    drawCylinder (x: 4.0f, y: 0.0f, z: -2.0f), 1.0f, 2.0f, 3.0f, 4, SKYBLUE
+    drawCylinderWires (x: 4.0f, y: 0.0f, z: -2.0f), 1.0f, 2.0f, 3.0f, 4, DARKBLUE
+    drawCylinderWires (x: 4.5f, y: -1.0f, z: 2.0f), 1.0f, 1.0f, 2.0f, 6, BROWN
 
-    drawCylinder Vector3(x: 1.0f, y: 0.0f, z: -4.0f), 0.0f, 1.5f, 3.0f, 8, GOLD
-    drawCylinderWires Vector3(x: 1.0f, y: 0.0f, z: -4.0f), 0.0f, 1.5f, 3.0f, 8, PINK
+    drawCylinder (x: 1.0f, y: 0.0f, z: -4.0f), 0.0f, 1.5f, 3.0f, 8, GOLD
+    drawCylinderWires (x: 1.0f, y: 0.0f, z: -4.0f), 0.0f, 1.5f, 3.0f, 8, PINK
 
     drawGrid 10, 1.0f         #  Draw a grid
 

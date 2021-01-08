@@ -36,9 +36,9 @@ var mouseTail: array[MAX_PARTICLES, Particle]
 
 #  Initialize particles
 for i in 0..<MAX_PARTICLES:
-    mouseTail[i].position = Vector2(x: 0, y: 0)
-    mouseTail[i].color = Color(r: getRandomValue(0, 255).uint8, g: getRandomValue(0, 255).uint8,
-        b: getRandomValue(0, 255).uint8, a: 255)
+    mouseTail[i].position = (x: 0f, y: 0f)
+    mouseTail[i].color = (r: getRandomValue(0, 255).uint8, g: getRandomValue(0, 255).uint8,
+        b: getRandomValue(0, 255).uint8, a: 255u8)
     mouseTail[i].alpha = 1.0f
     mouseTail[i].size = getRandomValue(1, 30).float / 20.0f
     mouseTail[i].rotation = getRandomValue(0, 360).float
@@ -92,10 +92,10 @@ while not windowShouldClose():    #  Detect window close button or ESC key
         #  Draw active particles
     for i in 0..<MAX_PARTICLES:
         if mouseTail[i].active: drawTexturePro smoke,
-            Rectangle(x: 0.0f, y: 0.0f, width: smoke.width.float, height: smoke.height.float),
-            Rectangle(x: mouseTail[i].position.x, y: mouseTail[i].position.y, width: smoke.width*mouseTail[i].size,
-                height: smoke.height*mouseTail[i].size),
-            Vector2(x: smoke.width*mouseTail[i].size.float/2.0f, y: smoke.height*mouseTail[i].size.float/2.0f),
+            (x: 0.0f, y: 0.0f, width: smoke.width.float32, height: smoke.height.float32),
+            (x: mouseTail[i].position.x, y: mouseTail[i].position.y, width: smoke.width*mouseTail[i].size.float32,
+                height: smoke.height*mouseTail[i].size.float32),
+            (x: smoke.width*mouseTail[i].size.float/2.0f, y: smoke.height*mouseTail[i].size.float/2.0f),
             mouseTail[i].rotation, fade(mouseTail[i].color, mouseTail[i].alpha)
 
     endBlendMode()

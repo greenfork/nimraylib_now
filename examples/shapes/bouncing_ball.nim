@@ -21,8 +21,8 @@ const screenHeight = 450
 initWindow screenWidth, screenHeight, "raylib [shapes] example - bouncing ball"
 
 var
-    ballPosition = Vector2(x: getScreenWidth()/2, y: getScreenHeight()/2)
-    ballSpeed = Vector2(x: 5.0f, y: 4.0f)
+    ballPosition = (x: getScreenWidth()/2, y: getScreenHeight()/2)
+    ballSpeed = (x: 5.0f, y: 4.0f)
     ballRadius = 20.0
 
     pause = false

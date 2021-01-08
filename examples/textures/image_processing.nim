@@ -57,7 +57,7 @@ var
     selectRecs: array[NUM_PROCESSES, Rectangle]
 
 for i in 0..<NUM_PROCESSES:
-    selectRecs[i] = Rectangle(x: 40.0f, y: (50 + 32*i).float, width: 150.0f, height: 30.0f)
+    selectRecs[i] = (x: 40.0f, y: (50 + 32*i).float32, width: 150.0f, height: 30.0f)
 
 60.setTargetFPS
 # ---------------------------------------------------------------------------------------
