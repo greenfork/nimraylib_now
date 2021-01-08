@@ -14,7 +14,9 @@ Use this library if you want to write games using Raylib in [Nim].
 * Includes modules: raymath, rlgl, raygui
 * Compiles raygui library for you
 * Conversion script is included in the library, no manual work is required
-  to update the bindings
+  to update the bindings`*`
+
+`*` _minor changes at most_
 
 ## Install
 
@@ -214,7 +216,10 @@ There are 4 steps:
 
 [c2nim]: https://github.com/nim-lang/c2nim
 
-## Develop
+## Contributing
+
+A number of examples are not ported:
+* `core_drop_files.c` - I can't test it on my machine (Linux running Wayland)
 
 tobedone
 
