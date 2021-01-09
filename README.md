@@ -46,7 +46,9 @@ $ LD_LIBRARY_PATH=$(pwd) nim r examples/original/basic.nim
 ## How to use
 
 Here is a long example to showcase most features.
-For more simple and narrow examples see `examples/` folder.
+For more simple and narrow examples see [examples] folder.
+
+[examples]: examples
 
 ```nim
 import math
@@ -175,6 +177,8 @@ while not windowShouldClose():
 
 closeWindow()
 ```
+
+![](obey_nim.png?raw=true)
 
 ## Conversion and naming differences with C
 Naming is converted to more Nim-pleasing style. Although some definitions in
