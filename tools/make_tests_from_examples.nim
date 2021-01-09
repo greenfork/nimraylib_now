@@ -8,6 +8,11 @@ const
   examplesDir = projectDir/"examples"
   testsDir = projectDir/"tests"/"examples"
 
+# Remove all existing example tests
+for dir in walkDirs(testsDir/"*"):
+  removeDir(dir)
+
+# Collect all category names and create them in tests directory
 var exampleCategories: seq[string]
 for dir in walkDirs(examplesDir/"*"):
   let dirName = dir.lastPathPart
@@ -20,6 +25,7 @@ const testTemplate =
   "  # more\n" &
   "\"\"\"\n"
 
+# Populate categories in tests with files
 for category in exampleCategories:
   for example in walkFiles(examplesDir/category/"*"):
     let
