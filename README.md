@@ -10,7 +10,7 @@ Use this library if you want to write games using [Raylib] in [Nim].
 
 * Automated generation of the wrapper for the latest version of Raylib using
   the power of (((Nim)))
-* Idiomatic Nim naming so you write **Nim** code, not C
+* Idiomatic Nim naming and conventions so you write **Nim** code, not C
 * A lot of examples converted to Nim
 * Includes modules: raylib, raymath, rlgl, raygui
 * Compiles raygui library for you (it is not distributed as dll)
@@ -53,8 +53,9 @@ import nimraylib_now/[raylib, raymath, raygui]
 from nimraylib_now/rlgl as rl import nil  # import rlgl with a mandatory prefix rl
 ```
 
-Here is a long example to showcase most features.
-For more simple and narrow examples see [examples](examples) folder.
+Here is a long example to showcase most features
+([crown](examples/original/crown.nim)). For more simple and narrow examples see
+[examples](examples/) directory.
 
 ```nim
 import math
@@ -248,7 +249,7 @@ setShaderValue(shader, viewEyeLoc, cameraPos.addr, Vec3)
 ```
 
 ## Tips and tricks
-### Tuples to objects converters for geometry
+### Tuple to object converters for geometry
 Vector2, Vector3, Vector4 (Quaternion), Matrix, Rectangle, Color can be written
 as a tuple to save on typing as they have pretty much standard parameter
 sequence:
@@ -259,8 +260,7 @@ var
   v1: Vector2 = (x: 3.0, y: 5.0)
   v2 = Vector2(x: 3.0, y: 5.0)
   v3 = (3.0, 5.0)
-  c: Color = (0xc9, 0xc9, 0xc9)  # color can be written as a tuple even without
-                                 # the alpha value!
+  c: Color = (0xc9, 0xc9, 0xc9)  # color can be written as a tuple even without the alpha value!
 ```
 
 ### Require fully qualified procs
@@ -283,9 +283,14 @@ from nimraylib_now/rlgl as rl import nil
 There are pairs like `beginDrawing()` - `endDrawing()`, each have helping
 templates to automatically insert `end`-proc at the end:
 ```nim
-beginDrawing():
+beginDrawing:
   drawLine(...)
-# endDrawing() is inserted here automatically
+```
+is same as
+```nim
+beginDrawing()
+drawLine(...)
+endDrawing()
 ```
 
 ## How wrapping works
@@ -310,20 +315,21 @@ be a comparatively easy task.
 1. Do `git pull` for all git submodules (see `.gitmodules`), which are
    different Raylib libraries. Optionally checkout the needed commit version.
 2. Run `nimble convert`
-3. Run `nimble testExamples` and fix anything if necessary
+3. Run `nimble testExamples` and fix everything if necessary
 
 ## Contribute
 
 Any ideas are welcome. Open an issue to ask a question or suggest an idea.
 
 ### Convert examples
-How to do this:
+You can help by converting missing examples from original C library doing
+the following:
 1. Find a missing example in C.
 2. Compile and run `tools/c2nim_example_converter.nim` on this C file, it helps
    with conversion.
 3. Edit resulting Nim file, make sure it runs.
-4. Put this file into a correct directory (`original/` is for self-developed
-   examples).
+4. Put this file into a correct category in `examples` (`original` is for
+   self-developed examples).
 5. Compile and run `tools/make_tests_from_examples.nim` without any arguments,
    it should create a test file in `tests/examples/yourcategory`.
 6. Run `nimble testExamples` and make sure that your example passes the test.
@@ -341,6 +347,9 @@ I cannot port a number of examples:
 Also see examples in original libraries, you can port the missing ones.
 
 ### Work on converter script
+If something is broken or you see an opportunity to improve the wrapper, you
+can help with converter script.
+
 Clone and run tests:
 
 ```shell
