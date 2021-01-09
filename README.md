@@ -1,4 +1,4 @@
-# NimraylibNow! - the Ultimate Raylib wrapper for Nim
+# NimraylibNow! - The Ultimate Raylib wrapper for Nim
 
 The most idiomatic and up-to-date wrapper for [Raylib] gaming C library.
 Use this library if you want to write games using [Raylib] in [Nim].
@@ -54,7 +54,7 @@ from nimraylib_now/rlgl as rl import nil  # import rlgl with a mandatory prefix 
 ```
 
 Here is a long example to showcase most features.
-For more simple and narrow examples see [examples]() folder.
+For more simple and narrow examples see [examples](examples) folder.
 
 ```nim
 import math
@@ -105,11 +105,17 @@ var camera = Camera(
 )
 camera.setCameraMode(Orbital)  # Several modes available, see CameraMode
 
-setTargetFPS(60)               # run game at 60 frames per second
+var pause = false
+
+setTargetFPS(60)
 
 # Wait for Esc key press or when the window is closed
 while not windowShouldClose():
-  camera.addr.updateCamera     # rotate camera
+  if not pause:
+    camera.addr.updateCamera   # rotate camera
+
+  if isKeyPressed(Space):
+    pause = not pause
 
   beginDrawing:                # use this sugar to insert endDrawing() automatically!
     clearBackground(RayWhite)  # set background color
@@ -145,7 +151,7 @@ while not windowShouldClose():
         drawTriangle3D(lowerCur, lowerNext, upperNext, nimBg)
 
         # Wire line for polygons
-        drawLine3D(lowerCur, upperCur, fade(nimFg, 0.8))
+        drawLine3D(lowerCur, upperCur, Gray)
 
         # Crown tooth front triangle (clockwise order)
         drawTriangle3D(upperCur, tooth, upperNext, nimFg)
@@ -154,37 +160,29 @@ while not windowShouldClose():
         drawTriangle3D(upperNext, tooth, upperCur, nimBg)
 
     block text:
-      let verticalPos = (getScreenHeight().float * 0.5).int
       block:
         let
           text = "I AM NIM"
           fontSize = 60
           textWidth = measureText(text, fontSize)
+          verticalPos = (getScreenHeight().float * 0.4).int
         drawText(
           text,
           (getScreenWidth() - textWidth) div 2,  # center
-          # Minus double `fontSize` for spacing for the next text
-          (getScreenHeight() - fontSize - fontSize + verticalPos) div 2,
-          fontSize,
-          Black
-        )
-      block:
-        let
-          text = "OBEY"
-          fontSize = 60
-          textWidth = measureText(text, fontSize)
-        drawText(
-          text,
-          (getScreenWidth() - textWidth) div 2,
           (getScreenHeight() + verticalPos) div 2,
           fontSize,
           Black
         )
+      block:
+        let text =
+          if pause: "Press Space to continue"
+          else: "Press Space to pause"
+        drawText(text, 10, 10, 20, Black)
 
 closeWindow()
 ```
 
-![](obey_nim.png?raw=true)
+![](crown.png?raw=true)
 
 ## Conversion and naming differences with C
 Naming is converted to more Nim-pleasing style. Although some definitions in

@@ -48,11 +48,17 @@ var camera = Camera(
 )
 camera.setCameraMode(Orbital)  # Several modes available, see CameraMode
 
+var pause = false
+
 setTargetFPS(60)
 
 # Wait for Esc key press or when the window is closed
 while not windowShouldClose():
-  camera.addr.updateCamera     # rotate camera
+  if not pause:
+    camera.addr.updateCamera   # rotate camera
+
+  if isKeyPressed(Space):
+    pause = not pause
 
   beginDrawing:                # use this sugar to insert endDrawing() automatically!
     clearBackground(RayWhite)  # set background color
@@ -88,7 +94,8 @@ while not windowShouldClose():
         drawTriangle3D(lowerCur, lowerNext, upperNext, nimBg)
 
         # Wire line for polygons
-        drawLine3D(lowerCur, upperCur, fade(nimFg, 0.8))
+        # drawLine3D(lowerCur, upperCur, fade(nimFg, 0.8))
+        drawLine3D(lowerCur, upperCur, Gray)
 
         # Crown tooth front triangle (clockwise order)
         drawTriangle3D(upperCur, tooth, upperNext, nimFg)
@@ -97,31 +104,23 @@ while not windowShouldClose():
         drawTriangle3D(upperNext, tooth, upperCur, nimBg)
 
     block text:
-      let verticalPos = (getScreenHeight().float * 0.5).int
       block:
         let
           text = "I AM NIM"
           fontSize = 60
           textWidth = measureText(text, fontSize)
+          verticalPos = (getScreenHeight().float * 0.4).int
         drawText(
           text,
           (getScreenWidth() - textWidth) div 2,  # center
-          # Minus double `fontSize` for spacing for the next text
-          (getScreenHeight() - fontSize - fontSize + verticalPos) div 2,
-          fontSize,
-          Black
-        )
-      block:
-        let
-          text = "OBEY"
-          fontSize = 60
-          textWidth = measureText(text, fontSize)
-        drawText(
-          text,
-          (getScreenWidth() - textWidth) div 2,
           (getScreenHeight() + verticalPos) div 2,
           fontSize,
           Black
         )
+      block:
+        let text =
+          if pause: "Press Space to continue"
+          else: "Press Space to pause"
+        drawText(text, 10, 10, 20, Black)
 
 closeWindow()
