@@ -340,13 +340,26 @@ converter tupleToRectangle*(self: tuple[x,y,width,height: float]): Rectangle =
 converter toCint*(self: int): cint = self.cint
 converter toInt*(self: cint): int = self.int
 """
+
+      # proc beginTextureMode*(target: RenderTexture2D) {.cdecl,
+      #     importc: "BeginTextureMode", dynlib: raylibdll.}
+      # ##  Initializes render texture for drawing
+      reBeginProc = re"(?sm)^proc ((begin[^*]*)\*\(.*?\)).*"
+      # beginScissorMode*(x: cint; y: cint; width: cint; height: cint)
+      reArgumentType = re": [[:word:]]+;"
+      reArgumentTypeEnd = re": [[:word:]]+\)"
     let
       raylibnim = readFile(buildDir/fmt"{filename}_modified.nim")
       # Digression from how compiler defines it, used for Color
       raylibnimConvertedTypes = raylibnim.replace("cuchar", "uint8")
       raylibnimLines = raylibnimConvertedTypes.splitLines
-    var rs: string
-    var i = 0
+    var
+      rs: string
+      i = 0
+      m: RegexMatch
+      # For procs such as beginDrawing - endDrawing to turn them into templates
+      # such as beginDrawing(body: untyped) = ... and auto-ending
+      beginEndPairs: seq[tuple[beginSignature, endProcName: string]]
     while i < raylibnimLines.len:
       var line = raylibnimLines[i]
       if "{.size: sizeof(cint).} = enum" in line: # add `pure` pragma to enums
@@ -356,6 +369,26 @@ converter toInt*(self: cint): int = self.int
         )
         rs.add line & "\n"
         i.inc
+      elif "proc begin" in line:
+        # Collect all the proc pairs for future templates
+        # Let's hope that 20 lines is enough for begin and end procs
+        let
+          nextLine = min(i + 20, raylibnim.len - 1)
+          nextTwentyLines = raylibnimLines[i..nextLine].join("\n")
+        if nextTwentyLines.match(reBeginProc, m):
+          let
+            signature = m.groupFirstCapture(0, nextTwentyLines)
+            beginProcName = m.groupFirstCapture(1, nextTwentyLines)
+            endProcName =
+              if beginProcName == "begin": "`end`" # `end` is a special word
+              else: beginProcName.replace("begin", "end")
+          assert endProcName in nextTwentyLines,
+                 "no end proc for " & beginProcName
+          beginEndPairs.add (signature, endProcName)
+        else:
+          assert false, "regex for begin proc didn't work:\n" & nextTwentyLines
+        rs.add line & "\n"
+        i.inc
       else:
         rs.add line & "\n"
         i.inc
@@ -363,4 +396,29 @@ converter toInt*(self: cint): int = self.int
       rs.add tupleConverters
       rs.add "\n"
       rs.add cTypeConverters
+      rs.add "\n"
+    # Add begin-end templates
+    for (beginSignature, endProcName) in beginEndPairs:
+      let
+        signatureWithBody =
+          if "()" in beginSignature:
+            beginSignature.replace( "()", "(body: untyped)")
+          else:
+            beginSignature.replace( ")", "; body: untyped)")
+        beginWithoutAsterisk = beginSignature.replace("*(", "(")
+        beginInvocation =
+          if "()" in beginWithoutAsterisk:
+            beginWithoutAsterisk
+          else:
+            beginWithoutAsterisk
+              .replace(reArgumentType, ",")
+              .replace(reArgumentTypeEnd, ")")
+      rs.add fmt"""
+template {signatureWithBody} =
+  {beginInvocation}
+  block:
+    body
+  {endProcName}()
+"""
+      rs.add "\n"
     writeFile(targetDirectory/fmt"{filename}.nim", rs)

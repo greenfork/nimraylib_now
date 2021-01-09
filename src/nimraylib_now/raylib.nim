@@ -2782,3 +2782,52 @@ converter tupleToRectangle*(self: tuple[x,y,width,height: float]): Rectangle =
 
 converter toCint*(self: int): cint = self.cint
 converter toInt*(self: cint): int = self.int
+
+template beginDrawing*(body: untyped) =
+  beginDrawing()
+  block:
+    body
+  endDrawing()
+
+template beginMode2D*(camera: Camera2D; body: untyped) =
+  beginMode2D(camera)
+  block:
+    body
+  endMode2D()
+
+template beginMode3D*(camera: Camera3D; body: untyped) =
+  beginMode3D(camera)
+  block:
+    body
+  endMode3D()
+
+template beginTextureMode*(target: RenderTexture2D; body: untyped) =
+  beginTextureMode(target)
+  block:
+    body
+  endTextureMode()
+
+template beginScissorMode*(x: cint; y: cint; width: cint; height: cint; body: untyped) =
+  beginScissorMode(x, y, width, height)
+  block:
+    body
+  endScissorMode()
+
+template beginShaderMode*(shader: Shader; body: untyped) =
+  beginShaderMode(shader)
+  block:
+    body
+  endShaderMode()
+
+template beginBlendMode*(mode: cint; body: untyped) =
+  beginBlendMode(mode)
+  block:
+    body
+  endBlendMode()
+
+template beginVrDrawing*(body: untyped) =
+  beginVrDrawing()
+  block:
+    body
+  endVrDrawing()
+

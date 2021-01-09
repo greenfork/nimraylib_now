@@ -434,3 +434,9 @@ converter GlVersionToInt*(self: GlVersion): cint = self.cint
 converter FramebufferAttachTypeToInt*(self: FramebufferAttachType): cint = self.cint
 converter FramebufferTexTypeToInt*(self: FramebufferTexType): cint = self.cint
 
+template begin*(mode: cint; body: untyped) =
+  begin(mode)
+  block:
+    body
+  `end`()
+
