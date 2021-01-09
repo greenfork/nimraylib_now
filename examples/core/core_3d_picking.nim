@@ -22,24 +22,21 @@ initWindow(screenWidth, screenHeight, "raylib [core] example - 3d picking")
 
 #  Define the camera to look into our 3d world
 var camera = Camera()
-camera.position = (x: 10.0, y: 10.0, z: 10.0)    #  Camera position
-camera.target = (x: 0.0, y: 0.0, z: 0.0)         #  Camera looking at point
-camera.up = (x: 0.0, y: 1.0, z: 0.0)             #  Camera up vector (rotation towards target)
-camera.fovy = 45.0                                        #  Camera field-of-view Y
-camera.`type` = Perspective                          #  Camera mode type
+camera.position = (x: 10.0, y: 10.0, z: 10.0)  #  Camera position
+camera.target = (x: 0.0, y: 0.0, z: 0.0)       #  Camera looking at point
+camera.up = (x: 0.0, y: 1.0, z: 0.0)           #  Camera up vector (rotation towards target)
+camera.fovy = 45.0                             #  Camera field-of-view Y
+camera.`type` = Perspective                    #  Camera mode type
 
 var
-    cubePosition = (x: 0.0, y: 1.0, z: 0.0)
-    cubeSize = (x: 2.0, y: 2.0, z: 2.0)
+  cubePosition = (x: 0.0, y: 1.0, z: 0.0)
+  cubeSize = (x: 2.0, y: 2.0, z: 2.0)
+  ray = Ray()                                  #  Picking line ray
+  collision = false
 
-    ray = Ray()                     #  Picking line ray
+camera.setCameraMode Free                      #  Set a free camera mode
 
-    collision = false
-
-camera.setCameraMode Free    #  Set a free camera mode
-
-setTargetFPS(60);                   #  Set our game to run at 60 frames-per-second
-# --------------------------------------------------------------------------------------
+setTargetFPS(60)                               #  Set our game to run at 60 frames-per-second
 
 #  Main game loop
 while not windowShouldClose():      #  Detect window close button or ESC key
@@ -71,13 +68,13 @@ while not windowShouldClose():      #  Detect window close button or ESC key
   beginMode3D camera
 
   if collision:
-      drawCube(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, RED)
-      drawCubeWires(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, MAROON)
+    drawCube(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, RED)
+    drawCubeWires(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, MAROON)
 
-      drawCubeWires(cubePosition, cubeSize.x + 0.2, cubeSize.y + 0.2, cubeSize.z + 0.2, GREEN)
+    drawCubeWires(cubePosition, cubeSize.x + 0.2, cubeSize.y + 0.2, cubeSize.z + 0.2, GREEN)
   else:
-      drawCube(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, GRAY)
-      drawCubeWires(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, DARKGRAY)
+    drawCube(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, GRAY)
+    drawCubeWires(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, DARKGRAY)
 
   drawRay(ray, MAROON)
   drawGrid(10, 1.0)

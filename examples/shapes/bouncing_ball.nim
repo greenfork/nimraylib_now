@@ -22,14 +22,14 @@ const screenHeight = 450
 initWindow screenWidth, screenHeight, "raylib [shapes] example - bouncing ball"
 
 var
-    ballPosition = (x: getScreenWidth()/2, y: getScreenHeight()/2)
-    ballSpeed = (x: 5.0f, y: 4.0f)
-    ballRadius = 20.0
+  ballPosition = (x: getScreenWidth()/2, y: getScreenHeight()/2)
+  ballSpeed = (x: 5.0f, y: 4.0f)
+  ballRadius = 20.0
 
-    pause = false
-    framesCounter = 0
+  pause = false
+  framesCounter = 0
 
-setTargetFPS(60);               #  Set our game to run at 60 frames-per-second
+setTargetFPS(60)               #  Set our game to run at 60 frames-per-second
 # ----------------------------------------------------------
 
 #  Main game loop
@@ -39,12 +39,12 @@ while not windowShouldClose():  #  Detect window close button or ESC key
     if isKeyPressed(SPACE): pause = not pause
 
     if not pause:
-        ballPosition.x += ballSpeed.x
-        ballPosition.y += ballSpeed.y
+      ballPosition.x += ballSpeed.x
+      ballPosition.y += ballSpeed.y
 
-        #  Check walls collision for bouncing
-        if (ballPosition.x >= (getScreenWidth() - ballRadius)) or (ballPosition.x <= ballRadius):  ballSpeed.x *= -1.0f
-        if (ballPosition.y >= (getScreenHeight() - ballRadius)) or (ballPosition.y <= ballRadius): ballSpeed.y *= -1.0f
+      #  Check walls collision for bouncing
+      if (ballPosition.x >= (getScreenWidth() - ballRadius)) or (ballPosition.x <= ballRadius):  ballSpeed.x *= -1.0f
+      if (ballPosition.y >= (getScreenHeight() - ballRadius)) or (ballPosition.y <= ballRadius): ballSpeed.y *= -1.0f
     else: framesCounter.inc
     # -----------------------------------------------------
 

@@ -312,15 +312,25 @@ be a comparatively easy task.
 1. Do `git pull` for all git submodules (see `.gitmodules`), which are
    different Raylib libraries. Optionally checkout the needed commit version.
 2. Run `nimble convert`
+3. Run `nimble testExamples` and fix anything if necessary
 
 ## Contribute
 
 Any ideas are welcome. Open an issue to ask a question or suggest an idea.
 
 ### Convert examples
-There's a helper script to do that: `tools/c2nim_example_converter.nim`.
-Compile it and run from terminal with a C file as an argument, then edit the
-resulting Nim file.
+How to do this:
+1. Find a missing example in C.
+2. Compile and run `tools/c2nim_example_converter.nim` on this C file, it helps
+   with conversion.
+3. Edit resulting Nim file, make sure it runs.
+4. Put this file into a correct directory (`original/` is for self-developed
+   examples).
+5. Compile and run `tools/make_tests_from_examples.nim` without any arguments,
+   it should create a test file in `tests/examples/yourcategory`.
+6. Run `nimble testExamples` and make sure that your example passes the test.
+   If it doesn't pass the test, create an issue or ask me any other way, I will
+   help.
 
 I cannot port a number of examples:
 * `core_drop_files.c` - I can't test it on my machine (Wayland on Linux)
@@ -331,6 +341,22 @@ I cannot port a number of examples:
 * `core_basic_window_web.c` - need emscripten dev tools
 
 Also see examples in original libraries, you can port the missing ones.
+
+### Work on converter script
+Clone and run tests:
+
+```shell
+$ git clone --recurse-submodules --shallow-submodules https://github.com/greenfork/nimraylib_now
+$ cd nimraylib_now
+$ nimble install --depsOnly
+$ nimble convert
+$ nimble testExamples
+```
+
+Then workflow is as follows:
+1. Change `src/converter.nim` file
+2. Run `nimble convert` and see if you achieved desired changes
+3. Run `nimble testExamples` to see that all examples are still compiled
 
 ## Thanks
 
