@@ -16,10 +16,10 @@ import ../../src/nimraylib_now/raylib
 
 ##  Initialization
 ## --------------------------------------------------------------------------------------
-var screenWidth: int32 = 800
-var screenHeight: int32 = 450
+var screenWidth = 800
+var screenHeight = 450
 initWindow(screenWidth, screenHeight, "raylib [core] example - scissor test")
-var scissorArea: Rectangle = (0f, 0f, 300f, 300f)
+var scissorArea: Rectangle = (0.0, 0.0, 300.0, 300.0)
 var scissorMode: bool = true
 setTargetFPS(60)
 ##  Set our game to run at 60 frames-per-second
@@ -30,16 +30,16 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
   ## ----------------------------------------------------------------------------------
   if isKeyPressed(S):
     scissorMode = not scissorMode
-  scissorArea.x = getMouseX().float32 - scissorArea.width / 2
-  scissorArea.y = getMouseY().float32 - scissorArea.height / 2
+  scissorArea.x = getMouseX().float - scissorArea.width / 2
+  scissorArea.y = getMouseY().float - scissorArea.height / 2
   ## ----------------------------------------------------------------------------------
   ##  Draw
   ## ----------------------------------------------------------------------------------
   beginDrawing()
   clearBackground(Raywhite)
   if scissorMode:
-    beginScissorMode(scissorArea.x.int32, scissorArea.y.int32, scissorArea.width.int32,
-                     scissorArea.height.int32)
+    beginScissorMode(scissorArea.x.cint, scissorArea.y.cint, scissorArea.width.cint,
+                     scissorArea.height.cint)
   drawRectangle(0, 0, getScreenWidth(), getScreenHeight(), Red)
   drawText("Move the mouse around to reveal this text!", 190, 200, 20, Lightgray)
   if scissorMode:

@@ -30,8 +30,8 @@ var
     resizing = false
     wordWrap = true
 
-    container: Rectangle = (x: 25f, y: 25f, width: (float32) screenWidth - 50, height: (float32) screenHeight - 250)
-    resizer: Rectangle   = (x: container.x+container.width-17, y: container.y+container.height-17, width: 14f, height: 14f)
+    container: Rectangle = (x: 25.0, y: 25.0, width: (float) screenWidth - 50, height: (float) screenHeight - 250)
+    resizer: Rectangle   = (x: container.x+container.width-17.0, y: container.y+container.height-17.0, width: 14.0, height: 14.0)
 
 #  Minimum width and heigh for the container rectangle
 const minWidth  = 60
@@ -40,7 +40,7 @@ const maxWidth  = screenWidth - 50
 const maxHeight = screenHeight - 160
 
 var
-    lastMouse: Vector2 = (x: 0.0f, y: 0.0f) #  Stores last mouse coordinates
+    lastMouse: Vector2 = (x: 0.0, y: 0.0) #  Stores last mouse coordinates
     borderColor = MAROON                 #  Container border color
     font = getFontDefault()              #  Get default system font
 
@@ -56,7 +56,7 @@ while not windowShouldClose():        #  Detect window close button or ESC key
     let mouse = getMousePosition()
 
     #  Check if the mouse is inside the container and toggle border color
-    if checkCollisionPointRec(mouse, container): borderColor = fade(MAROON, 0.4f)
+    if checkCollisionPointRec(mouse, container): borderColor = fade(MAROON, 0.4)
     elif not resizing: borderColor = MAROON
 
     #  Container resizing logic
@@ -89,14 +89,14 @@ while not windowShouldClose():        #  Detect window close button or ESC key
 
     #  Draw text in container (add some padding)
     drawTextRec font, text,
-               (x: container.x + 4, y: container.y + 4, width: container.width-4, height: container.height-4),
-               20.0f, 2.0f, wordWrap, GRAY
+               (x: container.x + 4.0, y: container.y + 4.0, width: container.width-4.0, height: container.height-4.0),
+               20.0, 2.0, wordWrap, GRAY
 
     drawRectangleRec resizer, borderColor          #  Draw the resize box
 
     #  Draw bottom info
     drawRectangle 0, screenHeight - 54, screenWidth, 54, GRAY
-    drawRectangleRec (x: 382f, y: screenHeight - 34f, width: 12f, height: 12f), MAROON
+    drawRectangleRec (x: 382.0, y: screenHeight - 34.0, width: 12.0, height: 12.0), MAROON
 
     drawText "Word Wrap: ", 313, screenHeight-115, 20, BLACK
     if wordWrap: drawText "ON", 447, screenHeight - 115, 20, RED

@@ -37,16 +37,16 @@ var mouseTail: array[MAX_PARTICLES, Particle]
 
 #  Initialize particles
 for i in 0..<MAX_PARTICLES:
-    mouseTail[i].position = (x: 0f, y: 0f)
-    mouseTail[i].color = (r: getRandomValue(0, 255).uint8, g: getRandomValue(0, 255).uint8,
+    mouseTail[i].position = (x: 0.0, y: 0.0)
+    mouseTail[i].color = Color(r: getRandomValue(0, 255).uint8, g: getRandomValue(0, 255).uint8,
         b: getRandomValue(0, 255).uint8, a: 255u8)
-    mouseTail[i].alpha = 1.0f
-    mouseTail[i].size = getRandomValue(1, 30).float / 20.0f
+    mouseTail[i].alpha = 1.0
+    mouseTail[i].size = getRandomValue(1, 30).float / 20.0
     mouseTail[i].rotation = getRandomValue(0, 360).float
     mouseTail[i].active = false
 
 let
-    gravity = 3.0f
+    gravity = 3.0
     smoke = loadTexture("resources/smoke.png")
 
 var blending = BlendMode.ALPHA
@@ -67,16 +67,16 @@ while not windowShouldClose():    #  Detect window close button or ESC key
     for i in 0..<MAX_PARTICLES:
         if not mouseTail[i].active:
             mouseTail[i].active = true
-            mouseTail[i].alpha = 1.0f
+            mouseTail[i].alpha = 1.0
             mouseTail[i].position = getMousePosition()
             break
 
     for i in 0..<MAX_PARTICLES:
         if mouseTail[i].active:
             mouseTail[i].position.y += gravity
-            mouseTail[i].alpha -= 0.01f
-            if mouseTail[i].alpha <= 0.0f: mouseTail[i].active = false
-            mouseTail[i].rotation += 5.0f
+            mouseTail[i].alpha -= 0.01
+            if mouseTail[i].alpha <= 0.0: mouseTail[i].active = false
+            mouseTail[i].rotation += 5.0
 
     if isKeyPressed(SPACE):
         blending = (if blending == ALPHA: ADDITIVE else: ALPHA)
@@ -93,10 +93,10 @@ while not windowShouldClose():    #  Detect window close button or ESC key
         #  Draw active particles
     for i in 0..<MAX_PARTICLES:
         if mouseTail[i].active: drawTexturePro smoke,
-            (x: 0.0f, y: 0.0f, width: smoke.width.float32, height: smoke.height.float32),
-            (x: mouseTail[i].position.x, y: mouseTail[i].position.y, width: smoke.width*mouseTail[i].size.float32,
-                height: smoke.height*mouseTail[i].size.float32),
-            (x: smoke.width*mouseTail[i].size.float/2.0f, y: smoke.height*mouseTail[i].size.float/2.0f),
+            Rectangle(x: 0.0, y: 0.0, width: smoke.width.float, height: smoke.height.float),
+            Rectangle(x: mouseTail[i].position.x, y: mouseTail[i].position.y, width: smoke.width*mouseTail[i].size.cfloat,
+                height: smoke.height*mouseTail[i].size.cfloat),
+            (x: smoke.width*mouseTail[i].size.cfloat/2.0, y: smoke.height*mouseTail[i].size.cfloat/2.0),
             mouseTail[i].rotation, fade(mouseTail[i].color, mouseTail[i].alpha)
 
     endBlendMode()

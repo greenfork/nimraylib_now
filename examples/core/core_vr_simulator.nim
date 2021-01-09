@@ -19,8 +19,8 @@ const
 
 ##  Initialization
 ## --------------------------------------------------------------------------------------
-var screenWidth: int32 = 800
-var screenHeight: int32 = 450
+var screenWidth = 800
+var screenHeight = 450
 ##  NOTE: screenWidth/screenHeight should match VR device aspect ratio
 setConfigFlags(Msaa4xHint)
 initWindow(screenWidth, screenHeight, "raylib [core] example - vr simulator")
@@ -30,26 +30,26 @@ var hmd = VrDeviceInfo()
 
 ##  VR device parameters (head-mounted-device)
 ##  Oculus Rift CV1 parameters for simulator
-hmd.hResolution = 2160 ##  HMD horizontal resolution in pixels
-hmd.vResolution = 1200 ##  HMD vertical resolution in pixels
-hmd.hScreenSize = 0.133793 ##  HMD horizontal size in meters
-hmd.vScreenSize = 0.0669 ##  HMD vertical size in meters
-hmd.vScreenCenter = 0.04678 ##  HMD screen center in meters
-hmd.eyeToScreenDistance = 0.041 ##  HMD distance between eye and display in meters
-hmd.lensSeparationDistance = 0.07f ##  HMD lens separation distance in meters
-hmd.interpupillaryDistance = 0.07f ##  HMD IPD (distance between pupils) in meters
+hmd.hResolution = 2160            ##  HMD horizontal resolution in pixels
+hmd.vResolution = 1200            ##  HMD vertical resolution in pixels
+hmd.hScreenSize = 0.133793        ##  HMD horizontal size in meters
+hmd.vScreenSize = 0.0669          ##  HMD vertical size in meters
+hmd.vScreenCenter = 0.04678       ##  HMD screen center in meters
+hmd.eyeToScreenDistance = 0.041   ##  HMD distance between eye and display in meters
+hmd.lensSeparationDistance = 0.07 ##  HMD lens separation distance in meters
+hmd.interpupillaryDistance = 0.07 ##  HMD IPD (distance between pupils) in meters
 
 ## NOTE: CV1 uses a Fresnel-hybrid-asymmetric lenses with specific distortion compute shaders.
 ## Following parameters are an approximation to distortion stereo rendering
 ## but results differ from actual device.
-hmd.lensDistortionValues[0] = 1.0 ##  HMD lens distortion constant parameter 0
+hmd.lensDistortionValues[0] = 1.0  ##  HMD lens distortion constant parameter 0
 hmd.lensDistortionValues[1] = 0.22 ##  HMD lens distortion constant parameter 1
 hmd.lensDistortionValues[2] = 0.24 ##  HMD lens distortion constant parameter 2
-hmd.lensDistortionValues[3] = 0.0 ##  HMD lens distortion constant parameter 3
-hmd.chromaAbCorrection[0] = 0.996 ##  HMD chromatic aberration correction parameter 0
+hmd.lensDistortionValues[3] = 0.0  ##  HMD lens distortion constant parameter 3
+hmd.chromaAbCorrection[0] = 0.996  ##  HMD chromatic aberration correction parameter 0
 hmd.chromaAbCorrection[1] = -0.004 ##  HMD chromatic aberration correction parameter 1
-hmd.chromaAbCorrection[2] = 1.014 ##  HMD chromatic aberration correction parameter 2
-hmd.chromaAbCorrection[3] = 0.0 ##  HMD chromatic aberration correction parameter 3
+hmd.chromaAbCorrection[2] = 1.014  ##  HMD chromatic aberration correction parameter 2
+hmd.chromaAbCorrection[3] = 0.0    ##  HMD chromatic aberration correction parameter 3
 
 ##  Distortion shader (uses device lens distortion and chroma)
 var distortion: Shader = loadShader("", textFormat("resources/distortion%i.fs", GlslVersion))
@@ -57,9 +57,9 @@ setVrConfiguration(hmd, distortion)
 ##  Set Vr device parameters for stereo rendering
 ##  Define the camera to look into our 3d world
 var camera = Camera()
-camera.position = (5.0f, 2.0f, 5.0f)    # Camera position
-camera.target = (0.0f, 2.0f, 0.0f)      # Camera looking at point
-camera.up = (0.0f, 1.0f, 0.0f)          # Camera up vector (rotation towards target)
+camera.position = (5.0, 2.0, 5.0)    # Camera position
+camera.target = (0.0, 2.0, 0.0)      # Camera looking at point
+camera.up = (0.0, 1.0, 0.0)          # Camera up vector (rotation towards target)
 camera.fovy = 60.0
 ##  Camera field-of-view Y
 camera.`type` = Perspective

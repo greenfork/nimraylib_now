@@ -15,8 +15,8 @@ import ../../src/nimraylib_now/raylib
 
 ##  Initialization
 ## ---------------------------------------------------------
-var screenWidth: int32 = 800
-var screenHeight: int32 = 450
+var screenWidth = 800
+var screenHeight = 450
 ##  Possible window flags
 ##
 ##     FLAG_VSYNC_HINT
@@ -36,10 +36,10 @@ var screenHeight: int32 = 450
 ##  Set configuration flags for window creation
 setConfigFlags(VsyncHint or Msaa4xHint or WindowHighdpi)
 initWindow(screenWidth, screenHeight, "raylib [core] example - window flags")
-var ballPosition: Vector2 = (getScreenWidth().float32 / 2f, getScreenHeight().float32 / 2f)
+var ballPosition: Vector2 = (getScreenWidth().float / 2.0, getScreenHeight().float / 2.0)
 var ballSpeed: Vector2 = (5.0, 4.0)
-var ballRadius: int32 = 20
-var framesCounter: int32 = 0
+var ballRadius = 20
+var framesCounter = 0
 ## SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
 ## ----------------------------------------------------------
 ##  Main game loop
@@ -113,8 +113,8 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
     clearBackground(Blank)
   else:
     clearBackground(Raywhite)
-  drawCircleV(ballPosition, ballRadius.float32, Maroon)
-  drawRectangleLinesEx((0f, 0f, getScreenWidth().float32, getScreenHeight().float32), 4, Raywhite);
+  drawCircleV(ballPosition, ballRadius.float, Maroon)
+  drawRectangleLinesEx((0.0, 0.0, getScreenWidth().float, getScreenHeight().float), 4, Raywhite);
   drawCircleV(getMousePosition(), 10, Darkblue)
   drawFPS(10, 10)
   drawText(textFormat("Screen Size: [%i, %i]", getScreenWidth(),

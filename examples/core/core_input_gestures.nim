@@ -17,15 +17,15 @@ const
 
 ##  Initialization
 ## --------------------------------------------------------------------------------------
-var screenWidth: int32 = 800
-var screenHeight: int32 = 450
+var screenWidth = 800
+var screenHeight = 450
 initWindow(screenWidth, screenHeight, "raylib [core] example - input gestures")
-var touchPosition: Vector2 = (0f, 0f)
-var touchArea: Rectangle = (220f, 10f, (float32)screenWidth - 230, (float32)screenHeight - 20)
+var touchPosition: Vector2 = (0.0, 0.0)
+var touchArea: Rectangle = (220.0, 10.0, (float)screenWidth - 230, (float)screenHeight - 20)
 var gesturesCount = 0
 var gestureStrings: array[MaxGestureStrings, cstring]
-var currentGesture: int32 = GestureType.None
-var lastGesture: int32 = GestureType.None
+var currentGesture = GestureType.None
+var lastGesture = GestureType.None
 ## SetGesturesEnabled(0b0000000000001001);   // Enable only some gestures to be detected
 setTargetFPS(60)
 ##  Set our game to run at 60 frames-per-second
@@ -35,7 +35,7 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
   ##  Update
   ## ----------------------------------------------------------------------------------
   lastGesture = currentGesture
-  currentGesture = getGestureDetected()
+  currentGesture = getGestureDetected().GestureType
   touchPosition = getTouchPosition(0)
   if checkCollisionPointRec(touchPosition, touchArea) and
       (currentGesture != GestureType.None):
@@ -67,7 +67,7 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
       inc(gesturesCount)
       ##  Reset gestures strings
       if gesturesCount >= MAX_GESTURE_STRINGS:
-        var i: int32 = 0
+        var i = 0
         while i < MAX_GESTURE_STRINGS:
           gestureStrings[i] = "\x00"
           inc(i)
@@ -78,7 +78,7 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
   drawRectangle(225, 15, screenWidth - 240, screenHeight - 30, Raywhite)
   drawText("GESTURES TEST AREA", screenWidth - 270, screenHeight - 40, 20,
            fade(Gray, 0.5))
-  var i: int32 = 0
+  var i = 0
   while i < gesturesCount:
     if i mod 2 == 0:
       drawRectangle(10, 30 + 20 * i, 200, 20, fade(Lightgray, 0.5))

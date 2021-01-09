@@ -11,9 +11,9 @@
 #
 #*******************************************************************************************
 
-import ../../src/nimraylib_now
-    # Initialization
-    #--------------------------------------------------------------------------------------
+import ../../src/nimraylib_now/raylib
+# Initialization
+#--------------------------------------------------------------------------------------
 const screenWidth = 800
 const screenHeight = 450
 
@@ -26,27 +26,25 @@ var ballPosition: Vector2 = (x: screenWidth/2, y: screenHeight/2)
 
 # Main game loop
 while not windowShouldClose():    # Detect window close button or ESC key
+  #  Update
+  # ----------------------------------------------------------------------------------
+  if isKeyDown(Right): ballPosition.x += 2.0
+  if isKeyDown(Left):  ballPosition.x -= 2.0
+  if isKeyDown(Up):    ballPosition.y -= 2.0
+  if isKeyDown(Down):  ballPosition.y += 2.0
+  # ----------------------------------------------------------------------------------
 
-    #  Update
-    # ----------------------------------------------------------------------------------
-    if isKeyDown(Right): ballPosition.x += 2.0f
-    if isKeyDown(Left):  ballPosition.x -= 2.0f
-    if isKeyDown(Up):    ballPosition.y -= 2.0f
-    if isKeyDown(Down):  ballPosition.y += 2.0f
-    # ----------------------------------------------------------------------------------
+  #  Draw
+  # ----------------------------------------------------------------------------------
+  beginDrawing()
+  clearBackground RAYWHITE
 
-    #  Draw
-    # ----------------------------------------------------------------------------------
-    beginDrawing()
-    clearBackground RAYWHITE
+  drawText "move the ball with arrow keys", 10, 10, 20, DARKGRAY
 
-    drawText "move the ball with arrow keys", 10, 10, 20, DARKGRAY
+  drawCircleV ballPosition, 50, MAROON
 
-    drawCircleV ballPosition, 50, MAROON
-
-    endDrawing()
-    # ----------------------------------------------------------------------------------
-
+  endDrawing()
+  # ----------------------------------------------------------------------------------
 # De-Initialization
 # --------------------------------------------------------------------------------------
 closeWindow()        #  Close window and OpenGL context

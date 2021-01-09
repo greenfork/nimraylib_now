@@ -58,7 +58,7 @@ var
     selectRecs: array[NUM_PROCESSES, Rectangle]
 
 for i in 0..<NUM_PROCESSES:
-    selectRecs[i] = (x: 40.0f, y: (50 + 32*i).float32, width: 150.0f, height: 30.0f)
+    selectRecs[i] = (x: 40.0, y: (50 + 32*i).float, width: 150.0, height: 30.0)
 
 60.setTargetFPS
 # ---------------------------------------------------------------------------------------
@@ -109,11 +109,11 @@ while not windowShouldClose():    #  Detect window close button or ESC key
 
     #  Draw rectangles
     for i in 0..<NUM_PROCESSES:
-        drawRectangleRec selectRecs[i], (if i == currentProcess.int32: SKYBLUE else: LIGHTGRAY)
-        drawRectangleLines selectRecs[i].x.int32, selectRecs[i].y.int32, selectRecs[i].width.int32,
-            selectRecs[i].height.int32, (if i == currentProcess.int32: BLUE else: GRAY)
-        drawText processText[i], (selectRecs[i].x + selectRecs[i].width/2 - measureText(processText[i], 10)/2).int32,
-            selectRecs[i].y.int32 + 11, 10, (if i == currentProcess.int32: DARKBLUE else: DARKGRAY)
+        drawRectangleRec selectRecs[i], (if i == currentProcess.int: SKYBLUE else: LIGHTGRAY)
+        drawRectangleLines selectRecs[i].x.int, selectRecs[i].y.int, selectRecs[i].width.int,
+            selectRecs[i].height.int, (if i == currentProcess.int: BLUE else: GRAY)
+        drawText processText[i], (selectRecs[i].x + selectRecs[i].width/2 - measureText(processText[i], 10)/2).int,
+            selectRecs[i].y.int + 11, 10, (if i == currentProcess.int: DARKBLUE else: DARKGRAY)
 
     drawTexture texture, screenWidth - texture.width - 60, screenHeight div 2 - texture.height div 2, WHITE
     drawRectangleLines screenWidth - texture.width - 60, screenHeight div 2 - texture.height div 2, texture.width, texture.height, BLACK

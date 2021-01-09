@@ -14,14 +14,14 @@ import ../../src/nimraylib_now/raylib
 
 ##  Initialization
 ## --------------------------------------------------------------------------------------
-var screenWidth: int32 = 800
-var screenHeight: int32 = 450
+var screenWidth = 800
+var screenHeight = 450
 initWindow(screenWidth, screenHeight, "raylib [core] example - 3d camera free")
 ##  Define the camera to look into our 3d world
 var camera = Camera()
-camera.position = (10.0f, 10.0f, 10.0f)
-camera.target = (0.0f, 0.0f, 0.0f)
-camera.up = (0.0f, 1.0f, 0.0f).Vector3
+camera.position = (10.0, 10.0, 10.0)
+camera.target = (0.0, 0.0, 0.0)
+camera.up = (0.0, 1.0, 0.0).Vector3
 camera.fovy = 45.0
 camera.`type` = Perspective
 var cubePosition: Vector3 = (0.0, 0.0, 0.0)
@@ -38,7 +38,7 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
   updateCamera(addr(camera))
   ## Update camera
   ## Calculate cube screen space position (with a little offset to be in top)
-  cubeScreenPosition = getWorldToScreen((cubePosition.x, cubePosition.y + 2.5f, cubePosition.z), camera);
+  cubeScreenPosition = getWorldToScreen((cubePosition.x.float, cubePosition.y + 2.5, cubePosition.z.float), camera);
   ## ----------------------------------------------------------------------------------
   ##  Draw
   ## ----------------------------------------------------------------------------------

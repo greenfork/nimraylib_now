@@ -26,7 +26,7 @@ var
     name: array[MAX_INPUT_CHARS+1, char] #  NOTE: One extra space required for line ending char '\0'
     letterCount = 0
 
-    textBox: Rectangle = (x: (float32) screenWidth/2 - 100, y: 180f, width: 225f, height: 50f)
+    textBox: Rectangle = (x: (float) screenWidth/2 - 100, y: 180.0, width: 225.0, height: 50.0)
     mouseOnText = false
 
     framesCounter = 0
@@ -69,11 +69,11 @@ while not windowShouldClose():#  Detect window close button or ESC key
     drawText "PLACE MOUSE OVER INPUT BOX!", 240, 140, 20, GRAY
 
     drawRectangleRec textBox, LIGHTGRAY
-    if mouseOnText: drawRectangleLines textBox.x.int32, textBox.y.int32, textBox.width.int32, textBox.height.int32, RED
-    else: drawRectangleLines textBox.x.int32, textBox.y.int32, textBox.width.int32, textBox.height.int32, DARKGRAY
+    if mouseOnText: drawRectangleLines textBox.x.int, textBox.y.int, textBox.width.int, textBox.height.int, RED
+    else: drawRectangleLines textBox.x.int, textBox.y.int, textBox.width.int, textBox.height.int, DARKGRAY
 
     let namestr = cast[cstring](addr name[0])
-    drawText $namestr, textBox.x.int32 + 5, textBox.y.int32 + 8, 40, MAROON
+    drawText $namestr, textBox.x.int + 5, textBox.y.int + 8, 40, MAROON
 
     drawText textFormat("INPUT CHARS: %i/%i", letterCount, MAX_INPUT_CHARS), 315, 250, 20, DARKGRAY
 
@@ -81,7 +81,7 @@ while not windowShouldClose():#  Detect window close button or ESC key
         if letterCount < MAX_INPUT_CHARS:
             #  Draw blinking underscore char
             if (framesCounter div 20)%%2 == 0:
-                drawText "_", textBox.x.int32 + 8 + measureText(namestr, 40), textBox.y.int32 + 12, 40, MAROON
+                drawText "_", textBox.x.int + 8 + measureText(namestr, 40), textBox.y.int + 12, 40, MAROON
         else: drawText "Press BACKSPACE to delete chars...", 230, 300, 20, GRAY
 
     endDrawing()

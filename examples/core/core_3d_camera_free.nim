@@ -14,14 +14,14 @@ import ../../src/nimraylib_now/raylib
 
 ##  Initialization
 ## --------------------------------------------------------------------------------------
-var screenWidth: int32 = 800
-var screenHeight: int32 = 450
+var screenWidth = 800
+var screenHeight = 450
 initWindow(screenWidth, screenHeight, "raylib [core] example - 3d camera free")
 ##  Define the camera to look into our 3d world
 var camera = Camera3D()
-camera.position = (10.0f, 10.0f, 10.0f)
-camera.target = (0.0f, 0.0f, 0.0f)      # Camera looking at point
-camera.up = (0.0f, 1.0f, 0.0f)          # Camera up vector (rotation towards target)
+camera.position = (10.0, 10.0, 10.0)
+camera.target = (0.0, 0.0, 0.0)      # Camera looking at point
+camera.up = (0.0, 1.0, 0.0)          # Camera up vector (rotation towards target)
 camera.fovy = 45.0
 ##  Camera field-of-view Y
 camera.`type` = Perspective
@@ -39,7 +39,7 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
   updateCamera(addr(camera))
   ##  Update camera
   if isKeyDown(Z):
-    camera.target = (0.0f, 0.0f, 0.0f)
+    camera.target = (0.0, 0.0, 0.0)
   ## ----------------------------------------------------------------------------------
   ##  Draw
   ## ----------------------------------------------------------------------------------

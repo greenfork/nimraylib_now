@@ -24,19 +24,19 @@ const GLSL_VERSION = 330
 #  Initialization
 # --------------------------------------------------------------------------------------
 var
-  screenWidth = 800.int32
-  screenHeight = 450.int32
+  screenWidth = 800
+  screenHeight = 450
 
 setConfigFlags WINDOW_RESIZABLE
 initWindow screenWidth, screenHeight, "raylib [shaders] example - raymarching shapes"
 
 var camera = Camera()
-camera.position = (x: 2.5f, y: 2.5f, z: 3.0f)    #  Camera position
-camera.target = (x: 0.0f, y: 0.0f, z: 0.7f)      #  Camera looking at point
-camera.up = (x: 0.0f, y: 1.0f, z: 0.0f)          #  Camera up vector (rotation towards target)
-camera.fovy = 65.0f                                     #  Camera field-of-view Y
+camera.position = (x: 2.5, y: 2.5, z: 3.0)    #  Camera position
+camera.target = (x: 0.0, y: 0.0, z: 0.7)      #  Camera looking at point
+camera.up = (x: 0.0, y: 1.0, z: 0.0)          #  Camera up vector (rotation towards target)
+camera.fovy = 65.0                                     #  Camera field-of-view Y
 
-setCameraMode camera, FREE                       #  Set camera mode
+setCameraMode camera, Free                       #  Set camera mode
 
 #  Load raymarching shader
 #  NOTE: Defining 0 (NULL) for vertex shader forces usage of internal default vertex shader
@@ -49,10 +49,10 @@ let
     runTimeLoc      = getShaderLocation(shader, "runTime")
     resolutionLoc   = getShaderLocation(shader, "resolution")
 
-var resolution = [screenWidth.float32, screenHeight.float32]
+var resolution = [screenWidth.cfloat, screenHeight.cfloat]
 setShaderValue shader, resolutionLoc, resolution.addr, VEC2
 
-var runTime = 0.0f
+var runTime: cfloat = 0.0
 
 60.setTargetFPS                         #  Set our game to run at 60 frames-per-second
 # --------------------------------------------------------------------------------------
@@ -64,7 +64,7 @@ while not windowShouldClose():          #  Detect window close button or ESC key
     if isWindowResized():
         screenWidth  = getScreenWidth()
         screenHeight = getScreenHeight()
-        resolution   = [screenWidth.float32, screenHeight.float32]
+        resolution   = [screenWidth.cfloat, screenHeight.cfloat]
         setShaderValue shader, resolutionLoc, resolution.addr, VEC2
 
     #  Update
@@ -72,10 +72,10 @@ while not windowShouldClose():          #  Detect window close button or ESC key
     camera.addr.updateCamera           #  Update camera
 
     var
-        cameraPos = [camera.position.x, camera.position.y, camera.position.z]
-        cameraTarget = [camera.target.x, camera.target.y, camera.target.z]
+      cameraPos = [camera.position.x, camera.position.y, camera.position.z]
+      cameraTarget = [camera.target.x, camera.target.y, camera.target.z]
 
-        deltaTime = getFrameTime()
+      deltaTime = getFrameTime()
     runTime += deltaTime
 
     #  Set shader required uniform values
@@ -86,19 +86,16 @@ while not windowShouldClose():          #  Detect window close button or ESC key
 
     #  Draw
     # ----------------------------------------------------------------------------------
-    beginDrawing()
+    beginDrawing:
 
-    clearBackground RAYWHITE
+      clearBackground RAYWHITE
 
-    #  We only draw a white full-screen rectangle,
-    #  frame is generated in shader using raymarching
-    beginShaderMode shader
-    drawRectangle 0, 0, screenWidth, screenHeight, WHITE
-    endShaderMode()
+      #  We only draw a white full-screen rectangle,
+      #  frame is generated in shader using raymarching
+      beginShaderMode(shader):
+        drawRectangle 0, 0, screenWidth, screenHeight, WHITE
 
-    drawText "(c) Raymarching shader by Iñigo Quilez. MIT License.", screenWidth - 280, screenHeight - 20, 10, BLACK
-
-    endDrawing()
+      drawText "(c) Raymarching shader by Iñigo Quilez. MIT License.", screenWidth - 280, screenHeight - 20, 10, BLACK
     # ----------------------------------------------------------------------------------
 
 #  De-Initialization

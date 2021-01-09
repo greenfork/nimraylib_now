@@ -25,8 +25,8 @@ initWindow screenWidth, screenHeight, "raylib [shapes] example - draw ring"
 var
     center = (x: (getScreenWidth() - 300) / 2, y: getScreenHeight() / 2)
 
-    innerRadius = 80.0f
-    outerRadius = 190.0f
+    innerRadius = 80.0
+    outerRadius = 190.0
 
     startAngle = 0.0
     endAngle = 360.0
@@ -52,11 +52,11 @@ while not windowShouldClose():  #  Detect window close button or ESC key
 
     clearBackground RAYWHITE
 
-    drawLine 500, 0, 500, getScreenHeight(), fade(LIGHTGRAY, 0.6f)
-    drawRectangle 500, 0, getScreenWidth() - 500, getScreenHeight(), fade(LIGHTGRAY, 0.3f)
+    drawLine 500, 0, 500, getScreenHeight(), fade(LIGHTGRAY, 0.6)
+    drawRectangle 500, 0, getScreenWidth() - 500, getScreenHeight(), fade(LIGHTGRAY, 0.3)
 
     if doDrawRing:
-      drawRing(center, innerRadius, outerRadius, startAngle.int32, endAngle.int32, segments, fade(MAROON, 0.3f))
+      drawRing(center, innerRadius, outerRadius, startAngle.int32, endAngle.int32, segments, fade(MAROON, 0.3))
     if doDrawRingLines:
       drawRingLines(center, innerRadius, outerRadius, startAngle.int32, endAngle.int32, segments, fade(BLACK, 0.4))
     if doDrawCircleLines:
@@ -64,17 +64,17 @@ while not windowShouldClose():  #  Detect window close button or ESC key
 
     #  Draw GUI controls
     # ------------------------------------------------------------------------------
-    startAngle = sliderBar((x: 600f, y: 40f, width: 120f, height: 20f), "StartAngle", "", startAngle, -450,450)
-    endAngle = sliderBar((x: 600f, y: 70f, width: 120f, height: 20f), "EndAngle", "", endAngle, -450,450)
+    startAngle = sliderBar((x: 600.0, y: 40.0, width: 120.0, height: 20.0), "StartAngle", "", startAngle, -450,450)
+    endAngle = sliderBar((x: 600.0, y: 70.0, width: 120.0, height: 20.0), "EndAngle", "", endAngle, -450,450)
 
-    innerRadius = sliderBar((x: 600f, y: 140f, width: 120f, height: 20f), "InnerRadius", "", innerRadius, 0,100)
-    outerRadius = sliderBar((x: 600f, y: 170f, width: 120f, height: 20f), "OuterRadius", "", outerRadius, 0,200)
+    innerRadius = sliderBar((x: 600.0, y: 140.0, width: 120.0, height: 20.0), "InnerRadius", "", innerRadius, 0,100)
+    outerRadius = sliderBar((x: 600.0, y: 170.0, width: 120.0, height: 20.0), "OuterRadius", "", outerRadius, 0,200)
 
-    segments = sliderBar((x: 600f, y: 240f, width: 120f, height: 20f), "Segments", "", segments.float, 0,100).int32
+    segments = sliderBar((x: 600.0, y: 240.0, width: 120.0, height: 20.0), "Segments", "", segments.float, 0,100).int32
 
-    doDrawRing = checkBox((x: 600f, y: 320f, width: 20f, height: 20f), "Draw Ring", doDrawRing)
-    doDrawRingLines = checkBox((x: 600f, y: 350f, width: 20f, height: 20f), "Draw RingLines", doDrawRingLines)
-    doDrawCircleLines = checkBox((x: 600f, y: 380f, width: 20f, height: 20f), "Draw CircleLines", doDrawCircleLines)
+    doDrawRing = checkBox((x: 600.0, y: 320.0, width: 20.0, height: 20.0), "Draw Ring", doDrawRing)
+    doDrawRingLines = checkBox((x: 600.0, y: 350.0, width: 20.0, height: 20.0), "Draw RingLines", doDrawRingLines)
+    doDrawCircleLines = checkBox((x: 600.0, y: 380.0, width: 20.0, height: 20.0), "Draw CircleLines", doDrawCircleLines)
     # ------------------------------------------------------------------------------
 
     drawText textFormat("MODE: %s", (if segments >= 4: "MANUAL" else: "AUTO")), 600, 270, 10,

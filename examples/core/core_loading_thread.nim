@@ -13,6 +13,9 @@
 #
 # ******************************************************************************************
 
+# WARNING: compile with --threads:on switch!
+# nim c --threads:on <file>
+
 import times, atomics
 import ../../src/nimraylib_now/raylib
 

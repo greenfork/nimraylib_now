@@ -22,10 +22,10 @@ initWindow screenWidth, screenHeight, "raylib [models] example - geometric shape
 
 #  Define the camera to look into our 3d world
 var camera = Camera()
-camera.position = (x: 0.0f, y: 10.0f, z: 10.0f)
-camera.target   = (x: 0.0f, y: 0.0f, z: 0.0f)
-camera.up       = (x: 0.0f, y: 1.0f, z: 0.0f)
-camera.fovy     = 45.0f
+camera.position = (x: 0.0, y: 10.0, z: 10.0)
+camera.target   = (x: 0.0, y: 0.0, z: 0.0)
+camera.up       = (x: 0.0, y: 1.0, z: 0.0)
+camera.fovy     = 45.0
 camera.`type`   = PERSPECTIVE
 
 60.setTargetFPS                #  Set our game to run at 60 frames-per-second
@@ -46,21 +46,21 @@ while not windowShouldClose(): #  Detect window close button or ESC key
 
     beginMode3D camera
 
-    drawCube (x: -4.0f, y: 0.0f, z: 2.0f), 2.0f, 5.0f, 2.0f, RED
-    drawCubeWires (x: -4.0f, y: 0.0f, z: 2.0f), 2.0f, 5.0f, 2.0f, GOLD
-    drawCubeWires (x: -4.0f, y: 0.0f, z: -2.0f), 3.0f, 6.0f, 2.0f, MAROON
+    drawCube (x: -4.0, y: 0.0, z: 2.0), 2.0, 5.0, 2.0, RED
+    drawCubeWires (x: -4.0, y: 0.0, z: 2.0), 2.0, 5.0, 2.0, GOLD
+    drawCubeWires (x: -4.0, y: 0.0, z: -2.0), 3.0, 6.0, 2.0, MAROON
 
-    drawSphere (x: -1.0f, y: 0.0f, z: -2.0f), 1.0f, GREEN
-    drawSphereWires (x: 1.0f, y: 0.0f, z: 2.0f), 2.0f, 16, 16, LIME
+    drawSphere (x: -1.0, y: 0.0, z: -2.0), 1.0, GREEN
+    drawSphereWires (x: 1.0, y: 0.0, z: 2.0), 2.0, 16, 16, LIME
 
-    drawCylinder (x: 4.0f, y: 0.0f, z: -2.0f), 1.0f, 2.0f, 3.0f, 4, SKYBLUE
-    drawCylinderWires (x: 4.0f, y: 0.0f, z: -2.0f), 1.0f, 2.0f, 3.0f, 4, DARKBLUE
-    drawCylinderWires (x: 4.5f, y: -1.0f, z: 2.0f), 1.0f, 1.0f, 2.0f, 6, BROWN
+    drawCylinder (x: 4.0, y: 0.0, z: -2.0), 1.0, 2.0, 3.0, 4, SKYBLUE
+    drawCylinderWires (x: 4.0, y: 0.0, z: -2.0), 1.0, 2.0, 3.0, 4, DARKBLUE
+    drawCylinderWires (x: 4.5, y: -1.0, z: 2.0), 1.0, 1.0, 2.0, 6, BROWN
 
-    drawCylinder (x: 1.0f, y: 0.0f, z: -4.0f), 0.0f, 1.5f, 3.0f, 8, GOLD
-    drawCylinderWires (x: 1.0f, y: 0.0f, z: -4.0f), 0.0f, 1.5f, 3.0f, 8, PINK
+    drawCylinder (x: 1.0, y: 0.0, z: -4.0), 0.0, 1.5, 3.0, 8, GOLD
+    drawCylinderWires (x: 1.0, y: 0.0, z: -4.0), 0.0, 1.5, 3.0, 8, PINK
 
-    drawGrid 10, 1.0f         #  Draw a grid
+    drawGrid 10, 1.0         #  Draw a grid
 
     endMode3D()
 

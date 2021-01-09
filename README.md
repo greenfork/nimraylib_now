@@ -13,7 +13,7 @@ Use this library if you want to write games using [Raylib] in [Nim].
 * Idiomatic Nim naming so you write **Nim** code, not C
 * A lot of examples converted to Nim
 * Includes modules: raylib, raymath, rlgl, raygui
-* Compiles raygui library for you
+* Compiles raygui library for you (it is not distributed as dll)
 * Conversion script is included in the library, no manual work is required
   to update the bindings*
 
@@ -45,10 +45,16 @@ $ LD_LIBRARY_PATH=$(pwd) nim r examples/original/basic.nim
 
 ## How to use
 
-Here is a long example to showcase most features.
-For more simple and narrow examples see [examples] folder.
+Import any necessary modules and use it!
 
-[examples]: examples
+```nim
+import nimraylib_now/raylib
+import nimraylib_now/[raylib, raymath, raygui]
+from nimraylib_now/rlgl as rl import nil  # import rlgl with a mandatory prefix rl
+```
+
+Here is a long example to showcase most features.
+For more simple and narrow examples see [examples]() folder.
 
 ```nim
 import math
@@ -99,7 +105,7 @@ var camera = Camera(
 )
 camera.setCameraMode(Orbital)  # Several modes available, see CameraMode
 
-setTargetFPS(60)
+setTargetFPS(60)               # run game at 60 frames per second
 
 # Wait for Esc key press or when the window is closed
 while not windowShouldClose():
@@ -186,119 +192,7 @@ this library's file may have names like `FULLSCREEN_MODE`, you can still use
 them (and encouraged to) as `FullscreenMode` in code.
 
 Generally just omit any prefixes you see in official docs and use camelCase for
-procs, everything else stays the same.
-
-### C types/Nim types
-NimraylibNow! heavily uses native Nim types in the wrapper. This is mostly done
-to avoid conversions to C types in code so we can write
-```nim
-const
-  screenWidth = 800
-  screenHeight = 640
-```
-instead of
-```nim
-const
-  screenWidth = 800.cint
-  screenHeight = 640.cint
-```
-Compiler should help you with warnings when conversion is not performed
-implicitly. Mostly you will need to convert types to `int32`, `float32` and
-`cstring` should the compiler shout at you.
-
-### C #define/Nim const
-Naming is same. `#define` directives are mostly skipped, exceptions include
-colors and some top-level definitions which might be useful.
-
-```c
-#define LIGHTGRAY  CLITERAL(Color){ 200, 200, 200, 255 }
-```
-to
-```nim
-const Lightgray*: Color = (r: 200, g: 200, b: 200, a: 255)
-```
-
-### C structs/Nim objects and tuples
-Most structs are converted to Nim objects. Prefixes are stripped if any.
-
-Vector2, Vector3, Vector4 (Quaternion), Matrix, Rectangle, Color are better
-fit as a tuple to save on typing as they have pretty much standard parameter
-sequence:
-```c
-typedef struct Vector2 {
-    float x;
-    float y;
-} Vector2;
-```
-to
-```nim
-type
-  Vector2* = tuple
-    x: float32
-    y: float32
-
-# All are valid:
-var v1: Vector2 = (x: 3.0, y: 5.0)
-var v2 = (x: 3.0, y: 5.0)
-var v3 = (3f, 5f)
-
-# Tuples can't be constructed as objects, following invalid:
-var invalid = Vector2(x: 3.0, y: 5.0)
-
-# But you can do this instead:
-var valid = (x: 3.0, y: 5.0).Vector2
-```
-
-Be careful when invoking fields which are also reserved words in Nim:
-```nim
-camera.`type` = CameraType.Perspective
-```
-
-### C enums/Nim enums
-Prefixes are stripped if any, including prefixes for values themselves.
-
-```c
-typedef enum {
-    FONT_DEFAULT = 0,
-    FONT_BITMAP,
-    FONT_SDF
-} FontType;
-```
-to
-```nim
-type
-  FontType* {.pure.} = enum
-    DEFAULT = 0,
-    BITMAP,
-    SDF
-```
-
-All enums are marked as `{.pure.}` which means they should be fully qualified
-when compiler can't guess it:
-```nim
-camera.`type` = Perspective     # can be guessed
-if isKeyDown(Right):            # can be guessed
-if KeyboardKey.Right.isKeyDown: # cannot be guessed
-```
-
-In C enums are regular numbers and used in functions which accept `int` as
-their arguments. Some arguments allow concatenating several values into a
-single `int` e.g. `SetWindowState(WINDOW_MAXIMIZED | WINDOW_UNDECORATED);`.
-For this reason they are not going to be type-checked but instead each have
-their converter from enum type to appropriate int type which should allow
-seamless interaction:
-```nim
-type MouseButton* {.pure.} = enum
-  LEFT_BUTTON = 0, RIGHT_BUTTON = 1, MIDDLE_BUTTON = 2
-
-proc isMouseButtonPressed*(button: int32): bool
-
-converter MouseButtonToInt32*(self: MouseButton): int32 = self.int32
-```
-
-### C functions/Nim procs
-Prefixes are stripped if any. Names are converted from PascalCase to camelCase:
-
+procs, everything else stays the same:
 ```c
 void InitWindow(int width, int height, const char *title);
 void GuiSetState(int state);
@@ -306,11 +200,72 @@ void rlBegin(int mode);
 ```
 to
 ```nim
-proc initWindow*(width: int32; height: int32; title: cstring)
-proc setState*(state: int32)
-proc begin*(mode: int32)
+proc initWindow*(width: cint; height: cint; title: cstring)
+proc setState*(state: cint)
+proc begin*(mode: cint)
 ```
 
+### Enums
+Enums are not type-checked but instead each have their converter from enum type
+to appropriate int type which should allow seamless interaction:
+```nim
+type MouseButton* {.pure.} = enum
+  LeftButton = 0, RightButton = 1, MiddleButton = 2
+
+converter MouseButtonToInt*(self: MouseButton): cint = self.cint
+
+proc isMouseButtonPressed*(button: cint): bool
+```
+
+Prefixes are stripped for enum values too. All enums are marked as `{.pure.}`
+which means they should be fully qualified when compiler can't guess their type:
+```nim
+camera.`type` = Perspective      # can be guessed
+if isKeyDown(Right):             # can be guessed
+if KeyboardKey.Right.isKeyDown:  # cannot be guessed
+```
+
+### Reserved words
+Be careful when invoking fields which are also reserved words in Nim:
+```nim
+camera.`type` = CameraType.Perspective
+```
+
+### Passing values by addresses
+**BE VERY CAREFUL** with values which are passed as addresses, **always** convert
+them to approapriate C-compatible types:
+```nim
+# Will do incorrect things!
+var
+  xPos = 0.0  # this is `float`, will not be converted to cfloat automatically
+  cameraPos = [xPos, camera.position.y, camera.position.z]
+setShaderValue(shader, viewEyeLoc, cameraPos.addr, Vec3) # cameraPos.addr is a pointer
+
+# Convert values instead
+var xPos: cfloat = 0.0
+# or
+var cameraPos = [xPos.cfloat, camera.position.y, camera.position.z]
+# So this finally works as intended:
+setShaderValue(shader, viewEyeLoc, cameraPos.addr, Vec3)
+```
+
+## Tips and tricks
+### Tuples to objects converters for geometry
+Vector2, Vector3, Vector4 (Quaternion), Matrix, Rectangle, Color can be written
+as a tuple to save on typing as they have pretty much standard parameter
+sequence:
+
+```nim
+# All are valid:
+var
+  v1: Vector2 = (x: 3.0, y: 5.0)
+  v2 = Vector2(x: 3.0, y: 5.0)
+  v3 = (3.0, 5.0)
+  c: Color = (0xc9, 0xc9, 0xc9)  # color can be written as a tuple even without
+                                 # the alpha value!
+```
+
+### Require fully qualified procs
 For functions operating on global scope it could be convenient to use
 fully qualified proc name:
 ```nim
@@ -320,13 +275,22 @@ rlgl.end()
 ```
 which can be enforced by compiler by importing `rlgl` module like this:
 ```nim
-from rlgl import nil
+from nimraylib_now/rlgl import nil
 
 # or to use a shorter `rl`
-from rlgl as rl import nil
+from nimraylib_now/rlgl as rl import nil
 ```
 
-## How this works
+### Begin-End pairs sugar
+There are pairs like `beginDrawing()` - `endDrawing()`, each have helping
+templates to automatically insert `end`-proc at the end:
+```nim
+beginDrawing():
+  drawLine(...)
+# endDrawing() is inserted here automatically
+```
+
+## How wrapping works
 
 `nimble convert` runs `src/converter.nim` script and checks that the resulting
 files are valid Nim files.
@@ -351,7 +315,7 @@ be a comparatively easy task.
 
 ## Contribute
 
-Any ideas are welcome. Open an issue to ask a question or tell a suggestion.
+Any ideas are welcome. Open an issue to ask a question or suggest an idea.
 
 ### Convert examples
 There's a helper script to do that: `tools/example_converter.nim`. Compile it

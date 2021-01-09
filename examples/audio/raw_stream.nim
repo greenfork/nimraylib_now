@@ -13,7 +13,7 @@
 #
 #*******************************************************************************************
 
-import ../../src/nimraylib_now, math, lenientops
+import ../../src/nimraylib_now/raylib, math, lenientops
 
 const MAX_SAMPLES            = 512
 const MAX_SAMPLES_PER_UPDATE = 4096
@@ -39,13 +39,13 @@ var writeBuf: array[MAX_SAMPLES_PER_UPDATE, uint16]
 playAudioStream stream         #  Start processing stream buffer (no data loaded currently)
 
 #  Position read in to determine next frequency
-var mousePosition = (x: -100.0f, y: -100.0f)
+var mousePosition = Vector2(x: -100.0, y: -100.0)
 
 #  Cycles per second (hz)
-var frequency = 440.0f
+var frequency = 440.0
 
 #  Previous value, used to test if sine needs to be rewritten, and to smoothly modulate frequency
-var oldFrequency = 1.0f
+var oldFrequency = 1.0
 
 #  Cursor to read and copy the samples of the sine wave buffer
 var readCursor = 0
@@ -66,7 +66,7 @@ while not windowShouldClose():  #  Detect window close button or ESC key
     #  Sample mouse input.
     mousePosition = getMousePosition()
 
-    if isMouseButtonDown(LEFT_BUTTON): frequency = 40.0f + (mousePosition.y).float
+    if isMouseButtonDown(LEFT_BUTTON): frequency = 40.0 + (mousePosition.y).float
 
     #  Rewrite the sine wave.
     #  Compute two cycles to allow the buffer padding, simplifying any modulation, resampling, etc.
