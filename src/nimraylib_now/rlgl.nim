@@ -120,15 +120,15 @@ const
 ## ----------------------------------------------------------------------------------
 
 type
-  GlVersion* {.size: sizeof(int32), pure.} = enum
+  GlVersion* {.size: sizeof(cint), pure.} = enum
     OPENGL_11 = 1, OPENGL_21, OPENGL_33, OPENGL_ES_20
-  FramebufferAttachType* {.size: sizeof(int32), pure.} = enum
+  FramebufferAttachType* {.size: sizeof(cint), pure.} = enum
     ATTACHMENT_COLOR_CHANNEL0 = 0, ATTACHMENT_COLOR_CHANNEL1,
     ATTACHMENT_COLOR_CHANNEL2, ATTACHMENT_COLOR_CHANNEL3,
     ATTACHMENT_COLOR_CHANNEL4, ATTACHMENT_COLOR_CHANNEL5,
     ATTACHMENT_COLOR_CHANNEL6, ATTACHMENT_COLOR_CHANNEL7, ATTACHMENT_DEPTH = 100,
     ATTACHMENT_STENCIL = 200
-  FramebufferTexType* {.size: sizeof(int32), pure.} = enum
+  FramebufferTexType* {.size: sizeof(cint), pure.} = enum
     ATTACHMENT_CUBEMAP_POSITIVE_X = 0, ATTACHMENT_CUBEMAP_NEGATIVE_X,
     ATTACHMENT_CUBEMAP_POSITIVE_Y, ATTACHMENT_CUBEMAP_NEGATIVE_Y,
     ATTACHMENT_CUBEMAP_POSITIVE_Z, ATTACHMENT_CUBEMAP_NEGATIVE_Z,
@@ -141,7 +141,7 @@ type
 ##  Functions Declaration - Matrix operations
 ## ------------------------------------------------------------------------------------
 
-proc matrixMode*(mode: int32) {.cdecl, importc: "rlMatrixMode", dynlib: raylibdll.}
+proc matrixMode*(mode: cint) {.cdecl, importc: "rlMatrixMode", dynlib: raylibdll.}
 ##  Choose the current matrix to be transformed
 
 proc pushMatrix*() {.cdecl, importc: "rlPushMatrix", dynlib: raylibdll.}
@@ -153,55 +153,55 @@ proc popMatrix*() {.cdecl, importc: "rlPopMatrix", dynlib: raylibdll.}
 proc loadIdentity*() {.cdecl, importc: "rlLoadIdentity", dynlib: raylibdll.}
 ##  Reset current matrix to identity matrix
 
-proc translatef*(x: float32; y: float32; z: float32) {.cdecl, importc: "rlTranslatef",
+proc translatef*(x: cfloat; y: cfloat; z: cfloat) {.cdecl, importc: "rlTranslatef",
     dynlib: raylibdll.}
 ##  Multiply the current matrix by a translation matrix
 
-proc rotatef*(angleDeg: float32; x: float32; y: float32; z: float32) {.cdecl,
+proc rotatef*(angleDeg: cfloat; x: cfloat; y: cfloat; z: cfloat) {.cdecl,
     importc: "rlRotatef", dynlib: raylibdll.}
 ##  Multiply the current matrix by a rotation matrix
 
-proc scalef*(x: float32; y: float32; z: float32) {.cdecl, importc: "rlScalef",
+proc scalef*(x: cfloat; y: cfloat; z: cfloat) {.cdecl, importc: "rlScalef",
     dynlib: raylibdll.}
 ##  Multiply the current matrix by a scaling matrix
 
-proc multMatrixf*(matf: ptr float32) {.cdecl, importc: "rlMultMatrixf",
+proc multMatrixf*(matf: ptr cfloat) {.cdecl, importc: "rlMultMatrixf",
                                   dynlib: raylibdll.}
 ##  Multiply the current matrix by another matrix
 
-proc frustum*(left: float64; right: float64; bottom: float64; top: float64;
-             znear: float64; zfar: float64) {.cdecl, importc: "rlFrustum",
+proc frustum*(left: cdouble; right: cdouble; bottom: cdouble; top: cdouble;
+             znear: cdouble; zfar: cdouble) {.cdecl, importc: "rlFrustum",
     dynlib: raylibdll.}
-proc ortho*(left: float64; right: float64; bottom: float64; top: float64; znear: float64;
-           zfar: float64) {.cdecl, importc: "rlOrtho", dynlib: raylibdll.}
-proc viewport*(x: int32; y: int32; width: int32; height: int32) {.cdecl,
+proc ortho*(left: cdouble; right: cdouble; bottom: cdouble; top: cdouble; znear: cdouble;
+           zfar: cdouble) {.cdecl, importc: "rlOrtho", dynlib: raylibdll.}
+proc viewport*(x: cint; y: cint; width: cint; height: cint) {.cdecl,
     importc: "rlViewport", dynlib: raylibdll.}
 ##  Set the viewport area
 ## ------------------------------------------------------------------------------------
 ##  Functions Declaration - Vertex level operations
 ## ------------------------------------------------------------------------------------
 
-proc begin*(mode: int32) {.cdecl, importc: "rlBegin", dynlib: raylibdll.}
+proc begin*(mode: cint) {.cdecl, importc: "rlBegin", dynlib: raylibdll.}
 ##  Initialize drawing mode (how to organize vertex)
 
 proc `end`*() {.cdecl, importc: "rlEnd", dynlib: raylibdll.}
 ##  Finish vertex providing
 
-proc vertex2i*(x: int32; y: int32) {.cdecl, importc: "rlVertex2i", dynlib: raylibdll.}
+proc vertex2i*(x: cint; y: cint) {.cdecl, importc: "rlVertex2i", dynlib: raylibdll.}
 ##  Define one vertex (position) - 2 int
 
-proc vertex2f*(x: float32; y: float32) {.cdecl, importc: "rlVertex2f", dynlib: raylibdll.}
+proc vertex2f*(x: cfloat; y: cfloat) {.cdecl, importc: "rlVertex2f", dynlib: raylibdll.}
 ##  Define one vertex (position) - 2 float
 
-proc vertex3f*(x: float32; y: float32; z: float32) {.cdecl, importc: "rlVertex3f",
+proc vertex3f*(x: cfloat; y: cfloat; z: cfloat) {.cdecl, importc: "rlVertex3f",
     dynlib: raylibdll.}
 ##  Define one vertex (position) - 3 float
 
-proc texCoord2f*(x: float32; y: float32) {.cdecl, importc: "rlTexCoord2f",
+proc texCoord2f*(x: cfloat; y: cfloat) {.cdecl, importc: "rlTexCoord2f",
                                     dynlib: raylibdll.}
 ##  Define one vertex (texture coordinate) - 2 float
 
-proc normal3f*(x: float32; y: float32; z: float32) {.cdecl, importc: "rlNormal3f",
+proc normal3f*(x: cfloat; y: cfloat; z: cfloat) {.cdecl, importc: "rlNormal3f",
     dynlib: raylibdll.}
 ##  Define one vertex (normal) - 3 float
 
@@ -209,11 +209,11 @@ proc color4ub*(r: uint8; g: uint8; b: uint8; a: uint8) {.cdecl, importc: "rlColo
     dynlib: raylibdll.}
 ##  Define one vertex (color) - 4 byte
 
-proc color3f*(x: float32; y: float32; z: float32) {.cdecl, importc: "rlColor3f",
+proc color3f*(x: cfloat; y: cfloat; z: cfloat) {.cdecl, importc: "rlColor3f",
     dynlib: raylibdll.}
 ##  Define one vertex (color) - 3 float
 
-proc color4f*(x: float32; y: float32; z: float32; w: float32) {.cdecl, importc: "rlColor4f",
+proc color4f*(x: cfloat; y: cfloat; z: cfloat; w: cfloat) {.cdecl, importc: "rlColor4f",
     dynlib: raylibdll.}
 ##  Define one vertex (color) - 4 float
 ## ------------------------------------------------------------------------------------
@@ -221,23 +221,23 @@ proc color4f*(x: float32; y: float32; z: float32; w: float32) {.cdecl, importc: 
 ##  NOTE: This functions are used to completely abstract raylib code from OpenGL layer
 ## ------------------------------------------------------------------------------------
 
-proc enableTexture*(id: uint32) {.cdecl, importc: "rlEnableTexture", dynlib: raylibdll.}
+proc enableTexture*(id: cuint) {.cdecl, importc: "rlEnableTexture", dynlib: raylibdll.}
 ##  Enable texture usage
 
 proc disableTexture*() {.cdecl, importc: "rlDisableTexture", dynlib: raylibdll.}
 ##  Disable texture usage
 
-proc textureParameters*(id: uint32; param: int32; value: int32) {.cdecl,
+proc textureParameters*(id: cuint; param: cint; value: cint) {.cdecl,
     importc: "rlTextureParameters", dynlib: raylibdll.}
 ##  Set texture parameters (filter, wrap)
 
-proc enableShader*(id: uint32) {.cdecl, importc: "rlEnableShader", dynlib: raylibdll.}
+proc enableShader*(id: cuint) {.cdecl, importc: "rlEnableShader", dynlib: raylibdll.}
 ##  Enable shader program usage
 
 proc disableShader*() {.cdecl, importc: "rlDisableShader", dynlib: raylibdll.}
 ##  Disable shader program usage
 
-proc enableFramebuffer*(id: uint32) {.cdecl, importc: "rlEnableFramebuffer",
+proc enableFramebuffer*(id: cuint) {.cdecl, importc: "rlEnableFramebuffer",
                                   dynlib: raylibdll.}
 ##  Enable render texture (fbo)
 
@@ -272,7 +272,7 @@ proc disableScissorTest*() {.cdecl, importc: "rlDisableScissorTest",
                            dynlib: raylibdll.}
 ##  Disable scissor test
 
-proc scissor*(x: int32; y: int32; width: int32; height: int32) {.cdecl, importc: "rlScissor",
+proc scissor*(x: cint; y: cint; width: cint; height: cint) {.cdecl, importc: "rlScissor",
     dynlib: raylibdll.}
 ##  Scissor test
 
@@ -282,11 +282,11 @@ proc enableWireMode*() {.cdecl, importc: "rlEnableWireMode", dynlib: raylibdll.}
 proc disableWireMode*() {.cdecl, importc: "rlDisableWireMode", dynlib: raylibdll.}
 ##  Disable wire mode
 
-proc setLineWidth*(width: float32) {.cdecl, importc: "rlSetLineWidth",
+proc setLineWidth*(width: cfloat) {.cdecl, importc: "rlSetLineWidth",
                                  dynlib: raylibdll.}
 ##  Set the line drawing width
 
-proc getLineWidth*(): float32 {.cdecl, importc: "rlGetLineWidth", dynlib: raylibdll.}
+proc getLineWidth*(): cfloat {.cdecl, importc: "rlGetLineWidth", dynlib: raylibdll.}
 ##  Get the line drawing width
 
 proc enableSmoothLines*() {.cdecl, importc: "rlEnableSmoothLines", dynlib: raylibdll.}
@@ -304,19 +304,19 @@ proc clearScreenBuffers*() {.cdecl, importc: "rlClearScreenBuffers",
                            dynlib: raylibdll.}
 ##  Clear used screen buffers (color and depth)
 
-proc updateBuffer*(bufferId: int32; data: pointer; dataSize: int32) {.cdecl,
+proc updateBuffer*(bufferId: cint; data: pointer; dataSize: cint) {.cdecl,
     importc: "rlUpdateBuffer", dynlib: raylibdll.}
 ##  Update GPU buffer with new data
 
-proc loadAttribBuffer*(vaoId: uint32; shaderLoc: int32; buffer: pointer; size: int32;
-                      dynamic: bool): uint32 {.cdecl, importc: "rlLoadAttribBuffer",
+proc loadAttribBuffer*(vaoId: cuint; shaderLoc: cint; buffer: pointer; size: cint;
+                      dynamic: bool): cuint {.cdecl, importc: "rlLoadAttribBuffer",
     dynlib: raylibdll.}
 ##  Load a new attributes buffer
 ## ------------------------------------------------------------------------------------
 ##  Functions Declaration - rlgl functionality
 ## ------------------------------------------------------------------------------------
 
-proc init*(width: int32; height: int32) {.cdecl, importc: "rlglInit", dynlib: raylibdll.}
+proc init*(width: cint; height: cint) {.cdecl, importc: "rlglInit", dynlib: raylibdll.}
 ##  Initialize rlgl (buffers, shaders, textures, states)
 
 proc close*() {.cdecl, importc: "rlglClose", dynlib: raylibdll.}
@@ -328,10 +328,10 @@ proc draw*() {.cdecl, importc: "rlglDraw", dynlib: raylibdll.}
 proc checkErrors*() {.cdecl, importc: "rlCheckErrors", dynlib: raylibdll.}
 ##  Check and log OpenGL error codes
 
-proc getVersion*(): int32 {.cdecl, importc: "rlGetVersion", dynlib: raylibdll.}
+proc getVersion*(): cint {.cdecl, importc: "rlGetVersion", dynlib: raylibdll.}
 ##  Returns current OpenGL version
 
-proc checkBufferLimit*(vCount: int32): bool {.cdecl, importc: "rlCheckBufferLimit",
+proc checkBufferLimit*(vCount: cint): bool {.cdecl, importc: "rlCheckBufferLimit",
     dynlib: raylibdll.}
 ##  Check internal buffer overflow for a given number of vertex
 
@@ -339,7 +339,7 @@ proc setDebugMarker*(text: cstring) {.cdecl, importc: "rlSetDebugMarker",
                                    dynlib: raylibdll.}
 ##  Set debug marker for analysis
 
-proc setBlendMode*(glSrcFactor: int32; glDstFactor: int32; glEquation: int32) {.cdecl,
+proc setBlendMode*(glSrcFactor: cint; glDstFactor: cint; glEquation: cint) {.cdecl,
     importc: "rlSetBlendMode", dynlib: raylibdll.}
 ##  // Set blending mode factor and equation (using OpenGL factors)
 
@@ -348,30 +348,30 @@ proc loadExtensions*(loader: pointer) {.cdecl, importc: "rlLoadExtensions",
 ##  Load OpenGL extensions
 ##  Textures data management
 
-proc loadTexture*(data: pointer; width: int32; height: int32; format: int32;
-                 mipmapCount: int32): uint32 {.cdecl, importc: "rlLoadTexture",
+proc loadTexture*(data: pointer; width: cint; height: cint; format: cint;
+                 mipmapCount: cint): cuint {.cdecl, importc: "rlLoadTexture",
     dynlib: raylibdll.}
 ##  Load texture in GPU
 
-proc loadTextureDepth*(width: int32; height: int32; useRenderBuffer: bool): uint32 {.cdecl,
+proc loadTextureDepth*(width: cint; height: cint; useRenderBuffer: bool): cuint {.cdecl,
     importc: "rlLoadTextureDepth", dynlib: raylibdll.}
 ##  Load depth texture/renderbuffer (to be attached to fbo)
 
-proc loadTextureCubemap*(data: pointer; size: int32; format: int32): uint32 {.cdecl,
+proc loadTextureCubemap*(data: pointer; size: cint; format: cint): cuint {.cdecl,
     importc: "rlLoadTextureCubemap", dynlib: raylibdll.}
 ##  Load texture cubemap
 
-proc updateTexture*(id: uint32; offsetX: int32; offsetY: int32; width: int32; height: int32;
-                   format: int32; data: pointer) {.cdecl, importc: "rlUpdateTexture",
+proc updateTexture*(id: cuint; offsetX: cint; offsetY: cint; width: cint; height: cint;
+                   format: cint; data: pointer) {.cdecl, importc: "rlUpdateTexture",
     dynlib: raylibdll.}
 ##  Update GPU texture with new data
 
-proc getGlTextureFormats*(format: int32; glInternalFormat: ptr uint32;
-                         glFormat: ptr uint32; glType: ptr uint32) {.cdecl,
+proc getGlTextureFormats*(format: cint; glInternalFormat: ptr cuint;
+                         glFormat: ptr cuint; glType: ptr cuint) {.cdecl,
     importc: "rlGetGlTextureFormats", dynlib: raylibdll.}
 ##  Get OpenGL internal formats
 
-proc unloadTexture*(id: uint32) {.cdecl, importc: "rlUnloadTexture", dynlib: raylibdll.}
+proc unloadTexture*(id: cuint) {.cdecl, importc: "rlUnloadTexture", dynlib: raylibdll.}
 ##  Unload texture from GPU memory
 
 proc generateMipmaps*(texture: ptr Texture2D) {.cdecl, importc: "rlGenerateMipmaps",
@@ -382,24 +382,24 @@ proc readTexturePixels*(texture: Texture2D): pointer {.cdecl,
     importc: "rlReadTexturePixels", dynlib: raylibdll.}
 ##  Read texture pixel data
 
-proc readScreenPixels*(width: int32; height: int32): ptr uint8 {.cdecl,
+proc readScreenPixels*(width: cint; height: cint): ptr uint8 {.cdecl,
     importc: "rlReadScreenPixels", dynlib: raylibdll.}
 ##  Read screen pixel data (color buffer)
 ##  Framebuffer management (fbo)
 
-proc loadFramebuffer*(width: int32; height: int32): uint32 {.cdecl,
+proc loadFramebuffer*(width: cint; height: cint): cuint {.cdecl,
     importc: "rlLoadFramebuffer", dynlib: raylibdll.}
 ##  Load an empty framebuffer
 
-proc framebufferAttach*(fboId: uint32; texId: uint32; attachType: int32; texType: int32) {.
+proc framebufferAttach*(fboId: cuint; texId: cuint; attachType: cint; texType: cint) {.
     cdecl, importc: "rlFramebufferAttach", dynlib: raylibdll.}
 ##  Attach texture/renderbuffer to a framebuffer
 
-proc framebufferComplete*(id: uint32): bool {.cdecl, importc: "rlFramebufferComplete",
+proc framebufferComplete*(id: cuint): bool {.cdecl, importc: "rlFramebufferComplete",
     dynlib: raylibdll.}
 ##  Verify framebuffer is complete
 
-proc unloadFramebuffer*(id: uint32) {.cdecl, importc: "rlUnloadFramebuffer",
+proc unloadFramebuffer*(id: cuint) {.cdecl, importc: "rlUnloadFramebuffer",
                                   dynlib: raylibdll.}
 ##  Delete framebuffer from GPU
 ##  Vertex data management
@@ -408,11 +408,11 @@ proc loadMesh*(mesh: ptr Mesh; dynamic: bool) {.cdecl, importc: "rlLoadMesh",
     dynlib: raylibdll.}
 ##  Upload vertex data into GPU and provided VAO/VBO ids
 
-proc updateMesh*(mesh: Mesh; buffer: int32; count: int32) {.cdecl,
+proc updateMesh*(mesh: Mesh; buffer: cint; count: cint) {.cdecl,
     importc: "rlUpdateMesh", dynlib: raylibdll.}
 ##  Update vertex or index data on GPU (upload new data to one buffer)
 
-proc updateMeshAt*(mesh: Mesh; buffer: int32; count: int32; index: int32) {.cdecl,
+proc updateMeshAt*(mesh: Mesh; buffer: cint; count: cint; index: cint) {.cdecl,
     importc: "rlUpdateMeshAt", dynlib: raylibdll.}
 ##  Update vertex or index data on GPU, at index
 
@@ -421,7 +421,7 @@ proc drawMesh*(mesh: Mesh; material: Material; transform: Matrix) {.cdecl,
 ##  Draw a 3d mesh with material and transform
 
 proc drawMeshInstanced*(mesh: Mesh; material: Material; transforms: ptr Matrix;
-                       count: int32) {.cdecl, importc: "rlDrawMeshInstanced",
+                       count: cint) {.cdecl, importc: "rlDrawMeshInstanced",
                                     dynlib: raylibdll.}
 ##  Draw a 3d mesh with material and transform
 
@@ -430,7 +430,7 @@ proc unloadMesh*(mesh: Mesh) {.cdecl, importc: "rlUnloadMesh", dynlib: raylibdll
 ##  NOTE: There is a set of shader related functions that are available to end user,
 ##  to avoid creating function wrappers through core module, they have been directly declared in raylib.h
 
-converter GlVersionToInt32*(self: GlVersion): int32 = self.int32
-converter FramebufferAttachTypeToInt32*(self: FramebufferAttachType): int32 = self.int32
-converter FramebufferTexTypeToInt32*(self: FramebufferTexType): int32 = self.int32
+converter GlVersionToInt*(self: GlVersion): cint = self.cint
+converter FramebufferAttachTypeToInt*(self: FramebufferAttachType): cint = self.cint
+converter FramebufferTexTypeToInt*(self: FramebufferTexType): cint = self.cint
 

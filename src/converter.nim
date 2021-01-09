@@ -240,7 +240,7 @@ converter intToUint8InColor*(self: tuple[r,g,b,a: int]): Color =
         assert m.groupFirstCapture(1, line) == typename, "wrong typename: " & $i
         rs.add fmt"typedef struct {typename} {{}} {typename};"
       elif line.match(reTypedefEnumStart):
-        # C uses enums in place of int32 numbers, so every enum takes an
+        # C uses enums in place of int numbers, so every enum takes an
         # appropriate converter to translate types in Nim implicitly
         var enumName =
           if line.match(reTypedefEnumOneline, m):
@@ -258,10 +258,10 @@ converter intToUint8InColor*(self: tuple[r,g,b,a: int]): Color =
             enumName.removePrefix(prefix)
             break
         let convertType =
-          if enumName == "ConfigFlag": "uint32"
-          else: "int32"
+          if enumName == "ConfigFlag": "cuint"
+          else: "cint"
         appendToVeryEnd.add(
-          fmt("converter {enumName}ToInt32*(self: {enumName}): {convertType} = self.{convertType}\n")
+          fmt("converter {enumName}ToInt*(self: {enumName}): {convertType} = self.{convertType}\n")
         )
         # Remember to still add this line
         rs.add line & "\n"
@@ -320,62 +320,43 @@ converter intToUint8InColor*(self: tuple[r,g,b,a: int]): Color =
         "Rectangle",
         "Color",
       ]
-      # Conversions from float to float32 for Vector2, Vector3, Vector4,
+      # Conversions from float to cfloat for Vector2, Vector3, Vector4,
       # Matrix and Rectangle. Quaternion is same as Vector4, so works too.
       tupleConverters = """
-converter floatToFloat32InVector2*(self: tuple[x,y: float]): Vector2 =
-  (self.x.float32, self.y.float32)
-converter floatToFloat32InVector3*(self: tuple[x,y,z: float]): Vector3 =
-  (self.x.float32, self.y.float32, self.z.float32)
-converter floatToFloat32InVector4*(self: tuple[x,y,z,w: float]): Vector4 =
-  (self.x.float32, self.y.float32, self.z.float32, self.w.float32)
-converter floatToFloat32InMatrix*(self:
+converter floatToCfloatInVector2*(self: tuple[x,y: float]): Vector2 =
+  (self.x.cfloat, self.y.cfloat)
+converter floatToCfloatInVector3*(self: tuple[x,y,z: float]): Vector3 =
+  (self.x.cfloat, self.y.cfloat, self.z.cfloat)
+converter floatToCfloatInVector4*(self: tuple[x,y,z,w: float]): Vector4 =
+  (self.x.cfloat, self.y.cfloat, self.z.cfloat, self.w.cfloat)
+converter floatToCfloatInMatrix*(self:
   tuple[m0,m4,m8, m12,
         m1,m5,m9, m13,
         m2,m6,m10,m14,
         m3,m7,m11,m15: float]
 ): Matrix =
   (
-    self.m0.float32, self.m4.float32, self.m8.float32,  self.m12.float32,
-    self.m1.float32, self.m5.float32, self.m9.float32,  self.m13.float32,
-    self.m2.float32, self.m6.float32, self.m10.float32, self.m14.float32,
-    self.m3.float32, self.m7.float32, self.m11.float32, self.m15.float32,
+    self.m0.cfloat, self.m4.cfloat, self.m8.cfloat,  self.m12.cfloat,
+    self.m1.cfloat, self.m5.cfloat, self.m9.cfloat,  self.m13.cfloat,
+    self.m2.cfloat, self.m6.cfloat, self.m10.cfloat, self.m14.cfloat,
+    self.m3.cfloat, self.m7.cfloat, self.m11.cfloat, self.m15.cfloat,
   )
-converter floatToFloat32InRectangle*(self: tuple[x,y,width,height: float]): Rectangle =
-  (self.x.float32, self.y.float32, self.width.float32, self.height.float32)
+converter floatToCfloatInRectangle*(self: tuple[x,y,width,height: float]): Rectangle =
+  (self.x.cfloat, self.y.cfloat, self.width.cfloat, self.height.cfloat)
 """
     let
       raylibnim = readFile(buildDir/fmt"{filename}_modified.nim")
-      # Replace all C-style types to native Nim ones
-      # Until we use 9-qbit words for bytes, Nim definition should be
-      # same as C definition and it allows one to write code without
-      # constant conversions such as `let width = 640.cint`
-      raylibnimConvertedTypes = raylibnim.multiReplace(
-        # According to definitions in compiler Nim/lib/system.nim
-        ("cint", "int32"),
-        ("cschar", "int8"),
-        ("cshort", "int16"),
-        ("cint", "int32"),
-        ("csize_t", "uint"),
-        ("csize", "int"),
-        ("clonglong", "int64"),
-        ("cfloat", "float32"),
-        ("cdouble", "float64"),
-        ("clongdouble", "BiggestFloat"),
-        ("cuchar", "uint8"), # digression from how compiler defines it
-        ("cushort", "uint16"),
-        ("cuint", "uint32"),
-        ("culonglong", "uint64"),
-      )
+      # Digression from how compiler defines it, used for Color
+      raylibnimConvertedTypes = raylibnim.replace("cuchar", "uint8")
       raylibnimLines = raylibnimConvertedTypes.splitLines
     var rs: string
     var i = 0
     while i < raylibnimLines.len:
       var line = raylibnimLines[i]
-      if "{.size: sizeof(int32).} = enum" in line: # add `pure` pragma to enums
+      if "{.size: sizeof(cint).} = enum" in line: # add `pure` pragma to enums
         line = line.replace(
-          "{.size: sizeof(int32).} = enum",
-          "{.size: sizeof(int32), pure.} = enum"
+          "{.size: sizeof(cint).} = enum",
+          "{.size: sizeof(cint), pure.} = enum"
         )
         rs.add line & "\n"
         i.inc

@@ -161,29 +161,29 @@ const
 
 type
   StyleProp* {.bycopy.} = object
-    controlId*: uint16
-    propertyId*: uint16
-    propertyValue*: int32
+    controlId*: cushort
+    propertyId*: cushort
+    propertyValue*: cint
 
 
 ##  Gui control state
 
 type
-  ControlState* {.size: sizeof(int32), pure.} = enum
+  ControlState* {.size: sizeof(cint), pure.} = enum
     STATE_NORMAL = 0, STATE_FOCUSED, STATE_PRESSED, STATE_DISABLED
 
 
 ##  Gui control text alignment
 
 type
-  TextAlignment* {.size: sizeof(int32), pure.} = enum
+  TextAlignment* {.size: sizeof(cint), pure.} = enum
     TEXT_ALIGN_LEFT = 0, TEXT_ALIGN_CENTER, TEXT_ALIGN_RIGHT
 
 
 ##  Gui controls
 
 type
-  Control* {.size: sizeof(int32), pure.} = enum
+  Control* {.size: sizeof(cint), pure.} = enum
     DEFAULT = 0, LABEL,          ##  LABELBUTTON
     BUTTON,                   ##  IMAGEBUTTON
     TOGGLE,                   ##  TOGGLEGROUP
@@ -195,7 +195,7 @@ type
 ##  Gui base properties for every control
 
 type
-  ControlProperty* {.size: sizeof(int32), pure.} = enum
+  ControlProperty* {.size: sizeof(cint), pure.} = enum
     BORDER_COLOR_NORMAL = 0, BASE_COLOR_NORMAL, TEXT_COLOR_NORMAL,
     BORDER_COLOR_FOCUSED, BASE_COLOR_FOCUSED, TEXT_COLOR_FOCUSED,
     BORDER_COLOR_PRESSED, BASE_COLOR_PRESSED, TEXT_COLOR_PRESSED,
@@ -208,7 +208,7 @@ type
 ##  DEFAULT properties
 
 type
-  DefaultProperty* {.size: sizeof(int32), pure.} = enum
+  DefaultProperty* {.size: sizeof(cint), pure.} = enum
     TEXT_SIZE = 16, TEXT_SPACING, LINE_COLOR, BACKGROUND_COLOR
 
 
@@ -219,63 +219,63 @@ type
 ##  Toggle / ToggleGroup
 
 type
-  ToggleProperty* {.size: sizeof(int32), pure.} = enum
+  ToggleProperty* {.size: sizeof(cint), pure.} = enum
     GROUP_PADDING = 16
 
 
 ##  Slider / SliderBar
 
 type
-  SliderProperty* {.size: sizeof(int32), pure.} = enum
+  SliderProperty* {.size: sizeof(cint), pure.} = enum
     SLIDER_WIDTH = 16, SLIDER_PADDING
 
 
 ##  ProgressBar
 
 type
-  ProgressBarProperty* {.size: sizeof(int32), pure.} = enum
+  ProgressBarProperty* {.size: sizeof(cint), pure.} = enum
     PROGRESS_PADDING = 16
 
 
 ##  CheckBox
 
 type
-  CheckBoxProperty* {.size: sizeof(int32), pure.} = enum
+  CheckBoxProperty* {.size: sizeof(cint), pure.} = enum
     CHECK_PADDING = 16
 
 
 ##  ComboBox
 
 type
-  ComboBoxProperty* {.size: sizeof(int32), pure.} = enum
+  ComboBoxProperty* {.size: sizeof(cint), pure.} = enum
     COMBO_BUTTON_WIDTH = 16, COMBO_BUTTON_PADDING
 
 
 ##  DropdownBox
 
 type
-  DropdownBoxProperty* {.size: sizeof(int32), pure.} = enum
+  DropdownBoxProperty* {.size: sizeof(cint), pure.} = enum
     ARROW_PADDING = 16, DROPDOWN_ITEMS_PADDING
 
 
 ##  TextBox / TextBoxMulti / ValueBox / Spinner
 
 type
-  TextBoxProperty* {.size: sizeof(int32), pure.} = enum
+  TextBoxProperty* {.size: sizeof(cint), pure.} = enum
     TEXT_INNER_PADDING = 16, TEXT_LINES_PADDING, COLOR_SELECTED_FG, COLOR_SELECTED_BG
 
 
 ##  Spinner
 
 type
-  SpinnerProperty* {.size: sizeof(int32), pure.} = enum
+  SpinnerProperty* {.size: sizeof(cint), pure.} = enum
     SPIN_BUTTON_WIDTH = 16, SPIN_BUTTON_PADDING
 
 
 ##  ScrollBar
 
 type
-  ScrollBarProperty* {.size: sizeof(int32), pure.} = enum
+  ScrollBarProperty* {.size: sizeof(cint), pure.} = enum
     ARROWS_SIZE = 16, ARROWS_VISIBLE, SCROLL_SLIDER_PADDING, SCROLL_SLIDER_SIZE,
     SCROLL_PADDING, SCROLL_SPEED
 
@@ -283,21 +283,21 @@ type
 ##  ScrollBar side
 
 type
-  ScrollBarSide* {.size: sizeof(int32), pure.} = enum
+  ScrollBarSide* {.size: sizeof(cint), pure.} = enum
     SCROLLBAR_LEFT_SIDE = 0, SCROLLBAR_RIGHT_SIDE
 
 
 ##  ListView
 
 type
-  ListViewProperty* {.size: sizeof(int32), pure.} = enum
+  ListViewProperty* {.size: sizeof(cint), pure.} = enum
     LIST_ITEMS_HEIGHT = 16, LIST_ITEMS_PADDING, SCROLLBAR_WIDTH, SCROLLBAR_SIDE
 
 
 ##  ColorPicker
 
 type
-  ColorPickerProperty* {.size: sizeof(int32), pure.} = enum
+  ColorPickerProperty* {.size: sizeof(cint), pure.} = enum
     COLOR_SELECTOR_SIZE = 16, HUEBAR_WIDTH, ##  Right hue bar width
     HUEBAR_PADDING,           ##  Right hue bar separation from panel
     HUEBAR_SELECTOR_HEIGHT,   ##  Right hue bar selector height
@@ -325,13 +325,13 @@ proc lock*() {.cdecl, importc: "GuiLock", dynlib: rayguidll.}
 proc unlock*() {.cdecl, importc: "GuiUnlock", dynlib: rayguidll.}
 ##  Unlock gui controls (global state)
 
-proc fade*(alpha: float32) {.cdecl, importc: "GuiFade", dynlib: rayguidll.}
+proc fade*(alpha: cfloat) {.cdecl, importc: "GuiFade", dynlib: rayguidll.}
 ##  Set gui controls alpha (global state), alpha goes from 0.0f to 1.0f
 
-proc setState*(state: int32) {.cdecl, importc: "GuiSetState", dynlib: rayguidll.}
+proc setState*(state: cint) {.cdecl, importc: "GuiSetState", dynlib: rayguidll.}
 ##  Set gui state (global state)
 
-proc getState*(): int32 {.cdecl, importc: "GuiGetState", dynlib: rayguidll.}
+proc getState*(): cint {.cdecl, importc: "GuiGetState", dynlib: rayguidll.}
 ##  Get gui state (global state)
 ##  Font set/get functions
 
@@ -342,11 +342,11 @@ proc getFont*(): Font {.cdecl, importc: "GuiGetFont", dynlib: rayguidll.}
 ##  Get gui custom font (global state)
 ##  Style set/get functions
 
-proc setStyle*(control: int32; property: int32; value: int32) {.cdecl,
+proc setStyle*(control: cint; property: cint; value: cint) {.cdecl,
     importc: "GuiSetStyle", dynlib: rayguidll.}
 ##  Set one style property
 
-proc getStyle*(control: int32; property: int32): int32 {.cdecl, importc: "GuiGetStyle",
+proc getStyle*(control: cint; property: cint): cint {.cdecl, importc: "GuiGetStyle",
     dynlib: rayguidll.}
 ##  Get one style property
 ##  Tooltips set functions
@@ -410,7 +410,7 @@ proc toggle*(bounds: Rectangle; text: cstring; active: bool): bool {.cdecl,
     importc: "GuiToggle", dynlib: rayguidll.}
 ##  Toggle Button control, returns true when active
 
-proc toggleGroup*(bounds: Rectangle; text: cstring; active: int32): int32 {.cdecl,
+proc toggleGroup*(bounds: Rectangle; text: cstring; active: cint): cint {.cdecl,
     importc: "GuiToggleGroup", dynlib: rayguidll.}
 ##  Toggle Group control, returns active toggle index
 
@@ -418,44 +418,44 @@ proc checkBox*(bounds: Rectangle; text: cstring; checked: bool): bool {.cdecl,
     importc: "GuiCheckBox", dynlib: rayguidll.}
 ##  Check Box control, returns true when active
 
-proc comboBox*(bounds: Rectangle; text: cstring; active: int32): int32 {.cdecl,
+proc comboBox*(bounds: Rectangle; text: cstring; active: cint): cint {.cdecl,
     importc: "GuiComboBox", dynlib: rayguidll.}
 ##  Combo Box control, returns selected item index
 
-proc dropdownBox*(bounds: Rectangle; text: cstring; active: ptr int32; editMode: bool): bool {.
+proc dropdownBox*(bounds: Rectangle; text: cstring; active: ptr cint; editMode: bool): bool {.
     cdecl, importc: "GuiDropdownBox", dynlib: rayguidll.}
 ##  Dropdown Box control, returns selected item
 
-proc spinner*(bounds: Rectangle; text: cstring; value: ptr int32; minValue: int32;
-             maxValue: int32; editMode: bool): bool {.cdecl, importc: "GuiSpinner",
+proc spinner*(bounds: Rectangle; text: cstring; value: ptr cint; minValue: cint;
+             maxValue: cint; editMode: bool): bool {.cdecl, importc: "GuiSpinner",
     dynlib: rayguidll.}
 ##  Spinner control, returns selected value
 
-proc valueBox*(bounds: Rectangle; text: cstring; value: ptr int32; minValue: int32;
-              maxValue: int32; editMode: bool): bool {.cdecl, importc: "GuiValueBox",
+proc valueBox*(bounds: Rectangle; text: cstring; value: ptr cint; minValue: cint;
+              maxValue: cint; editMode: bool): bool {.cdecl, importc: "GuiValueBox",
     dynlib: rayguidll.}
 ##  Value Box control, updates input text with numbers
 
-proc textBox*(bounds: Rectangle; text: cstring; textSize: int32; editMode: bool): bool {.
+proc textBox*(bounds: Rectangle; text: cstring; textSize: cint; editMode: bool): bool {.
     cdecl, importc: "GuiTextBox", dynlib: rayguidll.}
 ##  Text Box control, updates input text
 
-proc textBoxMulti*(bounds: Rectangle; text: cstring; textSize: int32; editMode: bool): bool {.
+proc textBoxMulti*(bounds: Rectangle; text: cstring; textSize: cint; editMode: bool): bool {.
     cdecl, importc: "GuiTextBoxMulti", dynlib: rayguidll.}
 ##  Text Box control with multiple lines
 
-proc slider*(bounds: Rectangle; textLeft: cstring; textRight: cstring; value: float32;
-            minValue: float32; maxValue: float32): float32 {.cdecl, importc: "GuiSlider",
+proc slider*(bounds: Rectangle; textLeft: cstring; textRight: cstring; value: cfloat;
+            minValue: cfloat; maxValue: cfloat): cfloat {.cdecl, importc: "GuiSlider",
     dynlib: rayguidll.}
 ##  Slider control, returns selected value
 
 proc sliderBar*(bounds: Rectangle; textLeft: cstring; textRight: cstring;
-               value: float32; minValue: float32; maxValue: float32): float32 {.cdecl,
+               value: cfloat; minValue: cfloat; maxValue: cfloat): cfloat {.cdecl,
     importc: "GuiSliderBar", dynlib: rayguidll.}
 ##  Slider Bar control, returns selected value
 
 proc progressBar*(bounds: Rectangle; textLeft: cstring; textRight: cstring;
-                 value: float32; minValue: float32; maxValue: float32): float32 {.cdecl,
+                 value: cfloat; minValue: cfloat; maxValue: cfloat): cfloat {.cdecl,
     importc: "GuiProgressBar", dynlib: rayguidll.}
 ##  Progress Bar control, shows current progress value
 
@@ -467,30 +467,30 @@ proc dummyRec*(bounds: Rectangle; text: cstring) {.cdecl, importc: "GuiDummyRec"
     dynlib: rayguidll.}
 ##  Dummy control for placeholders
 
-proc scrollBar*(bounds: Rectangle; value: int32; minValue: int32; maxValue: int32): int32 {.
+proc scrollBar*(bounds: Rectangle; value: cint; minValue: cint; maxValue: cint): cint {.
     cdecl, importc: "GuiScrollBar", dynlib: rayguidll.}
 ##  Scroll Bar control
 
-proc grid*(bounds: Rectangle; spacing: float32; subdivs: int32): Vector2 {.cdecl,
+proc grid*(bounds: Rectangle; spacing: cfloat; subdivs: cint): Vector2 {.cdecl,
     importc: "GuiGrid", dynlib: rayguidll.}
 ##  Grid control
 ##  Advance controls set
 
-proc listView*(bounds: Rectangle; text: cstring; scrollIndex: ptr int32; active: int32): int32 {.
+proc listView*(bounds: Rectangle; text: cstring; scrollIndex: ptr cint; active: cint): cint {.
     cdecl, importc: "GuiListView", dynlib: rayguidll.}
 ##  List View control, returns selected list item index
 
-proc listViewEx*(bounds: Rectangle; text: cstringArray; count: int32; focus: ptr int32;
-                scrollIndex: ptr int32; active: int32): int32 {.cdecl,
+proc listViewEx*(bounds: Rectangle; text: cstringArray; count: cint; focus: ptr cint;
+                scrollIndex: ptr cint; active: cint): cint {.cdecl,
     importc: "GuiListViewEx", dynlib: rayguidll.}
 ##  List View with extended parameters
 
-proc messageBox*(bounds: Rectangle; title: cstring; message: cstring; buttons: cstring): int32 {.
+proc messageBox*(bounds: Rectangle; title: cstring; message: cstring; buttons: cstring): cint {.
     cdecl, importc: "GuiMessageBox", dynlib: rayguidll.}
 ##  Message Box control, displays a message
 
 proc textInputBox*(bounds: Rectangle; title: cstring; message: cstring;
-                  buttons: cstring; text: cstring): int32 {.cdecl,
+                  buttons: cstring; text: cstring): cint {.cdecl,
     importc: "GuiTextInputBox", dynlib: rayguidll.}
 ##  Text Input Box control, ask for text
 
@@ -502,11 +502,11 @@ proc colorPanel*(bounds: Rectangle; color: Color): Color {.cdecl,
     importc: "GuiColorPanel", dynlib: rayguidll.}
 ##  Color Panel control
 
-proc colorBarAlpha*(bounds: Rectangle; alpha: float32): float32 {.cdecl,
+proc colorBarAlpha*(bounds: Rectangle; alpha: cfloat): cfloat {.cdecl,
     importc: "GuiColorBarAlpha", dynlib: rayguidll.}
 ##  Color Bar Alpha control
 
-proc colorBarHue*(bounds: Rectangle; value: float32): float32 {.cdecl,
+proc colorBarHue*(bounds: Rectangle; value: cfloat): cfloat {.cdecl,
     importc: "GuiColorBarHue", dynlib: rayguidll.}
 ##  Color Bar Hue control
 ##  Styles loading functions
@@ -522,46 +522,46 @@ proc loadStyleDefault*() {.cdecl, importc: "GuiLoadStyleDefault", dynlib: raygui
 ## RAYGUIDEF void UnloadGuiStyle(GuiStyle style);                  // Unload style
 ##
 
-proc iconText*(iconId: int32; text: cstring): cstring {.cdecl, importc: "GuiIconText",
+proc iconText*(iconId: cint; text: cstring): cstring {.cdecl, importc: "GuiIconText",
     dynlib: rayguidll.}
 ##  Get text with icon id prepended (if supported)
 
 when defined(raygui_Support_Icons):
   ##  Gui icons functionality
-  proc drawIcon*(iconId: int32; position: Vector2; pixelSize: int32; color: Color) {.cdecl,
+  proc drawIcon*(iconId: cint; position: Vector2; pixelSize: cint; color: Color) {.cdecl,
       importc: "GuiDrawIcon", dynlib: rayguidll.}
-  proc getIcons*(): ptr uint32 {.cdecl, importc: "GuiGetIcons", dynlib: rayguidll.}
+  proc getIcons*(): ptr cuint {.cdecl, importc: "GuiGetIcons", dynlib: rayguidll.}
   ##  Get full icons data pointer
-  proc getIconData*(iconId: int32): ptr uint32 {.cdecl, importc: "GuiGetIconData",
+  proc getIconData*(iconId: cint): ptr cuint {.cdecl, importc: "GuiGetIconData",
       dynlib: rayguidll.}
   ##  Get icon bit data
-  proc setIconData*(iconId: int32; data: ptr uint32) {.cdecl, importc: "GuiSetIconData",
+  proc setIconData*(iconId: cint; data: ptr cuint) {.cdecl, importc: "GuiSetIconData",
       dynlib: rayguidll.}
   ##  Set icon bit data
-  proc setIconPixel*(iconId: int32; x: int32; y: int32) {.cdecl,
+  proc setIconPixel*(iconId: cint; x: cint; y: cint) {.cdecl,
       importc: "GuiSetIconPixel", dynlib: rayguidll.}
   ##  Set icon pixel value
-  proc clearIconPixel*(iconId: int32; x: int32; y: int32) {.cdecl,
+  proc clearIconPixel*(iconId: cint; x: cint; y: cint) {.cdecl,
       importc: "GuiClearIconPixel", dynlib: rayguidll.}
   ##  Clear icon pixel value
-  proc checkIconPixel*(iconId: int32; x: int32; y: int32): bool {.cdecl,
+  proc checkIconPixel*(iconId: cint; x: cint; y: cint): bool {.cdecl,
       importc: "GuiCheckIconPixel", dynlib: rayguidll.}
   ##  Check icon pixel value
-converter ControlStateToInt32*(self: ControlState): int32 = self.int32
-converter TextAlignmentToInt32*(self: TextAlignment): int32 = self.int32
-converter ControlToInt32*(self: Control): int32 = self.int32
-converter ControlPropertyToInt32*(self: ControlProperty): int32 = self.int32
-converter DefaultPropertyToInt32*(self: DefaultProperty): int32 = self.int32
-converter TogglePropertyToInt32*(self: ToggleProperty): int32 = self.int32
-converter SliderPropertyToInt32*(self: SliderProperty): int32 = self.int32
-converter ProgressBarPropertyToInt32*(self: ProgressBarProperty): int32 = self.int32
-converter CheckBoxPropertyToInt32*(self: CheckBoxProperty): int32 = self.int32
-converter ComboBoxPropertyToInt32*(self: ComboBoxProperty): int32 = self.int32
-converter DropdownBoxPropertyToInt32*(self: DropdownBoxProperty): int32 = self.int32
-converter TextBoxPropertyToInt32*(self: TextBoxProperty): int32 = self.int32
-converter SpinnerPropertyToInt32*(self: SpinnerProperty): int32 = self.int32
-converter ScrollBarPropertyToInt32*(self: ScrollBarProperty): int32 = self.int32
-converter ScrollBarSideToInt32*(self: ScrollBarSide): int32 = self.int32
-converter ListViewPropertyToInt32*(self: ListViewProperty): int32 = self.int32
-converter ColorPickerPropertyToInt32*(self: ColorPickerProperty): int32 = self.int32
+converter ControlStateToInt*(self: ControlState): cint = self.cint
+converter TextAlignmentToInt*(self: TextAlignment): cint = self.cint
+converter ControlToInt*(self: Control): cint = self.cint
+converter ControlPropertyToInt*(self: ControlProperty): cint = self.cint
+converter DefaultPropertyToInt*(self: DefaultProperty): cint = self.cint
+converter TogglePropertyToInt*(self: ToggleProperty): cint = self.cint
+converter SliderPropertyToInt*(self: SliderProperty): cint = self.cint
+converter ProgressBarPropertyToInt*(self: ProgressBarProperty): cint = self.cint
+converter CheckBoxPropertyToInt*(self: CheckBoxProperty): cint = self.cint
+converter ComboBoxPropertyToInt*(self: ComboBoxProperty): cint = self.cint
+converter DropdownBoxPropertyToInt*(self: DropdownBoxProperty): cint = self.cint
+converter TextBoxPropertyToInt*(self: TextBoxProperty): cint = self.cint
+converter SpinnerPropertyToInt*(self: SpinnerProperty): cint = self.cint
+converter ScrollBarPropertyToInt*(self: ScrollBarProperty): cint = self.cint
+converter ScrollBarSideToInt*(self: ScrollBarSide): cint = self.cint
+converter ListViewPropertyToInt*(self: ListViewProperty): cint = self.cint
+converter ColorPickerPropertyToInt*(self: ColorPickerProperty): cint = self.cint
 
