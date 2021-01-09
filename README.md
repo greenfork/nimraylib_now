@@ -1,7 +1,7 @@
 # NimraylibNow! - the Ultimate Raylib wrapper for Nim
 
 The most idiomatic and up-to-date wrapper for [Raylib] gaming C library.
-Use this library if you want to write games using Raylib in [Nim].
+Use this library if you want to write games using [Raylib] in [Nim].
 
 [Raylib]: https://www.raylib.com/
 [Nim]: https://nim-lang.org/
@@ -11,13 +11,13 @@ Use this library if you want to write games using Raylib in [Nim].
 * Automated generation of the wrapper for the latest version of Raylib using
   the power of (((Nim)))
 * Idiomatic Nim naming so you write **Nim** code, not C
-* Includes modules: raymath, rlgl, raygui
+* A lot of examples converted to Nim
+* Includes modules: raylib, raymath, rlgl, raygui
 * Compiles raygui library for you
 * Conversion script is included in the library, no manual work is required
-  to update the bindings`*`
-* A lot of examples converted to Nim
+  to update the bindings*
 
-`*` _minor changes at most_
+*_minor changes at most_
 
 ## Install
 
@@ -33,7 +33,7 @@ $ nimble install nimraylib_now
 
 If you want to use [raygui] library, compile it:
 ```shell
-$ git clone --recurse-submodules --shallow-submodules <repository/path>
+$ git clone --recurse-submodules --shallow-submodules https://github.com/greenfork/nimraylib_now
 $ cd nimraylib_now
 $ nimble install --depsOnly
 $ nimble buildRaygui # as it's not distributed as a dynamic library
@@ -132,27 +132,7 @@ const Lightgray*: Color = (r: 200, g: 200, b: 200, a: 255)
 ```
 
 ### C structs/Nim objects and tuples
-Prefixes are stripped if any.
-
-```c
-typedef struct Image {
-    void *data;
-    int width;
-    int height;
-    int mipmaps;
-    int format;
-} Image;
-```
-to
-```nim
-type
-  Image* = object
-    data*: pointer
-    width*: int32
-    height*: int32
-    mipmaps*: int32
-    format*: int32
-```
+Most structs are converted to Nim objects. Prefixes are stripped if any.
 
 Vector2, Vector3, Vector4 (Quaternion), Matrix, Rectangle, Color are better
 fit as a tuple to save on typing as they have pretty much standard parameter
@@ -173,10 +153,13 @@ type
 # All are valid:
 var v1: Vector2 = (x: 3.0, y: 5.0)
 var v2 = (x: 3.0, y: 5.0)
-var v3 = (3.0, 5.0)
+var v3 = (3f, 5f)
 
-# But tuples can't be constructed as objects, following invalid:
+# Tuples can't be constructed as objects, following invalid:
 var invalid = Vector2(x: 3.0, y: 5.0)
+
+# But you can do this instead:
+var valid = (x: 3.0, y: 5.0).Vector2
 ```
 
 Be careful when invoking fields which are also reserved words in Nim:
@@ -189,18 +172,18 @@ Prefixes are stripped if any, including prefixes for values themselves.
 
 ```c
 typedef enum {
-    FONT_DEFAULT = 0,       // Default font generation, anti-aliased
-    FONT_BITMAP,            // Bitmap font generation, no anti-aliasing
-    FONT_SDF                // SDF font generation, requires external shader
+    FONT_DEFAULT = 0,
+    FONT_BITMAP,
+    FONT_SDF
 } FontType;
 ```
 to
 ```nim
 type
   FontType* {.pure.} = enum
-    DEFAULT = 0,              ##  Default font generation, anti-aliased
-    BITMAP,                   ##  Bitmap font generation, no anti-aliasing
-    SDF                       ##  SDF font generation, requires external shader
+    DEFAULT = 0,
+    BITMAP,
+    SDF
 ```
 
 All enums are marked as `{.pure.}` which means they should be fully qualified
@@ -251,12 +234,17 @@ rlgl.end()
 which can be enforced by compiler by importing `rlgl` module like this:
 ```nim
 from rlgl import nil
-from rlgl as rl import nil # to use a shorter `rl`
+
+# or to use a shorter `rl`
+from rlgl as rl import nil
 ```
 
 ## How this works
 
-There are 4 steps:
+`nimble convert` runs `src/converter.nim` script and checks that the resulting
+files are valid Nim files.
+
+There are 4 steps during conversion:
 
 1. Get C header files
 2. Modify C header files (preprocessing)
@@ -269,8 +257,9 @@ Since every step is done automatically, updating to the next version should
 be a comparatively easy task.
 
 ## How to update this library
+
 1. Do `git pull` for all git submodules (see `.gitmodules`), which are
-   different Raylib libraries.
+   different Raylib libraries. Optionally checkout the needed commit version.
 2. Run `nimble convert`
 
 ## Contribute
@@ -278,7 +267,7 @@ be a comparatively easy task.
 Any ideas are welcome. Open an issue to ask a question or tell a suggestion.
 
 ### Convert examples
-There's a helper script to do that `tools/example_converter.nim`. Compile it
+There's a helper script to do that: `tools/example_converter.nim`. Compile it
 and run from terminal with a C file as an argument, then edit the resulting
 Nim file.
 
