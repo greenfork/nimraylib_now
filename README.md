@@ -318,9 +318,9 @@ be a comparatively easy task.
 Any ideas are welcome. Open an issue to ask a question or suggest an idea.
 
 ### Convert examples
-There's a helper script to do that: `tools/example_converter.nim`. Compile it
-and run from terminal with a C file as an argument, then edit the resulting
-Nim file.
+There's a helper script to do that: `tools/c2nim_example_converter.nim`.
+Compile it and run from terminal with a C file as an argument, then edit the
+resulting Nim file.
 
 I cannot port a number of examples:
 * `core_drop_files.c` - I can't test it on my machine (Wayland on Linux)

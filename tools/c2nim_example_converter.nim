@@ -1,4 +1,4 @@
-## Usage: ./example_converter core_2d_camera.c
+## Usage: ./c2nim_example_converter core_2d_camera.c
 
 import os, osproc
 import strutils
