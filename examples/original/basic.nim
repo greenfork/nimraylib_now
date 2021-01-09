@@ -11,9 +11,9 @@ initWindow 800, 600, "[nim]RaylibNow!"
 
 # Camera setup.
 var camera = Camera(
-  position: (x: 0f, y: 10f, z: -15f),
-  up: (x: 0f, y: 0.5f, z: 0f),
-  fovy: 45f
+  position: (x: 0.0, y: 10.0, z: -15.0),
+  up: (x: 0.0, y: 0.5, z: 0.0),
+  fovy: 45
 )
 camera.setCameraMode Orbital
 
@@ -21,15 +21,15 @@ camera.setCameraMode Orbital
 while not windowShouldClose():
   camera.addr.updateCamera
   beginDrawing()
-  label (x: 10f, y: 0f, width: 100f, height: 25f), "by V.A. Guevara"
+  label (x: 10.0, y: 0.0, width: 100.0, height: 25.0), "by V.A. Guevara"
   clearBackground(Black)
   beginMode3D(camera)
-  drawGrid 10, 1.0f
-  drawSphere (0f, 0f, 0f), 0.5f, Red
+  drawGrid 10, 1.0
+  drawSphere (0.0, 0.0, 0.0), 0.5, Red
   endMode3D()
   let
     slogan = "/Hello from Nim/"
-    size = 20.int32
+    size = 20
     width = measureText(slogan, size)
   slogan.drawText(
     (getScreenWidth() - width) div 2,
@@ -38,8 +38,8 @@ while not windowShouldClose():
     LightGray
   )
   drawRectangleV(
-    (x: 10f, y: 10f),
-    (x: (getScreenWidth() - 20).float32, y: (getScreenHeight() - 20).float32),
+    (x: 10.0, y: 10.0),
+    (x: (getScreenWidth() - 20).float, y: (getScreenHeight() - 20).float),
     (r: 255, g: 0, b: 0, a: 20)
   )
   endDrawing()

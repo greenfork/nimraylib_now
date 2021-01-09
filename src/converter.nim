@@ -205,14 +205,6 @@ for (filepath, c2nimheader) in raylibFiles:
       appendToVeryEnd: string # as Nim code
       m: RegexMatch
     rs.add c2nimheader
-    if filename == "raylib":
-      # Needs to be after Color type definition but before declarations of
-      # different colors in raylib.h. Allows to write color tuples
-      # without uint8 conversions like (0.uint8, 125.uint8, ...)
-      appendToVeryEnd.add """
-converter intToUint8InColor*(self: tuple[r,g,b,a: int]): Color =
-  (self.r.uint8, self.g.uint8, self.b.uint8, self.a.uint8)
-"""
     var i = 0
     while i < raylibhLines.len:
       let
@@ -230,8 +222,8 @@ converter intToUint8InColor*(self: tuple[r,g,b,a: int]): Color =
           green = m.groupFirstCapture(2, line)
           blue = m.groupFirstCapture(3, line)
           alpha = m.groupFirstCapture(4, line)
-        appendToVeryEnd.add fmt"const {colorName.fmtConst}*: Color = " &
-          fmt("(r: {red}, g: {green}, b: {blue}, a: {alpha})\n")
+        appendToVeryEnd.add fmt"const {colorName.fmtConst}* = " &
+          fmt("Color(r: {red}, g: {green}, b: {blue}, a: {alpha})\n")
       elif line.match(reEmptyStructDef, m):
         # c2nim can't parse it without {} in the middle
         # this seems as a forward declaration of a struct but no further
@@ -310,39 +302,43 @@ converter intToUint8InColor*(self: tuple[r,g,b,a: int]): Color =
 
   block postprocessing:
     const
-      # By default C structs are converted to Nim objects but some structs
-      # are better described as Nim tuples
-      tupleStructs = [
-        "Vector2",
-        "Vector3",
-        "Vector4",
-        "Matrix",
-        "Rectangle",
-        "Color",
-      ]
-      # Conversions from float to cfloat for Vector2, Vector3, Vector4,
+      # Conversions from tuple to object for Vector2, Vector3, Vector4,
       # Matrix and Rectangle. Quaternion is same as Vector4, so works too.
       tupleConverters = """
-converter floatToCfloatInVector2*(self: tuple[x,y: float]): Vector2 =
-  (self.x.cfloat, self.y.cfloat)
-converter floatToCfloatInVector3*(self: tuple[x,y,z: float]): Vector3 =
-  (self.x.cfloat, self.y.cfloat, self.z.cfloat)
-converter floatToCfloatInVector4*(self: tuple[x,y,z,w: float]): Vector4 =
-  (self.x.cfloat, self.y.cfloat, self.z.cfloat, self.w.cfloat)
-converter floatToCfloatInMatrix*(self:
+converter tupleToColor*(self: tuple[r,g,b,a: int]): Color =
+  Color(r: self.r.uint8, g: self.g.uint8, b: self.b.uint8, a: self.a.uint8)
+
+converter tupleToColor*(self: tuple[r,g,b: int]): Color =
+  Color(r: self.r.uint8, g: self.g.uint8, b: self.b.uint8, a: 255)
+
+converter tupleToVector2*(self: tuple[x,y: float]): Vector2 =
+  Vector2(x: self.x.cfloat, y: self.y.cfloat)
+
+converter tupleToVector3*(self: tuple[x,y,z: float]): Vector3 =
+  Vector3(x: self.x.cfloat, y: self.y.cfloat, z: self.z.cfloat)
+
+converter tupleToVector4*(self: tuple[x,y,z,w: float]): Vector4 =
+  Vector4(x: self.x.cfloat, y: self.y.cfloat, z: self.z.cfloat, w: self.w.cfloat)
+
+converter tupleToMatrix*(self:
   tuple[m0,m4,m8, m12,
         m1,m5,m9, m13,
         m2,m6,m10,m14,
         m3,m7,m11,m15: float]
 ): Matrix =
-  (
-    self.m0.cfloat, self.m4.cfloat, self.m8.cfloat,  self.m12.cfloat,
-    self.m1.cfloat, self.m5.cfloat, self.m9.cfloat,  self.m13.cfloat,
-    self.m2.cfloat, self.m6.cfloat, self.m10.cfloat, self.m14.cfloat,
-    self.m3.cfloat, self.m7.cfloat, self.m11.cfloat, self.m15.cfloat,
+  Matrix(
+    m0: self.m0.cfloat, m4: self.m4.cfloat, m8:  self.m8.cfloat,  m12: self.m12.cfloat,
+    m1: self.m1.cfloat, m5: self.m5.cfloat, m9:  self.m9.cfloat,  m13: self.m13.cfloat,
+    m2: self.m2.cfloat, m6: self.m6.cfloat, m10: self.m10.cfloat, m14: self.m14.cfloat,
+    m3: self.m3.cfloat, m7: self.m7.cfloat, m11: self.m11.cfloat, m15: self.m15.cfloat,
   )
-converter floatToCfloatInRectangle*(self: tuple[x,y,width,height: float]): Rectangle =
-  (self.x.cfloat, self.y.cfloat, self.width.cfloat, self.height.cfloat)
+
+converter tupleToRectangle*(self: tuple[x,y,width,height: float]): Rectangle =
+  Rectangle(x: self.x.cfloat, y: self.y.cfloat, width: self.width.cfloat, height: self.height.cfloat)
+"""
+      cTypeConverters = """
+converter toCint*(self: int): cint = self.cint
+converter toInt*(self: cint): int = self.int
 """
     let
       raylibnim = readFile(buildDir/fmt"{filename}_modified.nim")
@@ -360,20 +356,11 @@ converter floatToCfloatInRectangle*(self: tuple[x,y,width,height: float]): Recta
         )
         rs.add line & "\n"
         i.inc
-      elif tupleStructs.any((ts) => ts & "* {.bycopy.} = object" in line):
-        rs.add line.replace("= object", "= tuple") & "\n"
-        i.inc
-        var cnt = 0
-        while raylibnimLines[i] != "": # this is the end of tuple definition
-          if cnt == 30: quit(1)
-          echo raylibnimLines[i]
-          # Tuples don't have visibility settings for fields, always visible
-          rs.add raylibnimLines[i].replace("*:", ":") & "\n"
-          i.inc
-          cnt.inc
       else:
         rs.add line & "\n"
         i.inc
     if filename == "raylib":
       rs.add tupleConverters
+      rs.add "\n"
+      rs.add cTypeConverters
     writeFile(targetDirectory/fmt"{filename}.nim", rs)
