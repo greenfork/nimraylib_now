@@ -11,7 +11,7 @@ Use this library if you want to write games using [Raylib] in [Nim].
 * Automated generation of the wrapper for the latest version of Raylib using
   the power of (((Nim)))
 * Idiomatic Nim naming and conventions so you write **Nim** code, not C
-* A lot of examples converted to Nim
+* 40+ [examples](examples/) converted from C to Nim
 * Includes modules: raylib, raymath, rlgl, raygui
 * Conversion script is included in the library, no manual work is required
   to update the bindings*
@@ -25,7 +25,7 @@ Install official [Raylib] library. For Arch Linux:
 $ sudo pacman -Syu raylib
 ```
 
-Install this library:
+Install this library (takes **6-10(!) minutes**, [fix] is on the way):
 ```shell
 $ nimble install nimraylib_now
 ```
@@ -44,6 +44,7 @@ $ LD_LIBRARY_PATH=$(pwd) nim r examples/original/basic.nim
 
 [raygui]: https://github.com/raysan5/raygui
 [releases]: https://github.com/greenfork/nimraylib_now/releases
+[fix]: https://github.com/nim-lang/nimble/pull/886
 
 ## How to use
 
@@ -55,9 +56,15 @@ import nimraylib_now/[raylib, raymath, raygui]
 from nimraylib_now/rlgl as rl import nil  # import rlgl with a mandatory prefix rl
 ```
 
+See [examples](examples/) for how to use it.
+You should generally be able to follow any tutorials for official C bindings,
+just mind the [naming](#naming-differences-with-c). Also see official
+[cheatsheet](https://www.raylib.com/cheatsheet/cheatsheet.html) and
+directly inspect the binding sources, e.g. for
+[raylib](src/nimraylib_now/raylib.nim).
+
 Here is a long example to showcase most features
-([crown.nim](examples/original/crown.nim)). For more simple and narrow examples
-see [examples](examples/) directory.
+([crown.nim](examples/original/crown.nim)).
 
 ```nim
 import math
@@ -302,12 +309,19 @@ be a comparatively easy task.
 
 1. Do `git pull` for all git submodules (see `.gitmodules`), which are
    different Raylib libraries. Optionally checkout the needed commit version.
+2. Install [c2nim] `nimble install c2nim`
 2. Run `nimble convert`
 3. Run `nimble testExamples` and fix everything if necessary
 
 ## Contribute
 
 Any ideas are welcome. Open an issue to ask a question or suggest an idea.
+
+### Documentation
+Currently there's no description on how to properly set it up on Windows which
+could be a great help for entry-level programmers.
+
+Other ideas on better documentation are also welcome!
 
 ### Convert examples
 You can help by converting missing examples from original C library doing
@@ -344,6 +358,7 @@ Clone and run tests:
 $ git clone --recurse-submodules --shallow-submodules https://github.com/greenfork/nimraylib_now
 $ cd nimraylib_now
 $ nimble install --depsOnly
+$ nimble install c2nim
 $ nimble convert
 $ nimble testExamples
 ```

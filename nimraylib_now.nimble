@@ -12,7 +12,6 @@ backend = "c"
 
 requires "nim >= 1.4.2"
 requires "regex"
-# requires "c2nim"
 
 task convert, "run with c2nim":
   echo "Running converter\n"
