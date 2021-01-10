@@ -45,7 +45,7 @@ $ LD_LIBRARY_PATH=$(pwd) nim r examples/original/basic.nim
 
 ## How to use
 
-Import any necessary modules and use it!
+Import any necessary modules and use it:
 
 ```nim
 import nimraylib_now/raylib
@@ -62,18 +62,18 @@ import math
 import nimraylib_now/raylib
 
 const
-  nimFg: Color = (0xff, 0xc2, 0x00) # use this shortcut with alpha = 255!
+  nimFg: Color = (0xff, 0xc2, 0x00)          # Use this shortcut with alpha = 255!
   nimBg: Color = (0x17, 0x18, 0x1f)
 
 # Let's draw a Nim crown!
 const
-  crownSides = 8                             # low-polygon version
-  centerAngle = 2.0 * PI / crownSides.float  # angle from the center of a circle
-  lowerRadius = 2.0                          # lower crown circle
-  upperRadius = lowerRadius * 1.4            # upper crown circle
-  mainHeight = lowerRadius * 0.8             # height without teeth
-  toothHeight = mainHeight * 1.3             # height with teeth
-  toothSkew = 1.2                            # little angle for teeth
+  crownSides = 8                             # Low-polygon version
+  centerAngle = 2.0 * PI / crownSides.float  # Angle from the center of a circle
+  lowerRadius = 2.0                          # Lower crown circle
+  upperRadius = lowerRadius * 1.4            # Upper crown circle
+  mainHeight = lowerRadius * 0.8             # Height without teeth
+  toothHeight = mainHeight * 1.3             # Height with teeth
+  toothSkew = 1.2                            # Little angle for teeth
 
 var
   lowerPoints, upperPoints: array[crownSides, tuple[x, y: float]]
@@ -84,44 +84,41 @@ for i in 0..<crownSides:
   let multiplier = i.float
   # Formulas are for 2D space, good enough for 3D since height is always same
   lowerPoints[i] = (
-    lowerRadius * cos(centerAngle * multiplier),
-    lowerRadius * sin(centerAngle * multiplier),
+    x: lowerRadius * cos(centerAngle * multiplier),
+    y: lowerRadius * sin(centerAngle * multiplier),
   )
   upperPoints[i] = (
-    upperRadius * cos(centerAngle * multiplier),
-    upperRadius * sin(centerAngle * multiplier),
+    x: upperRadius * cos(centerAngle * multiplier),
+    y: upperRadius * sin(centerAngle * multiplier),
   )
 
-initWindow(800, 600, "[nim]RaylibNow!") # open window
+initWindow(800, 600, "[nim]RaylibNow!")  # Open window
 
 var camera = Camera(
   position: (5.0, 8.0, 10.0),  # Camera position
   target: (0.0, 0.0, 0.0),     # Camera target it looks-at
   up: (0.0, 1.0, 0.0),         # Camera up vector (rotation over its axis)
   fovy: 45.0,                  # Camera field-of-view apperture in Y (degrees)
-                               # in Perspective, used as near plane width
-                               # in Orthographic
-  `type`: Perspective          # Camera type, defines projection type:
-                               # Perspective or Orthographic
+  type: Perspective            # Defines projection type, see CameraType
 )
 camera.setCameraMode(Orbital)  # Several modes available, see CameraMode
 
-var pause = false
+var pause = false              # Pausing the game will stop animation
 
-setTargetFPS(60)
+setTargetFPS(60)               # Set the game to run at 60 frames per second
 
 # Wait for Esc key press or when the window is closed
 while not windowShouldClose():
   if not pause:
-    camera.addr.updateCamera   # rotate camera
+    camera.addr.updateCamera   # Rotate camera
 
-  if isKeyPressed(Space):
+  if isKeyPressed(Space):      # Pressing Space will stop/resume animation
     pause = not pause
 
-  beginDrawing:                # use this sugar to insert endDrawing() automatically!
-    clearBackground(RayWhite)  # set background color
+  beginDrawing:                # Use drawing functions inside this block
+    clearBackground(RayWhite)  # Set background color
 
-    beginMode3D(camera):
+    beginMode3D(camera):       # Use 3D drawing functions inside this block
       drawGrid(10, 1.0)
 
       for i in 0..<crownSides:
@@ -130,7 +127,7 @@ while not windowShouldClose():
         # - Current upper circle point
         # - Next lower circle point
         # - Next upper circle point
-        # - Point for crown tooth
+        # - Point for peak of crown tooth
         let
           nexti = if i == crownSides - 1: 0 else: i + 1
           lowerCur: Vector3 = (lowerPoints[i].x, 0.0, lowerPoints[i].y)
@@ -185,11 +182,8 @@ closeWindow()
 
 ![](crown.png?raw=true)
 
-## Conversion and naming differences with C
-Naming is converted to more Nim-pleasing style. Although some definitions in
-this library's file may have names like `FULLSCREEN_MODE`, you can still use
-them (and encouraged to) as `FullscreenMode` in code.
-
+## Naming differences with C
+Naming is converted to more Nim conventional style but in a predictable manner.
 Generally just omit any prefixes you see in official docs and use camelCase for
 procs, everything else stays the same:
 ```c
@@ -204,41 +198,18 @@ proc setState*(state: cint)
 proc begin*(mode: cint)
 ```
 
-### Enums
-Enums are not type-checked but instead each have their converter from enum type
-to appropriate int type which should allow seamless interaction:
-```nim
-type MouseButton* {.pure.} = enum
-  LeftButton = 0, RightButton = 1, MiddleButton = 2
+Although some definitions may have names like `FULLSCREEN_MODE`, you can still
+use them (and encouraged to) as `FullscreenMode` in code.
 
-converter MouseButtonToInt*(self: MouseButton): cint = self.cint
-
-proc isMouseButtonPressed*(button: cint): bool
-```
-
-Prefixes are stripped for enum values too. All enums are marked as `{.pure.}`
-which means they should be fully qualified when compiler can't guess their type:
-```nim
-camera.`type` = Perspective      # can be guessed
-if isKeyDown(Right):             # can be guessed
-if KeyboardKey.Right.isKeyDown:  # cannot be guessed
-```
-
-### Reserved words
-Be careful when invoking fields which are also reserved words in Nim:
-```nim
-camera.`type` = CameraType.Perspective
-```
-
-### Passing values by addresses
+## Passing values by addresses
 **BE VERY CAREFUL** with values which are passed as addresses, **always** convert
 them to approapriate C-compatible types:
 ```nim
 # Will do incorrect things!
 var
-  xPos = 0.0  # this is `float`, will not be converted to cfloat automatically
+  xPos = 0.0  # this is `float` type, will not be converted to `cfloat` automatically
   cameraPos = [xPos, camera.position.y, camera.position.z]
-setShaderValue(shader, viewEyeLoc, cameraPos.addr, Vec3) # cameraPos.addr is a pointer
+setShaderValue(shader, viewEyeLoc, cameraPos.addr, Vec3)  # cameraPos.addr is a pointer
 
 # Convert values instead
 var xPos: cfloat = 0.0
@@ -291,6 +262,21 @@ is same as
 beginDrawing()
 drawLine(...)
 endDrawing()
+```
+
+### Reserved words
+Be careful when using fields of functions which are also reserved words in Nim:
+```nim
+camera.`type` = CameraType.Perspective
+```
+
+### Enums
+All enums are marked as `{.pure.}` which means they should be fully qualified
+when compiler can't guess their type:
+```nim
+camera.`type` = Perspective      # can be guessed
+if isKeyDown(Right):             # can be guessed
+if KeyboardKey.Right.isKeyDown:  # cannot be guessed
 ```
 
 ## How wrapping works
