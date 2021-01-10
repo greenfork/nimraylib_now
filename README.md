@@ -31,17 +31,20 @@ Install this library:
 $ nimble install nimraylib_now
 ```
 
-If you want to use [raygui] library, compile it:
+If you want to use [raygui] library, grab a compiled library from [releases]:
+.dll for Windows and .so for Linux - and put it into the directory for dynamic
+libraries. Alternatively compile the library yourself, for Linux:
 ```shell
 $ git clone --recurse-submodules --shallow-submodules https://github.com/greenfork/nimraylib_now
 $ cd nimraylib_now
 $ nimble install --depsOnly
-$ nimble buildRaygui # as it's not distributed as a dynamic library
-# Run example, for Linux, LD_LIBRARY_PATH is set so that executable sees built raygui library
+$ nimble buildRaygui
+# Run example, for Linux LD_LIBRARY_PATH is set so that executable sees built raygui library
 $ LD_LIBRARY_PATH=$(pwd) nim r examples/original/basic.nim
 ```
 
 [raygui]: https://github.com/raysan5/raygui
+[releases]: https://github.com/greenfork/nimraylib_now/releases
 
 ## How to use
 
