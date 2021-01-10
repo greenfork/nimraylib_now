@@ -20,10 +20,11 @@ const
     rayguiDir/"src/raygui.h",
   ]
   buildDir = projectDir/"build"
-  targetDirectory = projectDir/"src"/"nimraylib_now"
+  targetDir = projectDir/"src"/"nimraylib_now"
 
 for file in filesToConvert:
   copyFileToDir(file, buildDir)
+  copyFileToDir(file, targetDir)
 
 
 # Parse files to (((Nim))) wrappers
@@ -75,7 +76,7 @@ const
   raylibHeader = """
 #ifdef C2NIM
 #  def RLAPI
-#  dynlib raylibdll
+#  header raylibHeader
 #  cdecl
 #  nep1
 #  skipinclude
@@ -95,69 +96,55 @@ const
 #  prefix GESTURE_
 #  prefix CAMERA_
 #  mangle va_list va_list
-#  private raylibdll
-#  if defined(windows)
-#    define raylibdll "raylib.dll"
-#  elif defined(macosx)
-#    define raylibdll "libraylib.dylib"
-#  else
-#    define raylibdll "libraylib.so"
-#  endif
 #@
 # Functions on C varargs
 # Used only for TraceLogCallback type, see core_custom_logging example
 type va_list* {.importc: "va_list", header: "<stdarg.h>".} = object
 proc vprintf*(format: cstring, args: va_list) {.cdecl, importc: "vprintf", header: "<stdio.h>"}
+
+from os import parentDir, `/`
+const raylibHeader = currentSourcePath().parentDir()/"raylib.h"
+{.passL:"-lraylib".}
 @#
 #endif
 """
   rlglHeader = """
 #ifdef C2NIM
 #  def RLAPI
-#  dynlib raylibdll
+#  header rlglHeader
 #  cdecl
 #  nep1
 #  skipinclude
 #  prefix rlgl
 #  prefix rl
 #  prefix RL_
-#  private raylibdll
-#  if defined(windows)
-#    define raylibdll "raylib.dll"
-#  elif defined(macosx)
-#    define raylibdll "libraylib.dylib"
-#  else
-#    define raylibdll "libraylib.so"
-#  endif
 #@
 import raylib
+
+from os import parentDir, `/`
+const rlglHeader = currentSourcePath().parentDir()/"rlgl.h"
 @#
 #endif
 """
   raymathHeader = """
 #ifdef C2NIM
 #  def RMDEF static inline
-#  dynlib raylibdll
+#  header raymathHeader
 #  cdecl
 #  nep1
 #  skipinclude
-#  private raylibdll
-#  if defined(windows)
-#    define raylibdll "raylib.dll"
-#  elif defined(macosx)
-#    define raylibdll "libraylib.dylib"
-#  else
-#    define raylibdll "libraylib.so"
-#  endif
 #@
 import raylib
+
+from os import parentDir, `/`
+const raymathHeader = currentSourcePath().parentDir()/"raymath.h"
 @#
 #endif
 """
   rayguiHeader = """
 #ifdef C2NIM
 #  def RAYGUIDEF
-#  dynlib rayguidll
+#  header rayguiHeader
 #  cdecl
 #  nep1
 #  skipinclude
@@ -165,15 +152,12 @@ import raylib
 #  prefix GUI_
 #  prefix gui
 #  private rayguidll
-#  if defined(windows)
-#    define rayguidll "raygui.dll"
-#  elif defined(macosx)
-#    define rayguidll "libraygui.dylib"
-#  else
-#    define rayguidll "libraygui.so"
-#  endif
 #@
 import raylib
+
+from os import parentDir, `/`
+const rayguiHeader = currentSourcePath().parentDir()/"raygui.h"
+{.passC: "-DRAYGUI_IMPLEMENTATION".}
 @#
 #endif
 """
@@ -342,7 +326,7 @@ converter toInt*(self: cint): int = self.int
 """
 
       # proc beginTextureMode*(target: RenderTexture2D) {.cdecl,
-      #     importc: "BeginTextureMode", dynlib: raylibdll.}
+      #     importc: "BeginTextureMode", header: raylibHeader.}
       # ##  Initializes render texture for drawing
       reBeginProc = re"(?sm)^proc ((begin[^*]*)\*\(.*?\)).*"
       # beginScissorMode*(x: cint; y: cint; width: cint; height: cint)
@@ -421,4 +405,4 @@ template {signatureWithBody} =
   {endProcName}()
 """
       rs.add "\n"
-    writeFile(targetDirectory/fmt"{filename}.nim", rs)
+    writeFile(targetDir/fmt"{filename}.nim", rs)
