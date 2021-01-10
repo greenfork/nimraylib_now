@@ -97,7 +97,7 @@ const
 #  mangle va_list va_list
 #  private raylibdll
 #  if defined(windows)
-#    define raylibdll "libraylib.dll"
+#    define raylibdll "raylib.dll"
 #  elif defined(macosx)
 #    define raylibdll "libraylib.dylib"
 #  else
@@ -123,7 +123,7 @@ proc vprintf*(format: cstring, args: va_list) {.cdecl, importc: "vprintf", heade
 #  prefix RL_
 #  private raylibdll
 #  if defined(windows)
-#    define raylibdll "libraylib.dll"
+#    define raylibdll "raylib.dll"
 #  elif defined(macosx)
 #    define raylibdll "libraylib.dylib"
 #  else
@@ -143,7 +143,7 @@ import raylib
 #  skipinclude
 #  private raylibdll
 #  if defined(windows)
-#    define raylibdll "libraylib.dll"
+#    define raylibdll "raylib.dll"
 #  elif defined(macosx)
 #    define raylibdll "libraylib.dylib"
 #  else
@@ -166,7 +166,7 @@ import raylib
 #  prefix gui
 #  private rayguidll
 #  if defined(windows)
-#    define rayguidll "libraygui.dll"
+#    define rayguidll "raygui.dll"
 #  elif defined(macosx)
 #    define rayguidll "libraygui.dylib"
 #  else
