@@ -13,7 +13,6 @@ Use this library if you want to write games using [Raylib] in [Nim].
 * Idiomatic Nim naming and conventions so you write **Nim** code, not C
 * A lot of examples converted to Nim
 * Includes modules: raylib, raymath, rlgl, raygui
-* Compiles raygui library for you (it is not distributed as dll)
 * Conversion script is included in the library, no manual work is required
   to update the bindings*
 
@@ -57,8 +56,8 @@ from nimraylib_now/rlgl as rl import nil  # import rlgl with a mandatory prefix 
 ```
 
 Here is a long example to showcase most features
-([crown](examples/original/crown.nim)). For more simple and narrow examples see
-[examples](examples/) directory.
+([crown.nim](examples/original/crown.nim)). For more simple and narrow examples
+see [examples](examples/) directory.
 
 ```nim
 import math
@@ -268,7 +267,7 @@ endDrawing()
 ```
 
 ### Reserved words
-Be careful when using fields of functions which are also reserved words in Nim:
+Be careful when using fields or functions which are also reserved words in Nim:
 ```nim
 camera.`type` = CameraType.Perspective
 ```
@@ -277,8 +276,8 @@ camera.`type` = CameraType.Perspective
 All enums are marked as `{.pure.}` which means they should be fully qualified
 when compiler can't guess their type:
 ```nim
-camera.`type` = Perspective      # can be guessed
-if isKeyDown(Right):             # can be guessed
+camera.`type` = Perspective      # can be guessed, no need for CameraType.Perspective
+if isKeyDown(Right):             # can be guessed, no need for KeyboardKey.Right
 if KeyboardKey.Right.isKeyDown:  # cannot be guessed
 ```
 
