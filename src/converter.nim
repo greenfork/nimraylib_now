@@ -18,6 +18,7 @@ const
     raylibDir/"src/rlgl.h",
     raylibDir/"src/raymath.h",
     rayguiDir/"src/raygui.h",
+    raylibDir/"src/physac.h",
   ]
   buildDir = projectDir/"build"
   targetDir = projectDir/"src"/"nimraylib_now"
@@ -57,6 +58,8 @@ const
     "LOC_MAP_SPECULAR", # deprecated?
     "MAP_DIFFUSE", # deprecated?
     "MAP_SPECULAR", # deprecated?
+    "PHYSAC_PI", # already in math module
+    "PHYSAC_DEG2RAD", # already in math module
   ]
   allowIfs = [
     "RAYGUI_SUPPORT_ICONS"
@@ -65,7 +68,7 @@ const
   # #define LIGHTGRAY  CLITERAL(Color){ 200, 200, 200, 255 }   // Light Gray
   reDefineColor = re"^#define ([[:word:]]+)\s*CLITERAL\(Color\)\{ (\d+), (\d+), (\d+), (\d+) \}.*"
   # typedef struct rAudioBuffer rAudioBuffer;
-  reEmptyStructDef = re"^typedef struct ([[:word:]]+) ([[:word:]]+);.*"
+  reEmptyStructDef = re"^typedef struct ([[:word:]]+) (\*?[[:word:]]+);.*"
   # typedef enum {
   reTypedefEnumStart = re"^typedef enum \{.*"
   # typedef enum { OPENGL_11 = 1, OPENGL_21, OPENGL_33, OPENGL_ES_20 } GlVersion;
@@ -104,7 +107,7 @@ proc vprintf*(format: cstring, args: va_list) {.cdecl, importc: "vprintf", heade
 
 from os import parentDir, `/`
 const raylibHeader = currentSourcePath().parentDir()/"raylib.h"
-# {.passL:"-lraylib".}
+{.passL:"-lraylib".}
 @#
 #endif
 """
@@ -151,7 +154,6 @@ const raymathHeader = currentSourcePath().parentDir()/"raymath.h"
 #  prefix Gui
 #  prefix GUI_
 #  prefix gui
-#  private rayguidll
 #@
 import raylib
 
@@ -161,14 +163,46 @@ const rayguiHeader = currentSourcePath().parentDir()/"raygui.h"
 @#
 #endif
 """
+  physacHeader = """
+#ifdef C2NIM
+#  def PHYSACDEF
+#  header physacHeader
+#  cdecl
+#  nep1
+#  skipinclude
+#  prefix PHYSICS_
+#  prefix PHYSAC_
+#@
+import raylib
+
+from os import parentDir, `/`
+const physacHeader = currentSourcePath().parentDir()/"physac.h"
+{.passC: "-DPHYSAC_IMPLEMENTATION".}
+{.passC: "-std=99".}
+{.passL: "-s -static -lraylib -lpthread".}
+when defined(windows):
+  when defined(vcc):
+    {.passL: "winmm.lib gdi32.lib opengl32.lib".}
+  else:
+    {.passL: "-lwinmm -lgdi32 -lopengl32".}
+@#
+#endif
+"""
 
   raylibFiles = [
     (buildDir/"raylib.h", raylibHeader),
     (buildDir/"rlgl.h", rlglHeader),
     (buildDir/"raymath.h", raymathHeader),
     (buildDir/"raygui.h", rayguiHeader),
+    (buildDir/"physac.h", physacHeader),
   ]
-  selfModuleDeclarationNames = ["RAYLIB_H", "RLGL_H", "RAYGUI_H", "RAYMATH_H"]
+  selfModuleDeclarationNames = [
+    re"\bRAYLIB_H\b",
+    re"\bRLGL_H\b",
+    re"\bRAYGUI_H\b",
+    re"\bRAYMATH_H\b",
+    re"\bPHYSAC_H\b"
+  ]
   # For converters which are written before c2nim conversion with proper
   # name mangling. Should converters be written in postprocessing after c2nim?
   namePrefixes = ["rlgl", "rl", "RL_", "Gui", "GUI_", "gui"]
@@ -194,7 +228,7 @@ for (filepath, c2nimheader) in raylibFiles:
       let
         line = raylibhLines[i]
         words = line.splitWhitespace
-      if selfModuleDeclarationNames.any((name) => name in words):
+      if selfModuleDeclarationNames.any((name) => name in line):
         if "#endif" in line: # this is the end of h file and start of implementation
           echo "Reached end of header part: " & line
           break
@@ -213,8 +247,10 @@ for (filepath, c2nimheader) in raylibFiles:
         # this seems as a forward declaration of a struct but no further
         # declaration actually happens
         let typename = m.groupFirstCapture(0, line)
-        assert m.groupFirstCapture(1, line) == typename, "wrong typename: " & $i
-        rs.add fmt"typedef struct {typename} {{}} {typename};"
+        if m.groupFirstCapture(1, line) == typename:
+          rs.add fmt"typedef struct {typename} {{}} {typename};"
+        else:
+          rs.add line & "\n"
       elif line.match(reTypedefEnumStart):
         # C uses enums in place of int numbers, so every enum takes an
         # appropriate converter to translate types in Nim implicitly
