@@ -5,7 +5,15 @@ proc vprintf*(format: cstring, args: va_list) {.cdecl, importc: "vprintf", heade
 
 from os import parentDir, `/`
 const raylibHeader = currentSourcePath().parentDir()/"raylib.h"
-# {.passL:"-lraylib".}
+
+when defined(windows):
+  when defined(vcc):
+    # Should it be `link` instead of passL?
+    {.passL:"raylibdll.lib".}
+  else:
+    {.passL:"libraylibdll.a".}
+else:
+  {.passL:"-lraylib".}
 ## *********************************************************************************************
 ##
 ##    raylib - A simple and easy-to-use library to enjoy videogames programming (www.raylib.com)
