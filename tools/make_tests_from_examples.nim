@@ -22,6 +22,8 @@ for dir in walkDirs(examplesDir/"*"):
 const testTemplate =
   "discard \"\"\"\n" &
   "  action: \"compile\"\n" &
+  "  joinable: false\n" &
+  "  matrix: \"; --gc:orc; -d:release\"\n" &
   "  # more\n" &
   "\"\"\"\n"
 
