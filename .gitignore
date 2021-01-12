@@ -17,6 +17,8 @@
 *.log
 *.pdb
 
+a.out
+
 /build
 /nimcache
 /tests/megatest.nim
