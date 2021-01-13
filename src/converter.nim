@@ -69,6 +69,8 @@ const
   reDefineColor = re"^#define ([[:word:]]+)\s*CLITERAL\(Color\)\{ (\d+), (\d+), (\d+), (\d+) \}.*"
   # typedef struct rAudioBuffer rAudioBuffer;
   reEmptyStructDef = re"^typedef struct ([[:word:]]+) (\*?[[:word:]]+);.*"
+  # } PhysicsBodyData;
+  reStructDefEnd = re"^\} (\*?[[:word:]]+);.*"
   # typedef enum {
   reTypedefEnumStart = re"^typedef enum \{.*"
   # typedef enum { OPENGL_11 = 1, OPENGL_21, OPENGL_33, OPENGL_ES_20 } GlVersion;
@@ -186,13 +188,7 @@ import raylib
 from os import parentDir, `/`
 const physacHeader = currentSourcePath().parentDir()/"physac.h"
 {.passC: "-DPHYSAC_IMPLEMENTATION".}
-{.passC: "-std=99".}
-{.passL: "-s -static -lraylib -lpthread".}
-when defined(windows):
-  when defined(vcc):
-    {.passL: "winmm.lib gdi32.lib opengl32.lib".}
-  else:
-    {.passL: "-lwinmm -lgdi32 -lopengl32".}
+{.passC: "-DPHYSAC_NO_THREADS".}
 @#
 #endif
 """
@@ -230,6 +226,7 @@ for (filepath, c2nimheader) in raylibFiles:
       rs: string
       appendToVeryEnd: string # as Nim code
       m: RegexMatch
+      physicsBodyDataMoveDefinition: bool # used only for physac.h
     rs.add c2nimheader
     var i = 0
     while i < raylibhLines.len:
@@ -254,11 +251,22 @@ for (filepath, c2nimheader) in raylibFiles:
         # c2nim can't parse it without {} in the middle
         # this seems as a forward declaration of a struct but no further
         # declaration actually happens
-        let typename = m.groupFirstCapture(0, line)
-        if m.groupFirstCapture(1, line) == typename:
-          rs.add fmt"typedef struct {typename} {{}} {typename};"
+        let
+          structName = m.groupFirstCapture(0, line)
+          typename = m.groupFirstCapture(1, line)
+        if typeName == structName:
+          rs.add fmt"typedef struct {structName} {{}} {structName};"
+        elif structName == "PhysicsBodyData" and typeName == "*PhysicsBody":
+          # Due to circular dependency, it is necessary for these 2 types to
+          # be defined in the same `type` block
+          physicsBodyDataMoveDefinition = true
         else:
           rs.add line & "\n"
+      elif physicsBodyDataMoveDefinition and line.match(reStructDefEnd, m) and
+         m.groupFirstCapture(0, line) == "PhysicsBodyData":
+        # This rewrite allows c2nim to generate correct code
+        rs.add "} PhysicsBodyData, *PhysicsBody;\n"
+        physicsBodyDataMoveDefinition = false
       elif line.match(reTypedefEnumStart):
         # C uses enums in place of int numbers, so every enum takes an
         # appropriate converter to translate types in Nim implicitly
@@ -390,6 +398,13 @@ converter toInt*(self: cint): int = self.int
       beginEndPairs: seq[tuple[beginSignature, endProcName: string]]
     while i < raylibnimLines.len:
       var line = raylibnimLines[i]
+
+      # Fix c2nim --nep1 flag working not as intended
+      # if "physicsBodyData" in line:
+      #   line = line.replace("physicsBodyData", "PhysicsBodyData")
+      if "max_Vertices" in line:
+        line = line.replace("max_Vertices", "MAX_VERTICES")
+
       if "{.size: sizeof(cint).} = enum" in line: # add `pure` pragma to enums
         line = line.replace(
           "{.size: sizeof(cint).} = enum",

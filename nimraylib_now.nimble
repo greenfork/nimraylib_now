@@ -22,6 +22,7 @@ task convert, "run with c2nim":
     rayguiFile = "src"/"nimraylib_now"/"raygui.nim"
     rlglFile = "src"/"nimraylib_now"/"rlgl.nim"
     raymathFile = "src"/"nimraylib_now"/"raymath.nim"
+    physacFile = "src"/"nimraylib_now"/"physac.nim"
   echo "Running converter\n"
   exec "nim r " & converterFile
   echo "\nExecuting nim check\n"
@@ -29,6 +30,7 @@ task convert, "run with c2nim":
   exec "nim check " & rlglFile
   exec "nim check " & raymathFile
   exec "nim check " & rayguiFile
+  exec "nim check " & physacFile
 
 task buildRaygui, "build raygui as a dynamic library":
   let sourceFile = "raygui"/"src"/"raygui.h"

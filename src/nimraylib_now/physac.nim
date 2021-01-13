@@ -3,13 +3,7 @@ import raylib
 from os import parentDir, `/`
 const physacHeader = currentSourcePath().parentDir()/"physac.h"
 {.passC: "-DPHYSAC_IMPLEMENTATION".}
-{.passC: "-std=99".}
-{.passL: "-s -static -lraylib -lpthread".}
-when defined(windows):
-  when defined(vcc):
-    {.passL: "winmm.lib gdi32.lib opengl32.lib".}
-  else:
-    {.passL: "-lwinmm -lgdi32 -lopengl32".}
+{.passC: "-DPHYSAC_NO_THREADS".}
 ## *********************************************************************************************
 ##
 ##    Physac v1.0 - 2D Physics library for videogames
@@ -99,6 +93,9 @@ const
 ##  Types and Structures Definition
 ##  NOTE: Below types are required for PHYSAC_STANDALONE usage
 ## ----------------------------------------------------------------------------------
+## ----------------------------------------------------------------------------------
+##  Data Types Structure Definition
+## ----------------------------------------------------------------------------------
 
 type
   PhysicsShapeType* {.size: sizeof(cint), pure.} = enum
@@ -106,9 +103,62 @@ type
 
 
 ##  Previously defined to be used in PhysicsShape struct as circular dependencies
+##  Matrix2x2 type (used for polygon shape rotation matrix)
 
 type
-  PhysicsBody* = ptr physicsBodyData
+  Matrix2x2* {.importc: "Matrix2x2", header: physacHeader, bycopy.} = object
+    m00* {.importc: "m00".}: cfloat
+    m01* {.importc: "m01".}: cfloat
+    m10* {.importc: "m10".}: cfloat
+    m11* {.importc: "m11".}: cfloat
+
+  PolygonData* {.importc: "PolygonData", header: physacHeader, bycopy.} = object
+    vertexCount* {.importc: "vertexCount".}: cuint ##  Current used vertex and normals count
+    positions* {.importc: "positions".}: array[MAX_VERTICES, Vector2] ##  Polygon vertex positions vectors
+    normals* {.importc: "normals".}: array[MAX_VERTICES, Vector2] ##  Polygon vertex normals vectors
+
+  PhysicsShape* {.importc: "PhysicsShape", header: physacHeader, bycopy.} = object
+    `type`* {.importc: "type".}: PhysicsShapeType ##  Physics shape type (circle or polygon)
+    body* {.importc: "body".}: PhysicsBody ##  Shape physics body reference
+    radius* {.importc: "radius".}: cfloat ##  Circle shape radius (used for circle shapes)
+    transform* {.importc: "transform".}: Matrix2x2 ##  Vertices transform matrix 2x2
+    vertexData* {.importc: "vertexData".}: PolygonData ##  Polygon shape vertices position and normals data (just used for polygon shapes)
+
+  PhysicsBodyData* {.importc: "PhysicsBodyData", header: physacHeader, bycopy.} = object
+    id* {.importc: "id".}: cuint ##  Reference unique identifier
+    enabled* {.importc: "enabled".}: bool ##  Enabled dynamics state (collisions are calculated anyway)
+    position* {.importc: "position".}: Vector2 ##  Physics body shape pivot
+    velocity* {.importc: "velocity".}: Vector2 ##  Current linear velocity applied to position
+    force* {.importc: "force".}: Vector2 ##  Current linear force (reset to 0 every step)
+    angularVelocity* {.importc: "angularVelocity".}: cfloat ##  Current angular velocity applied to orient
+    torque* {.importc: "torque".}: cfloat ##  Current angular force (reset to 0 every step)
+    orient* {.importc: "orient".}: cfloat ##  Rotation in radians
+    inertia* {.importc: "inertia".}: cfloat ##  Moment of inertia
+    inverseInertia* {.importc: "inverseInertia".}: cfloat ##  Inverse value of inertia
+    mass* {.importc: "mass".}: cfloat ##  Physics body mass
+    inverseMass* {.importc: "inverseMass".}: cfloat ##  Inverse value of mass
+    staticFriction* {.importc: "staticFriction".}: cfloat ##  Friction when the body has not movement (0 to 1)
+    dynamicFriction* {.importc: "dynamicFriction".}: cfloat ##  Friction when the body has movement (0 to 1)
+    restitution* {.importc: "restitution".}: cfloat ##  Restitution coefficient of the body (0 to 1)
+    useGravity* {.importc: "useGravity".}: bool ##  Apply gravity force to dynamics
+    isGrounded* {.importc: "isGrounded".}: bool ##  Physics grounded on other body state
+    freezeOrient* {.importc: "freezeOrient".}: bool ##  Physics rotation constraint
+    shape* {.importc: "shape".}: PhysicsShape ##  Physics body shape information (type, radius, vertices, normals)
+
+  PhysicsBody* = ptr PhysicsBodyData
+  PhysicsManifoldData* {.importc: "PhysicsManifoldData", header: physacHeader, bycopy.} = object
+    id* {.importc: "id".}: cuint ##  Reference unique identifier
+    bodyA* {.importc: "bodyA".}: PhysicsBody ##  Manifold first physics body reference
+    bodyB* {.importc: "bodyB".}: PhysicsBody ##  Manifold second physics body reference
+    penetration* {.importc: "penetration".}: cfloat ##  Depth of penetration from collision
+    normal* {.importc: "normal".}: Vector2 ##  Normal direction vector from 'a' to 'b'
+    contacts* {.importc: "contacts".}: array[2, Vector2] ##  Points of contact during collision
+    contactsCount* {.importc: "contactsCount".}: cuint ##  Current collision number of contacts
+    restitution* {.importc: "restitution".}: cfloat ##  Mixed restitution during collision
+    dynamicFriction* {.importc: "dynamicFriction".}: cfloat ##  Mixed dynamic friction during collision
+    staticFriction* {.importc: "staticFriction".}: cfloat ##  Mixed static friction during collision
+
+  PhysicsManifold* = ptr PhysicsManifoldData
 
 ## ----------------------------------------------------------------------------------
 ##  Module Functions Declaration
