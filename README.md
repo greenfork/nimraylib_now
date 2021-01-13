@@ -3,7 +3,6 @@
 The most idiomatic and up-to-date wrapper for [Raylib] gaming C library.
 Use this library if you want to write games using [Raylib] in [Nim].
 
-[Raylib]: https://www.raylib.com/
 [Nim]: https://nim-lang.org/
 
 ## Features
@@ -12,37 +11,55 @@ Use this library if you want to write games using [Raylib] in [Nim].
   the power of (((Nim)))
 * Idiomatic Nim naming and conventions so you write **Nim** code, not C
 * 40+ [examples](examples/) converted from C to Nim
-* Includes modules: raylib, raymath, rlgl, raygui
+* Includes modules: [raylib], [raymath], [rlgl], [raygui]
 * Conversion script is included in the library, no manual work is required
   to update the bindings*
 
 *_minor changes at most_
 
-## Install
+[raylib]: https://github.com/raysan5/raylib
+[raymath]: https://github.com/raysan5/raylib/blob/master/src/raymath.h
+[rlgl]: https://github.com/raysan5/raylib/blob/master/src/rlgl.h
+[raygui]: https://github.com/raysan5/raygui
 
-Install official [Raylib] library. For Arch Linux:
+## Install Raylib
+### Windows
+Download latest library from [releases] page for MinGW compiler, for version 3.5.0
+the name is `raylib-3.5.0_win64_mingw-w64.zip`. Extract it and **make sure**
+that files `libraylibdll.a` and `raylib.dll` are always in the same directory
+as your game `.exe` file.
+
+### Linux
+Use your package manager, for example for Arch Linux:
 ```shell
 $ sudo pacman -Syu raylib
 ```
 
-Install this library (takes **6-10(!) minutes**, [fix] is on the way):
+Alternatively download latest library from [releases] page, for version 3.5.0
+the name is `raylib-3.5.0_linux_amd64.tar.gz`. Extract it and put all `.so`
+files into `/usr/local/lib`.
+
+### MacOS
+With brew package manager:
+```shell
+$ brew install raylib
+```
+
+Alternatively download latest library from [releases] page, for version 3.5.0
+the name is `raylib-3.5.0_macos.tar.gz`. Extract it and put all `.dylib`
+files into `/usr/local/lib`.
+
+## Install NimraylibNow!
+Install this library with nimble (takes **6-10(!) minutes**, [fix] is on the way):
 ```shell
 $ nimble install nimraylib_now
 ```
 
-If you want to use [raygui] library, grab a compiled library from [releases]:
-.dll for Windows and .so for Linux - and put it into the directory for dynamic
-libraries. Alternatively compile the library yourself, for Linux:
-```shell
-$ git clone --recurse-submodules --shallow-submodules https://github.com/greenfork/nimraylib_now
-$ cd nimraylib_now
-$ nimble install --depsOnly
-$ nimble buildRaygui
-# Run example, for Linux LD_LIBRARY_PATH is set so that executable sees built raygui library
-$ LD_LIBRARY_PATH=$(pwd) nim r examples/original/basic.nim
+Or put it into your `.nimble` file:
+```nim
+requires "nimraylib_now"
 ```
 
-[raygui]: https://github.com/raysan5/raygui
 [releases]: https://github.com/greenfork/nimraylib_now/releases
 [fix]: https://github.com/nim-lang/nimble/pull/886
 
@@ -189,7 +206,7 @@ while not windowShouldClose():
 closeWindow()
 ```
 
-![](crown.png?raw=true)
+![Nim crown drawn with polygons](crown.png?raw=true)
 
 ## Naming differences with C
 Naming is converted to more Nim conventional style but in a predictable manner.
@@ -339,10 +356,7 @@ $ git push --all
 Any ideas are welcome. Open an issue to ask a question or suggest an idea.
 
 ### Documentation
-Currently there's no description on how to properly set it up on Windows which
-could be a great help for entry-level programmers.
-
-Other ideas on better documentation are also welcome!
+Any ideas on how to improve documentation are welcome!
 
 ### Convert examples
 You can help by converting missing examples from original C library doing
