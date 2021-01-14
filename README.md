@@ -11,7 +11,7 @@ Use this library if you want to write games using [Raylib] in [Nim].
   the power of (((Nim)))
 * Idiomatic Nim naming and conventions so you write **Nim** code, not C
 * 40+ [examples](examples/) converted from C to Nim
-* Includes modules: [raylib], [raymath], [rlgl], [raygui]
+* Includes modules: [raylib], [raymath], [rlgl], [raygui], [physac]
 * Conversion script is included in the library, no manual work is required
   to update the bindings*
 
@@ -21,6 +21,7 @@ Use this library if you want to write games using [Raylib] in [Nim].
 [raymath]: https://github.com/raysan5/raylib/blob/master/src/raymath.h
 [rlgl]: https://github.com/raysan5/raylib/blob/master/src/rlgl.h
 [raygui]: https://github.com/raysan5/raygui
+[physac]: https://github.com/raysan5/raylib/blob/master/src/physac.h
 
 ## Install Raylib
 ### Windows
