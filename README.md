@@ -362,7 +362,8 @@ Any ideas on how to improve documentation are welcome!
 ### Convert examples
 You can help by converting missing examples from original C library doing
 the following:
-1. Find a missing example in C.
+1. Find a missing example in C, you can use helper script for that:
+   `nim r tools/find_missing_examples.nim`.
 2. Compile and run `tools/c2nim_example_converter.nim` on this C file, it helps
    with conversion.
 3. Edit resulting Nim file, make sure it runs.
@@ -381,8 +382,6 @@ I cannot port a number of examples:
 * `core_storage_values.c` - I can't compile the original C example, values
   are reset to 0,0 when I press Space
 * `core_basic_window_web.c` - need emscripten dev tools
-
-Also see examples in original libraries, you can port the missing ones.
 
 ### Work on converter script
 If something is broken or you see an opportunity to improve the wrapper, you
