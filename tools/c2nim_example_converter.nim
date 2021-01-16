@@ -17,8 +17,28 @@ assert ext == ".c", "supplied file must have .c extension"
 
 echo "\n\nRunning ", paramStr(0), " for ", filename
 
+# Preprocessing of C file
+
 let newFilename = name & "_new" & ext
-copyFile(filename, newFilename)
+var newFileContent = ""
+for line in filename.lines:
+  var line = line
+  if "(Vector2){" in line or "(Vector3){" in line or "(Vector4){" in line or
+     "(Quaternion){" in line or "(Rectangle){" in line or "(Matrix){" in line:
+    var
+      head, tail, body: string
+      n: int
+    if scanf(line, "$+(Vector$i){$+}$+$.", head, n, body, tail):
+      newFileContent.add head & "Vector" & $n & "(" & body.strip & ")" & tail & "\n"
+    elif scanf(line, "$+(Quaternion){$+}$+$.", head, body, tail):
+      newFileContent.add head & "Vector" & "(" & body.strip & ")" & tail & "\n"
+    elif scanf(line, "$+(Rectangle){$+}$+$.", head, body, tail):
+      newFileContent.add head & "Vector" & "(" & body.strip & ")" & tail & "\n"
+    elif scanf(line, "$+(Matrix){$+}$+$.", head, body, tail):
+      newFileContent.add head & "Vector" & "(" & body.strip & ")" & tail & "\n"
+  else:
+    newFileContent.add line & "\n"
+writeFile(newFilename, newFileContent)
 
 let nimFilename = name & ".nim"
 
@@ -44,6 +64,8 @@ const
     "$+($i, $i) Error: expected ';'$*",
     "$+($i, $i) Error: did not expect {$*"
   )
+
+# Conversion with c2nim
 
 var c2nimOutput = runc2nim()
 while errorStrings.any((error) => error in c2nimOutput):
@@ -81,23 +103,47 @@ while errorStrings.any((error) => error in c2nimOutput):
 if fileExists(nimFilename):
   let
     fileContent = readFile(nimFilename)
-    newFileContent = fileContent.multiReplace(
-      # According to definitions in compiler Nim/lib/system.nim
-      ("cint", "int32"),
-      ("cschar", "int8"),
-      ("cshort", "int16"),
-      ("cint", "int32"),
-      ("csize_t", "uint"),
-      ("csize", "int"),
-      ("clonglong", "int64"),
-      ("cfloat", "float32"),
-      ("cdouble", "float64"),
-      ("clongdouble", "BiggestFloat"),
-      ("cuchar", "uint8"), # digression from how compiler defines it
-      ("cushort", "uint16"),
-      ("cuint", "uint32"),
-      ("culonglong", "uint64"),
+    contentWithReplacements = fileContent.multiReplace(
+      ("proc main*(): cint =", ""),
+      (": cint =", " ="),
+      (": cfloat =", " ="),
+      ("import\n  raylib", "import ../../src/nimraylib_now/raylib"),
+
+      ("vector2(", "("),
+      ("vector3(", "("),
+      ("vector4(", "("),
+      ("quaternion(", "("),
+      ("rectangle(", "("),
+      ("matrix(", "("),
+
+      ("lightgray", "Lightgray"),
+      ("gray", "Gray"),
+      ("darkgray", "Darkgray"),
+      ("yellow", "Yellow"),
+      ("gold", "Gold"),
+      ("orange", "Orange"),
+      ("pink", "Pink"),
+      ("red", "Red"),
+      ("maroon", "Maroon"),
+      ("green", "Green"),
+      ("lime", "Lime"),
+      ("darkgreen", "Darkgreen"),
+      ("skyblue", "Skyblue"),
+      ("blue", "Blue"),
+      ("darkblue", "Darkblue"),
+      ("purple", "Purple"),
+      ("violet", "Violet"),
+      ("darkpurple", "Darkpurple"),
+      ("beige", "Beige"),
+      ("brown", "Brown"),
+      ("darkbrown", "Darkbrown"),
+      ("white", "White"),
+      ("black", "Black"),
+      ("blank", "Blank"),
+      ("magenta", "Magenta"),
+      ("raywhite", "Raywhite"),
     )
+  var newFileContent: string = contentWithReplacements
   writeFile(nimFilename, newFileContent)
   discard tryRemoveFile(newFilename)
 else:
