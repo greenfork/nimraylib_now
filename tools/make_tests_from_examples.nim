@@ -17,22 +17,29 @@ var exampleCategories: seq[string]
 for dir in walkDirs(examplesDir/"*"):
   let dirName = dir.lastPathPart
   exampleCategories.add dirName
-  createDir(testsDir/dirName)
+  # createDir(testsDir/dirName)
 
 const testTemplate =
   "discard \"\"\"\n" &
   "  action: \"compile\"\n" &
   "  joinable: false\n" &
-  "  matrix: \"; --gc:orc; -d:release\"\n" &
-  "  # more\n" &
-  "\"\"\"\n"
+  "  matrix: \"; --gc:orc; -d:release; --gc:orc -d:release; -d:release -d:danger; --gc:orc -d:release -d:danger\"\n" &
+  "\"\"\"\n" &
+  "import lenientops, math, times, strformat, atomics, system/ansi_c\n" &
+  "import ../../src/nimraylib_now/[raylib, raygui, raymath, physac]\n" &
+  "from ../../src/nimraylib_now/rlgl as rl import nil\n" &
+  "\n"
 
-# Populate categories in tests with files
+# Create one big megatest
+const testFilename = projectDir/"tests"/"texamples.nim"
+removeFile(testFilename)
+var texamples = testTemplate
 for category in exampleCategories:
   for example in walkFiles(examplesDir/category/"*.nim"):
-    let
-      testName = "t" & example.lastPathPart
-      includePath = example.replace(projectDir, "../../..").replace(".nim", "")
-      includeStmt = "include " & includePath
-      content = testTemplate & includeStmt
-    writeFile(testsDir/category/testName, content)
+    texamples.add "block " & example.lastPathPart.replace(".nim", "") & ":\n"
+    for line in example.lines:
+      if not line.startsWith("import") and not line.startsWith("from"):
+        let space = if line == "": "" else: "  "
+        texamples.add space & line & "\n"
+    texamples.add "\n\n"
+writeFile(testFilename, texamples)

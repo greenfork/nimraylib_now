@@ -13,7 +13,7 @@
 import ../../src/nimraylib_now/raylib
 
 const
-  MAX_GESTURE_STRINGS* = 20
+  MAX_GESTURE_STRINGS = 20
 
 ##  Initialization
 ## --------------------------------------------------------------------------------------

@@ -14,7 +14,7 @@ import ../../src/nimraylib_now/raylib
 
 # Change GLSL this version to see different effects!
 const
-  GLSL_VERSION* = 330
+  GLSL_VERSION = 330
   # GLSL_VERSION* = 100
 
 ##  Initialization

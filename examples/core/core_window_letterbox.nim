@@ -17,7 +17,7 @@ import ../../src/nimraylib_now/raylib
 
 ##  Clamp Vector2 value with min and max and return a new vector2
 ##  NOTE: Required for virtual mouse, to clamp inside virtual game size
-proc clampValue*(value: Vector2; minV: Vector2; maxV: Vector2): Vector2 =
+proc clampValue(value: Vector2; minV: Vector2; maxV: Vector2): Vector2 =
   result = value
   result.x = if (result.x > maxV.x): maxV.x else: result.x
   result.x = if (result.x < minV.x): minV.x else: result.x

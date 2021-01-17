@@ -22,10 +22,10 @@ import ../../src/nimraylib_now/raylib
 type State {.pure.} = enum
   Waiting, Loading, Finished
 
-var dataLoaded*: Atomic[bool]  ##  Data Loaded completion indicator
+var dataLoaded: Atomic[bool]  ##  Data Loaded completion indicator
 dataLoaded.store(false)
-proc loadDataThread*() {.thread.} ##  Loading data thread function declaration
-var dataProgress*: int32 = 0 ##  Data progress accumulator
+proc loadDataThread() {.thread.} ##  Loading data thread function declaration
+var dataProgress: int32 = 0 ##  Data progress accumulator
 var state = State.Waiting
 
 ##  Initialization
@@ -59,8 +59,6 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
       dataLoaded.store(false)
       dataProgress = 0
       state = Waiting
-  else:
-    discard
   ## ----------------------------------------------------------------------------------
   ##  Draw
   ## ----------------------------------------------------------------------------------
@@ -76,8 +74,6 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
   of Finished:
     drawRectangle(150, 200, 500, 60, Lime)
     drawText("DATA LOADED!", 250, 210, 40, Green)
-  else:
-    discard
   drawRectangleLines(150, 200, 500, 60, Darkgray)
   endDrawing()
 ## ----------------------------------------------------------------------------------
@@ -89,7 +85,7 @@ closeWindow()
 
 ##  Loading data thread function definition
 
-proc loadDataThread*() {.thread.} =
+proc loadDataThread() {.thread.} =
   var timeCounter: int32 = 0 ##  Time counted in ms
   var prevTime = cpuTime() ##  Previous time
   ##  We simulate data loading with a time counter for 5 seconds

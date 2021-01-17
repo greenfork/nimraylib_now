@@ -43,7 +43,7 @@ while not windowShouldClose():    #  Detect window close button or ESC key
     #  Update
     # ----------------------------------------------------------------------------------
     let
-        time = getTime()
+        time = raylib.getTime()
 
         #  Calculate time scale for cube position and size
         scale = (2.0 + sin(time))*0.7

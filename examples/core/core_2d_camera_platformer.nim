@@ -16,35 +16,35 @@ import lenientops
 import ../../src/nimraylib_now/[raylib, raymath]
 
 const
-  G* = 400
-  PLAYER_JUMP_SPD* = 350.0
-  PLAYER_HOR_SPD* = 200.0
+  G = 400
+  PLAYER_JUMP_SPD = 350.0
+  PLAYER_HOR_SPD = 200.0
 
 type
-  Player* = object
-    position*: Vector2
-    speed*: float
-    canJump*: bool
+  Player = object
+    position: Vector2
+    speed: float
+    canJump: bool
 
-  EnvItem* = object
-    rect*: Rectangle
-    blocking*: bool
-    color*: Color
+  EnvItem = object
+    rect: Rectangle
+    blocking: bool
+    color: Color
 
-proc updatePlayer*(player: var Player; envItems: var openArray[EnvItem];  delta: float)
-proc updateCameraCenter*(camera: var Camera2D; player: var Player;
+proc updatePlayer(player: var Player; envItems: var openArray[EnvItem];  delta: float)
+proc updateCameraCenter(camera: var Camera2D; player: var Player;
                         envItems: var openArray[EnvItem]; delta: float;
                         width: int; height: int)
-proc updateCameraCenterInsideMap*(camera: var Camera2D; player: var Player;
+proc updateCameraCenterInsideMap(camera: var Camera2D; player: var Player;
                                  envItems: var openArray[EnvItem];
                                  delta: float; width: int; height: int)
-proc updateCameraCenterSmoothFollow*(camera: var Camera2D; player: var Player;
+proc updateCameraCenterSmoothFollow(camera: var Camera2D; player: var Player;
                                     envItems: var openArray[EnvItem];
                                     delta: float; width: int; height: int)
-proc updateCameraEvenOutOnLanding*(camera: var Camera2D; player: var Player;
+proc updateCameraEvenOutOnLanding(camera: var Camera2D; player: var Player;
                                   envItems: var openArray[EnvItem];
                                   delta: float; width: int; height: int)
-proc updateCameraPlayerBoundsPush*(camera: var Camera2D; player: var Player;
+proc updateCameraPlayerBoundsPush(camera: var Camera2D; player: var Player;
                                   envItems: var openArray[EnvItem];
                                   delta: float; width: int; height: int)
 ##  Initialization
@@ -129,7 +129,7 @@ closeWindow()
 ##  Close window and OpenGL context
 ## --------------------------------------------------------------------------------------
 
-proc updatePlayer*(player: var Player; envItems: var openArray[EnvItem]; delta: float) =
+proc updatePlayer(player: var Player; envItems: var openArray[EnvItem]; delta: float) =
   if isKeyDown(Left):
     player.position.x -= PLAYER_HOR_SPD * delta
   if isKeyDown(Right):
@@ -155,13 +155,13 @@ proc updatePlayer*(player: var Player; envItems: var openArray[EnvItem]; delta: 
   else:
     player.canJump = true
 
-proc updateCameraCenter*(camera: var Camera2D; player: var Player;
+proc updateCameraCenter(camera: var Camera2D; player: var Player;
                         envItems: var openArray[EnvItem]; delta: float;
                         width: int; height: int) =
   camera.offset = (x: width/2, y: height/2);
   camera.target = player.position
 
-proc updateCameraCenterInsideMap*(camera: var Camera2D; player: var Player;
+proc updateCameraCenterInsideMap(camera: var Camera2D; player: var Player;
                                  envItems: var openArray[EnvItem];
                                  delta: float; width: int; height: int) =
   camera.target = player.position
@@ -191,7 +191,7 @@ proc updateCameraCenterInsideMap*(camera: var Camera2D; player: var Player;
   if minV.y > 0:
     camera.offset.y = height div 2 - minV.y
 
-proc updateCameraCenterSmoothFollow*(camera: var Camera2D; player: var Player;
+proc updateCameraCenterSmoothFollow(camera: var Camera2D; player: var Player;
                                     envItems: var openArray[EnvItem];
                                     delta: float; width: int; height: int) =
   var minSpeed = 30.0
@@ -207,7 +207,7 @@ proc updateCameraCenterSmoothFollow*(camera: var Camera2D; player: var Player;
 
 var eveningOut = false
 var evenOutTarget: float
-proc updateCameraEvenOutOnLanding*(camera: var Camera2D; player: var Player;
+proc updateCameraEvenOutOnLanding(camera: var Camera2D; player: var Player;
                                   envItems: var openArray[EnvItem];
                                   delta: float; width: int; height: int) =
   var evenOutSpeed = 700.0
@@ -230,7 +230,7 @@ proc updateCameraEvenOutOnLanding*(camera: var Camera2D; player: var Player;
       eveningOut = true
       evenOutTarget = player.position.y
 
-proc updateCameraPlayerBoundsPush*(camera: var Camera2D; player: var Player;
+proc updateCameraPlayerBoundsPush(camera: var Camera2D; player: var Player;
                                   envItems: var openArray[EnvItem];
                                   delta: float; width: int; height: int) =
   var

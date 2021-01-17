@@ -16,7 +16,7 @@ import times, strformat
 import ../../src/nimraylib_now/raylib
 
 ##  Custom logging funtion
-proc logCustom*(msgType: int32; text: cstring; args: va_list) {.cdecl.} =
+proc logCustom(msgType: int32; text: cstring; args: va_list) {.cdecl.} =
   var msg: string
   let timeStr = now().format("yyyy-MM-dd hh:mm:ss")
   msg.add fmt"[{timeStr}] "
