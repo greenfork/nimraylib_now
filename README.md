@@ -10,7 +10,7 @@ Use this library if you want to write games using [Raylib] in [Nim].
 * Automated generation of the wrapper for the latest version of Raylib using
   the power of (((Nim)))
 * Idiomatic Nim naming and conventions so you write **Nim** code, not C
-* 40+ [examples](examples/) converted from C to Nim
+* 60+ [examples](examples/) converted from C to Nim
 * Includes modules: [raylib], [raymath], [rlgl], [raygui], [physac]
 * Conversion script is included in the library, no manual work is required
   to update the bindings*
