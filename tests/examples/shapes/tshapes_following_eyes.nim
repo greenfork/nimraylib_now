@@ -4,4 +4,4 @@ discard """
   matrix: "; --gc:orc; -d:release"
   # more
 """
-include ../../../examples/shapes/draw_ring
+include ../../../examples/shapes/shapes_following_eyes

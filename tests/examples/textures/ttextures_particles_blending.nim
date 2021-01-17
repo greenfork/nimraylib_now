@@ -4,4 +4,4 @@ discard """
   matrix: "; --gc:orc; -d:release"
   # more
 """
-include ../../../examples/models/rlgl_solar_system
+include ../../../examples/textures/textures_particles_blending

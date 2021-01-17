@@ -4,4 +4,4 @@ discard """
   matrix: "; --gc:orc; -d:release"
   # more
 """
-include ../../../examples/shapes/bouncing_ball
+include ../../../examples/textures/textures_background_scrolling

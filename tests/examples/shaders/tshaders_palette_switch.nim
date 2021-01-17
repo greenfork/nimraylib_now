@@ -4,4 +4,4 @@ discard """
   matrix: "; --gc:orc; -d:release"
   # more
 """
-include ../../../examples/models/waving_cubes
+include ../../../examples/shaders/shaders_palette_switch

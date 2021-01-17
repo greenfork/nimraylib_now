@@ -4,4 +4,4 @@ discard """
   matrix: "; --gc:orc; -d:release"
   # more
 """
-include ../../../examples/textures/raw_data
+include ../../../examples/models/models_geometric_shapes

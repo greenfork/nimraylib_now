@@ -4,4 +4,4 @@ discard """
   matrix: "; --gc:orc; -d:release"
   # more
 """
-include ../../../examples/shaders/palette_switch
+include ../../../examples/audio/audio_multichannel_sound

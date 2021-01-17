@@ -29,7 +29,7 @@ const testTemplate =
 
 # Populate categories in tests with files
 for category in exampleCategories:
-  for example in walkFiles(examplesDir/category/"*"):
+  for example in walkFiles(examplesDir/category/"*.nim"):
     let
       testName = "t" & example.lastPathPart
       includePath = example.replace(projectDir, "../../..").replace(".nim", "")

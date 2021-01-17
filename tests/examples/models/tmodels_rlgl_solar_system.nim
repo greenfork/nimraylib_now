@@ -4,4 +4,4 @@ discard """
   matrix: "; --gc:orc; -d:release"
   # more
 """
-include ../../../examples/audio/raw_stream
+include ../../../examples/models/models_rlgl_solar_system

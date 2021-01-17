@@ -4,4 +4,4 @@ discard """
   matrix: "; --gc:orc; -d:release"
   # more
 """
-include ../../../examples/text/format_text
+include ../../../examples/textures/textures_image_processing

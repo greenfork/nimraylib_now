@@ -4,4 +4,4 @@ discard """
   matrix: "; --gc:orc; -d:release"
   # more
 """
-include ../../../examples/text/rectangle_bound
+include ../../../examples/audio/audio_raw_stream

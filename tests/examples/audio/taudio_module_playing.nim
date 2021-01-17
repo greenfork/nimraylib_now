@@ -4,4 +4,4 @@ discard """
   matrix: "; --gc:orc; -d:release"
   # more
 """
-include ../../../examples/models/geometric_shapes
+include ../../../examples/audio/audio_module_playing

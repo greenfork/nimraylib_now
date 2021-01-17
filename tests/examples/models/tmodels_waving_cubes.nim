@@ -4,4 +4,4 @@ discard """
   matrix: "; --gc:orc; -d:release"
   # more
 """
-include ../../../examples/audio/module_playing
+include ../../../examples/models/models_waving_cubes

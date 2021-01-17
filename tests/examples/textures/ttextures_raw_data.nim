@@ -4,4 +4,4 @@ discard """
   matrix: "; --gc:orc; -d:release"
   # more
 """
-include ../../../examples/shaders/raymarching
+include ../../../examples/textures/textures_raw_data
