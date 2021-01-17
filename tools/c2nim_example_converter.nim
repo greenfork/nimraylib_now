@@ -31,11 +31,11 @@ for line in filename.lines:
     if scanf(line, "$+(Vector$i){$+}$+$.", head, n, body, tail):
       newFileContent.add head & "Vector" & $n & "(" & body.strip & ")" & tail & "\n"
     elif scanf(line, "$+(Quaternion){$+}$+$.", head, body, tail):
-      newFileContent.add head & "Vector" & "(" & body.strip & ")" & tail & "\n"
+      newFileContent.add head & "Quaternion" & "(" & body.strip & ")" & tail & "\n"
     elif scanf(line, "$+(Rectangle){$+}$+$.", head, body, tail):
-      newFileContent.add head & "Vector" & "(" & body.strip & ")" & tail & "\n"
+      newFileContent.add head & "Rectangle" & "(" & body.strip & ")" & tail & "\n"
     elif scanf(line, "$+(Matrix){$+}$+$.", head, body, tail):
-      newFileContent.add head & "Vector" & "(" & body.strip & ")" & tail & "\n"
+      newFileContent.add head & "Matrix" & "(" & body.strip & ")" & tail & "\n"
   else:
     newFileContent.add line & "\n"
 writeFile(newFilename, newFileContent)
