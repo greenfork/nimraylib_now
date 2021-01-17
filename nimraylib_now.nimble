@@ -39,5 +39,4 @@ task buildRaygui, "build raygui as a dynamic library":
   rmFile "raygui.o"
 
 task testExamples, "checks that all examples are correctly compiled":
-  let pattern = "'tests"/"examples"/"*"/"*.nim'"
-  exec "testament pattern " & pattern
+  exec "testament run texamples"
