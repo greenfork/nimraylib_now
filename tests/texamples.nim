@@ -4170,6 +4170,578 @@ block textures_background_scrolling:
   ## --------------------------------------------------------------------------------------
 
 
+block textures_blend_modes:
+  # ******************************************************************************************
+  #
+  #    raylib [textures] example - blend modes
+  #
+  #    NOTE: Images are loaded in CPU memory (RAM); textures are loaded in GPU memory (VRAM)
+  #
+  #    This example has been created using raylib 3.5 (www.raylib.com)
+  #    raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+  #
+  #    Example contributed by Karlo Licudine (@accidentalrebel) and reviewed by Ramon Santamaria (@raysan5)
+  #
+  #    Copyright (c) 2020 Karlo Licudine (@accidentalrebel)
+  #    Converted in 2021 by greenfork
+  #
+  # ******************************************************************************************
+
+
+
+  ##  Initialization
+  ## --------------------------------------------------------------------------------------
+  var screenWidth = 800
+  var screenHeight = 450
+  initWindow(screenWidth, screenHeight, "raylib [textures] example - blend modes")
+  ##  NOTE: Textures MUST be loaded after Window initialization (OpenGL context is requiRed)
+  var bgImage: Image = loadImage("resources/cyberpunk_street_background.png")
+  ##  Loaded in CPU memory (RAM)
+  var bgTexture: Texture2D = loadTextureFromImage(bgImage)
+  ##  Image converted to texture, GPU memory (VRAM)
+  var fgImage: Image = loadImage("resources/cyberpunk_street_foreground.png")
+  ##  Loaded in CPU memory (RAM)
+  var fgTexture: Texture2D = loadTextureFromImage(fgImage)
+  ##  Image converted to texture, GPU memory (VRAM)
+  ##  Once image has been converted to texture and uploaded to VRAM, it can be unloaded from RAM
+  unloadImage(bgImage)
+  unloadImage(fgImage)
+  var blendCountMax = 4
+  var blendMode: BlendMode
+  ##  Main game loop
+  while not windowShouldClose(): ##  Detect window close button or ESC key
+    ##  Update
+    ## ----------------------------------------------------------------------------------
+    if isKeyPressed(Space):
+      if blendMode >= (blendCountMax - 1):
+        blendMode = BlendMode(0.ord)
+      else:
+        blendMode = succ(blendMode)
+    beginDrawing()
+    clearBackground(Raywhite)
+    drawTexture(bgTexture, screenWidth div 2 - bgTexture.width div 2,
+                screenHeight div 2 - bgTexture.height div 2, White)
+    ##  Apply the blend mode and then draw the foreground texture
+    beginBlendMode(blendMode)
+    drawTexture(fgTexture, screenWidth div 2 - fgTexture.width div 2,
+                screenHeight div 2 - fgTexture.height div 2, White)
+    endBlendMode()
+    ##  Draw the texts
+    drawText("Press SPACE to change blend modes.", 310, 350, 10, Gray)
+    case blendMode
+    of Alpha:
+      drawText("Current: BLEND_ALPHA", (screenWidth div 2) - 60, 370, 10, Gray)
+    of Additive:
+      drawText("Current: BLEND_ADDITIVE", (screenWidth div 2) - 60, 370, 10, Gray)
+    of Multiplied:
+      drawText("Current: BLEND_MULTIPLIED", (screenWidth div 2) - 60, 370, 10, Gray)
+    of Add_Colors:
+      drawText("Current: BLEND_ADD_COLORS", (screenWidth div 2) - 60, 370, 10, Gray)
+    else:
+      discard
+    drawText("(c) Cyberpunk Street Environment by Luis Zuno (@ansimuz)",
+             screenWidth - 330, screenHeight - 20, 10, Gray)
+    endDrawing()
+    ## ----------------------------------------------------------------------------------
+  ##  De-Initialization
+  ## --------------------------------------------------------------------------------------
+  unloadTexture(fgTexture)
+  ##  Unload foreground texture
+  unloadTexture(bgTexture)
+  ##  Unload background texture
+  closeWindow()
+  ##  Close window and OpenGL context
+  ## --------------------------------------------------------------------------------------
+
+
+block textures_bunnymark:
+  # ******************************************************************************************
+  #
+  #    raylib [textures] example - Bunnymark
+  #
+  #    This example has been created using raylib 1.6 (www.raylib.com)
+  #    raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+  #
+  #    Copyright (c) 2014-2019 Ramon Santamaria (@raysan5)
+  #    Converted in 2021 by greenfork
+  #
+  # ******************************************************************************************
+
+
+  const
+    MAX_BUNNIES = 50000
+
+  ##  This is the maximum amount of elements (quads) per batch
+  ##  NOTE: This value is defined in [rlgl] module and can be changed there
+
+  const
+    MAX_BATCH_ELEMENTS = 8192
+
+  type
+    BunnyObj {.bycopy.} = object
+      position: Vector2
+      speed: Vector2
+      color: Color
+    Bunny = ref BunnyObj
+
+  ##  Initialization
+  ## --------------------------------------------------------------------------------------
+  var screenWidth = 800
+  var screenHeight = 450
+  initWindow(screenWidth, screenHeight, "raylib [textures] example - bunnymark")
+  ##  Load bunny texture
+  var texBunny: Texture2D = loadTexture("resources/wabbit_alpha.png")
+  var bunnies: array[MAX_BUNNIES, Bunny] ##  Bunnies array
+  for bunny in bunnies.mitems:
+    bunny = new Bunny
+  var bunniesCount = 0 ##  Bunnies counter
+  setTargetFPS(60)
+  ##  Set our game to run at 60 frames-per-second
+  ## --------------------------------------------------------------------------------------
+  ##  Main game loop
+  while not windowShouldClose(): ##  Detect window close button or ESC key
+    ##  Update
+    ## ----------------------------------------------------------------------------------
+    if isMouseButtonDown(Left_Button):
+      ##  Create more bunnies
+      for i in 0..<100:
+        if bunniesCount < MAX_BUNNIES:
+          bunnies[bunniesCount].position = getMousePosition()
+          bunnies[bunniesCount].speed.x = (getRandomValue(-250, 250).float / 60.0)
+          bunnies[bunniesCount].speed.y = (getRandomValue(-250, 250).float / 60.0)
+          bunnies[bunniesCount].color = Color(
+            r: getRandomValue(50, 240).uint8,
+            g: getRandomValue(80, 240).uint8,
+            b: getRandomValue(100, 240).uint8,
+            a: 255
+          )
+          inc(bunniesCount)
+    for i in 0..<bunniesCount:
+      bunnies[i].position.x += bunnies[i].speed.x
+      bunnies[i].position.y += bunnies[i].speed.y
+      if ((bunnies[i].position.x + texBunny.width / 2.0) > getScreenWidth()) or
+          ((bunnies[i].position.x + texBunny.width div 2) < 0):
+        bunnies[i].speed.x = bunnies[i].speed.x * -1
+      if ((bunnies[i].position.y + texBunny.height div 2) > getScreenHeight()) or
+          ((bunnies[i].position.y + texBunny.height div 2 - 40) < 0):
+        bunnies[i].speed.y = bunnies[i].speed.y * -1
+    ## ----------------------------------------------------------------------------------
+    ##  Draw
+    ## ----------------------------------------------------------------------------------
+    beginDrawing()
+    clearBackground(Raywhite)
+    for i in 0..<bunniesCount:
+      ##  NOTE: When internal batch buffer limit is reached (MAX_BATCH_ELEMENTS),
+      ##  a draw call is launched and buffer starts being filled again;
+      ##  before issuing a draw call, updated vertex data from internal CPU buffer is send to GPU...
+      ##  Process of sending data is costly and it could happen that GPU data has not been completely
+      ##  processed for drawing while new data is tried to be sent (updating current in-use buffers)
+      ##  it could generates a stall and consequently a frame drop, limiting the number of drawn bunnies
+      drawTexture(texBunny, bunnies[i].position.x.cint, bunnies[i].position.y.cint,
+                  bunnies[i].color)
+    drawRectangle(0, 0, screenWidth, 40, Black)
+    drawText(textFormat("bunnies: %i", bunniesCount), 120, 10, 20, Green)
+    drawText(textFormat("batched draw calls: %i",
+                        1 + bunniesCount div MAX_BATCH_ELEMENTS), 320, 10, 20, Maroon)
+    drawFPS(10, 10)
+    endDrawing()
+  ## ----------------------------------------------------------------------------------
+  ##  De-Initialization
+  ## --------------------------------------------------------------------------------------
+  unloadTexture(texBunny)
+  ##  Unload bunny texture
+  closeWindow()
+  ##  Close window and OpenGL context
+  ## --------------------------------------------------------------------------------------
+
+
+block textures_draw_tiled:
+  # ******************************************************************************************
+  #
+  #    raylib [textures] example - Draw part of the texture tiled
+  #
+  #    This example has been created using raylib 3.0 (www.raylib.com)
+  #    raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+  #
+  #    Copyright (c) 2020 Vlad Adrian (@demizdor) and Ramon Santamaria (@raysan5)
+  #    Converted in 2021 by greenfork
+  #
+  # ******************************************************************************************
+
+
+  const
+    OPT_WIDTH = 220
+    MARGIN_SIZE = 8
+    COLOR_SIZE = 16
+
+  ##  Initialization
+  ## --------------------------------------------------------------------------------------
+  var screenWidth = 800
+  var screenHeight = 450
+  setConfigFlags(WindowResizable)
+  ##  Make the window resizable
+  initWindow(screenWidth, screenHeight,
+             "raylib [textures] example - Draw part of a texture tiled")
+  ##  NOTE: Textures MUST be loaded after Window initialization (OpenGL context is requiRed)
+  var texPattern: Texture = loadTexture("resources/patterns.png")
+  setTextureFilter(texPattern, Trilinear)
+  ##  Makes the texture smoother when upscaled
+  ##  Coordinates for all patterns inside the texture
+  var recPattern = [
+    Rectangle(x: 3, y: 3, width: 66, height: 66),
+    Rectangle(x: 75, y: 3, width: 100, height: 100),
+    Rectangle(x: 3, y: 75, width: 66, height: 66),
+    Rectangle(x: 7, y: 156, width: 50, height: 50),
+    Rectangle(x: 85, y: 106, width: 90, height: 45),
+    Rectangle(x: 75, y: 154, width: 100, height: 60)
+  ]
+  ##  Setup colors
+  var colors = [Black, Maroon, Orange, Blue, Purple, Beige, Lime, Red, Darkgray,
+                      Skyblue]
+  const
+    MAX_COLORS = colors.len
+  var colorRec: array[MAX_COLORS, Rectangle]
+  ##  Calculate rectangle for each color
+  var
+    i = 0
+    x = 0
+    y = 0
+  while i < MAX_COLORS:
+    colorRec[i].x = (float) 2 + MARGIN_SIZE + x
+    colorRec[i].y = (float) 22 + 256 + MARGIN_SIZE + y
+    colorRec[i].width = COLOR_SIZE * 2
+    colorRec[i].height = COLOR_SIZE
+    if i == (MAX_COLORS div 2 - 1):
+      x = 0
+      inc(y, COLOR_SIZE + MARGIN_SIZE)
+    else:
+      inc(x, (COLOR_SIZE * 2 + MARGIN_SIZE))
+    inc(i)
+  var
+    activePattern = 0
+    activeCol = 0
+  var
+    scale = 1.0
+    rotation = 0.0
+  setTargetFPS(60)
+  ## ---------------------------------------------------------------------------------------
+  ##  Main game loop
+  while not windowShouldClose(): ##  Detect window close button or ESC key
+    ##  Update
+    ## ----------------------------------------------------------------------------------
+    screenWidth = getScreenWidth()
+    screenHeight = getScreenHeight()
+    ##  Handle mouse
+    if isMouseButtonPressed(Left_Button):
+      var mouse: Vector2 = getMousePosition()
+      ##  Check which pattern was clicked and set it as the active pattern
+      var i = 0
+      while i < recPattern.len:
+        if checkCollisionPointRec(mouse, Rectangle(x: 2 + MARGIN_SIZE + recPattern[i].x,
+            y: 40 + MARGIN_SIZE + recPattern[i].y, width: recPattern[i].width,
+            height: recPattern[i].height)):
+          activePattern = i
+          break
+        inc(i)
+      ##  Check to see which color was clicked and set it as the active color
+      for i in 0..<MAX_COLORS:
+        if checkCollisionPointRec(mouse, colorRec[i]):
+          activeCol = i
+          break
+    if isKeyPressed(Up):
+      scale += 0.25
+    if isKeyPressed(Down):
+      scale -= 0.25
+    if scale > 10.0:
+      scale = 10.0
+    elif scale <= 0.0:           ##  Change rotation
+      scale = 0.25
+    if isKeyPressed(Left):
+      rotation -= 25.0
+    if isKeyPressed(Right):
+      rotation += 25.0
+    if isKeyPressed(Space):
+      rotation = 0.0
+      scale = 1.0
+    beginDrawing()
+    clearBackground(Raywhite)
+    ##  Draw the tiled area
+    drawTextureTiled(texPattern, recPattern[activePattern], Rectangle(
+        x: OPT_WIDTH + MARGIN_SIZE, y: MARGIN_SIZE,
+        width: (float) screenWidth - OPT_WIDTH - 2 * MARGIN_SIZE, height: (float) screenHeight - 2 * MARGIN_SIZE),
+                     (0.0, 0.0), rotation, scale, colors[activeCol])
+    ##  Draw options
+    drawRectangle(MARGIN_SIZE, MARGIN_SIZE, OPT_WIDTH - MARGIN_SIZE,
+                  screenHeight - 2 * MARGIN_SIZE, colorAlpha(Lightgray, 0.5))
+    drawText("Select Pattern", 2 + MARGIN_SIZE, 30 + MARGIN_SIZE, 10, Black)
+    drawTexture(texPattern, 2 + MARGIN_SIZE, 40 + MARGIN_SIZE, Black)
+    drawRectangle((int)2 + MARGIN_SIZE + recPattern[activePattern].x,
+                  (int)40 + MARGIN_SIZE + recPattern[activePattern].y,
+                  (int)recPattern[activePattern].width,
+                  (int)recPattern[activePattern].height, colorAlpha(Darkblue, 0.3))
+    drawText("Select Color", 2 + MARGIN_SIZE, 10 + 256 + MARGIN_SIZE, 10, Black)
+    for i in 0..<MAX_COLORS:
+      drawRectangleRec(colorRec[i], colors[i])
+      if activeCol == i:
+        drawRectangleLinesEx(colorRec[i], 3, colorAlpha(White, 0.5))
+    drawText("Scale (UP/DOWN to change)", 2 + MARGIN_SIZE, 80 + 256 + MARGIN_SIZE, 10,
+             Black)
+    drawText(textFormat("%.2fx", scale), 2 + MARGIN_SIZE, 92 + 256 + MARGIN_SIZE, 20, Black)
+    drawText("Rotation (LEFT/RIGHT to change)", 2 + MARGIN_SIZE,
+             122 + 256 + MARGIN_SIZE, 10, Black)
+    drawText(textFormat("%.0f degrees", rotation), 2 + MARGIN_SIZE,
+             134 + 256 + MARGIN_SIZE, 20, Black)
+    drawText("Press [SPACE] to reset", 2 + MARGIN_SIZE, 164 + 256 + MARGIN_SIZE, 10,
+             Darkblue)
+    ##  Draw FPS
+    drawText(textFormat("%i FPS", getFPS()), 2 + MARGIN_SIZE, 2 + MARGIN_SIZE, 20, Black)
+    endDrawing()
+    ## ----------------------------------------------------------------------------------
+  ##  De-Initialization
+  ## --------------------------------------------------------------------------------------
+  unloadTexture(texPattern)
+  ##  Unload texture
+  closeWindow()
+  ##  Close window and OpenGL context
+  ## --------------------------------------------------------------------------------------
+
+
+block textures_image_drawing:
+  # ******************************************************************************************
+  #
+  #    raylib [textures] example - Image loading and drawing on it
+  #
+  #    NOTE: Images are loaded in CPU memory (RAM); textures are loaded in GPU memory (VRAM)
+  #
+  #    This example has been created using raylib 1.4 (www.raylib.com)
+  #    raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+  #
+  #    Copyright (c) 2016 Ramon Santamaria (@raysan5)
+  #    Converted in 2021 by greenfork
+  #
+  # ******************************************************************************************
+
+
+  ##  Initialization
+  ## --------------------------------------------------------------------------------------
+  var screenWidth = 800
+  var screenHeight = 450
+  initWindow(screenWidth, screenHeight,
+             "raylib [textures] example - image drawing")
+  ##  NOTE: Textures MUST be loaded after Window initialization (OpenGL context is requiRed)
+  var cat: Image = loadImage("resources/cat.png") ##  Load image in CPU memory (RAM)
+  imageCrop(addr(cat), (100.0, 10.0, 280.0, 380.0)) ##  Crop an image piece
+  imageFlipHorizontal(addr(cat)) ##  Flip cropped image horizontally
+  imageResize(addr(cat), 150, 200) ##  Resize flipped-cropped image
+  var parrots: Image = loadImage("resources/parrots.png") ##  Load image in CPU memory (RAM)
+  ##  Draw one image over the other with a scaling of 1.5f
+  imageDraw(
+    addr(parrots),
+    cat,
+    Rectangle(x: 0.0, y: 0.0, width: cat.width.float, height: cat.height.float),
+    Rectangle(x: 30.0, y: 40.0, width: cat.width.float*1.5, height: cat.height.float*1.5),
+    White)
+  imageCrop(addr(parrots), (0.0, 50.0, parrots.width.float, parrots.height.float - 100.0)) ##  Crop resulting image
+  ##  Draw on the image with a few image draw methods
+  imageDrawPixel(addr(parrots), 10, 10, Raywhite)
+  imageDrawCircle(addr(parrots), 10, 10, 5, Raywhite)
+  imageDrawRectangle(addr(parrots), 5, 20, 10, 10, Raywhite)
+  unloadImage(cat)
+  ##  Unload image from RAM
+  ##  Load custom font for frawing on image
+  var font: Font = loadFont("resources/custom_jupiter_crash.png")
+  ##  Draw over image using custom font
+  imageDrawTextEx(addr(parrots), font, "PARROTS & CAT", (300.0, 230.0),
+                  font.baseSize.float, -2.0, White)
+  unloadFont(font)
+  ##  Unload custom spritefont (already drawn used on image)
+  var texture: Texture2D = loadTextureFromImage(parrots)
+  ##  Image converted to texture, uploaded to GPU memory (VRAM)
+  unloadImage(parrots)
+  ##  Once image has been converted to texture and uploaded to VRAM, it can be unloaded from RAM
+  setTargetFPS(60)
+  ## ---------------------------------------------------------------------------------------
+  ##  Main game loop
+  while not windowShouldClose(): ##  Detect window close button or ESC key
+    ##  Update
+    ## ----------------------------------------------------------------------------------
+    ##  TODO: Update your variables here
+    ## ----------------------------------------------------------------------------------
+    ##  Draw
+    ## ----------------------------------------------------------------------------------
+    beginDrawing()
+    clearBackground(Raywhite)
+    drawTexture(texture, screenWidth div 2 - texture.width div 2,
+                screenHeight div 2 - texture.height div 2 - 40, White)
+    drawRectangleLines(screenWidth div 2 - texture.width div 2,
+                       screenHeight div 2 - texture.height div 2 - 40, texture.width,
+                       texture.height, Darkgray)
+    drawText("We are drawing only one texture from various images composed!",
+             240, 350, 10, Darkgray)
+    drawText("Source images have been cropped, scaled, flipped and copied one over the other.",
+             190, 370, 10, Darkgray)
+    endDrawing()
+  ## ----------------------------------------------------------------------------------
+  ##  De-Initialization
+  ## --------------------------------------------------------------------------------------
+  unloadTexture(texture)
+  ##  Texture unloading
+  closeWindow()
+  ##  Close window and OpenGL context
+  ## --------------------------------------------------------------------------------------
+
+
+block textures_image_generation:
+  # ******************************************************************************************
+  #
+  #    raylib [textures] example - Procedural images generation
+  #
+  #    This example has been created using raylib 1.8 (www.raylib.com)
+  #    raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+  #
+  #    Copyright (c) 2O17 Wilhem Barbier (@nounoursheureux)
+  #    Converted in 2021 by greenfork
+  #
+  # ******************************************************************************************
+
+
+  const
+    NUM_TEXTURES = 7
+
+
+  ##  Initialization
+  ## --------------------------------------------------------------------------------------
+  var screenWidth = 800
+  var screenHeight = 450
+  initWindow(screenWidth, screenHeight,
+             "raylib [textures] example - procedural images generation")
+  var verticalGradient: Image = genImageGradientV(screenWidth, screenHeight, Red, Blue)
+  var horizontalGradient: Image = genImageGradientH(screenWidth, screenHeight, Red,
+      Blue)
+  var radialGradient: Image = genImageGradientRadial(screenWidth, screenHeight, 0.0,
+      White, Black)
+  var checked: Image = genImageChecked(screenWidth, screenHeight, 32, 32, Red, Blue)
+  var WhiteNoise: Image = genImageWhiteNoise(screenWidth, screenHeight, 0.5)
+  var perlinNoise: Image = genImagePerlinNoise(screenWidth, screenHeight, 50, 50, 4.0)
+  var cellular: Image = genImageCellular(screenWidth, screenHeight, 32)
+  var textures: array[NUM_TEXTURES, Texture2D]
+  textures[0] = loadTextureFromImage(verticalGradient)
+  textures[1] = loadTextureFromImage(horizontalGradient)
+  textures[2] = loadTextureFromImage(radialGradient)
+  textures[3] = loadTextureFromImage(checked)
+  textures[4] = loadTextureFromImage(WhiteNoise)
+  textures[5] = loadTextureFromImage(perlinNoise)
+  textures[6] = loadTextureFromImage(cellular)
+  ##  Unload image data (CPU RAM)
+  unloadImage(verticalGradient)
+  unloadImage(horizontalGradient)
+  unloadImage(radialGradient)
+  unloadImage(checked)
+  unloadImage(WhiteNoise)
+  unloadImage(perlinNoise)
+  unloadImage(cellular)
+  var currentTexture = 0
+  setTargetFPS(60)
+  ## ---------------------------------------------------------------------------------------
+  ##  Main game loop
+  while not windowShouldClose():
+    ##  Update
+    ## ----------------------------------------------------------------------------------
+    if isMouseButtonPressed(Left_Button) or isKeyPressed(Right):
+      currentTexture = (currentTexture + 1) mod NUM_TEXTURES
+      ##  Cycle between the textures
+    beginDrawing()
+    clearBackground(Raywhite)
+    drawTexture(textures[currentTexture], 0, 0, White)
+    drawRectangle(30, 400, 325, 30, fade(Skyblue, 0.5))
+    drawRectangleLines(30, 400, 325, 30, fade(White, 0.5))
+    drawText("MOUSE LEFT BUTTON to CYCLE PROCEDURAL TEXTURES", 40, 410, 10, White)
+    case currentTexture
+    of 0:
+      drawText("VERTICAL GRADIENT", 560, 10, 20, Raywhite)
+    of 1:
+      drawText("HORIZONTAL GRADIENT", 540, 10, 20, Raywhite)
+    of 2:
+      drawText("RADIAL GRADIENT", 580, 10, 20, Lightgray)
+    of 3:
+      drawText("CHECKED", 680, 10, 20, Raywhite)
+    of 4:
+      drawText("WHITE NOISE", 640, 10, 20, Red)
+    of 5:
+      drawText("PERLIN NOISE", 630, 10, 20, Raywhite)
+    of 6:
+      drawText("CELLULAR", 670, 10, 20, Raywhite)
+    else:
+      discard
+    endDrawing()
+  ## ----------------------------------------------------------------------------------
+  ##  De-Initialization
+  ## --------------------------------------------------------------------------------------
+  ##  Unload textures data (GPU VRAM)
+  var i = 0
+  while i < NUM_TEXTURES:
+    unloadTexture(textures[i])
+    inc(i)
+  closeWindow()
+  ##  Close window and OpenGL context
+  ## --------------------------------------------------------------------------------------
+
+
+block textures_image_loading:
+  # ******************************************************************************************
+  #
+  #    raylib [textures] example - Image loading and texture creation
+  #
+  #    NOTE: Images are loaded in CPU memory (RAM); textures are loaded in GPU memory (VRAM)
+  #
+  #    This example has been created using raylib 1.3 (www.raylib.com)
+  #    raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+  #
+  #    Copyright (c) 2015 Ramon Santamaria (@raysan5)
+  #    Converted in 2021 by greenfork
+  #
+  # ******************************************************************************************
+
+
+
+  ##  Initialization
+  ## --------------------------------------------------------------------------------------
+  var screenWidth = 800
+  var screenHeight = 450
+  initWindow(screenWidth, screenHeight,
+             "raylib [textures] example - image loading")
+  ##  NOTE: Textures MUST be loaded after Window initialization (OpenGL context is requiRed)
+  var image: Image = loadImage("resources/raylib_logo.png")
+  ##  Loaded in CPU memory (RAM)
+  var texture: Texture2D = loadTextureFromImage(image)
+  ##  Image converted to texture, GPU memory (VRAM)
+  unloadImage(image)
+  ##  Once image has been converted to texture and uploaded to VRAM, it can be unloaded from RAM
+  ## ---------------------------------------------------------------------------------------
+  ##  Main game loop
+  while not windowShouldClose(): ##  Detect window close button or ESC key
+    ##  Update
+    ## ----------------------------------------------------------------------------------
+    ##  TODO: Update your variables here
+    ## ----------------------------------------------------------------------------------
+    ##  Draw
+    ## ----------------------------------------------------------------------------------
+    beginDrawing()
+    clearBackground(Raywhite)
+    drawTexture(texture, screenWidth div 2 - texture.width div 2,
+                screenHeight div 2 - texture.height div 2, White)
+    drawText("this IS a texture loaded from an image!", 300, 370, 10, Gray)
+    endDrawing()
+    ## ----------------------------------------------------------------------------------
+  ##  De-Initialization
+  ## --------------------------------------------------------------------------------------
+  unloadTexture(texture)
+  ##  Texture unloading
+  closeWindow()
+  ##  Close window and OpenGL context
+  ## --------------------------------------------------------------------------------------
+
+
 block textures_image_processing:
   #*******************************************************************************************
   #
@@ -4299,6 +4871,428 @@ block textures_image_processing:
 
   closeWindow()                #  Close window and OpenGL context
   # --------------------------------------------------------------------------------------
+
+
+block textures_image_text:
+  # ******************************************************************************************
+  #
+  #    raylib [texture] example - Image text drawing using TTF generated spritefont
+  #
+  #    This example has been created using raylib 1.8 (www.raylib.com)
+  #    raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+  #
+  #    Copyright (c) 2017 Ramon Santamaria (@raysan5)
+  #    Converted in 2021 by greenfork
+  #
+  # ******************************************************************************************
+
+
+  ##  Initialization
+  ## --------------------------------------------------------------------------------------
+  var screenWidth = 800
+  var screenHeight = 450
+  initWindow(screenWidth, screenHeight,
+             "raylib [texture] example - image text drawing")
+  var parrots: Image = loadImage("resources/parrots.png")
+  ##  Load image in CPU memory (RAM)
+  ##  TTF Font loading with custom generation parameters
+  var font: Font = loadFontEx("resources/KAISG.ttf", 64, nil, 0)
+  ##  Draw over image using custom font
+  imageDrawTextEx(addr(parrots), font, "[Parrots font drawing]",
+                  (20.0, 20.0), cast[cfloat](font.baseSize), 0.0, Red)
+  var texture: Texture2D = loadTextureFromImage(parrots)
+  ##  Image converted to texture, uploaded to GPU memory (VRAM)
+  unloadImage(parrots)
+  ##  Once image has been converted to texture and uploaded to VRAM, it can be unloaded from RAM
+  var position: Vector2 = ((float)(screenWidth div 2 - texture.width div 2),
+                       (float)(screenHeight div 2 - texture.height div 2 - 20))
+  var showFont: bool = false
+  setTargetFPS(60)
+  ## --------------------------------------------------------------------------------------
+  ##  Main game loop
+  while not windowShouldClose(): ##  Detect window close button or ESC key
+    ##  Update
+    ## ----------------------------------------------------------------------------------
+    if isKeyDown(Space):
+      showFont = true
+    else:
+      showFont = false
+    ## ----------------------------------------------------------------------------------
+    ##  Draw
+    ## ----------------------------------------------------------------------------------
+    beginDrawing()
+    clearBackground(Raywhite)
+    if not showFont:
+      ##  Draw texture with text already drawn inside
+      drawTextureV(texture, position, White)
+      ##  Draw text directly using sprite font
+      drawTextEx(font, "[Parrots font drawing]", Vector2(x: position.x + 20,
+                 y: position.y + 20 + 280), (float)font.baseSize, 0.0, White)
+    else:
+      drawTexture(font.texture, screenWidth div 2 - font.texture.width div 2, 50, Black)
+    drawText("PRESS SPACE to SEE USED SPRITEFONT ", 290, 420, 10, Darkgray)
+    endDrawing()
+  ## ----------------------------------------------------------------------------------
+  ##  De-Initialization
+  ## --------------------------------------------------------------------------------------
+  unloadTexture(texture)
+  ##  Texture unloading
+  unloadFont(font)
+  ##  Unload custom spritefont
+  closeWindow()
+  ##  Close window and OpenGL context
+  ## --------------------------------------------------------------------------------------
+
+
+block textures_logo_raylib:
+  # ******************************************************************************************
+  #
+  #    raylib [textures] example - Texture loading and drawing
+  #
+  #    This example has been created using raylib 1.0 (www.raylib.com)
+  #    raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+  #
+  #    Copyright (c) 2014 Ramon Santamaria (@raysan5)
+  #    Converted in 2021 by greenfork
+  #
+  # ******************************************************************************************
+
+
+
+  ##  Initialization
+  ## --------------------------------------------------------------------------------------
+  var screenWidth = 800
+  var screenHeight = 450
+  initWindow(screenWidth, screenHeight,
+             "raylib [textures] example - texture loading and drawing")
+  ##  NOTE: Textures MUST be loaded after Window initialization (OpenGL context is requiRed)
+  var texture: Texture2D = loadTexture("resources/raylib_logo.png")
+  ##  Texture loading
+  ## ---------------------------------------------------------------------------------------
+  ##  Main game loop
+  while not windowShouldClose(): ##  Detect window close button or ESC key
+    ##  Update
+    ## ----------------------------------------------------------------------------------
+    ##  TODO: Update your variables here
+    ## ----------------------------------------------------------------------------------
+    ##  Draw
+    ## ----------------------------------------------------------------------------------
+    beginDrawing()
+    clearBackground(Raywhite)
+    drawTexture(texture, screenWidth div 2 - texture.width div 2,
+                screenHeight div 2 - texture.height div 2, White)
+    drawText("this IS a texture!", 360, 370, 10, Gray)
+    endDrawing()
+    ## ----------------------------------------------------------------------------------
+  ##  De-Initialization
+  ## --------------------------------------------------------------------------------------
+  unloadTexture(texture)
+  ##  Texture unloading
+  closeWindow()
+  ##  Close window and OpenGL context
+  ## --------------------------------------------------------------------------------------
+
+
+block textures_mouse_painting:
+  # ******************************************************************************************
+  #
+  #    raylib [textures] example - Mouse painting
+  #
+  #    This example has been created using raylib 2.5 (www.raylib.com)
+  #    raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+  #
+  #    Example contributed by Chris Dill (@MysteriousSpace) and reviewed by Ramon Santamaria (@raysan5)
+  #
+  #    Copyright (c) 2019 Chris Dill (@MysteriousSpace) and Ramon Santamaria (@raysan5)
+  #    Converted in 2021 by greenfork
+  #
+  # ******************************************************************************************
+
+
+  const
+    MAX_COLORS_COUNT = 23
+
+  ##  Initialization
+  ## --------------------------------------------------------------------------------------
+  var screenWidth = 800
+  var screenHeight = 450
+  initWindow(screenWidth, screenHeight,
+             "raylib [textures] example - mouse painting")
+  ##  Colours to choose from
+  var colors: array[MAX_COLORS_COUNT, Color] = [Raywhite, Yellow, Gold, Orange, Pink, Red,
+      Maroon, Green, Lime, Darkgreen, Skyblue, Blue, Darkblue, Purple, Violet,
+      Darkpurple, Beige, Brown, Darkbrown, Lightgray, Gray, Darkgray, Black]
+  ##  Define colorsRecs data (for every rectangle)
+  var colorsRecs: array[MAX_COLORS_COUNT, Rectangle]
+  for i in 0..<MAX_COLORS_COUNT:
+    colorsRecs[i].x = (float) 10 + 30 * i + 2 * i
+    colorsRecs[i].y = 10.0
+    colorsRecs[i].width = 30
+    colorsRecs[i].height = 30
+  var colorSelected = 0
+  var colorSelectedPrev = colorSelected
+  var colorMouseHover = 0
+  var brushSize = 20
+  var btnSaveRec: Rectangle = (750.0, 10.0, 40.0, 30.0)
+  var btnSaveMouseHover: bool = false
+  var showSaveMessage: bool = false
+  var saveMessageCounter = 0
+  ##  Create a RenderTexture2D to use as a canvas
+  var target: RenderTexture2D = loadRenderTexture(screenWidth, screenHeight)
+  ##  Clear render texture before entering the game loop
+  beginTextureMode(target)
+  clearBackground(colors[0])
+  endTextureMode()
+  setTargetFPS(120)
+  ##  Set our game to run at 120 frames-per-second
+  ## --------------------------------------------------------------------------------------
+  ##  Main game loop
+  while not windowShouldClose(): ##  Detect window close button or ESC key
+    ##  Update
+    ## ----------------------------------------------------------------------------------
+    var mousePos: Vector2 = getMousePosition()
+    ##  Move between colors with keys
+    if isKeyPressed(Right):
+      inc(colorSelected)
+    elif isKeyPressed(Left):
+      dec(colorSelected)
+    if colorSelected >= MAX_COLORS_COUNT:
+      colorSelected = MAX_COLORS_COUNT - 1
+    elif colorSelected < 0:      ##  Choose color with mouse
+      colorSelected = 0
+    var i = 0
+    while i < MAX_COLORS_COUNT:
+      if checkCollisionPointRec(mousePos, colorsRecs[i]):
+        colorMouseHover = i
+        break
+      else:
+        colorMouseHover = -1
+      inc(i)
+    if (colorMouseHover >= 0) and isMouseButtonPressed(Left_Button):
+      colorSelected = colorMouseHover
+      colorSelectedPrev = colorSelected
+    brushSize += getMouseWheelMove().int * 5
+    if brushSize < 2:
+      brushSize = 2
+    if brushSize > 50:
+      brushSize = 50
+    if isKeyPressed(C):
+      ##  Clear render texture to clear color
+      beginTextureMode(target)
+      clearBackground(colors[0])
+      endTextureMode()
+    if isMouseButtonDown(Left_Button) or
+        (getGestureDetected() == Drag):
+      ##  Paint circle into render texture
+      ##  NOTE: To avoid discontinuous circles, we could store
+      ##  previous-next mouse points and just draw a line using brush size
+      beginTextureMode(target)
+      if mousePos.y > 50:
+        drawCircle(mousePos.x.int, mousePos.y.int, brushSize.float, colors[colorSelected])
+      endTextureMode()
+    if isMouseButtonDown(Right_Button):
+      colorSelected = 0
+      ##  Erase circle from render texture
+      beginTextureMode(target)
+      if mousePos.y > 50:
+        drawCircle(mousePos.x.int, mousePos.y.int, brushSize.float, colors[0])
+      endTextureMode()
+    else:
+      colorSelected = colorSelectedPrev
+    ##  Check mouse hover save button
+    if checkCollisionPointRec(mousePos, btnSaveRec):
+      btnSaveMouseHover = true
+    else:
+      btnSaveMouseHover = false
+    ##  Image saving logic
+    ##  NOTE: Saving painted texture to a default named image
+    if (btnSaveMouseHover and isMouseButtonReleased(Left_Button)) or
+        isKeyPressed(S):
+      var image: Image = getTextureData(target.texture)
+      imageFlipVertical(addr(image))
+      discard exportImage(image, "my_amazing_texture_painting.png")
+      unloadImage(image)
+      showSaveMessage = true
+    if showSaveMessage:
+      ##  On saving, show a full screen message for 2 seconds
+      inc(saveMessageCounter)
+      if saveMessageCounter > 240:
+        showSaveMessage = false
+        saveMessageCounter = 0
+    beginDrawing()
+    clearBackground(Raywhite)
+    ##  NOTE: Render texture must be y-flipped due to default OpenGL coordinates (left-bottom)
+    drawTextureRec(
+      target.texture,
+      Rectangle(x: 0.0, y: 0.0, width: target.texture.width.float, height: -target.texture.height.float),
+      Vector2(x: 0, y: 0),
+      White
+    )
+    ##  Draw drawing circle for reference
+    if mousePos.y > 50:
+      if isMouseButtonDown(Right_Button):
+        drawCircleLines(mousePos.x.int, mousePos.y.int, brushSize.float, Gray)
+      else:
+        drawCircle(getMouseX().int, getMouseY().int, brushSize.float, colors[colorSelected])
+    drawRectangle(0, 0, getScreenWidth(), 50, Raywhite)
+    drawLine(0, 50, getScreenWidth(), 50, Lightgray)
+    ##  Draw color selection rectangles
+    for i in 0..<MAX_COLORS_COUNT:
+      drawRectangleRec(colorsRecs[i], colors[i])
+    drawRectangleLines(10, 10, 30, 30, Lightgray)
+    if colorMouseHover >= 0:
+      drawRectangleRec(colorsRecs[colorMouseHover], fade(White, 0.6))
+    drawRectangleLinesEx(
+      Rectangle(
+        x: colorsRecs[colorSelected].x - 2,
+        y: colorsRecs[colorSelected].y - 2,
+        width: colorsRecs[colorSelected].width + 4,
+        height: colorsRecs[colorSelected].height + 4
+      ),
+      2,
+      Black
+    )
+
+    drawRectangleLinesEx(btnSaveRec, 2, if btnSaveMouseHover: Red else: Black)
+    drawText("SAVE!", 755, 20, 10, if btnSaveMouseHover: Red else: Black)
+    ##  Draw save image message
+    if showSaveMessage:
+      drawRectangle(0, 0, getScreenWidth(), getScreenHeight(), fade(Raywhite, 0.8))
+      drawRectangle(0, 150, getScreenWidth(), 80, Black)
+      drawText("IMAGE SAVED:  my_amazing_texture_painting.png", 150, 180, 20,
+               Raywhite)
+    endDrawing()
+  ## ----------------------------------------------------------------------------------
+  ##  De-Initialization
+  ## --------------------------------------------------------------------------------------
+  unloadRenderTexture(target)
+  ##  Unload render texture
+  closeWindow()
+  ##  Close window and OpenGL context
+  ## --------------------------------------------------------------------------------------
+
+
+block textures_npatch_drawing:
+  # ******************************************************************************************
+  #
+  #    raylib [textures] example - N-patch drawing
+  #
+  #    NOTE: Images are loaded in CPU memory (RAM); textures are loaded in GPU memory (VRAM)
+  #
+  #    This example has been created using raylib 2.0 (www.raylib.com)
+  #    raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+  #
+  #    Example contributed by Jorge A. Gomes (@overdev) and reviewed by Ramon Santamaria (@raysan5)
+  #
+  #    Copyright (c) 2018 Jorge A. Gomes (@overdev) and Ramon Santamaria (@raysan5)
+  #    Converted in 2021 by greenfork
+  #
+  # ******************************************************************************************
+
+
+  ##  Initialization
+  ## --------------------------------------------------------------------------------------
+  var screenWidth = 800
+  var screenHeight = 450
+  initWindow(screenWidth, screenHeight,
+             "raylib [textures] example - N-patch drawing")
+  ##  NOTE: Textures MUST be loaded after Window initialization (OpenGL context is requiRed)
+  var nPatchTexture: Texture2D = loadTexture("resources/ninepatch_button.png")
+  var mousePosition: Vector2
+  var origin: Vector2
+  ##  Position and size of the n-patches
+  var dstRec1: Rectangle = (480.0, 160.0, 32.0, 32.0)
+  var dstRec2: Rectangle = (160.0, 160.0, 32.0, 32.0)
+  var dstRecH: Rectangle = (160.0, 93.0, 32.0, 32.0)
+  var dstRecV: Rectangle = (92.0, 160.0, 32.0, 32.0)
+  ##  A 9-patch (NPT_9PATCH) changes its sizes in both axis
+  var ninePatchInfo1: NPatchInfo = NPatchInfo(
+    source: (0.0, 0.0, 64.0, 64.0),
+    left: 12,
+    top: 40,
+    right: 12,
+    bottom: 12,
+    type: NPT_9PATCH
+  )
+  var ninePatchInfo2: NPatchInfo = NPatchInfo(
+    source: (0.0, 128.0, 64.0, 64.0),
+    left: 16,
+    top: 16,
+    right: 16,
+    bottom: 16,
+    type: NPT_9PATCH
+  )
+  ##  A horizontal 3-patch (NPT_3PATCH_HORIZONTAL) changes its sizes along the x axis only
+  var h3PatchInfo: NPatchInfo = NPatchInfo(
+    source: (0.0, 64.0, 64.0, 64.0),
+    left: 8,
+    top: 8,
+    right: 8,
+    bottom: 8,
+    type: NPT_3PATCH_HORIZONTAL
+  )
+  ##  A vertical 3-patch (NPT_3PATCH_VERTICAL) changes its sizes along the y axis only
+  var v3PatchInfo: NPatchInfo = NPatchInfo(
+    source: (0.0, 192.0, 64.0, 64.0),
+    left: 6,
+    top: 6,
+    right: 6,
+    bottom: 6,
+    type: NPT_3PATCH_VERTICAL
+  )
+  setTargetFPS(60)
+  ## ---------------------------------------------------------------------------------------
+  ##  Main game loop
+  while not windowShouldClose(): ##  Detect window close button or ESC key
+    ##  Update
+    ## ----------------------------------------------------------------------------------
+    mousePosition = getMousePosition()
+    ##  Resize the n-patches based on mouse position
+    dstRec1.width = mousePosition.x - dstRec1.x
+    dstRec1.height = mousePosition.y - dstRec1.y
+    dstRec2.width = mousePosition.x - dstRec2.x
+    dstRec2.height = mousePosition.y - dstRec2.y
+    dstRecH.width = mousePosition.x - dstRecH.x
+    dstRecV.height = mousePosition.y - dstRecV.y
+    ##  Set a minimum width and/or height
+    if dstRec1.width < 1.0:
+      dstRec1.width = 1.0
+    if dstRec1.width > 300.0:
+      dstRec1.width = 300.0
+    if dstRec1.height < 1.0:
+      dstRec1.height = 1.0
+    if dstRec2.width < 1.0:
+      dstRec2.width = 1.0
+    if dstRec2.width > 300.0:
+      dstRec2.width = 300.0
+    if dstRec2.height < 1.0:
+      dstRec2.height = 1.0
+    if dstRecH.width < 1.0:
+      dstRecH.width = 1.0
+    if dstRecV.height < 1.0:
+      dstRecV.height = 1.0
+    beginDrawing()
+    clearBackground(Raywhite)
+    ##  Draw the n-patches
+    drawTextureNPatch(nPatchTexture, ninePatchInfo2, dstRec2, origin, 0.0, White)
+    drawTextureNPatch(nPatchTexture, ninePatchInfo1, dstRec1, origin, 0.0, White)
+    drawTextureNPatch(nPatchTexture, h3PatchInfo, dstRecH, origin, 0.0, White)
+    drawTextureNPatch(nPatchTexture, v3PatchInfo, dstRecV, origin, 0.0, White)
+    ##  Draw the source texture
+    drawRectangleLines(5, 88, 74, 266, Blue)
+    drawTexture(nPatchTexture, 10, 93, White)
+    drawText("TEXTURE", 15, 360, 10, Darkgray)
+    drawText("Move the mouse to stretch or shrink the n-patches", 10, 20, 20,
+             Darkgray)
+    endDrawing()
+  ## ----------------------------------------------------------------------------------
+  ##  De-Initialization
+  ## --------------------------------------------------------------------------------------
+  unloadTexture(nPatchTexture)
+  ##  Texture unloading
+  closeWindow()
+  ##  Close window and OpenGL context
+  ## --------------------------------------------------------------------------------------
 
 
 block textures_particles_blending:
@@ -4503,5 +5497,393 @@ block textures_raw_data:
 
   closeWindow()              #  Close window and OpenGL context
   # --------------------------------------------------------------------------------------
+
+
+block textures_rectangle:
+  # ******************************************************************************************
+  #
+  #    raylib [textures] example - Texture loading and drawing a part defined by a rectangle
+  #
+  #    This example has been created using raylib 1.3 (www.raylib.com)
+  #    raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+  #
+  #    Copyright (c) 2014 Ramon Santamaria (@raysan5)
+  #    Converted in 2021 by greenfork
+  #
+  # ******************************************************************************************
+
+
+  const
+    MAX_FRAME_SPEED = 15
+    MIN_FRAME_SPEED = 1
+
+
+  ##  Initialization
+  ## --------------------------------------------------------------------------------------
+  var screenWidth = 800
+  var screenHeight = 450
+  initWindow(screenWidth, screenHeight,
+             "raylib [texture] example - texture rectangle")
+  ##  NOTE: Textures MUST be loaded after Window initialization (OpenGL context is requiRed)
+  var scarfy: Texture2D = loadTexture("resources/scarfy.png")
+  ##  Texture loading
+  var position: Vector2 = (350.0, 280.0)
+  var frameRec: Rectangle = (0.0, 0.0, (float)(scarfy.width div 6),
+                         (float)(scarfy.height))
+  var currentFrame = 0
+  var framesCounter = 0
+  var framesSpeed = 8
+  ##  Number of spritesheet frames shown by second
+  setTargetFPS(60)
+  ##  Set our game to run at 60 frames-per-second
+  ## --------------------------------------------------------------------------------------
+  ##  Main game loop
+  while not windowShouldClose(): ##  Detect window close button or ESC key
+    ##  Update
+    ## ----------------------------------------------------------------------------------
+    inc(framesCounter)
+    if framesCounter >= (60 div framesSpeed):
+      framesCounter = 0
+      inc(currentFrame)
+      if currentFrame > 5:
+        currentFrame = 0
+      frameRec.x = (currentFrame * (scarfy.width div 6)).float
+    if isKeyPressed(Right):
+      inc(framesSpeed)
+    elif isKeyPressed(Left):
+      dec(framesSpeed)
+    if framesSpeed > MAX_FRAME_SPEED:
+      framesSpeed = MAX_FRAME_SPEED
+    elif framesSpeed < MIN_FRAME_SPEED: ## ----------------------------------------------------------------------------------
+                                    ##  Draw
+                                    ## ----------------------------------------------------------------------------------
+      framesSpeed = MIN_FRAME_SPEED
+    beginDrawing()
+    clearBackground(Raywhite)
+    drawTexture(scarfy, 15, 40, White)
+    drawRectangleLines(15, 40, scarfy.width, scarfy.height, Lime)
+    drawRectangleLines(15 + frameRec.x.int, 40 + frameRec.y.int, frameRec.width.int,
+                       frameRec.height.int, Red)
+    drawText("FRAME SPEED: ", 165, 210, 10, Darkgray)
+    drawText(textFormat("%02i FPS", framesSpeed), 575, 210, 10, Darkgray)
+    drawText("PRESS RIGHT/LEFT KEYS to CHANGE SPEED!", 290, 240, 10, Darkgray)
+    var i = 0
+    while i < MAX_FRAME_SPEED:
+      if i < framesSpeed:
+        drawRectangle(250 + 21 * i, 205, 20, 20, Red)
+      drawRectangleLines(250 + 21 * i, 205, 20, 20, Maroon)
+      inc(i)
+    drawTextureRec(scarfy, frameRec, position, White)
+    ##  Draw part of the texture
+    drawText("(c) Scarfy sprite by Eiden Marsal", screenWidth - 200,
+             screenHeight - 20, 10, Gray)
+    endDrawing()
+  ## ----------------------------------------------------------------------------------
+  ##  De-Initialization
+  ## --------------------------------------------------------------------------------------
+  unloadTexture(scarfy)
+  ##  Texture unloading
+  closeWindow()
+  ##  Close window and OpenGL context
+  ## --------------------------------------------------------------------------------------
+
+
+block textures_sprite_button:
+  # ******************************************************************************************
+  #
+  #    raylib [textures] example - sprite button
+  #
+  #    This example has been created using raylib 2.5 (www.raylib.com)
+  #    raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+  #
+  #    Copyright (c) 2019 Ramon Santamaria (@raysan5)
+  #    Converted in 2021 by greenfork
+  #
+  # ******************************************************************************************
+
+
+  const
+    NUM_FRAMES = 3
+
+  ##  Initialization
+  ## --------------------------------------------------------------------------------------
+  var screenWidth = 800
+  var screenHeight = 450
+  initWindow(screenWidth, screenHeight,
+             "raylib [textures] example - sprite button")
+  initAudioDevice()
+  ##  Initialize audio device
+  var fxButton: Sound = loadSound("resources/buttonfx.wav")
+  ##  Load button sound
+  var button: Texture2D = loadTexture("resources/button.png")
+  ##  Load button texture
+  ##  Define frame rectangle for drawing
+  var frameHeight = button.height div NUM_FRAMES
+  var sourceRec: Rectangle = (0.0, 0.0, button.width.float, frameHeight.float)
+  ##  Define button bounds on screen
+  var btnBounds: Rectangle = ((float)screenWidth div 2 - button.width div 2, (float)screenHeight div 2 -
+      button.height div NUM_FRAMES div 2, button.width.float, frameHeight.float)
+  var btnState = 0
+  ##  Button state: 0-NORMAL, 1-MOUSE_HOVER, 2-PRESSED
+  var btnAction: bool = false
+  ##  Button action should be activated
+  var mousePoint: Vector2
+  setTargetFPS(60)
+  ## --------------------------------------------------------------------------------------
+  ##  Main game loop
+  while not windowShouldClose(): ##  Detect window close button or ESC key
+    ##  Update
+    ## ----------------------------------------------------------------------------------
+    mousePoint = getMousePosition()
+    btnAction = false
+    ##  Check button state
+    if checkCollisionPointRec(mousePoint, btnBounds):
+      if isMouseButtonDown(Left_Button):
+        btnState = 2
+      else:
+        btnState = 1
+      if isMouseButtonReleased(Left_Button):
+        btnAction = true
+    else:
+      btnState = 0
+    if btnAction:
+      playSound(fxButton)
+      ##  TODO: Any desiRed action
+    sourceRec.y = (float)btnState * frameHeight
+    ## ----------------------------------------------------------------------------------
+    ##  Draw
+    ## ----------------------------------------------------------------------------------
+    beginDrawing()
+    clearBackground(Raywhite)
+    drawTextureRec(button, sourceRec, (btnBounds.x.float, btnBounds.y.float), White)
+    ##  Draw button frame
+    endDrawing()
+  ## ----------------------------------------------------------------------------------
+  ##  De-Initialization
+  ## --------------------------------------------------------------------------------------
+  unloadTexture(button)
+  ##  Unload button texture
+  unloadSound(fxButton)
+  ##  Unload sound
+  closeAudioDevice()
+  ##  Close audio device
+  closeWindow()
+  ##  Close window and OpenGL context
+  ## --------------------------------------------------------------------------------------
+
+
+block textures_sprite_explosion:
+  # ******************************************************************************************
+  #
+  #    raylib [textures] example - sprite explosion
+  #
+  #    This example has been created using raylib 2.5 (www.raylib.com)
+  #    raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+  #
+  #    Copyright (c) 2019 Anata and Ramon Santamaria (@raysan5)
+  #    Converted in 2021 by greenfork
+  #
+  # ******************************************************************************************
+
+
+  const
+    NUM_FRAMES_PER_LINE = 5
+    NUM_LINES = 5
+
+  ##  Initialization
+  ## --------------------------------------------------------------------------------------
+  var screenWidth = 800
+  var screenHeight = 450
+  initWindow(screenWidth, screenHeight,
+             "raylib [textures] example - sprite explosion")
+  initAudioDevice()
+  ##  Load explosion sound
+  var fxBoom: Sound = loadSound("resources/boom.wav")
+  ##  Load explosion texture
+  var explosion: Texture2D = loadTexture("resources/explosion.png")
+  ##  Init variables for animation
+  var frameWidth = explosion.width div NUM_FRAMES_PER_LINE
+  ##  Sprite one frame rectangle width
+  var frameHeight = explosion.height div NUM_LINES
+  ##  Sprite one frame rectangle height
+  var currentFrame = 0
+  var currentLine = 0
+  var frameRec: Rectangle = (0.0, 0.0, frameWidth.float, frameHeight.float)
+  var position: Vector2
+  var active: bool = false
+  var framesCounter = 0
+  setTargetFPS(120)
+  ## --------------------------------------------------------------------------------------
+  ##  Main game loop
+  while not windowShouldClose(): ##  Detect window close button or ESC key
+    ##  Update
+    ## ----------------------------------------------------------------------------------
+    ##  Check for mouse button pressed and activate explosion (if not active)
+    if isMouseButtonPressed(Left_Button) and not active:
+      position = getMousePosition()
+      active = true
+      position.x -= (float)frameWidth div 2
+      position.y -= (float)frameHeight div 2
+      playSound(fxBoom)
+    if active:
+      inc(framesCounter)
+      if framesCounter > 2:
+        inc(currentFrame)
+        if currentFrame >= NUM_FRAMES_PER_LINE:
+          currentFrame = 0
+          inc(currentLine)
+          if currentLine >= NUM_LINES:
+            currentLine = 0
+            active = false
+        framesCounter = 0
+    frameRec.x = (float) frameWidth * currentFrame
+    frameRec.y = (float) frameHeight * currentLine
+    ## ----------------------------------------------------------------------------------
+    ##  Draw
+    ## ----------------------------------------------------------------------------------
+    beginDrawing()
+    clearBackground(Raywhite)
+    ##  Draw explosion requiRed frame rectangle
+    if active:
+      drawTextureRec(explosion, frameRec, position, White)
+    endDrawing()
+  ## ----------------------------------------------------------------------------------
+  ##  De-Initialization
+  ## --------------------------------------------------------------------------------------
+  unloadTexture(explosion)
+  ##  Unload texture
+  unloadSound(fxBoom)
+  ##  Unload sound
+  closeAudioDevice()
+  closeWindow()
+  ##  Close window and OpenGL context
+  ## --------------------------------------------------------------------------------------
+
+
+block textures_srcrec_dstrec:
+  # ******************************************************************************************
+  #
+  #    raylib [textures] example - Texture source and destination rectangles
+  #
+  #    This example has been created using raylib 1.3 (www.raylib.com)
+  #    raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+  #
+  #    Copyright (c) 2015 Ramon Santamaria (@raysan5)
+  #    Converted in 2021 by greenfork
+  #
+  # ******************************************************************************************
+
+
+  ##  Initialization
+  ## --------------------------------------------------------------------------------------
+  var screenWidth = 800
+  var screenHeight = 450
+  initWindow(screenWidth, screenHeight, "raylib [textures] examples - texture source and destination rectangles")
+  ##  NOTE: Textures MUST be loaded after Window initialization (OpenGL context is requiRed)
+  var scarfy: Texture2D = loadTexture("resources/scarfy.png")
+  ##  Texture loading
+  var frameWidth = scarfy.width div 6
+  var frameHeight = scarfy.height
+  ##  Source rectangle (part of the texture to use for drawing)
+  var sourceRec: Rectangle = (0.0, 0.0, frameWidth.float, frameHeight.float)
+  ##  Destination rectangle (screen rectangle where drawing part of texture)
+  var destRec: Rectangle = ((float)screenWidth div 2, (float)screenHeight div 2, (float)frameWidth * 2,
+                        (float)frameHeight * 2)
+  ##  Origin of the texture (rotation/scale point), it's relative to destination rectangle size
+  var origin: Vector2 = (frameWidth.float, frameHeight.float)
+  var rotation = 0
+  setTargetFPS(60)
+  ## --------------------------------------------------------------------------------------
+  ##  Main game loop
+  while not windowShouldClose(): ##  Detect window close button or ESC key
+    ##  Update
+    ## ----------------------------------------------------------------------------------
+    inc(rotation)
+    ## ----------------------------------------------------------------------------------
+    ##  Draw
+    ## ----------------------------------------------------------------------------------
+    beginDrawing()
+    clearBackground(Raywhite)
+    ##  NOTE: Using DrawTexturePro() we can easily rotate and scale the part of the texture we draw
+    ##  sourceRec defines the part of the texture we use for drawing
+    ##  destRec defines the rectangle where our texture part will fit (scaling it to fit)
+    ##  origin defines the point of the texture used as reference for rotation and scaling
+    ##  rotation defines the texture rotation (using origin as rotation point)
+    drawTexturePro(scarfy, sourceRec, destRec, origin, rotation.float, White)
+    drawLine(destRec.x.int, 0, destRec.x.int, screenHeight, Gray)
+    drawLine(0, destRec.y.int, screenWidth, destRec.y.int, Gray)
+    drawText("(c) Scarfy sprite by Eiden Marsal", screenWidth - 200,
+             screenHeight - 20, 10, Gray)
+    endDrawing()
+  ## ----------------------------------------------------------------------------------
+  ##  De-Initialization
+  ## --------------------------------------------------------------------------------------
+  unloadTexture(scarfy)
+  ##  Texture unloading
+  closeWindow()
+  ##  Close window and OpenGL context
+  ## --------------------------------------------------------------------------------------
+
+
+block textures_to_image:
+  # ******************************************************************************************
+  #
+  #    raylib [textures] example - Retrieve image data from texture: GetTextureData()
+  #
+  #    NOTE: Images are loaded in CPU memory (RAM); textures are loaded in GPU memory (VRAM)
+  #
+  #    This example has been created using raylib 1.3 (www.raylib.com)
+  #    raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+  #
+  #    Copyright (c) 2015 Ramon Santamaria (@raysan5)
+  #    Converted in 2021 by greenfork
+  #
+  # ******************************************************************************************
+
+
+  ##  Initialization
+  ## --------------------------------------------------------------------------------------
+  var screenWidth = 800
+  var screenHeight = 450
+  initWindow(screenWidth, screenHeight,
+             "raylib [textures] example - texture to image")
+  ##  NOTE: Textures MUST be loaded after Window initialization (OpenGL context is requiRed)
+  var image: Image = loadImage("resources/raylib_logo.png")
+  ##  Load image data into CPU memory (RAM)
+  var texture: Texture2D = loadTextureFromImage(image)
+  ##  Image converted to texture, GPU memory (RAM -> VRAM)
+  unloadImage(image)
+  ##  Unload image data from CPU memory (RAM)
+  image = getTextureData(texture)
+  ##  Retrieve image data from GPU memory (VRAM -> RAM)
+  unloadTexture(texture)
+  ##  Unload texture from GPU memory (VRAM)
+  texture = loadTextureFromImage(image)
+  ##  Recreate texture from retrieved image data (RAM -> VRAM)
+  unloadImage(image)
+  ##  Unload retrieved image data from CPU memory (RAM)
+  ## ---------------------------------------------------------------------------------------
+  ##  Main game loop
+  while not windowShouldClose(): ##  Detect window close button or ESC key
+    ##  Update
+    ## ----------------------------------------------------------------------------------
+    ##  TODO: Update your variables here
+    ## ----------------------------------------------------------------------------------
+    ##  Draw
+    ## ----------------------------------------------------------------------------------
+    beginDrawing()
+    clearBackground(Raywhite)
+    drawTexture(texture, screenWidth div 2 - texture.width div 2,
+                screenHeight div 2 - texture.height div 2, White)
+    drawText("this IS a texture loaded from an image!", 300, 370, 10, Gray)
+    endDrawing()
+  ## ----------------------------------------------------------------------------------
+  ##  De-Initialization
+  ## --------------------------------------------------------------------------------------
+  unloadTexture(texture)
+  ##  Texture unloading
+  closeWindow()
+  ##  Close window and OpenGL context
+  ## --------------------------------------------------------------------------------------
 
 
