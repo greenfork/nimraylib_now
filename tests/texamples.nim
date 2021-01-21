@@ -729,12 +729,11 @@ block core_2d_camera_platformer:
     var minEffectLength = 10.0
     var fractionSpeed = 0.8
     camera.offset = (x: width/2, y: height/2);
-    var diff: Vector2 = vector2Subtract(player.position, camera.target)
-    var length = vector2Length(diff)
+    var diff: Vector2 = subtract(player.position, camera.target)
+    var length = length(diff)
     if length > minEffectLength:
       var speed = max(fractionSpeed * length, minSpeed)
-      camera.target = vector2Add(camera.target,
-                               vector2Scale(diff, speed * delta / length))
+      camera.target = add(camera.target, scale(diff, speed * delta / length))
 
   var eveningOut = false
   var evenOutTarget: float
@@ -1636,16 +1635,16 @@ block core_quat_conversion:
       v1.y -= PI * 2
     if v1.z > PI * 2:
       v1.z -= PI * 2
-    q1 = quaternionFromEuler(v1.x, v1.y, v1.z)
-    m1 = matrixRotateZYX(v1)
-    m2 = quaternionToMatrix(q1)
-    q1 = quaternionFromMatrix(m1)
-    m3 = quaternionToMatrix(q1)
-    v2 = quaternionToEuler(q1)
+    q1 = fromEuler(v1.x, v1.y, v1.z)
+    m1 = rotateZYX(v1)
+    m2 = toMatrix(q1)
+    q1 = fromMatrix(m1)
+    m3 = toMatrix(q1)
+    v2 = toEuler(q1)
     v2.x = degToRad v2.x
     v2.y = degToRad v2.y
     v2.z = degToRad v2.z
-    m4 = matrixRotateZYX(v2)
+    m4 = rotateZYX(v2)
     ## --------------------------------------------------------------------------------------
     ##  Draw
     ## ----------------------------------------------------------------------------------

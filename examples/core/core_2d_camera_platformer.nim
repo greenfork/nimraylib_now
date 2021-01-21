@@ -198,12 +198,11 @@ proc updateCameraCenterSmoothFollow(camera: var Camera2D; player: var Player;
   var minEffectLength = 10.0
   var fractionSpeed = 0.8
   camera.offset = (x: width/2, y: height/2);
-  var diff: Vector2 = vector2Subtract(player.position, camera.target)
-  var length = vector2Length(diff)
+  var diff: Vector2 = subtract(player.position, camera.target)
+  var length = length(diff)
   if length > minEffectLength:
     var speed = max(fractionSpeed * length, minSpeed)
-    camera.target = vector2Add(camera.target,
-                             vector2Scale(diff, speed * delta / length))
+    camera.target = add(camera.target, scale(diff, speed * delta / length))
 
 var eveningOut = false
 var evenOutTarget: float

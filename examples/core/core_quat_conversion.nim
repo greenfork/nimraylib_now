@@ -60,16 +60,16 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
     v1.y -= PI * 2
   if v1.z > PI * 2:
     v1.z -= PI * 2
-  q1 = quaternionFromEuler(v1.x, v1.y, v1.z)
-  m1 = matrixRotateZYX(v1)
-  m2 = quaternionToMatrix(q1)
-  q1 = quaternionFromMatrix(m1)
-  m3 = quaternionToMatrix(q1)
-  v2 = quaternionToEuler(q1)
+  q1 = fromEuler(v1.x, v1.y, v1.z)
+  m1 = rotateZYX(v1)
+  m2 = toMatrix(q1)
+  q1 = fromMatrix(m1)
+  m3 = toMatrix(q1)
+  v2 = toEuler(q1)
   v2.x = degToRad v2.x
   v2.y = degToRad v2.y
   v2.z = degToRad v2.z
-  m4 = matrixRotateZYX(v2)
+  m4 = rotateZYX(v2)
   ## --------------------------------------------------------------------------------------
   ##  Draw
   ## ----------------------------------------------------------------------------------

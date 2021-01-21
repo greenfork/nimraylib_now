@@ -386,6 +386,8 @@ converter toInt*(self: cint): int = self.int
       # beginScissorMode*(x: cint; y: cint; width: cint; height: cint)
       reArgumentType = re": [[:word:]]+;"
       reArgumentTypeEnd = re": [[:word:]]+\)"
+      # proc vector2Zero*(
+      reMathTypeProc = re"^proc ((vector[23]|matrix|quaternion)[^*]+)\*.*"
     let
       raylibnim = readFile(buildDir/fmt"{filename}_modified.nim")
       # Digression from how compiler defines it, used for Color
@@ -433,6 +435,19 @@ converter toInt*(self: cint): int = self.int
         else:
           assert false, "regex for begin proc didn't work:\n" & nextTwentyLines
         rs.add line & "\n"
+        i.inc
+      elif filename == "raymath" and line.match(reMathTypeProc, m):
+        let
+          procName = m.groupFirstCapture(0, line)
+          mathType = m.groupFirstCapture(1, line)
+        if procName in ["vector2Zero", "vector3Zero", "vector2One", "vector3One",
+                        "matrixIdentity", "quaternionIdentity"]:
+          # These procs take no arguments and hence can't be overloaded.
+          rs.add line & "\n"
+        else:
+          var newProcName = procName[mathType.len..^1]
+          newProcName[0] = newProcName[0].toLowerAscii
+          rs.add line.replace(procName, newProcName) & "\n"
         i.inc
       else:
         rs.add line & "\n"
