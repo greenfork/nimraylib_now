@@ -2774,6 +2774,7 @@ converter CameraModeToInt*(self: CameraMode): cint = self.cint
 converter CameraTypeToInt*(self: CameraType): cint = self.cint
 converter NPatchTypeToInt*(self: NPatchType): cint = self.cint
 
+
 converter tupleToColor*(self: tuple[r,g,b,a: int]): Color =
   Color(r: self.r.uint8, g: self.g.uint8, b: self.b.uint8, a: self.a.uint8)
 
@@ -2807,7 +2808,6 @@ converter tupleToRectangle*(self: tuple[x,y,width,height: float]): Rectangle =
 
 converter toCint*(self: int): cint = self.cint
 converter toInt*(self: cint): int = self.int
-
 template beginDrawing*(body: untyped) =
   beginDrawing()
   block:

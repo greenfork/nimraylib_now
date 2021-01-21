@@ -325,6 +325,16 @@ if isKeyDown(Right):             # can be guessed, no need for KeyboardKey.Right
 if KeyboardKey.Right.isKeyDown:  # cannot be guessed
 ```
 
+### Raymath infix operators
+You can use infix operators like `+`, `-`, `*`, `/` for operations on vectors,
+matrices and quaternions:
+```nim
+let
+  v1 = Vector3(x: 5, y: 2, z: 1)
+  v2 = Vector3(x: 3, y: 0, z: 0)
+assert v1 - v2 == Vector3(x: 2.0, y: 2.0, z: 1.0)
+```
+
 ## How wrapping works
 
 `nimble convert` runs `src/converter.nim` script and checks that the resulting

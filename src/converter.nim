@@ -378,6 +378,29 @@ converter tupleToRectangle*(self: tuple[x,y,width,height: float]): Rectangle =
 converter toCint*(self: int): cint = self.cint
 converter toInt*(self: cint): int = self.int
 """
+      raymathShortcuts = """
+template `+`*[T: Vector2 | Vector3 | Quaternion | Matrix](v1, v2: T): T = add(v1, v2)
+template `+=`*[T: Vector2 | Vector3 | Quaternion | Matrix](v1: var T, v2: T) = v1 = add(v1, v2)
+template `+`*[T: Vector2 | Vector3 | Quaternion](v1: T, value: cfloat): T = addValue(v1, value)
+template `+=`*[T: Vector2 | Vector3 | Quaternion](v1: var T, value: cfloat) = v1 = addValue(v1, value)
+
+template `-`*[T: Vector2 | Vector3 | Quaternion | Matrix](v1, v2: T): T = subtract(v1, v2)
+template `-=`*[T: Vector2 | Vector3 | Quaternion | Matrix](v1: var T, v2: T) = v1 = subtract(v1, v2)
+template `-`*[T: Vector2 | Vector3 | Quaternion](v1: T, value: cfloat): T = subtractValue(v1, value)
+template `-=`*[T: Vector2 | Vector3 | Quaternion](v1: var T, value: cfloat) = v1 = subtractValue(v1, value)
+
+template `*`*[T: Vector2 | Vector3 | Quaternion | Matrix](v1, v2: T): T = multiply(v1, v2)
+template `*=`*[T: Vector2 | Vector3 | Quaternion | Matrix](v1: var T, v2: T) = v1 = multiply(v1, v2)
+template `*`*[T: Vector2 | Vector3 | Quaternion](v1: T, value: cfloat): T = scale(v1, value)
+template `*=`*[T: Vector2 | Vector3 | Quaternion](v1: var T, value: cfloat) = v1 = scale(v1, value)
+
+template `/`*[T: Vector2 | Vector3 | Quaternion | Matrix](v1, v2: T): T = divide(v1, v2)
+template `/=`*[T: Vector2 | Vector3 | Quaternion | Matrix](v1: var T, v2: T) = v1 = divide(v1, v2)
+template `/`*[T: Vector2 | Vector3 | Quaternion](v1: T, value: cfloat): T = scale(v1, 1.0/value)
+template `/=`*[T: Vector2 | Vector3 | Quaternion](v1: var T, value: cfloat) = v1 = scale(v1, 1.0/value)
+
+template `-`*[T: Vector2 | Vector3](v1: T): T = negate(v1)
+"""
 
       # proc beginTextureMode*(target: RenderTexture2D) {.cdecl,
       #     importc: "BeginTextureMode", header: raylibHeader.}
@@ -442,7 +465,7 @@ converter toInt*(self: cint): int = self.int
           mathType = m.groupFirstCapture(1, line)
         if procName in ["vector2Zero", "vector3Zero", "vector2One", "vector3One",
                         "matrixIdentity", "quaternionIdentity"]:
-          # These procs take no arguments and hence can't be overloaded.
+          # Some procs take no arguments and hence can't be overloaded.
           rs.add line & "\n"
         else:
           var newProcName = procName[mathType.len..^1]
@@ -453,10 +476,13 @@ converter toInt*(self: cint): int = self.int
         rs.add line & "\n"
         i.inc
     if filename == "raylib":
+      rs.add "\n"
       rs.add tupleConverters
       rs.add "\n"
       rs.add cTypeConverters
+    if filename == "raymath":
       rs.add "\n"
+      rs.add raymathShortcuts
     # Add begin-end templates
     for (beginSignature, endProcName) in beginEndPairs:
       let
