@@ -146,6 +146,8 @@ const rlglHeader = currentSourcePath().parentDir()/"rlgl.h"
 #  cdecl
 #  nep1
 #  skipinclude
+#  mangle float3 Float3
+#  mangle float16 Float16
 #@
 import raylib
 

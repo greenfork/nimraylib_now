@@ -55,10 +55,10 @@ const raymathHeader = currentSourcePath().parentDir()/"raymath.h"
 ##  NOTE: Helper types to be used instead of array return types for *ToFloat functions
 
 type
-  float3* {.importc: "float3", header: raymathHeader, bycopy.} = object
+  Float3* {.importc: "float3", header: raymathHeader, bycopy.} = object
     v* {.importc: "v".}: array[3, cfloat]
 
-  float16* {.importc: "float16", header: raymathHeader, bycopy.} = object
+  Float16* {.importc: "float16", header: raymathHeader, bycopy.} = object
     v* {.importc: "v".}: array[16, cfloat]
 
 
@@ -273,7 +273,7 @@ proc vector3Barycenter*(p: Vector3; a: Vector3; b: Vector3; c: Vector3): Vector3
     cdecl, importc: "Vector3Barycenter", header: raymathHeader.}
 ##  Returns Vector3 as float array
 
-proc vector3ToFloatV*(v: Vector3): float3 {.inline, cdecl, importc: "Vector3ToFloatV",
+proc vector3ToFloatV*(v: Vector3): Float3 {.inline, cdecl, importc: "Vector3ToFloatV",
                                         header: raymathHeader.}
 ## ----------------------------------------------------------------------------------
 ##  Module Functions Definition - Matrix math
@@ -371,7 +371,7 @@ proc matrixLookAt*(eye: Vector3; target: Vector3; up: Vector3): Matrix {.inline,
     importc: "MatrixLookAt", header: raymathHeader.}
 ##  Returns float array of matrix data
 
-proc matrixToFloatV*(mat: Matrix): float16 {.inline, cdecl, importc: "MatrixToFloatV",
+proc matrixToFloatV*(mat: Matrix): Float16 {.inline, cdecl, importc: "MatrixToFloatV",
     header: raymathHeader.}
 ## ----------------------------------------------------------------------------------
 ##  Module Functions Definition - Quaternion math
