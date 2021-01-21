@@ -228,6 +228,25 @@ proc begin*(mode: cint)
 Although some definitions may have names like `FULLSCREEN_MODE`, you can still
 use them (and encouraged to) as `FullscreenMode` in code.
 
+### Raymath
+
+All prefixes specific to types were omitted where possible:
+```c
+Vector2 Vector2Zero(void)
+Vector3 Vector3Zero(void)
+
+Vector2 Vector2Add(Vector2 v1, Vector2 v2)
+Vector3 Vector3Add(Vector3 v1, Vector3 v2)
+```
+to
+```nim
+proc vector2Zero*(): Vector2
+proc vector3Zero*(): Vector3
+
+proc add*(v1: Vector2; v2: Vector2): Vector2
+proc add*(v1: Vector3; v2: Vector3): Vector3
+```
+
 ## Passing values by addresses
 **BE VERY CAREFUL** with values which are passed as addresses, **always** convert
 them to approapriate C-compatible types:
@@ -402,6 +421,17 @@ Then workflow is as follows:
 1. Change `src/converter.nim` file
 2. Run `nimble convert` and see if you achieved desired changes
 3. Run `nimble testExamples` to see that all examples are still compiled
+
+## Troubleshooting
+### Freezes on Wayland
+Random freezes when everything stops being responsive can be caused by glfw
+compiled against Wayland library. Try X11 version of glfw.
+
+[GLFW] is a raylib dependency that was installed by your package manager, you
+can uninstall raylib with clearing all of its dependencies and install it again
+choosing X11 version of glfw.
+
+[GLFW]: https://www.glfw.org/
 
 ## Thanks
 
