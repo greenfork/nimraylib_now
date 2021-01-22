@@ -411,6 +411,26 @@ template `-`*[T: Vector2 | Vector3](v1: T): T = negate(v1)
       reArgumentTypeEnd = re": [[:word:]]+\)"
       # proc vector2Zero*(
       reMathTypeProc = re"^proc ((vector[23]|matrix|quaternion)[^*]+)\*.*"
+
+      # These cannot be determined automatically, only through manual inspection.
+      uncheckedArrayReplacements = [
+        # In Shader
+        ("locs* {.importc: \"locs\".}: ptr cint",
+         "locs* {.importc: \"locs\".}: ptr UncheckedArray[cint]"),
+        # In Material
+        ("maps* {.importc: \"maps\".}: ptr MaterialMap",
+         "maps* {.importc: \"maps\".}: ptr UncheckedArray[MaterialMap]"),
+        # In Model
+        ("meshes* {.importc: \"meshes\".}: ptr Mesh",
+         "meshes* {.importc: \"meshes\".}: ptr UncheckedArray[Mesh]"),
+        ("materials* {.importc: \"materials\".}: ptr Material",
+         "materials* {.importc: \"materials\".}: ptr UncheckedArray[Material]"),
+        ("meshMaterial* {.importc: \"meshMaterial\".}: ptr cint",
+         "meshMaterial* {.importc: \"meshMaterial\".}: ptr UncheckedArray[cint]"),
+        # In ModelAnimation
+        ("framePoses* {.importc: \"framePoses\".}: ptr ptr Transform",
+         "framePoses* {.importc: \"framePoses\".}: ptr UncheckedArray[ptr Transform]"),
+      ]
     let
       raylibnim = readFile(buildDir/fmt"{filename}_modified.nim")
       # Digression from how compiler defines it, used for Color
@@ -426,11 +446,8 @@ template `-`*[T: Vector2 | Vector3](v1: T): T = negate(v1)
     while i < raylibnimLines.len:
       var line = raylibnimLines[i]
 
-      # Fix c2nim --nep1 flag working not as intended
-      # if "physicsBodyData" in line:
-      #   line = line.replace("physicsBodyData", "PhysicsBodyData")
-      if "max_Vertices" in line:
-        line = line.replace("max_Vertices", "MAX_VERTICES")
+      line = line.replace("max_Vertices", "MAX_VERTICES")
+      line = line.multiReplace(uncheckedArrayReplacements)
 
       if "{.size: sizeof(cint).} = enum" in line: # add `pure` pragma to enums
         line = line.replace(

@@ -312,7 +312,7 @@ type
 type
   Shader* {.importc: "Shader", header: raylibHeader, bycopy.} = object
     id* {.importc: "id".}: cuint ##  Shader program id
-    locs* {.importc: "locs".}: ptr cint ##  Shader locations array (MAX_SHADER_LOCATIONS)
+    locs* {.importc: "locs".}: ptr UncheckedArray[cint] ##  Shader locations array (MAX_SHADER_LOCATIONS)
 
 
 ##  Material texture map
@@ -329,7 +329,7 @@ type
 type
   Material* {.importc: "Material", header: raylibHeader, bycopy.} = object
     shader* {.importc: "shader".}: Shader ##  Material shader
-    maps* {.importc: "maps".}: ptr MaterialMap ##  Material maps array (MAX_MATERIAL_MAPS)
+    maps* {.importc: "maps".}: ptr UncheckedArray[MaterialMap] ##  Material maps array (MAX_MATERIAL_MAPS)
     params* {.importc: "params".}: ptr cfloat ##  Material generic parameters (if required)
 
 
@@ -357,9 +357,9 @@ type
     transform* {.importc: "transform".}: Matrix ##  Local transform matrix
     meshCount* {.importc: "meshCount".}: cint ##  Number of meshes
     materialCount* {.importc: "materialCount".}: cint ##  Number of materials
-    meshes* {.importc: "meshes".}: ptr Mesh ##  Meshes array
-    materials* {.importc: "materials".}: ptr Material ##  Materials array
-    meshMaterial* {.importc: "meshMaterial".}: ptr cint ##  Mesh material number
+    meshes* {.importc: "meshes".}: ptr UncheckedArray[Mesh] ##  Meshes array
+    materials* {.importc: "materials".}: ptr UncheckedArray[Material] ##  Materials array
+    meshMaterial* {.importc: "meshMaterial".}: ptr UncheckedArray[cint] ##  Mesh material number
                                                    ##  Animation data
     boneCount* {.importc: "boneCount".}: cint ##  Number of bones
     bones* {.importc: "bones".}: ptr BoneInfo ##  Bones information (skeleton)
@@ -373,7 +373,7 @@ type
     boneCount* {.importc: "boneCount".}: cint ##  Number of bones
     frameCount* {.importc: "frameCount".}: cint ##  Number of animation frames
     bones* {.importc: "bones".}: ptr BoneInfo ##  Bones information (skeleton)
-    framePoses* {.importc: "framePoses".}: ptr ptr Transform ##  Poses array by frame
+    framePoses* {.importc: "framePoses".}: ptr UncheckedArray[ptr Transform] ##  Poses array by frame
 
 
 ##  Ray type (useful for raycast)
