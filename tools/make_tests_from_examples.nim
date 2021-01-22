@@ -28,6 +28,7 @@ const testTemplate =
   "import lenientops, math, times, strformat, atomics, system/ansi_c\n" &
   "import ../../src/nimraylib_now/[raylib, raygui, raymath, physac]\n" &
   "from ../../src/nimraylib_now/rlgl as rl import nil\n" &
+  "import ../examples/shaders/rlights\n" &
   "\n"
 
 # Create one big megatest
@@ -36,6 +37,8 @@ removeFile(testFilename)
 var texamples = testTemplate
 for category in exampleCategories:
   for example in walkFiles(examplesDir/category/"*.nim"):
+    if example.endsWith("rlights.nim"): continue
+
     texamples.add "block " & example.lastPathPart.replace(".nim", "") & ":\n"
     for line in example.lines:
       if not line.startsWith("import") and not line.startsWith("from"):
