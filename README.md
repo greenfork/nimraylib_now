@@ -443,6 +443,14 @@ choosing X11 version of glfw.
 
 [GLFW]: https://www.glfw.org/
 
+### Windows error: The application was unable to start correctly (0x00000007b)
+Or similar errors which point to missing `libwinpthread-1.dll` file mean that
+you do not have path set correctly and MinGW can't find correct library files.
+
+Make sure to include MinGW's bin folder in your PATH. The path to MinGW's bin
+folder looks something like this by default:
+`C:\Program Files\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin`.
+
 ## Thanks
 
 Many thanks to V.A. Guevara for the efforts on [Raylib-Forever] library which
