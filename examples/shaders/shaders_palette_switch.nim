@@ -76,14 +76,14 @@ const screenHeight = 450
 
 initWindow screenWidth, screenHeight, "raylib [shaders] example - color palette switch"
 
-#  Load shader to be used on some parts drawing
-#  NOTE 1: Using GLSL 330 shader version, on OpenGL ES 2.0 use GLSL 100 shader version
-#  NOTE 2: Defining 0 (NULL) for vertex shader forces usage of internal default vertex shader
 let
-    shader = loadShader(nil, textFormat("resources/shaders/glsl%i/palette_switch.fs", GLSL_VERSION))
-#  Get variable (uniform) location on the shader to connect with the program
-#  NOTE: If uniform variable could not be found in the shader, function returns -1
-    paletteLoc = getShaderLocation(shader, "palette")
+  # Load shader to be used on some parts drawing
+  # NOTE 1: Using GLSL 330 shader version, on OpenGL ES 2.0 use GLSL 100 shader version
+  # NOTE 2: Defining 0 (NULL) for vertex shader forces usage of internal default vertex shader
+  shader = loadShader(nil, textFormat("resources/shaders/glsl%i/palette_switch.fs", GLSL_VERSION))
+  # Get variable (uniform) location on the shader to connect with the program
+  # NOTE: If uniform variable could not be found in the shader, function returns -1
+  paletteLoc = getShaderLocation(shader, "palette")
 
 var currentPalette = 0
 let lineHeight = screenHeight div COLORS_PER_PALETTE
@@ -107,26 +107,18 @@ while not windowShouldClose():         #  Detect window close button or ESC key
 
     #  Draw
     # ----------------------------------------------------------------------------------
-    beginDrawing()
+    beginDrawing:
+      clearBackground RAYWHITE
+      beginShaderMode(shader):
+        for i in 0..<COLORS_PER_PALETTE:
+            #  Draw horizontal screen-wide rectangles with increasing "palette index"
+            #  The used palette index is encoded in the RGB components of the pixel
+            drawRectangle 0.int32, (int32)lineHeight*i, getScreenWidth(), lineHeight.int32, (r: i, g: i, b: i, a: 255)
+      drawText "< >", 10, 10, 30, DARKBLUE
+      drawText "CURRENT PALETTE:", 60, 15, 20, RAYWHITE
+      drawText paletteText[currentPalette], 300, 15, 20, RED
 
-    clearBackground RAYWHITE
-
-    beginShaderMode shader
-
-    for i in 0..<COLORS_PER_PALETTE:
-        #  Draw horizontal screen-wide rectangles with increasing "palette index"
-        #  The used palette index is encoded in the RGB components of the pixel
-        drawRectangle 0.int32, (int32)lineHeight*i, getScreenWidth(), lineHeight.int32, (r: i, g: i, b: i, a: 255)
-
-    endShaderMode()
-
-    drawText "< >", 10, 10, 30, DARKBLUE
-    drawText "CURRENT PALETTE:", 60, 15, 20, RAYWHITE
-    drawText paletteText[currentPalette], 300, 15, 20, RED
-
-    drawFPS 700, 15
-
-    endDrawing()
+      drawFPS 700, 15
     # ----------------------------------------------------------------------------------
 
 #  De-Initialization
