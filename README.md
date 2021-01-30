@@ -25,7 +25,7 @@ Use this library if you want to write games using [Raylib] in [Nim].
 
 ## Install Raylib
 ### Windows
-Download latest library from [releases] page for MinGW compiler, for version 3.5.0
+Download latest library from [raylib releases] page for MinGW compiler, for version 3.5.0
 the name is `raylib-3.5.0_win64_mingw-w64.zip`. Extract it and **make sure**
 that files `libraylibdll.a` and `raylib.dll` are always in the same directory
 as your game `.exe` file.
@@ -36,7 +36,7 @@ Use your package manager, for example for Arch Linux:
 $ sudo pacman -Syu raylib
 ```
 
-Alternatively download latest library from [releases] page, for version 3.5.0
+Alternatively download latest library from [raylib releases] page, for version 3.5.0
 the name is `raylib-3.5.0_linux_amd64.tar.gz`. Extract it and put all `.so`
 files into `/usr/local/lib`.
 
@@ -46,7 +46,7 @@ With brew package manager:
 $ brew install raylib
 ```
 
-Alternatively download latest library from [releases] page, for version 3.5.0
+Alternatively download latest library from [raylib releases] page, for version 3.5.0
 the name is `raylib-3.5.0_macos.tar.gz`. Extract it and put all `.dylib`
 files into `/usr/local/lib`.
 
@@ -61,7 +61,7 @@ Or put it into your `.nimble` file:
 requires "nimraylib_now"
 ```
 
-[releases]: https://github.com/greenfork/nimraylib_now/releases
+[raylib releases]: https://github.com/raysan5/raylib/releases
 [fix]: https://github.com/nim-lang/nimble/pull/886
 
 ## How to use
