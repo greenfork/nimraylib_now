@@ -46,7 +46,7 @@ while not windowShouldClose():      #  Detect window close button or ESC key
 
   if MouseButton.LeftButton.isMouseButtonPressed():
     if not collision:
-      let ray = getMouseRay(getMousePosition(), camera);
+      ray = getMouseRay(getMousePosition(), camera);
 
       #  Check collision between ray and box
       collision = checkCollisionRayBox(
