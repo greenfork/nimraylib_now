@@ -27,6 +27,17 @@ for file in filesToConvert:
   copyFileToDir(file, buildDir)
   copyFileToDir(file, targetDir)
 
+# Insert fix for windows.h file
+
+block windowshFix:
+  const
+    windowshFixFile = targetDir/"windows_conflict_fix.h"
+    raylibhFile = targetDir/"raylib.h"
+  let
+    windowshFixContent = readFile(windowshFixFile)
+    raylibhContent = readFile(raylibhFile)
+  raylibhFile.writeFile(windowshFixContent & raylibhContent)
+
 
 # Parse files to (((Nim))) wrappers
 
