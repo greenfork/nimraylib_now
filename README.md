@@ -51,7 +51,8 @@ the name is `raylib-3.5.0_macos.tar.gz`. Extract it and put all `.dylib`
 files into `/usr/local/lib`.
 
 ## Install NimraylibNow!
-Install this library with nimble (takes **6-10(!) minutes**, [fix] is on the way):
+Install this library with nimble (takes **6-10(!) minutes** because of huge
+original raylib repository):
 ```shell
 $ nimble install nimraylib_now
 ```
@@ -62,7 +63,6 @@ requires "nimraylib_now"
 ```
 
 [raylib releases]: https://github.com/raysan5/raylib/releases
-[fix]: https://github.com/nim-lang/nimble/pull/886
 
 ## How to use
 
