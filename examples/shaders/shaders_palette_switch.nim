@@ -102,13 +102,13 @@ while not windowShouldClose():         #  Detect window close button or ESC key
 
     #  Send new value to the shader to be used on drawing.
     #  NOTE: We are sending RGB triplets w/o the alpha channel
-    setShaderValueV shader, paletteLoc, palettes[currentPalette].addr, IVEC3, COLORS_PER_PALETTE
+    setShaderValueV shader, paletteLoc, palettes[currentPalette].addr, IVec3, COLORS_PER_PALETTE
     # ----------------------------------------------------------------------------------
 
     #  Draw
     # ----------------------------------------------------------------------------------
     beginDrawing:
-      clearBackground RAYWHITE
+      clearBackground Raywhite
       beginShaderMode(shader):
         for i in 0..<COLORS_PER_PALETTE:
             #  Draw horizontal screen-wide rectangles with increasing "palette index"

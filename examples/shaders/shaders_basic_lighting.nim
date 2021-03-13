@@ -36,10 +36,8 @@ const GLSL_VERSION = 330
 ## --------------------------------------------------------------------------------------
 var screenWidth = 800
 var screenHeight = 450
-setConfigFlags(Msaa_4x_Hint)
-##  Enable Multi Sampling Anti Aliasing 4x (if available)
-initWindow(screenWidth, screenHeight,
-           "raylib [shaders] example - basic lighting")
+setConfigFlags(Msaa_4x_Hint) ##  Enable Multi Sampling Anti Aliasing 4x (if available)
+initWindow(screenWidth, screenHeight, "raylib [shaders] example - basic lighting")
 ##  Define the camera to look into our 3d world
 var camera = Camera()
 camera.position = (2.0, 2.0, 6.0) ##  Camera position
@@ -59,9 +57,10 @@ var texture: Texture = loadTexture("resources/texel_checker.png")
 modelA.materials[0].maps[int(Albedo)].texture = texture
 modelB.materials[0].maps[int(Albedo)].texture = texture
 modelC.materials[0].maps[int(Albedo)].texture = texture
-var shader: Shader = loadShader(textFormat(
-    "resources/shaders/glsl%i/base_lighting.vs", GLSL_VERSION), textFormat(
-    "resources/shaders/glsl%i/lighting.fs", GLSL_VERSION))
+var shader: Shader = loadShader(
+  textFormat("resources/shaders/glsl%i/base_lighting.vs", GLSL_VERSION),
+  textFormat("resources/shaders/glsl%i/lighting.fs", GLSL_VERSION)
+)
 ##  Get some shader locations
 shader.locs[int(Matrix_Model)] = getShaderLocation(shader, "matModel")
 shader.locs[int(Vector_View)] = getShaderLocation(shader, "viewPos")

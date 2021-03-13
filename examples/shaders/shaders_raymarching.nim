@@ -41,13 +41,12 @@ setCameraMode camera, Free                       #  Set camera mode
 #  Load raymarching shader
 #  NOTE: Defining 0 (NULL) for vertex shader forces usage of internal default vertex shader
 let
-    shader = loadShader(nil, textFormat("resources/shaders/glsl%i/raymarching.fs", GLSL_VERSION))
-
-#  Get shader locations for required uniforms
-    viewEyeLoc      = getShaderLocation(shader, "viewEye")
-    viewCenterLoc   = getShaderLocation(shader, "viewCenter")
-    runTimeLoc      = getShaderLocation(shader, "runTime")
-    resolutionLoc   = getShaderLocation(shader, "resolution")
+  shader = loadShader(nil, textFormat("resources/shaders/glsl%i/raymarching.fs", GLSL_VERSION))
+  # Get shader locations for required uniforms
+  viewEyeLoc      = getShaderLocation(shader, "viewEye")
+  viewCenterLoc   = getShaderLocation(shader, "viewCenter")
+  runTimeLoc      = getShaderLocation(shader, "runTime")
+  resolutionLoc   = getShaderLocation(shader, "resolution")
 
 var resolution = [screenWidth.cfloat, screenHeight.cfloat]
 setShaderValue shader, resolutionLoc, resolution.addr, VEC2
