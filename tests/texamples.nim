@@ -1051,7 +1051,7 @@ block core_3d_picking:
 
     if MouseButton.LeftButton.isMouseButtonPressed():
       if not collision:
-        let ray = getMouseRay(getMousePosition(), camera);
+        ray = getMouseRay(getMousePosition(), camera);
 
         #  Check collision between ray and box
         collision = checkCollisionRayBox(
@@ -3335,10 +3335,8 @@ block shaders_basic_lighting:
   ## --------------------------------------------------------------------------------------
   var screenWidth = 800
   var screenHeight = 450
-  setConfigFlags(Msaa_4x_Hint)
-  ##  Enable Multi Sampling Anti Aliasing 4x (if available)
-  initWindow(screenWidth, screenHeight,
-             "raylib [shaders] example - basic lighting")
+  setConfigFlags(Msaa_4x_Hint) ##  Enable Multi Sampling Anti Aliasing 4x (if available)
+  initWindow(screenWidth, screenHeight, "raylib [shaders] example - basic lighting")
   ##  Define the camera to look into our 3d world
   var camera = Camera()
   camera.position = (2.0, 2.0, 6.0) ##  Camera position
@@ -3358,9 +3356,10 @@ block shaders_basic_lighting:
   modelA.materials[0].maps[int(Albedo)].texture = texture
   modelB.materials[0].maps[int(Albedo)].texture = texture
   modelC.materials[0].maps[int(Albedo)].texture = texture
-  var shader: Shader = loadShader(textFormat(
-      "resources/shaders/glsl%i/base_lighting.vs", GLSL_VERSION), textFormat(
-      "resources/shaders/glsl%i/lighting.fs", GLSL_VERSION))
+  var shader: Shader = loadShader(
+    textFormat("resources/shaders/glsl%i/base_lighting.vs", GLSL_VERSION),
+    textFormat("resources/shaders/glsl%i/lighting.fs", GLSL_VERSION)
+  )
   ##  Get some shader locations
   shader.locs[int(Matrix_Model)] = getShaderLocation(shader, "matModel")
   shader.locs[int(Vector_View)] = getShaderLocation(shader, "viewPos")
@@ -3456,6 +3455,594 @@ block shaders_basic_lighting:
   ##  Unload the texture
   unloadShader(shader)
   ##  Unload shader
+  closeWindow()
+  ##  Close window and OpenGL context
+  ## --------------------------------------------------------------------------------------
+
+
+block shaders_custom_uniform:
+  # ******************************************************************************************
+  #
+  #    raylib [shaders] example - Apply a postprocessing shader and connect a custom uniform variable
+  #
+  #    NOTE: This example requires raylib OpenGL 3.3 or ES2 versions for shaders support,
+  #          OpenGL 1.1 does not support shaders, recompile raylib to OpenGL 3.3 version.
+  #
+  #    NOTE: Shaders used in this example are #version 330 (OpenGL 3.3), to test this example
+  #          on OpenGL ES 2.0 platforms (Android, Raspberry Pi, HTML5), use #version 100 shaders
+  #          raylib comes with shaders ready for both versions, check raylib/shaders install folder
+  #
+  #    This example has been created using raylib 1.3 (www.raylib.com)
+  #    raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+  #
+  #    Copyright (c) 2015 Ramon Santamaria (@raysan5)
+  #    Converted in 2021 by greenfork
+  #
+  # ******************************************************************************************
+
+
+  const GLSL_VERSION = 330
+
+  ##  Initialization
+  ## --------------------------------------------------------------------------------------
+  var screenWidth = 800
+  var screenHeight = 450
+  setConfigFlags(Msaa_4x_Hint)
+  ##  Enable Multi Sampling Anti Aliasing 4x (if available)
+  initWindow(screenWidth, screenHeight,
+             "raylib [shaders] example - custom uniform variable")
+  ##  Define the camera to look into our 3d world
+  var camera = Camera()
+  camera.position = (8.0, 8.0, 8.0)
+  camera.target = (0.0, 1.5, 0.0)
+  camera.up = (0.0, 1.0, 0.0)
+  camera.fovy = 45.0
+  camera.`type` = Perspective
+  var model: Model = loadModel("resources/models/barracks.obj")
+  ##  Load OBJ model
+  var texture: Texture2D = loadTexture("resources/models/barracks_diffuse.png")
+  ##  Load model texture (diffuse map)
+  model.materials[0].maps[int(Albedo)].texture = texture
+  ##  Set model diffuse texture
+  var position = Vector3()
+  ##  Set model position
+  ##  Load postprocessing shader
+  ##  NOTE: Defining 0 (NULL) for vertex shader forces usage of internal default vertex shader
+  var shader: Shader = loadShader(nil, textFormat("resources/shaders/glsl%i/swirl.fs",
+      GLSL_VERSION))
+  ##  Get variable (uniform) location on the shader to connect with the program
+  ##  NOTE: If uniform variable could not be found in the shader, function returns -1
+  var swirlCenterLoc = getShaderLocation(shader, "center")
+  var swirlCenter: array[2, cfloat] = [(screenWidth div 2).cfloat, (screenHeight div 2).cfloat]
+  ##  Create a RenderTexture2D to be used for render to texture
+  var target: RenderTexture2D = loadRenderTexture(screenWidth, screenHeight)
+  ##  Setup orbital camera
+  setCameraMode(camera, Orbital)
+  ##  Set an orbital camera mode
+  setTargetFPS(60)
+  ##  Set our game to run at 60 frames-per-second
+  ## --------------------------------------------------------------------------------------
+  ##  Main game loop
+  while not windowShouldClose(): ##  Detect window close button or ESC key
+    ##  Update
+    ## ----------------------------------------------------------------------------------
+    var mousePosition: Vector2 = getMousePosition()
+    swirlCenter[0] = mousePosition.x
+    swirlCenter[1] = screenHeight.float - mousePosition.y
+    ##  Send new value to the shader to be used on drawing
+    setShaderValue(shader, swirlCenterLoc, swirlCenter.addr, Vec2)
+    updateCamera(addr(camera))
+    ##  Update camera
+    ## ----------------------------------------------------------------------------------
+    ##  Draw
+    ## ----------------------------------------------------------------------------------
+    beginDrawing:
+      clearBackground(Raywhite)
+      beginTextureMode(target): ##  Enable drawing to texture
+        clearBackground(Raywhite) ##  Clear texture background
+        beginMode3D(camera): ##  Begin 3d mode drawing
+          drawModel(model, position, 0.5, White) ##  Draw 3d model with texture
+          drawGrid(10, 1.0) ##  Draw a grid
+        ##  End 3d mode drawing, returns to orthographic 2d mode
+        drawText("TEXT DRAWN IN RENDER TEXTURE", 200, 10, 30, Red)
+      ##  End drawing to texture (now we have a texture available for next passes)
+      beginShaderMode(shader):
+        # NOTE: Render texture must be y-flipped due to default OpenGL coordinates (left-bottom)
+        drawTextureRec(
+          target.texture,
+          Rectangle(x: 0, y: 0, width: target.texture.width.float, height: -target.texture.height.float),
+          Vector2(x: 0, y: 0),
+          White
+        )
+      ##  Draw some 2d text over drawn texture
+      drawText("(c) Barracks 3D model by Alberto Cano", screenWidth - 220,
+               screenHeight - 20, 10, Gray)
+      drawFPS(10, 10)
+  ## ----------------------------------------------------------------------------------
+  ##  De-Initialization
+  ## --------------------------------------------------------------------------------------
+  unloadShader(shader)
+  ##  Unload shader
+  unloadTexture(texture)
+  ##  Unload texture
+  unloadModel(model)
+  ##  Unload model
+  unloadRenderTexture(target)
+  ##  Unload render texture
+  closeWindow()
+  ##  Close window and OpenGL context
+  ## --------------------------------------------------------------------------------------
+
+
+block shaders_eratosthenes:
+  # ******************************************************************************************
+  #
+  #    raylib [shaders] example - Sieve of Eratosthenes
+  #
+  #    Sieve of Eratosthenes, the earliest known (ancient Greek) prime number sieve.
+  #
+  #    "Sift the twos and sift the threes,
+  #     The Sieve of Eratosthenes.
+  #     When the multiples subLime,
+  #     the numbers that are left are prime."
+  #
+  #    NOTE: This example requires raylib OpenGL 3.3 or ES2 versions for shaders support,
+  #          OpenGL 1.1 does not support shaders, recompile raylib to OpenGL 3.3 version.
+  #
+  #    NOTE: Shaders used in this example are #version 330 (OpenGL 3.3).
+  #
+  #    This example has been created using raylib 2.5 (www.raylib.com)
+  #    raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+  #
+  #    Example contributed by ProfJski and reviewed by Ramon Santamaria (@raysan5)
+  #
+  #    Copyright (c) 2019 ProfJski and Ramon Santamaria (@raysan5)
+  #    Converted in 2021 by greenfork
+  #
+  # ******************************************************************************************
+
+
+  const GLSL_VERSION = 330
+
+  ##  Initialization
+  ## --------------------------------------------------------------------------------------
+  var screenWidth = 800
+  var screenHeight = 450
+  initWindow(screenWidth, screenHeight,
+             "raylib [shaders] example - Sieve of Eratosthenes")
+  var target: RenderTexture2D = loadRenderTexture(screenWidth, screenHeight)
+  ##  Load Eratosthenes shader
+  ##  NOTE: Defining 0 (NULL) for vertex shader forces usage of internal default vertex shader
+  var shader: Shader = loadShader(nil, textFormat(
+      "resources/shaders/glsl%i/eratosthenes.fs", GLSL_VERSION))
+  setTargetFPS(60)
+  ##  Set our game to run at 60 frames-per-second
+  ## --------------------------------------------------------------------------------------
+  ##  Main game loop
+  while not windowShouldClose(): ##  Detect window close button or ESC key
+    ##  Update
+    ## ----------------------------------------------------------------------------------
+    ##  Nothing to do here, everything is happening in the shader
+    ## ----------------------------------------------------------------------------------
+    ##  Draw
+    ## ----------------------------------------------------------------------------------
+    beginDrawing:
+      clearBackground(Raywhite)
+      beginTextureMode(target):
+        ##  Enable drawing to texture
+        clearBackground(Black)
+        ##  Clear the render texture
+        ##  Draw a rectangle in shader mode to be used as shader canvas
+        ##  NOTE: Rectangle uses font White character texture coordinates,
+        ##  so shader can not be applied here directly because input vertexTexCoord
+        ##  do not represent full screen coordinates (space where want to apply shader)
+        drawRectangle(0, 0, getScreenWidth(), getScreenHeight(), Black)
+      ##  End drawing to texture (now we have a Blank texture available for the shader)
+      beginShaderMode(shader):
+        ##  NOTE: Render texture must be y-flipped due to default OpenGL coordinates (left-bottom)
+        drawTextureRec(
+          target.texture,
+          Rectangle(x: 0, y: 0, width: target.texture.width.float, height: -target.texture.height.float),
+          Vector2(x: 0.0, y: 0.0),
+          White
+        )
+  ## ----------------------------------------------------------------------------------
+  ##  De-Initialization
+  ## --------------------------------------------------------------------------------------
+  unloadShader(shader)
+  ##  Unload shader
+  unloadRenderTexture(target)
+  ##  Unload texture
+  closeWindow()
+  ##  Close window and OpenGL context
+  ## --------------------------------------------------------------------------------------
+
+
+block shaders_fog:
+  # ******************************************************************************************
+  #
+  #    raylib [shaders] example - fog
+  #
+  #    NOTE: This example requires raylib OpenGL 3.3 or ES2 versions for shaders support,
+  #          OpenGL 1.1 does not support shaders, recompile raylib to OpenGL 3.3 version.
+  #
+  #    NOTE: Shaders used in this example are #version 330 (OpenGL 3.3).
+  #
+  #    This example has been created using raylib 2.5 (www.raylib.com)
+  #    raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+  #
+  #    Example contributed by Chris Camacho (@chriscamacho) and reviewed by Ramon Santamaria (@raysan5)
+  #
+  #    Chris Camacho (@chriscamacho -  http://bedroomcoders.co.uk/) notes:
+  #
+  #    This is based on the PBR lighting example, but greatly simplified to aid learning...
+  #    actually there is very little of the PBR example left!
+  #    When I first looked at the bewildering complexity of the PBR example I feaRed
+  #    I would never understand how I could do simple lighting with raylib however its
+  #    a testement to the authors of raylib (including rlights.h) that the example
+  #    came together fairly quickly.
+  #
+  #    Copyright (c) 2019 Chris Camacho (@chriscamacho) and Ramon Santamaria (@raysan5)
+  #    Converted in 2021 by greenfork
+  #
+  # ******************************************************************************************
+
+
+  const GLSL_VERSION = 330
+
+  ##  Initialization
+  ## --------------------------------------------------------------------------------------
+  var screenWidth = 800
+  var screenHeight = 450
+  setConfigFlags(Msaa_4x_Hint)
+  ##  Enable Multi Sampling Anti Aliasing 4x (if available)
+  initWindow(screenWidth, screenHeight, "raylib [shaders] example - fog")
+  ##  Define the camera to look into our 3d world
+  var camera = Camera(
+    position: (2.0, 2.0, 6.0),
+    target: (0.0, 0.5, 0.0),
+    up: (0.0, 1.0, 0.0),
+    fovy: 45.0,
+    type: Perspective
+  )
+  ##  Load models and texture
+  var modelA: Model = loadModelFromMesh(genMeshTorus(0.4, 1.0, 16, 32))
+  var modelB: Model = loadModelFromMesh(genMeshCube(1.0, 1.0, 1.0))
+  var modelC: Model = loadModelFromMesh(genMeshSphere(0.5, 32, 32))
+  var texture: Texture = loadTexture("resources/texel_checker.png")
+  ##  Assign texture to default model material
+  modelA.materials[0].maps[int(Albedo)].texture = texture
+  modelB.materials[0].maps[int(Albedo)].texture = texture
+  modelC.materials[0].maps[int(Albedo)].texture = texture
+  ##  Load shader and set up some uniforms
+  var shader: Shader = loadShader(textFormat(
+      "resources/shaders/glsl%i/base_lighting.vs", GLSL_VERSION), textFormat(
+      "resources/shaders/glsl%i/fog.fs", GLSL_VERSION))
+  shader.locs[int(Matrix_Model)] = getShaderLocation(shader, "matModel")
+  shader.locs[int(Vector_View)] = getShaderLocation(shader, "viewPos")
+  ##  Ambient light level
+  var ambientLoc = getShaderLocation(shader, "ambient")
+  var shaderPosition = [0.2.cfloat, 0.2, 0.2, 1.0]
+  setShaderValue(shader, ambientLoc, shaderPosition.addr, VEC4);
+  var fogDensity: cfloat = 0.15
+  var fogDensityLoc = getShaderLocation(shader, "fogDensity")
+  setShaderValue(shader, fogDensityLoc, addr(fogDensity), Float)
+  ##  NOTE: All models share the same shader
+  modelA.materials[0].shader = shader
+  modelB.materials[0].shader = shader
+  modelC.materials[0].shader = shader
+  ##  Using just 1 point lights
+  discard createLight(LightType.Point, (0.0, 2.0, 6.0), vector3Zero(), White, shader)
+  setCameraMode(camera, Orbital)
+  ##  Set an orbital camera mode
+  setTargetFPS(60)
+  ##  Set our game to run at 60 frames-per-second
+  ## --------------------------------------------------------------------------------------
+  ##  Main game loop
+  while not windowShouldClose(): ##  Detect window close button or ESC key
+    ##  Update
+    ## ----------------------------------------------------------------------------------
+    updateCamera(addr(camera))
+    ##  Update camera
+    if isKeyDown(Up):
+      fogDensity += 0.001
+      if fogDensity > 1.0:
+        fogDensity = 1.0
+    if isKeyDown(Down):
+      fogDensity -= 0.001
+      if fogDensity < 0.0:
+        fogDensity = 0.0
+    setShaderValue(shader, fogDensityLoc, addr(fogDensity), Float)
+    ##  Rotate the torus
+    modelA.transform = modelA.transform * rotateX(-0.025)
+    modelA.transform = modelA.transform * rotateZ(0.012)
+    ##  Update the light shader with the camera view position
+    setShaderValue(shader, shader.locs[int(Vector_View)], addr(camera.position.x), Vec3)
+    ## ----------------------------------------------------------------------------------
+    ##  Draw
+    ## ----------------------------------------------------------------------------------
+    beginDrawing:
+      clearBackground(Gray)
+      beginMode3D(camera):
+        ##  Draw the three models
+        drawModel(modelA, vector3Zero(), 1.0, White)
+        drawModel(modelB, (-2.6, 0.0, 0.0), 1.0, White)
+        drawModel(modelC, (2.6, 0.0, 0.0), 1.0, White)
+        var i = -20
+        while i < 20:
+          drawModel(modelA, (i.float, 0.0, 2.0), 1.0, White)
+          inc(i, 2)
+      drawText(textFormat("Use KEY_UP/KEY_DOWN to change fog density [%.2f]",
+                          fogDensity), 10, 10, 20, Raywhite)
+  ## ----------------------------------------------------------------------------------
+  ##  De-Initialization
+  ## --------------------------------------------------------------------------------------
+  unloadModel(modelA)
+  ##  Unload the model A
+  unloadModel(modelB)
+  ##  Unload the model B
+  unloadModel(modelC)
+  ##  Unload the model C
+  unloadTexture(texture)
+  ##  Unload the texture
+  unloadShader(shader)
+  ##  Unload shader
+  closeWindow()
+  ##  Close window and OpenGL context
+  ## --------------------------------------------------------------------------------------
+
+
+block shaders_hot_reloading:
+  # ******************************************************************************************
+  #
+  #    raylib [shaders] example - Hot reloading
+  #
+  #    NOTE: This example requires raylib OpenGL 3.3 for shaders support and only #version 330
+  #          is currently supported. OpenGL ES 2.0 platforms are not supported at the moment.
+  #
+  #    This example has been created using raylib 3.0 (www.raylib.com)
+  #    raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+  #
+  #    Copyright (c) 2020 Ramon Santamaria (@raysan5)
+  #    Converted in 2021 by greenfork
+  #
+  # ******************************************************************************************
+
+
+  const GLSL_VERSION = 330
+
+  ##  Initialization
+  ## --------------------------------------------------------------------------------------
+  var screenWidth = 800
+  var screenHeight = 450
+  initWindow(screenWidth, screenHeight, "raylib [shaders] example - hot reloading")
+  var fragShaderFileName: cstring = "resources/shaders/glsl%i/reload.fs"
+  var fragShaderFileModTime: clong = getFileModTime(
+      textFormat(fragShaderFileName, GLSL_VERSION))
+  ##  Load raymarching shader
+  ##  NOTE: Defining 0 (NULL) for vertex shader forces usage of internal default vertex shader
+  var shader: Shader = loadShader(nil, textFormat(fragShaderFileName, GLSL_VERSION))
+  ##  Get shader locations for requiRed uniforms
+  var resolutionLoc = getShaderLocation(shader, "resolution")
+  var mouseLoc = getShaderLocation(shader, "mouse")
+  var timeLoc = getShaderLocation(shader, "time")
+  var resolution: array[2, cfloat] = [screenWidth.cfloat, screenHeight.cfloat]
+  setShaderValue(shader, resolutionLoc, resolution.addr, Vec2)
+  var totalTime: cfloat = 0.0
+  var shaderAutoReloading: bool = false
+  setTargetFPS(60)
+  ##  Set our game to run at 60 frames-per-second
+  ## --------------------------------------------------------------------------------------
+  ##  Main game loop
+  while not windowShouldClose(): ##  Detect window close button or ESC key
+    ##  Update
+    ## ----------------------------------------------------------------------------------
+    totalTime += getFrameTime()
+    var mouse: Vector2 = getMousePosition()
+    var mousePos: array[2, cfloat] = [mouse.x, mouse.y]
+    ##  Set shader requiRed uniform values
+    setShaderValue(shader, timeLoc, addr(totalTime), Float)
+    setShaderValue(shader, mouseLoc, mousePos.addr, Vec2)
+    ##  Hot shader reloading
+    if shaderAutoReloading or (isMouseButtonPressed(Left_Button)):
+      var currentFragShaderModTime: clong = getFileModTime(textFormat(fragShaderFileName, GLSL_VERSION))
+      ##  Check if shader file has been modified
+      if currentFragShaderModTime != fragShaderFileModTime:
+        ##  Try reloading updated shader
+        var updatedShader: Shader = loadShader(nil, textFormat(fragShaderFileName, GLSL_VERSION))
+        if updatedShader.id != getShaderDefault().id:
+          unloadShader(shader)
+          shader = updatedShader
+          ##  Get shader locations for requiRed uniforms
+          resolutionLoc = getShaderLocation(shader, "resolution")
+          mouseLoc = getShaderLocation(shader, "mouse")
+          timeLoc = getShaderLocation(shader, "time")
+          ##  Reset requiRed uniforms
+          setShaderValue(shader, resolutionLoc, resolution.addr, Vec2)
+        fragShaderFileModTime = currentFragShaderModTime
+    if isKeyPressed(A):
+      shaderAutoReloading = not shaderAutoReloading
+    beginDrawing:
+      clearBackground(Raywhite)
+      ##  We only draw a White full-screen rectangle, frame is generated in shader
+      beginShaderMode(shader):
+        drawRectangle(0, 0, screenWidth, screenHeight, White)
+      drawText(textFormat("PRESS [A] to TOGGLE SHADER AUTOLOADING: %s",
+                          if shaderAutoReloading: "AUTO" else: "MANUAL"), 10, 10, 10,
+               if shaderAutoReloading: Red else: Black)
+      if not shaderAutoReloading:
+        drawText("MOUSE CLICK to SHADER RE-LOADING", 10, 30, 10, Black)
+      drawText(textFormat("Shader last modification: %s", $fromUnix(fragShaderFileModTime)), 10, 430,
+               10, Black)
+  ## ----------------------------------------------------------------------------------
+  ##  De-Initialization
+  ## --------------------------------------------------------------------------------------
+  unloadShader(shader)
+  ##  Unload shader
+  closeWindow()
+  ##  Close window and OpenGL context
+  ## --------------------------------------------------------------------------------------
+
+
+block shaders_julia_set:
+  # ******************************************************************************************
+  #
+  #    raylib [shaders] example - julia sets
+  #
+  #    NOTE: This example requires raylib OpenGL 3.3 or ES2 versions for shaders support,
+  #          OpenGL 1.1 does not support shaders, recompile raylib to OpenGL 3.3 version.
+  #
+  #    NOTE: Shaders used in this example are #version 330 (OpenGL 3.3).
+  #
+  #    This example has been created using raylib 2.5 (www.raylib.com)
+  #    raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+  #
+  #    Example contributed by eggmund (@eggmund) and reviewed by Ramon Santamaria (@raysan5)
+  #
+  #    Copyright (c) 2019 eggmund (@eggmund) and Ramon Santamaria (@raysan5)
+  #    Converted in 2021 by greenfork
+  #
+  # ******************************************************************************************
+
+
+  const GLSL_VERSION = 330
+
+  ##  A few good julia sets
+  var POINTS_OF_INTEREST: array[6, array[2, cfloat]] = [
+    [-0.348827.cfloat, 0.607167],
+    [-0.786268.cfloat, 0.169728],
+    [-0.8.cfloat, 0.156],
+    [0.285.cfloat, 0.0],
+    [-0.835.cfloat, -0.2321],
+    [-0.7017600000000001.cfloat, -0.3842]
+  ]
+
+
+  ##  Initialization
+  ## --------------------------------------------------------------------------------------
+  var screenWidth = 800
+  var screenHeight = 450
+  initWindow(screenWidth, screenHeight, "raylib [shaders] example - julia sets")
+  ##  Load julia set shader
+  ##  NOTE: Defining 0 (NULL) for vertex shader forces usage of internal default vertex shader
+  var shader: Shader = loadShader(nil, textFormat(
+      "resources/shaders/glsl%i/julia_set.fs", GLSL_VERSION))
+  ##  c constant to use in z^2 + c
+  var c: array[2, cfloat] = [POINTS_OF_INTEREST[0][0], POINTS_OF_INTEREST[0][1]]
+  ##  Offset and zoom to draw the julia set at. (centeRed on screen and default size)
+  var offset: array[2, cfloat] = [-(screenWidth div 2).cfloat, -(screenHeight div 2).cfloat]
+  var zoom: cfloat = 1.0
+  var offsetSpeed = Vector2()
+  ##  Get variable (uniform) locations on the shader to connect with the program
+  ##  NOTE: If uniform variable could not be found in the shader, function returns -1
+  var cLoc = getShaderLocation(shader, "c")
+  var zoomLoc = getShaderLocation(shader, "zoom")
+  var offsetLoc = getShaderLocation(shader, "offset")
+  ##  Tell the shader what the screen dimensions, zoom, offset and c are
+  var screenDims: array[2, cfloat] = [screenWidth.cfloat, screenHeight.cfloat]
+  setShaderValue(shader, getShaderLocation(shader, "screenDims"), screenDims.addr, Vec2)
+  setShaderValue(shader, cLoc, c.addr, Vec2)
+  setShaderValue(shader, zoomLoc, addr(zoom), Float)
+  setShaderValue(shader, offsetLoc, offset.addr, Vec2)
+  ##  Create a RenderTexture2D to be used for render to texture
+  var target: RenderTexture2D = loadRenderTexture(screenWidth, screenHeight)
+  var incrementSpeed = 0
+  ##  Multiplier of speed to change c value
+  var showControls: bool = true
+  ##  Show controls
+  var pause: bool = false
+  ##  Pause animation
+  setTargetFPS(60)
+  ##  Set our game to run at 60 frames-per-second
+  ## --------------------------------------------------------------------------------------
+  ##  Main game loop
+  while not windowShouldClose(): ##  Detect window close button or ESC key
+    ##  Update
+    ## ----------------------------------------------------------------------------------
+    ##  Press [1 - 6] to reset c to a point of interest
+    if isKeyPressed(One) or isKeyPressed(Two) or isKeyPressed(Three) or
+        isKeyPressed(Four) or isKeyPressed(Five) or isKeyPressed(Six):
+      if isKeyPressed(One):
+        c[0] = POINTS_OF_INTEREST[0][0]
+        c[1] = POINTS_OF_INTEREST[0][1]
+      elif isKeyPressed(Two):
+        c[0] = POINTS_OF_INTEREST[1][0]
+        c[1] = POINTS_OF_INTEREST[1][1]
+      elif isKeyPressed(Three):
+        c[0] = POINTS_OF_INTEREST[2][0]
+        c[1] = POINTS_OF_INTEREST[2][1]
+      elif isKeyPressed(Four):
+        c[0] = POINTS_OF_INTEREST[3][0]
+        c[1] = POINTS_OF_INTEREST[3][1]
+      elif isKeyPressed(Five):
+        c[0] = POINTS_OF_INTEREST[4][0]
+        c[1] = POINTS_OF_INTEREST[4][1]
+      elif isKeyPressed(Six):
+        c[0] = POINTS_OF_INTEREST[5][0]
+        c[1] = POINTS_OF_INTEREST[5][1]
+      setShaderValue(shader, cLoc, c.addr, Vec2)
+    if isKeyPressed(Space):
+      pause = not pause
+    if isKeyPressed(F1):
+      showControls = not showControls
+    if not pause:
+      if isKeyPressed(Right):
+        inc(incrementSpeed)
+      elif isKeyPressed(Left): ##  TODO: The idea is to zoom and move around with mouse
+                                 ##  Probably offset movement should be proportional to zoom level
+        dec(incrementSpeed)
+      if isMouseButtonDown(Left_Button) or isMouseButtonDown(Right_Button):
+        if isMouseButtonDown(Left_Button):
+          zoom += zoom*0.003
+        if isMouseButtonDown(Right_Button):
+          zoom -= zoom*0.003
+        var mousePos: Vector2 = getMousePosition()
+        offsetSpeed.x = mousePos.x - (float)(screenWidth div 2)
+        offsetSpeed.y = mousePos.y - (float)(screenHeight div 2)
+        ##  Slowly move camera to targetOffset
+        offset[0] += getFrameTime() * offsetSpeed.x * 0.8
+        offset[1] += getFrameTime() * offsetSpeed.y * 0.8
+      else:
+        offsetSpeed = (0.0, 0.0)
+      setShaderValue(shader, zoomLoc, addr(zoom), Float)
+      setShaderValue(shader, offsetLoc, offset.addr, Vec2)
+      ##  Increment c value with time
+      var amount = getFrameTime() * incrementSpeed.float * 0.0005
+      c[0] += amount
+      c[1] += amount
+      setShaderValue(shader, cLoc, c.addr, Vec2)
+    beginDrawing:
+      clearBackground(Black)
+      ##  Clear the screen of the previous frame.
+      ##  Using a render texture to draw Julia set
+      beginTextureMode(target):
+        ##  Enable drawing to texture
+        clearBackground(Black)
+        ##  Clear the render texture
+        ##  Draw a rectangle in shader mode to be used as shader canvas
+        ##  NOTE: Rectangle uses font White character texture coordinates,
+        ##  so shader can not be applied here directly because input vertexTexCoord
+        ##  do not represent full screen coordinates (space where want to apply shader)
+        drawRectangle(0, 0, getScreenWidth(), getScreenHeight(), Black)
+      ##  Draw the saved texture and rendeRed julia set with shader
+      ##  NOTE: We do not invert texture on Y, already consideRed inside shader
+      beginShaderMode(shader):
+        drawTexture(target.texture, 0, 0, White)
+      if showControls:
+        drawText("Press Mouse buttons right/left to zoom in/out and move", 10, 15,
+                 10, Raywhite)
+        drawText("Press KEY_F1 to toggle these controls", 10, 30, 10, Raywhite)
+        drawText("Press KEYS [1 - 6] to change point of interest", 10, 45, 10,
+                 Raywhite)
+        drawText("Press KEY_LEFT | KEY_RIGHT to change speed", 10, 60, 10, Raywhite)
+        drawText("Press KEY_SPACE to pause movement animation", 10, 75, 10, Raywhite)
+  ## ----------------------------------------------------------------------------------
+  ##  De-Initialization
+  ## --------------------------------------------------------------------------------------
+  unloadShader(shader)
+  ##  Unload shader
+  unloadRenderTexture(target)
+  ##  Unload render texture
   closeWindow()
   ##  Close window and OpenGL context
   ## --------------------------------------------------------------------------------------
@@ -3565,13 +4152,13 @@ block shaders_palette_switch:
 
       #  Send new value to the shader to be used on drawing.
       #  NOTE: We are sending RGB triplets w/o the alpha channel
-      setShaderValueV shader, paletteLoc, palettes[currentPalette].addr, IVEC3, COLORS_PER_PALETTE
+      setShaderValueV shader, paletteLoc, palettes[currentPalette].addr, IVec3, COLORS_PER_PALETTE
       # ----------------------------------------------------------------------------------
 
       #  Draw
       # ----------------------------------------------------------------------------------
       beginDrawing:
-        clearBackground RAYWHITE
+        clearBackground Raywhite
         beginShaderMode(shader):
           for i in 0..<COLORS_PER_PALETTE:
               #  Draw horizontal screen-wide rectangles with increasing "palette index"
@@ -3635,13 +4222,12 @@ block shaders_raymarching:
   #  Load raymarching shader
   #  NOTE: Defining 0 (NULL) for vertex shader forces usage of internal default vertex shader
   let
-      shader = loadShader(nil, textFormat("resources/shaders/glsl%i/raymarching.fs", GLSL_VERSION))
-
-  #  Get shader locations for required uniforms
-      viewEyeLoc      = getShaderLocation(shader, "viewEye")
-      viewCenterLoc   = getShaderLocation(shader, "viewCenter")
-      runTimeLoc      = getShaderLocation(shader, "runTime")
-      resolutionLoc   = getShaderLocation(shader, "resolution")
+    shader = loadShader(nil, textFormat("resources/shaders/glsl%i/raymarching.fs", GLSL_VERSION))
+    # Get shader locations for required uniforms
+    viewEyeLoc      = getShaderLocation(shader, "viewEye")
+    viewCenterLoc   = getShaderLocation(shader, "viewCenter")
+    runTimeLoc      = getShaderLocation(shader, "runTime")
+    resolutionLoc   = getShaderLocation(shader, "resolution")
 
   var resolution = [screenWidth.cfloat, screenHeight.cfloat]
   setShaderValue shader, resolutionLoc, resolution.addr, VEC2
