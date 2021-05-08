@@ -3,6 +3,11 @@
 The most idiomatic and up-to-date wrapper for [Raylib] gaming C library.
 Use this library if you want to write games using [Raylib] in [Nim].
 
+This library is an effort to create an automatically generated wrapper which can
+be easily upgraded to any future version of [Raylib]. Anyone should be able to
+upgrade it with some effort and [HACKING](HACKING.md) should be a guide on how
+to do it. Please file a bug report if any of that is too far from the reality.
+
 [Nim]: https://nim-lang.org/
 
 ## Features
@@ -22,6 +27,14 @@ Use this library if you want to write games using [Raylib] in [Nim].
 [rlgl]: https://github.com/raysan5/raylib/blob/master/src/rlgl.h
 [raygui]: https://github.com/raysan5/raygui
 [physac]: https://github.com/raysan5/raylib/blob/master/src/physac.h
+
+## Contributing
+
+Do you want to contribute but don't know how? Check out [CONTRIBUTING](CONTRIBUTING.md)!
+
+## How does it work?
+
+If you would like to know how it works or how to update it, check out [HACKING](HACKING.md).
 
 ## Install Raylib
 ### Windows
@@ -335,103 +348,6 @@ let
 assert v1 - v2 == Vector3(x: 2.0, y: 2.0, z: 1.0)
 ```
 
-## How wrapping works
-
-`nimble convert` runs `src/converter.nim` script and checks that the resulting
-files are valid Nim files.
-
-There are 4 steps during conversion:
-
-1. Get C header files
-2. Modify C header files (preprocessing)
-3. Run [c2nim] on modified C header files (processing)
-4. Modify resulting Nim files (postprocessing)
-
-[c2nim]: https://github.com/nim-lang/c2nim
-
-Since every step is done automatically, updating to the next version should
-be a comparatively easy task.
-
-## How to update this library
-
-```shell
-$ git clone --recurse-submodules --shallow-submodules https://github.com/greenfork/nimraylib_now
-$ cd nimraylib_now
-$ nimble install --depsOnly
-$ nimble install c2nim
-$ git checkout master
-$ cat .gitmodules  # let's see which submodules might need updating
-# For every submodule do the following; here we will only do it for "raylib"
-$ cd raylib
-$ git pull
-$ git fetch --tags
-$ git tag --list
-# Here you can choose any desired version or just stay at latest master
-$ git checkout 3.5.0
-$ cd ..
-$ nimble convert
-$ git diff  # review changes
-$ nimble testExamples  # make sure every example still compiles
-# Edit nimraylib_now.nimble file and change version according to [semver]
-# Assume that the edited version is now 1.2.0
-$ git commit --all --verbose
-$ git tag -a v1.2.0  # version 1.2.0 is from nimble file earlier
-$ git push --all
-```
-
-[semver]: https://semver.org/
-
-## Contribute
-
-Any ideas are welcome. Open an issue to ask a question or suggest an idea.
-
-### Documentation
-Any ideas on how to improve documentation are welcome!
-
-### Convert examples
-You can help by converting missing examples from original C library doing
-the following:
-1. Find a missing example in C, you can use helper script for that:
-   `nim r tools/find_missing_examples.nim`.
-2. Compile and run `tools/c2nim_example_converter.nim` on this C file, it helps
-   with conversion.
-3. Edit resulting Nim file, make sure it runs.
-4. Put this file into a correct category in `examples` (`original` is for
-   self-developed examples).
-5. Compile and run `tools/make_tests_from_examples.nim` without any arguments,
-   it should create a test file in `tests/examples/yourcategory`.
-6. Run `nimble testExamples` and make sure that your example passes the test.
-   If it doesn't pass the test, create an issue or ask me any other way, I will
-   help.
-
-I cannot port a number of examples:
-* `core_drop_files.c` - I can't test it on my machine (Wayland on Linux)
-* `core_input_gamepad.c` - I don't have a gamepad
-* `core_input_multitouch.c` - probably requires a phone to test it?
-* `core_storage_values.c` - I can't compile the original C example, values
-  are reset to 0,0 when I press Space
-* `core_basic_window_web.c` - need emscripten dev tools
-
-### Work on converter script
-If something is broken or you see an opportunity to improve the wrapper, you
-can help with converter script.
-
-Clone and run tests:
-
-```shell
-$ git clone --recurse-submodules --shallow-submodules https://github.com/greenfork/nimraylib_now
-$ cd nimraylib_now
-$ nimble install --depsOnly
-$ nimble install c2nim
-$ nimble convert
-$ nimble testExamples
-```
-
-Then workflow is as follows:
-1. Change `src/converter.nim` file
-2. Run `nimble convert` and see if you achieved desired changes
-3. Run `nimble testExamples` to see that all examples are still compiled
-
 ## Troubleshooting
 ### Freezes on Wayland
 Random freezes when everything stops being responsive can be caused by glfw
@@ -458,8 +374,7 @@ was the initial inspiration for this library.
 
 [Raylib-Forever]: https://github.com/Guevara-chan/Raylib-Forever
 
-Thanks to Nim community, it's very nice to get the answers to questions
-rather quickly.
+Thanks to everyone who contributed to this project!
 
 ## License
 
