@@ -32,7 +32,7 @@ setTargetFPS(60)
 ##  Main game loop
 while not windowShouldClose(): ##  Detect window close button or ESC key
   ##  Update
-  runPhysicsStep()
+  updatePhysics()
   ## ----------------------------------------------------------------------------------
   ##  Delay initialization of variables due to physics reset asynchronous
   if needsReset:

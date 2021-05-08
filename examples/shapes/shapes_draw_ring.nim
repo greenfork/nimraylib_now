@@ -56,11 +56,11 @@ while not windowShouldClose():  #  Detect window close button or ESC key
     drawRectangle 500, 0, getScreenWidth() - 500, getScreenHeight(), fade(LIGHTGRAY, 0.3)
 
     if doDrawRing:
-      drawRing(center, innerRadius, outerRadius, startAngle.int32, endAngle.int32, segments, fade(MAROON, 0.3))
+      drawRing(center, innerRadius, outerRadius, startAngle.float32, endAngle.float32, segments, fade(MAROON, 0.3))
     if doDrawRingLines:
-      drawRingLines(center, innerRadius, outerRadius, startAngle.int32, endAngle.int32, segments, fade(BLACK, 0.4))
+      drawRingLines(center, innerRadius, outerRadius, startAngle.float32, endAngle.float32, segments, fade(BLACK, 0.4))
     if doDrawCircleLines:
-      drawCircleSectorLines(center, outerRadius, startAngle.int32, endAngle.int32, segments, fade(BLACK, 0.4))
+      drawCircleSectorLines(center, outerRadius, startAngle.float32, endAngle.float32, segments, fade(BLACK, 0.4))
 
     #  Draw GUI controls
     # ------------------------------------------------------------------------------

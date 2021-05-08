@@ -15,6 +15,7 @@
 
 import times
 import ../../src/nimraylib_now/raylib
+import ../../src/nimraylib_now/rlgl as rl
 
 const GLSL_VERSION = 330
 
@@ -57,7 +58,7 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
     if currentFragShaderModTime != fragShaderFileModTime:
       ##  Try reloading updated shader
       var updatedShader: Shader = loadShader(nil, textFormat(fragShaderFileName, GLSL_VERSION))
-      if updatedShader.id != getShaderDefault().id:
+      if updatedShader.id != rl.getShaderDefault().id:
         unloadShader(shader)
         shader = updatedShader
         ##  Get shader locations for requiRed uniforms

@@ -35,7 +35,7 @@ camera.position = (8.0, 8.0, 8.0)
 camera.target = (0.0, 1.5, 0.0)
 camera.up = (0.0, 1.0, 0.0)
 camera.fovy = 45.0
-camera.`type` = Perspective
+camera.projection = Perspective
 var model: Model = loadModel("resources/models/barracks.obj")
 ##  Load OBJ model
 var texture: Texture2D = loadTexture("resources/models/barracks_diffuse.png")

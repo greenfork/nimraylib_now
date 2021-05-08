@@ -814,7 +814,7 @@ block core_3d_camera_first_person:
   camera.target = (x: 0.0, y: 1.8, z: 0.0)
   camera.up = (x: 0.0, y: 1.0, z: 0.0)
   camera.fovy = 60.0
-  camera.`type` = Perspective
+  camera.projection = Perspective
 
   #  Generates some random columns
   var
@@ -901,7 +901,7 @@ block core_3d_camera_free:
   camera.up = (0.0, 1.0, 0.0)          # Camera up vector (rotation towards target)
   camera.fovy = 45.0
   ##  Camera field-of-view Y
-  camera.`type` = Perspective
+  camera.projection = Perspective
   ##  Camera mode type
   var cubePosition: Vector3 = (0.0, 0.0, 0.0)
   setCameraMode(camera, Free)
@@ -971,7 +971,7 @@ block core_3d_camera_mode:
   camera.up = (0.0, 1.0, 0.0)           # Camera up vector (rotation towards target)
   camera.fovy = 45.0
   ##  Camera field-of-view Y
-  camera.`type` = Perspective
+  camera.projection = Perspective
   ##  Camera mode type
   var cubePosition: Vector3 = (0.0, 0.0, 0.0)
   setTargetFPS(60)
@@ -1031,7 +1031,7 @@ block core_3d_picking:
   camera.target = (x: 0.0, y: 0.0, z: 0.0)       #  Camera looking at point
   camera.up = (x: 0.0, y: 1.0, z: 0.0)           #  Camera up vector (rotation towards target)
   camera.fovy = 45.0                             #  Camera field-of-view Y
-  camera.`type` = Perspective                    #  Camera mode type
+  camera.projection = Perspective                    #  Camera mode type
 
   var
     cubePosition = (x: 0.0, y: 1.0, z: 0.0)
@@ -1244,8 +1244,8 @@ block core_input_gestures:
   var touchArea: Rectangle = (220.0, 10.0, (float)screenWidth - 230, (float)screenHeight - 20)
   var gesturesCount = 0
   var gestureStrings: array[MaxGestureStrings, cstring]
-  var currentGesture = GestureType.None
-  var lastGesture = GestureType.None
+  var currentGesture = Gestures.None
+  var lastGesture = Gestures.None
   ## SetGesturesEnabled(0b0000000000001001);   // Enable only some gestures to be detected
   setTargetFPS(60)
   ##  Set our game to run at 60 frames-per-second
@@ -1255,10 +1255,10 @@ block core_input_gestures:
     ##  Update
     ## ----------------------------------------------------------------------------------
     lastGesture = currentGesture
-    currentGesture = getGestureDetected().GestureType
+    currentGesture = getGestureDetected().Gestures
     touchPosition = getTouchPosition(0)
     if checkCollisionPointRec(touchPosition, touchArea) and
-        (currentGesture != GestureType.None):
+        (currentGesture != Gestures.None):
       if currentGesture != lastGesture:
         ##  Store gesture string
         case currentGesture
@@ -1311,7 +1311,7 @@ block core_input_gestures:
       inc(i)
     drawRectangleLines(10, 29, 200, screenHeight - 50, Gray)
     drawText("DETECTED GESTURES", 50, 15, 10, Gray)
-    if currentGesture != GestureType.None:
+    if currentGesture != Gestures.None:
       drawCircleV(touchPosition, 30, Maroon)
     endDrawing()
   ## ----------------------------------------------------------------------------------
@@ -1605,7 +1605,7 @@ block core_quat_conversion:
   camera.up = (0.0, 1.0, 0.0)          # Camera up vector (rotation towards target)
   camera.fovy = 45.0
   ##  Camera field-of-view Y
-  camera.`type` = Perspective
+  camera.projection = Perspective
   ##  Camera mode type
   var mesh: Mesh = genMeshCylinder(0.2, 1.0, 32)
   var model: Model = loadModelFromMesh(mesh)
@@ -1822,48 +1822,67 @@ block core_vr_simulator:
   ## --------------------------------------------------------------------------------------
   var screenWidth = 800
   var screenHeight = 450
-  ##  NOTE: screenWidth/screenHeight should match VR device aspect ratio
-  setConfigFlags(Msaa4xHint)
   initWindow(screenWidth, screenHeight, "raylib [core] example - vr simulator")
   ##  Init VR simulator (Oculus Rift CV1 parameters)
-  initVrSimulator()
-  var hmd = VrDeviceInfo()
+  var device = VrDeviceInfo()
 
   ##  VR device parameters (head-mounted-device)
   ##  Oculus Rift CV1 parameters for simulator
-  hmd.hResolution = 2160            ##  HMD horizontal resolution in pixels
-  hmd.vResolution = 1200            ##  HMD vertical resolution in pixels
-  hmd.hScreenSize = 0.133793        ##  HMD horizontal size in meters
-  hmd.vScreenSize = 0.0669          ##  HMD vertical size in meters
-  hmd.vScreenCenter = 0.04678       ##  HMD screen center in meters
-  hmd.eyeToScreenDistance = 0.041   ##  HMD distance between eye and display in meters
-  hmd.lensSeparationDistance = 0.07 ##  HMD lens separation distance in meters
-  hmd.interpupillaryDistance = 0.07 ##  HMD IPD (distance between pupils) in meters
+  device.hResolution = 2160            ## horizontal resolution in pixels
+  device.vResolution = 1200            ## vertical resolution in pixels
+  device.hScreenSize = 0.133793        ## horizontal size in meters
+  device.vScreenSize = 0.0669          ## vertical size in meters
+  device.vScreenCenter = 0.04678       ## screen center in meters
+  device.eyeToScreenDistance = 0.041   ## distance between eye and display in meters
+  device.lensSeparationDistance = 0.07 ## lens separation distance in meters
+  device.interpupillaryDistance = 0.07 ## IPD (distance between pupils) in meters
 
   ## NOTE: CV1 uses a Fresnel-hybrid-asymmetric lenses with specific distortion compute shaders.
   ## Following parameters are an approximation to distortion stereo rendering
-  ## but results differ from actual device.
-  hmd.lensDistortionValues[0] = 1.0  ##  HMD lens distortion constant parameter 0
-  hmd.lensDistortionValues[1] = 0.22 ##  HMD lens distortion constant parameter 1
-  hmd.lensDistortionValues[2] = 0.24 ##  HMD lens distortion constant parameter 2
-  hmd.lensDistortionValues[3] = 0.0  ##  HMD lens distortion constant parameter 3
-  hmd.chromaAbCorrection[0] = 0.996  ##  HMD chromatic aberration correction parameter 0
-  hmd.chromaAbCorrection[1] = -0.004 ##  HMD chromatic aberration correction parameter 1
-  hmd.chromaAbCorrection[2] = 1.014  ##  HMD chromatic aberration correction parameter 2
-  hmd.chromaAbCorrection[3] = 0.0    ##  HMD chromatic aberration correction parameter 3
+  device.lensDistortionValues[0] = 1.0  ## lens distortion constant parameter 0
+  device.lensDistortionValues[1] = 0.22 ## lens distortion constant parameter 1
+  device.lensDistortionValues[2] = 0.24 ## lens distortion constant parameter 2
+  device.lensDistortionValues[3] = 0.0  ## lens distortion constant parameter 3
+  device.chromaAbCorrection[0] = 0.996  ## chromatic aberration correction parameter 0
+  device.chromaAbCorrection[1] = -0.004 ## chromatic aberration correction parameter 1
+  device.chromaAbCorrection[2] = 1.014  ## chromatic aberration correction parameter 2
+  device.chromaAbCorrection[3] = 0.0    ## chromatic aberration correction parameter 3
+
+  ## Load VR stereo config for VR device parameteres (Oculus Rift CV1 parameters)
+  var config = loadVrStereoConfig(device)
 
   ##  Distortion shader (uses device lens distortion and chroma)
   var distortion: Shader = loadShader("", textFormat("resources/distortion%i.fs", GlslVersion))
-  setVrConfiguration(hmd, distortion)
-  ##  Set Vr device parameters for stereo rendering
+
+  ## Update distortion shader with lens and distortion-scale parameters
+  setShaderValue(distortion, getShaderLocation(distortion, "leftLensCenter"),
+                 cast[pointer](config.leftLensCenter.addr), ShaderUniformDataType.Vec2);
+  setShaderValue(distortion, getShaderLocation(distortion, "rightLensCenter"),
+                 cast[pointer](config.rightLensCenter.addr), ShaderUniformDataType.Vec2);
+  setShaderValue(distortion, getShaderLocation(distortion, "leftScreenCenter"),
+                 cast[pointer](config.leftScreenCenter.addr), ShaderUniformDataType.Vec2);
+  setShaderValue(distortion, getShaderLocation(distortion, "rightScreenCenter"),
+                 cast[pointer](config.rightScreenCenter.addr), ShaderUniformDataType.Vec2);
+
+  setShaderValue(distortion, getShaderLocation(distortion, "scale"),
+                 cast[pointer](config.scale.addr), ShaderUniformDataType.Vec2);
+  setShaderValue(distortion, getShaderLocation(distortion, "scaleIn"),
+                 cast[pointer](config.scaleIn.addr), ShaderUniformDataType.Vec2);
+  setShaderValue(distortion, getShaderLocation(distortion, "deviceWarpParam"),
+                 cast[pointer](device.lensDistortionValues.addr), ShaderUniformDataType.Vec4);
+  setShaderValue(distortion, getShaderLocation(distortion, "chromaAbParam"),
+                 cast[pointer](device.chromaAbCorrection.addr), ShaderUniformDataType.Vec4);
+
+  var target = loadRenderTexture(getScreenWidth(), getScreenHeight())
+
   ##  Define the camera to look into our 3d world
   var camera = Camera()
   camera.position = (5.0, 2.0, 5.0)    # Camera position
   camera.target = (0.0, 2.0, 0.0)      # Camera looking at point
-  camera.up = (0.0, 1.0, 0.0)          # Camera up vector (rotation towards target)
+  camera.up = (0.0, 1.0, 0.0)          # Camera up vector
   camera.fovy = 60.0
   ##  Camera field-of-view Y
-  camera.`type` = Perspective
+  camera.projection = Perspective
   ##  Camera type
   var cubePosition: Vector3 = (0.0, 0.0, 0.0)
   setCameraMode(camera, FirstPerson)
@@ -1877,25 +1896,31 @@ block core_vr_simulator:
     ## ----------------------------------------------------------------------------------
     updateCamera(addr(camera))
     ##  Update camera (simulator mode)
-    if isKeyPressed(Space):
-      toggleVrMode()
-    beginDrawing()
-    clearBackground(Raywhite)
-    beginVrDrawing()
-    beginMode3D(camera)
-    drawCube(cubePosition, 2.0, 2.0, 2.0, Red)
-    drawCubeWires(cubePosition, 2.0, 2.0, 2.0, Maroon)
-    drawGrid(40, 1.0)
-    endMode3D()
-    endVrDrawing()
-    drawFPS(10, 10)
-    endDrawing()
+    beginDrawing:
+      clearBackground(Raywhite)
+      beginTextureMode(target):
+        clearBackground(Raywhite)
+        beginVrStereoMode(config):
+          beginMode3D(camera):
+            drawCube(cubePosition, 2.0, 2.0, 2.0, Red)
+            drawCubeWires(cubePosition, 2.0, 2.0, 2.0, Maroon)
+            drawGrid(40, 1.0)
+      beginShaderMode(distortion):
+        drawTextureRec(
+          target.texture,
+          Rectangle(width: target.texture.width.cfloat, height: -target.texture.height.cfloat),
+          Vector2(),
+          White
+        )
+      drawFPS(10, 10)
+
   ## ----------------------------------------------------------------------------------
   ##  De-Initialization
   ## --------------------------------------------------------------------------------------
+  unloadVrStereoConfig(config)
+  unloadRenderTexture(target)
   unloadShader(distortion)
   ##  Unload distortion shader
-  closeVrSimulator()
   ##  Close VR simulator
   closeWindow()
   ##  Close window and OpenGL context
@@ -2224,7 +2249,7 @@ block core_world_screen:
   camera.target = (0.0, 0.0, 0.0)
   camera.up = (0.0, 1.0, 0.0).Vector3
   camera.fovy = 45.0
-  camera.`type` = Perspective
+  camera.projection = Perspective
   var cubePosition: Vector3 = (0.0, 0.0, 0.0)
   var cubeScreenPosition: Vector2 = (0.0, 0.0)
   setCameraMode(camera, Free)
@@ -2301,7 +2326,7 @@ block models_geometric_shapes:
   camera.target   = (x: 0.0, y: 0.0, z: 0.0)
   camera.up       = (x: 0.0, y: 1.0, z: 0.0)
   camera.fovy     = 45.0
-  camera.`type`   = PERSPECTIVE
+  camera.projection   = PERSPECTIVE
 
   60.setTargetFPS                #  Set our game to run at 60 frames-per-second
   # --------------------------------------------------------------------------------------
@@ -2396,7 +2421,7 @@ block models_rlgl_solar_system:
   camera.target   = (x: 0.0, y: 0.0, z: 0.0)
   camera.up       = (x: 0.0, y: 1.0, z: 0.0)
   camera.fovy     = 45.0
-  camera.`type`    = Perspective
+  camera.projection    = Perspective
 
   camera.setCameraMode Free
 
@@ -2536,7 +2561,7 @@ block models_waving_cubes:
   camera.target   = (x: 0.0, y: 0.0, z: 0.0)
   camera.up       = (x: 0.0, y: 1.0, z: 0.0)
   camera.fovy     = 70.0
-  camera.`type`   = PERSPECTIVE
+  camera.projection   = PERSPECTIVE
 
   #  Specify the amount of blocks in each direction
   const numBlocks = 15
@@ -2694,7 +2719,7 @@ block crown:
     target: (0.0, 0.0, 0.0),     # Camera target it looks-at
     up: (0.0, 1.0, 0.0),         # Camera up vector (rotation over its axis)
     fovy: 45.0,                  # Camera field-of-view apperture in Y (degrees)
-    type: Perspective            # Defines projection type, see CameraType
+    projection: Perspective            # Defines projection type, see CameraType
   )
   camera.setCameraMode(Orbital)  # Several modes available, see CameraMode
 
@@ -2813,7 +2838,7 @@ block physics_demo:
     ##  Update
     ## ----------------------------------------------------------------------------------
     ##  Delay initialization of variables due to physics reset async
-    runPhysicsStep()
+    updatePhysics()
     if needsReset:
       floor = createPhysicsBodyRectangle((screenWidth.float/2.0, screenHeight.float), 500.0, 100.0, 10.0)
       floor.enabled = false
@@ -2928,7 +2953,7 @@ block physics_friction:
   while not windowShouldClose(): ##  Detect window close button or ESC key
     ##  Update
     ## ----------------------------------------------------------------------------------
-    runPhysicsStep()
+    updatePhysics()
     if isKeyPressed(R):
       ##  Reset dynamic physics bodies position, velocity and rotation
       ##             bodyA->position = (Vector2){ 35, screenHeight*0.6f };
@@ -3051,7 +3076,7 @@ block physics_movement:
   while not windowShouldClose(): ##  Detect window close button or ESC key
     ##  Update
     ## ----------------------------------------------------------------------------------
-    runPhysicsStep()
+    updatePhysics()
     if isKeyPressed(R):
       ##  Reset movement physics body position, velocity and rotation
       body.position = (screenWidth.float / 2.0, screenHeight.float / 2.0)
@@ -3154,7 +3179,7 @@ block physics_restitution:
   while not windowShouldClose(): ##  Detect window close button or ESC key
     ##  Update
     ## ----------------------------------------------------------------------------------
-    runPhysicsStep()
+    updatePhysics()
     if isKeyPressed(R):
       ##  Reset circles physics bodies position and velocity
       circleA.position = Vector2(x: screenWidth.float * 0.25, y: screenHeight.float / 2.0)
@@ -3243,7 +3268,7 @@ block physics_shatter:
   ##  Main game loop
   while not windowShouldClose(): ##  Detect window close button or ESC key
     ##  Update
-    runPhysicsStep()
+    updatePhysics()
     ## ----------------------------------------------------------------------------------
     ##  Delay initialization of variables due to physics reset asynchronous
     if needsReset:
@@ -3343,7 +3368,7 @@ block shaders_basic_lighting:
   camera.target = (0.0, 0.5, 0.0) ##  Camera looking at point
   camera.up = (0.0, 1.0, 0.0) ##  Camera up vector (rotation towards target)
   camera.fovy = 45.0 ##  Camera field-of-view Y
-  camera.`type` = Perspective
+  camera.projection = Perspective
   ##  Camera mode type
   ##  Load models
   var modelA: Model = loadModelFromMesh(genMeshTorus(0.4, 1.0, 16, 32))
@@ -3497,7 +3522,7 @@ block shaders_custom_uniform:
   camera.target = (0.0, 1.5, 0.0)
   camera.up = (0.0, 1.0, 0.0)
   camera.fovy = 45.0
-  camera.`type` = Perspective
+  camera.projection = Perspective
   var model: Model = loadModel("resources/models/barracks.obj")
   ##  Load OBJ model
   var texture: Texture2D = loadTexture("resources/models/barracks_diffuse.png")
@@ -3703,7 +3728,7 @@ block shaders_fog:
     target: (0.0, 0.5, 0.0),
     up: (0.0, 1.0, 0.0),
     fovy: 45.0,
-    type: Perspective
+    projection: Perspective
   )
   ##  Load models and texture
   var modelA: Model = loadModelFromMesh(genMeshTorus(0.4, 1.0, 16, 32))
@@ -3850,7 +3875,7 @@ block shaders_hot_reloading:
       if currentFragShaderModTime != fragShaderFileModTime:
         ##  Try reloading updated shader
         var updatedShader: Shader = loadShader(nil, textFormat(fragShaderFileName, GLSL_VERSION))
-        if updatedShader.id != getShaderDefault().id:
+        if updatedShader.id != rl.getShaderDefault().id:
           unloadShader(shader)
           shader = updatedShader
           ##  Get shader locations for requiRed uniforms
@@ -4416,11 +4441,11 @@ block shapes_draw_ring:
       drawRectangle 500, 0, getScreenWidth() - 500, getScreenHeight(), fade(LIGHTGRAY, 0.3)
 
       if doDrawRing:
-        drawRing(center, innerRadius, outerRadius, startAngle.int32, endAngle.int32, segments, fade(MAROON, 0.3))
+        drawRing(center, innerRadius, outerRadius, startAngle.float32, endAngle.float32, segments, fade(MAROON, 0.3))
       if doDrawRingLines:
-        drawRingLines(center, innerRadius, outerRadius, startAngle.int32, endAngle.int32, segments, fade(BLACK, 0.4))
+        drawRingLines(center, innerRadius, outerRadius, startAngle.float32, endAngle.float32, segments, fade(BLACK, 0.4))
       if doDrawCircleLines:
-        drawCircleSectorLines(center, outerRadius, startAngle.int32, endAngle.int32, segments, fade(BLACK, 0.4))
+        drawCircleSectorLines(center, outerRadius, startAngle.float32, endAngle.float32, segments, fade(BLACK, 0.4))
 
       #  Draw GUI controls
       # ------------------------------------------------------------------------------
@@ -5952,7 +5977,7 @@ block textures_npatch_drawing:
     top: 40,
     right: 12,
     bottom: 12,
-    type: NPT_9PATCH
+    layout: NINE_PATCH
   )
   var ninePatchInfo2: NPatchInfo = NPatchInfo(
     source: (0.0, 128.0, 64.0, 64.0),
@@ -5960,7 +5985,7 @@ block textures_npatch_drawing:
     top: 16,
     right: 16,
     bottom: 16,
-    type: NPT_9PATCH
+    layout: NINE_PATCH
   )
   ##  A horizontal 3-patch (NPT_3PATCH_HORIZONTAL) changes its sizes along the x axis only
   var h3PatchInfo: NPatchInfo = NPatchInfo(
@@ -5969,7 +5994,7 @@ block textures_npatch_drawing:
     top: 8,
     right: 8,
     bottom: 8,
-    type: NPT_3PATCH_HORIZONTAL
+    layout: THREE_PATCH_HORIZONTAL
   )
   ##  A vertical 3-patch (NPT_3PATCH_VERTICAL) changes its sizes along the y axis only
   var v3PatchInfo: NPatchInfo = NPatchInfo(
@@ -5978,7 +6003,7 @@ block textures_npatch_drawing:
     top: 6,
     right: 6,
     bottom: 6,
-    type: NPT_3PATCH_VERTICAL
+    layout: THREE_PATCH_VERTICAL
   )
   setTargetFPS(60)
   ## ---------------------------------------------------------------------------------------

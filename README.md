@@ -8,6 +8,7 @@ be easily upgraded to any future version of [Raylib]. Anyone should be able to
 upgrade it with some effort and [HACKING](HACKING.md) should be a guide on how
 to do it. Please file a bug report if any of that is too far from the reality.
 
+
 [Nim]: https://nim-lang.org/
 
 ## Features
@@ -35,6 +36,19 @@ Do you want to contribute but don't know how? Check out [CONTRIBUTING](CONTRIBUT
 ## How does it work?
 
 If you would like to know how it works or how to update it, check out [HACKING](HACKING.md).
+
+## Current version and upgrading from previous versions
+
+This is a wrapper for [Raylib v3.7.0].
+
+See [MIGRATION](MIGRATION.md) for any tips on how to upgrade your code.
+There are not a lot of possibilities to use proper deprecation warnings
+since it is not always possible to translate `#define` declarations from C.
+Sadly upgrades of user code is a necessary part of migration. On the bright
+side it should mainly consist of renaming, please try they wonderful tool
+`nimgrep`, it is shipped with Nim and has a useful "replace" functionality.
+
+[Raylib v3.7.0]: https://github.com/raysan5/raylib/releases/tag/3.7.0
 
 ## Install Raylib
 ### Windows
