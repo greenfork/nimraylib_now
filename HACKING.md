@@ -40,6 +40,7 @@ $ nimble testExamples  # make sure every example still compiles
 $ git commit --all --verbose
 $ git tag -a v1.2.0  # version 1.2.0 is from nimble file earlier
 $ git push --all
+$ git push --tags
 ```
 
 [semver]: https://semver.org/
