@@ -605,7 +605,7 @@ static void DrawTextRec(Font font, const char *text, NmrlbNow_Rectangle rec, flo
 //-------------------------------------------------------------------------------
 static Font GetFontDefault(void);                           // -- GuiLoadStyleDefault()
 static Vector2 MeasureTextEx(Font font, const char *text, float fontSize, float spacing);                          // -- GetTextWidth(), GuiTextBoxMulti()
-static void DrawTextEx(Font font, const char *text, Vector2 position, float fontSize, float spacing, Color tint);  // -- GuiDrawText()
+static void NmrlbNow_DrawTextEx(Font font, const char *text, Vector2 position, float fontSize, float spacing, Color tint);  // -- GuiDrawText()
 
 static Font LoadFontEx(const char *fileName, int fontSize, int *fontChars, int charsCount);  // -- GuiLoadStyle()
 static char *LoadText(const char *fileName);                // -- GuiLoadStyle()
@@ -3326,7 +3326,7 @@ static void GuiDrawText(const char *text, NmrlbNow_Rectangle bounds, int alignme
             position.x += (RICON_SIZE + ICON_TEXT_PADDING);
         }
 #endif
-        DrawTextEx(guiFont, text, position, GuiGetStyle(DEFAULT, TEXT_SIZE), GuiGetStyle(DEFAULT, TEXT_SPACING), tint);
+        NmrlbNow_DrawTextEx(guiFont, text, position, GuiGetStyle(DEFAULT, TEXT_SIZE), GuiGetStyle(DEFAULT, TEXT_SPACING), tint);
         //---------------------------------------------------------------------------------
     }
 }

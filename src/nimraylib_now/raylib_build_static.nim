@@ -56,6 +56,8 @@ when not defined(nimraylib_now_linkingOverride):
 
   when defined(macosx):
     {.compile(RaylibSrcPathRelative & "/rglfw.c", "-x objective-c").}
+  elif defined(windows):
+    {.compile(RaylibSrcPathRelative & "/rglfw.c", "-lgdi").}
   else:
     {.compile: RaylibSrcPathRelative & "/rglfw.c".}
 

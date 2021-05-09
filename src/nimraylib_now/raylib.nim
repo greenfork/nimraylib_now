@@ -1664,7 +1664,7 @@ proc getCollisionRec*(rec1: Rectangle; rec2: Rectangle): Rectangle {.cdecl,
 ##  Image loading functions
 ##  NOTE: This functions do not require GPU access
 
-proc loadImage*(fileName: cstring): Image {.cdecl, importc: "LoadImage",
+proc loadImage*(fileName: cstring): Image {.cdecl, importc: "NmrlbNow_LoadImage",
                                         header: raylibHeader.}
 ##  Load image from file into CPU memory (RAM)
 
@@ -2112,12 +2112,12 @@ proc drawFPS*(posX: cint; posY: cint) {.cdecl, importc: "DrawFPS", header: rayli
 ##  Draw current FPS
 
 proc drawText*(text: cstring; posX: cint; posY: cint; fontSize: cint; color: Color) {.
-    cdecl, importc: "DrawText", header: raylibHeader.}
+    cdecl, importc: "NmrlbNow_DrawText", header: raylibHeader.}
 ##  Draw text (using default font)
 
 proc drawTextEx*(font: Font; text: cstring; position: Vector2; fontSize: cfloat;
-                spacing: cfloat; tint: Color) {.cdecl, importc: "DrawTextEx",
-    header: raylibHeader.}
+                spacing: cfloat; tint: Color) {.cdecl,
+    importc: "NmrlbNow_DrawTextEx", header: raylibHeader.}
 ##  Draw text using font and additional parameters
 
 proc drawTextRec*(font: Font; text: cstring; rec: Rectangle; fontSize: cfloat;

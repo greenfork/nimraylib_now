@@ -32,16 +32,6 @@ const
   buildDir* = projectDir/"build"
   targetDir* = projectDir/"src"/"nimraylib_now"
 
-removeDir(buildDir)
-createDir(buildDir)
-writeFile(buildDir/".gitkeep", "")
-
-for file in raylibHeaders:
-  copyFileToDir(file, buildDir)
-
-for file in raylibSources:
-  copyFileToDir(file, buildDir)
-
 # Do name mangling
 
 const
@@ -64,8 +54,18 @@ func mangle(line: string): string =
     result = result.replace(reName, manglePrefix & "$1")
 
 # We re-created directory, so all the files inside are needed.
-for _, file in walkDir(buildDir):
-  if not file.endsWith(".gitkeep"):
-    let fileContent = readFile(file)
-    writeFile(file, mangle(fileContent))
-    copyFileToDir(file, targetDir)
+for file in raylibHeaders:
+  let fileContent = readFile(file)
+  writeFile(file, mangle(fileContent))
+for file in raylibSources:
+  let fileContent = readFile(file)
+  writeFile(file, mangle(fileContent))
+
+# Copy files to build directory
+
+removeDir(buildDir)
+createDir(buildDir)
+writeFile(buildDir/".gitkeep", "")
+
+for file in raylibHeaders:
+  copyFileToDir(file, buildDir)
