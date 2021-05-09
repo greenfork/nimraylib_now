@@ -356,8 +356,10 @@ for (filepath, c2nimheader) in raylibFiles:
 
   # Processing with c2nim
 
-  echo "\nExecuting c2nim\n"
-  assert execCmd("c2nim " & (buildDir/fmt"{filename}_modified.h")) == 0
+  echo "\nExecuting c2nim"
+  let c2nimcmd = "c2nim " & buildDir/fmt"{filename}_modified.h"
+  echo c2nimcmd & "\n"
+  assert execCmd(c2nimcmd) == 0
 
 
   # Postprocessing of generated nim file by c2nim
