@@ -4,6 +4,7 @@
 # https://github.com/greenfork/nimraylib_now/issues/5
 
 from os import `/`, parentDir, copyFileToDir, removeDir, createDir, walkDir
+import strutils
 import regex
 
 # Copy C headers and sources to build directory
@@ -28,8 +29,26 @@ const
     raylibDir/"src"/"raudio.c",
     raylibDir/"src"/"core.c",
   ]
+  queryPerfFiles = [
+    raylibDir/"src"/"gestures.h",
+    raylibDir/"src"/"physac.h",
+  ]
   buildDir* = projectDir/"build"
   targetDir* = projectDir/"src"/"nimraylib_now"
+
+
+# Do clean up
+
+for file in queryPerfFiles:
+  var content: string
+  for line in file.lines:
+    if "int __stdcall QueryPerformanceCounter" in line or
+       "int __stdcall QueryPerformanceFrequency" in line:
+      echo "Ignore: " & line
+    else:
+      content.add line & "\n"
+  writeFile(file, content)
+
 
 # Do name mangling
 
