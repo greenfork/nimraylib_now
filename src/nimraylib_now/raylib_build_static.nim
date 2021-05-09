@@ -11,7 +11,6 @@ when not defined(linkingOverride):
     Platform = "PLATFORM_DESKTOP"
     Graphics = "GRAPHICS_API_OPENGL_33"
 
-    # Paths
     CurrentDirectory = currentSourcePath().parentDir()
     NimraylibNowProjectPath = CurrentDirectory.parentDir().parentDir()
     RaylibSrcPath = NimraylibNowProjectPath / "raylib" / "src"
@@ -19,50 +18,39 @@ when not defined(linkingOverride):
     # https://github.com/nim-lang/Nim/issues/9370
     RaylibSrcPathRelative = relativePath(RaylibSrcPath, CurrentDirectory)
 
-  var
-    cflags {.compileTime.}: string
-    ldflags {.compileTime.}: string
-    ldlibs {.compileTime.}: string
-    includePaths {.compileTime.}: string
-    glfwosx {.compileTime.}: string
-
-  when defined(macosx):
-    glfwosx &= " -x objective-c"
-
-  cflags &= " -Wall -D_DEFAULT_SOURCE -Wno-missing-braces -Werror=pointer-arith -fno-strict-aliasing"
-  cflags &= " -std=c99"
+  {.passC: "-Wall -D_DEFAULT_SOURCE -Wno-missing-braces -Werror=pointer-arith -fno-strict-aliasing".}
+  {.passC: "-std=c99".}
 
   when defined(linux):
-    cflags &= " -fPIC"
+    {.passC: "-fPIC".}
 
-  cflags &= " -s -O1"
-  cflags &= " -Werror=implicit-function-declaration"
+  {.passC: "-s -O1".}
+  {.passC: "-Werror=implicit-function-declaration".}
 
   when defined(linux):
     when defined(wayland):
-      cflags &= " -D_GLFW_WAYLAND"
+      {.passC: "-D_GLFW_WAYLAND".}
     else:
-      ldlibs &= " -lX11"
+      {.passL: "-lX11".}
 
-  includePaths &= fmt" -I{RaylibSrcPathRelative}"
-  includePaths &= fmt" -I{RaylibSrcPathRelative}/external/glfw/include"
-  includePaths &= fmt" -I{RaylibSrcPathRelative}/external/glfw/deps/mingw"
+  {.passC: "-I" & RaylibSrcPath.}
+  {.passC: "-I" & RaylibSrcPath & "/external/glfw/include".}
+  {.passC: "-I" & RaylibSrcPath & "/external/glfw/deps/mingw".}
 
   when defined(bsd):
-    includePaths &= " -I/usr/local/include"
-    ldflags &= fmt" -L{RaylibSrcPathRelative}"
-    ldflags &= fmt" -L{RaylibSrcPathRelative}/src"
-    ldflags &= " -L/usr/local/lib"
-    ldflags &= fmt" -L{RaylibReleasePathRelative}"
+    {.passC: "-I/usr/local/include".}
+    {.passL: "-L" & RaylibSrcPath.}
+    {.passL: "-L" & RaylibSrcPath & "/src".}
+    {.passL: "-L/usr/local/lib".}
+    {.passL: "-L" & RaylibReleasePath.}
 
-  {.passC: cflags.}
-  {.passC: fmt"-D{Platform}".}
-  {.passC: fmt"-D{Graphics}".}
-  {.passL: ldlibs.}
-  {.passL: ldflags.}
-  {.passL: includePaths.}
+  {.passC: "-D" & Platform.}
+  {.passC: "-D" & Graphics.}
 
-  {.compile(fmt"{RaylibSrcPathRelative}/rglfw.c", glfwosx).}
+  when defined(macosx):
+    {.compile(fmt"{RaylibSrcPathRelative}/rglfw.c", "-x objective-c").}
+  else:
+    {.compile: fmt"{RaylibSrcPathRelative}/rglfw.c".}
   {.compile: fmt"{RaylibSrcPathRelative}/shapes.c".}
   {.compile: fmt"{RaylibSrcPathRelative}/textures.c".}
   {.compile: fmt"{RaylibSrcPathRelative}/text.c".}

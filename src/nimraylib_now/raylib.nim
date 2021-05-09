@@ -15,7 +15,6 @@ when not defined(nimraylib_now_linkingOverride):
   when defined(nimraylib_now_shared):
     when defined(windows):
       when defined(vcc):
-        # Should it be `link` instead of passL?
         {.passL:"raylibdll.lib".}
       else:
         {.passL:"libraylibdll.a".}
