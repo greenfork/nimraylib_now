@@ -4,7 +4,7 @@
 ## compiled and linkedin manually.
 
 # Add the ability to do all the linking manually.
-when not defined(linkingOverride):
+when not defined(nimraylib_now_linkingOverride):
   from os import parentDir, relativePath, `/`
 
   const
@@ -30,7 +30,7 @@ when not defined(linkingOverride):
 
   when defined(linux):
     {.passC: "-fPIC".}
-    when defined(wayland):
+    when defined(nimraylib_now_wayland):
       {.passC: "-D_GLFW_WAYLAND".}
     else:
       {.passL: "-lX11".}
