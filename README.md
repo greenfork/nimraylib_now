@@ -153,7 +153,7 @@ var camera = Camera(
   target: (0.0, 0.0, 0.0),     # Camera target it looks-at
   up: (0.0, 1.0, 0.0),         # Camera up vector (rotation over its axis)
   fovy: 45.0,                  # Camera field-of-view apperture in Y (degrees)
-  type: Perspective            # Defines projection type, see CameraType
+  projection: Perspective      # Defines projection type, see CameraProjection
 )
 camera.setCameraMode(Orbital)  # Several modes available, see CameraMode
 
@@ -340,14 +340,14 @@ endDrawing()
 ### Reserved words
 Be careful when using fields or functions which are also reserved words in Nim:
 ```nim
-camera.`type` = CameraType.Perspective
+camera.projection = CameraProjection.Perspective
 ```
 
 ### Enums
 All enums are marked as `{.pure.}` which means they should be fully qualified
 when compiler can't guess their type:
 ```nim
-camera.`type` = Perspective      # can be guessed, no need for CameraType.Perspective
+camera.projection = Perspective  # can be guessed, no need for CameraProjection.Perspective
 if isKeyDown(Right):             # can be guessed, no need for KeyboardKey.Right
 if KeyboardKey.Right.isKeyDown:  # cannot be guessed
 ```

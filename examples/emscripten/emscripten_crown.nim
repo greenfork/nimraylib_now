@@ -24,7 +24,7 @@ var
     target: (0.0, 0.0, 0.0),     # Camera target it looks-at
     up: (0.0, 1.0, 0.0),         # Camera up vector (rotation over its axis)
     fovy: 45.0,                  # Camera field-of-view apperture in Y (degrees)
-    projection: Perspective            # Defines projection type, see CameraType
+    projection: Perspective      # Defines projection type, see CameraProjection
   )
   pause = false # Pausing the game will stop animation
 
