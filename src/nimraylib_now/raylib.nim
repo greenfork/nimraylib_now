@@ -10,15 +10,19 @@ when defined(emscripten):
   type emCallbackFunc* = proc() {.cdecl.}
   proc emscriptenSetMainLoop*(f: emCallbackFunc, fps: cint, simulateInfiniteLoop: cint) {.
     cdecl, importc: "emscripten_set_main_loop", header: "<emscripten.h>".}
-else:
-  when defined(windows):
-    when defined(vcc):
-      # Should it be `link` instead of passL?
-      {.passL:"raylibdll.lib".}
+
+when not defined(nimraylib_now_linkingOverride):
+  when defined(nimraylib_now_shared):
+    when defined(windows):
+      when defined(vcc):
+        {.passL:"raylibdll.lib".}
+      else:
+        {.passL:"libraylibdll.a".}
     else:
-      {.passL:"libraylibdll.a".}
+      {.passL:"-lraylib".}
   else:
-    {.passL:"-lraylib".}
+    include raylib_build_static
+
 ## *********************************************************************************************
 ##
 ##    raylib - A simple and easy-to-use library to enjoy videogames programming (www.raylib.com)

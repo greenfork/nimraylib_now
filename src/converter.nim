@@ -1,7 +1,7 @@
 import strutils, strformat
 from sequtils import any
 from os import `/`, fileExists, extractFilename, changeFileExt, parentDir,
-  copyFileToDir
+  copyFileToDir, findExe
 from osproc import execCmd
 from sugar import `=>`
 import regex
@@ -124,15 +124,20 @@ when defined(emscripten):
   type emCallbackFunc* = proc() {.cdecl.}
   proc emscriptenSetMainLoop*(f: emCallbackFunc, fps: cint, simulateInfiniteLoop: cint) {.
     cdecl, importc: "emscripten_set_main_loop", header: "<emscripten.h>".}
-else:
-  when defined(windows):
-    when defined(vcc):
-      # Should it be `link` instead of passL?
-      {.passL:"raylibdll.lib".}
+
+when not defined(nimraylib_now_linkingOverride):
+  when defined(nimraylib_now_shared):
+    when defined(windows):
+      when defined(vcc):
+        # Should it be `link` instead of passL?
+        {.passL:"raylibdll.lib".}
+      else:
+        {.passL:"libraylibdll.a".}
     else:
-      {.passL:"libraylibdll.a".}
+      {.passL:"-lraylib".}
   else:
-    {.passL:"-lraylib".}
+    include raylib_build_static
+
 @#
 #endif
 """
@@ -351,8 +356,10 @@ for (filepath, c2nimheader) in raylibFiles:
 
   # Processing with c2nim
 
-  echo "\nExecuting c2nim\n"
-  assert execCmd("c2nim " & (buildDir/fmt"{filename}_modified.h")) == 0
+  echo "\nExecuting c2nim"
+  let c2nimcmd = findExe("c2nim") & " " & buildDir/fmt"{filename}_modified.h"
+  echo c2nimcmd & "\n"
+  assert execCmd(c2nimcmd) == 0
 
 
   # Postprocessing of generated nim file by c2nim

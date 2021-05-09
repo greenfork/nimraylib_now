@@ -40,3 +40,4 @@ task buildRaygui, "build raygui as a dynamic library":
 
 task testExamples, "checks that all examples are correctly compiled":
   exec "testament run texamples.nim"
+  exec "testament run texamples_windows.nim"

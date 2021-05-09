@@ -19,22 +19,40 @@ for dir in walkDirs(examplesDir/"*"):
   if dirName != "emscripten":
     exampleCategories.add dirName
 
-const testTemplate =
-  "discard \"\"\"\n" &
-  "  action: \"compile\"\n" &
-  "  joinable: false\n" &
-  "  matrix: \"; --gc:orc; -d:release; --gc:orc -d:release; -d:release -d:danger; --gc:orc -d:release -d:danger\"\n" &
-  "\"\"\"\n" &
-  "import lenientops, math, times, strformat, atomics, system/ansi_c\n" &
-  "import ../../src/nimraylib_now/[raylib, raygui, raymath, physac]\n" &
-  "from ../../src/nimraylib_now/rlgl as rl import nil\n" &
-  "import ../examples/shaders/rlights\n" &
-  "\n"
+const
+  testTemplate =
+    "discard \"\"\"\n" &
+    "  action: \"compile\"\n" &
+    "  joinable: false\n" &
+    "  matrix: \"; -d:release; --gc:orc -d:release; -d:nimraylib_now_shared -d:release; -d:nimraylib_now_shared -d:release --gc:orc\"\n" &
+    "  disabled: \"win\"\n" &
+    "\"\"\"\n" &
+    "import lenientops, math, times, strformat, atomics, system/ansi_c\n" &
+    "import ../../src/nimraylib_now/[raylib, raygui, raymath, physac]\n" &
+    "from ../../src/nimraylib_now/rlgl as rl import nil\n" &
+    "import ../examples/shaders/rlights\n" &
+    "\n"
+  # Don't test shared library for windows
+  testTemplateWindows =
+    "discard \"\"\"\n" &
+    "  action: \"compile\"\n" &
+    "  joinable: false\n" &
+    "  matrix: \"; -d:release; --gc:orc -d:release;\"\n" &
+    "  disabled: \"linux\"\n" &
+    "  disabled: \"bsd\"\n" &
+    "  disabled: \"macosx\"\n" &
+    "\"\"\"\n" &
+    "import lenientops, math, times, strformat, atomics, system/ansi_c\n" &
+    "import ../../src/nimraylib_now/[raylib, raygui, raymath, physac]\n" &
+    "from ../../src/nimraylib_now/rlgl as rl import nil\n" &
+    "import ../examples/shaders/rlights\n" &
+    "\n"
 
 # Create one big megatest
 const testFilename = projectDir/"tests"/"texamples.nim"
+const testFilenameWindows = projectDir/"tests"/"texamples_windows.nim"
 removeFile(testFilename)
-var texamples = testTemplate
+var texamples: string
 for category in exampleCategories:
   for example in walkFiles(examplesDir/category/"*.nim"):
     if example.endsWith("rlights.nim"): continue
@@ -45,4 +63,6 @@ for category in exampleCategories:
         let space = if line == "": "" else: "  "
         texamples.add space & line & "\n"
     texamples.add "\n\n"
-writeFile(testFilename, texamples)
+
+writeFile(testFilename, testTemplate & texamples)
+writeFile(testFilenameWindows, testTemplateWindows & texamples)

@@ -11,9 +11,9 @@ This is experimental support for Emscripten. Please report any bugs.
 3. Compile the Nim source file in the example passing the library file
    compiled in step 2 via passL:
 ```
-$ nim c -d:emscripten \
-  --passL:"/home/grfork/reps/nimraylib_now/raylib/src/libraylib.a" \
-  emscripten_crown.nim
+$ nim c -d:emscripten -d:nimraylib_now_linkingOverride \
+    --passL:"/home/grfork/reps/nimraylib_now/raylib/src/libraylib.a" \
+    emscripten_crown.nim
 ```
 4. Install and run `nimhttpd` server:
 ```
