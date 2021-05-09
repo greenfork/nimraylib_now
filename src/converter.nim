@@ -511,7 +511,7 @@ template `-`*[T: Vector2 | Vector3](v1: T): T = negate(v1)
       elif filename == "raylib" and line == "  MENU = R":
         # This is a duplicated enum value. Nim forbids duplicated values for
         # enums and `c2nim` converts it to const but doesn't import it.
-        rs.add "  MENU* = R" & "\n"
+        rs.add "  MENU* = KeyboardKey.R" & "\n"
         i.inc
       else:
         rs.add line & "\n"

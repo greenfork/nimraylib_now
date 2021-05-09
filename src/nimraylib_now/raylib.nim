@@ -546,7 +546,7 @@ type
     KB_MENU = 348
 
 const
-  MENU* = R
+  MENU* = KeyboardKey.R
 
 ##  Mouse buttons
 
