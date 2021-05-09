@@ -50,10 +50,13 @@ when not defined(nimraylib_now_linkingOverride):
     {.passL: "-framework GLUT".}
     {.passL: "-framework OpenGL".}
 
+  when defined(windows):
+    {.passL: "-lgdi32".}
+
   when defined(macosx):
     {.compile(RaylibSrcPathRelative & "/rglfw.c", "-x objective-c").}
-  elif defined(windows):
-    {.compile(RaylibSrcPathRelative & "/rglfw.c", "-lgdi32").}
+  # elif defined(windows):
+  #   {.compile(RaylibSrcPathRelative & "/rglfw.c", "-lgdi32").}
   else:
     {.compile: RaylibSrcPathRelative & "/rglfw.c".}
 

@@ -42,8 +42,8 @@ const
     re"\b(LoadImage)\b",
     re"\b(DrawText)\b",
     re"\b(DrawTextEx)\b",
-    re"\b(QueryPerformanceCounter)\b",
-    re"\b(QueryPerformanceFrequency)\b",
+    # re"\b(QueryPerformanceCounter)\b",
+    # re"\b(QueryPerformanceFrequency)\b",
     re"\b(GetCurrentTime)\b",
   ]
   manglePrefix* = "NmrlbNow_"
