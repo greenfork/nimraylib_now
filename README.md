@@ -52,8 +52,8 @@ side it should mainly consist of renaming, please try they wonderful tool
 
 ## Install Raylib
 ### Windows
-Download latest library from [raylib releases] page for MinGW compiler, for version 3.5.0
-the name is `raylib-3.5.0_win64_mingw-w64.zip`. Extract it and **make sure**
+Download latest library from [raylib releases] page for MinGW compiler, for version 3.7.0
+the name is `raylib-3.7.0_win64_mingw-w64.zip`. Extract it and **make sure**
 that files `libraylibdll.a` and `raylib.dll` are always in the same directory
 as your game `.exe` file.
 
@@ -63,8 +63,8 @@ Use your package manager, for example for Arch Linux:
 $ sudo pacman -Syu raylib
 ```
 
-Alternatively download latest library from [raylib releases] page, for version 3.5.0
-the name is `raylib-3.5.0_linux_amd64.tar.gz`. Extract it and put all `.so`
+Alternatively download latest library from [raylib releases] page, for version 3.7.0
+the name is `raylib-3.7.0_linux_amd64.tar.gz`. Extract it and put all `.so`
 files into `/usr/local/lib`.
 
 ### MacOS
@@ -73,8 +73,8 @@ With brew package manager:
 $ brew install raylib
 ```
 
-Alternatively download latest library from [raylib releases] page, for version 3.5.0
-the name is `raylib-3.5.0_macos.tar.gz`. Extract it and put all `.dylib`
+Alternatively download latest library from [raylib releases] page, for version 3.7.0
+the name is `raylib-3.7.0_macos.tar.gz`. Extract it and put all `.dylib`
 files into `/usr/local/lib`.
 
 ## Install NimraylibNow!
