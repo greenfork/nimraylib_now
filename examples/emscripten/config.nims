@@ -22,3 +22,6 @@ if defined(emscripten):
   --exceptions:goto # Goto exceptions are friendlier with crazy platforms.
   --define:noSignalHandler # Emscripten doesn't support signal handlers.
   switch("passL", "-s USE_GLFW=3 -o public/index.html")
+
+# Enable manual linking for nimraylib_now, we will use --passL
+--define:nimraylib_now_linkingOverride
