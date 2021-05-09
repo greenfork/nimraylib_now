@@ -256,8 +256,8 @@ PHYSACDEF Vector2 GetPhysicsShapeVertex(PhysicsBody body, int vertex);          
     #include <time.h>                   // Required for: time(), clock_gettime()
     #if defined(_WIN32)
         // Functions required to query time on Windows
-        int __stdcall NmrlbNow_QueryPerformanceCounter(unsigned long long int *lpPerformanceCount);
-        int __stdcall NmrlbNow_QueryPerformanceFrequency(unsigned long long int *lpFrequency);
+        int __stdcall QueryPerformanceCounter(unsigned long long int *lpPerformanceCount);
+        int __stdcall QueryPerformanceFrequency(unsigned long long int *lpFrequency);
     #endif
     #if defined(__linux__) || defined(__FreeBSD__)
         #if _POSIX_C_SOURCE < 199309L
@@ -1851,7 +1851,7 @@ static Vector2 MathTriangleBarycenter(Vector2 v1, Vector2 v2, Vector2 v3)
 static void InitTimer(void)
 {
 #if defined(_WIN32)
-    NmrlbNow_QueryPerformanceFrequency((unsigned long long int *) &frequency);
+    QueryPerformanceFrequency((unsigned long long int *) &frequency);
 #endif
 
 #if defined(__EMSCRIPTEN__) || defined(__linux__)
@@ -1875,7 +1875,7 @@ static unsigned long long int GetClockTicks(void)
     unsigned long long int value = 0;
 
 #if defined(_WIN32)
-    NmrlbNow_QueryPerformanceCounter((unsigned long long int *) &value);
+    QueryPerformanceCounter((unsigned long long int *) &value);
 #endif
 
 #if defined(__linux__)

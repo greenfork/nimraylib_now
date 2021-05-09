@@ -4,7 +4,6 @@
 # https://github.com/greenfork/nimraylib_now/issues/5
 
 from os import `/`, parentDir, copyFileToDir, removeDir, createDir, walkDir
-from strutils import endsWith
 import regex
 
 # Copy C headers and sources to build directory
@@ -42,8 +41,6 @@ const
     re"\b(LoadImage)\b",
     re"\b(DrawText)\b",
     re"\b(DrawTextEx)\b",
-    # re"\b(QueryPerformanceCounter)\b",
-    # re"\b(QueryPerformanceFrequency)\b",
     re"\b(GetCurrentTime)\b",
   ]
   manglePrefix* = "NmrlbNow_"
@@ -69,3 +66,4 @@ writeFile(buildDir/".gitkeep", "")
 
 for file in raylibHeaders:
   copyFileToDir(file, buildDir)
+  copyFileToDir(file, targetDir)
