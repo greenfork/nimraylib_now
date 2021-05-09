@@ -26,6 +26,6 @@ jobs:
       - name: Run converter and check files
         run: nimble convert
       - name: Assemble megatest from examples
-        run: nim r tools/make_tests_from_examples.nim
+        run: nim r scripts/make_tests_from_examples.nim
       - name: Run megatest
         run: nimble testExamples
