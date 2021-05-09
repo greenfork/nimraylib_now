@@ -20,22 +20,20 @@ when not defined(linkingOverride):
 
   {.passC: "-Wall -D_DEFAULT_SOURCE -Wno-missing-braces -Werror=pointer-arith -fno-strict-aliasing".}
   {.passC: "-std=c99".}
+  {.passC: "-s -O1".}
+  {.passC: "-Werror=implicit-function-declaration".}
+  {.passC: "-I" & RaylibSrcPath.}
+  {.passC: "-I" & RaylibSrcPath & "/external/glfw/include".}
+  {.passC: "-I" & RaylibSrcPath & "/external/glfw/deps/mingw".}
+  {.passC: "-D" & Platform.}
+  {.passC: "-D" & Graphics.}
 
   when defined(linux):
     {.passC: "-fPIC".}
-
-  {.passC: "-s -O1".}
-  {.passC: "-Werror=implicit-function-declaration".}
-
-  when defined(linux):
     when defined(wayland):
       {.passC: "-D_GLFW_WAYLAND".}
     else:
       {.passL: "-lX11".}
-
-  {.passC: "-I" & RaylibSrcPath.}
-  {.passC: "-I" & RaylibSrcPath & "/external/glfw/include".}
-  {.passC: "-I" & RaylibSrcPath & "/external/glfw/deps/mingw".}
 
   when defined(bsd):
     {.passC: "-I/usr/local/include".}
@@ -44,8 +42,12 @@ when not defined(linkingOverride):
     {.passL: "-L/usr/local/lib".}
     {.passL: "-L" & RaylibReleasePath.}
 
-  {.passC: "-D" & Platform.}
-  {.passC: "-D" & Graphics.}
+  when defined(macosx):
+    {.passC: "-framework CoreVideo".}
+    {.passC: "-framework IOKit".}
+    {.passC: "-framework Cocoa".}
+    {.passC: "-framework GLUT".}
+    {.passC: "-framework OpenGL".}
 
   when defined(macosx):
     {.compile(RaylibSrcPathRelative & "/rglfw.c", "-x objective-c").}
