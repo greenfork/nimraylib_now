@@ -50,7 +50,27 @@ side it should mainly consist of renaming, please try they wonderful tool
 
 [Raylib v3.7.0]: https://github.com/raysan5/raylib/releases/tag/3.7.0
 
-## Install Raylib
+## How to use Raylib?
+
+You have 3 options:
+1. Static library linking - this is the default setting, Raylib will be linked
+   statically to your executable. This means that its code will be directly
+   embedded into the executable file.
+2. Shared library linking - this is activated with `-d:nimraylib_now_shared`
+   flag passed to the Nim compiler. This requires a present `raylib.dll` or
+   similar file depending on your OS. This is usually preferable for Linux.
+3. Manual library linking - this is activated with `-d:nimraylib_now_overrideLinking`
+   flag passed to the Nim compiler. This means that you build the Raylib
+   library yourself and link it yourself, for example with option `--passL:`
+   passed to the Nim compiler. This is a preferable option for any
+   non-desktop targets such as Android or Emscripten.
+
+## Install Raylib as a static library
+
+You don't have to do anything here, this is the default option. Raylib C sources
+are included in this library and compiled automatically.
+
+## Install Raylib as a shared library
 ### Windows
 Download latest library from [raylib releases] page for MinGW compiler, for version 3.7.0
 the name is `raylib-3.7.0_win64_mingw-w64.zip`. Extract it and **make sure**
@@ -76,6 +96,15 @@ $ brew install raylib
 Alternatively download latest library from [raylib releases] page, for version 3.7.0
 the name is `raylib-3.7.0_macos.tar.gz`. Extract it and put all `.dylib`
 files into `/usr/local/lib`.
+
+## Install Raylib manually
+
+Consult [Raylib wiki] on how to build Raylib for different targets. Also see
+an example of [how to use Emscripten] to build Raylib for execution in the
+browser.
+
+[Raylib wiki]: https://github.com/raysan5/raylib/wiki
+[how to use Emscripten]: examples/emscripten/
 
 ## Install NimraylibNow!
 Install this library with nimble (takes **6-10(!) minutes** because of huge

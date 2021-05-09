@@ -23,7 +23,7 @@ const testTemplate =
   "discard \"\"\"\n" &
   "  action: \"compile\"\n" &
   "  joinable: false\n" &
-  "  matrix: \"; -d:release; --gc:orc -d:release; -d:static -d:release; -d:static -d:release --gc:orc\"\n" &
+  "  matrix: \"; -d:release; --gc:orc -d:release; -d:nimraylib_now_shared -d:release; -d:nimraylib_now_shared -d:release --gc:orc\"\n" &
   "\"\"\"\n" &
   "import lenientops, math, times, strformat, atomics, system/ansi_c\n" &
   "import ../../src/nimraylib_now/[raylib, raygui, raymath, physac]\n" &

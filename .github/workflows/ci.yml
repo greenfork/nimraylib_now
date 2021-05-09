@@ -37,19 +37,13 @@ jobs:
         run: nimble install --depsOnly --accept
       - name: Install c2nim
         run: nimble install --accept c2nim
-
       - name: Cache nimble
         id: cache-nimble
         uses: actions/cache@v1
         with:
           path: ~/.nimble
           key: ${{ runner.os }}-nimble-${{ hashFiles('*.nimble') }}
-        if: runner.os != 'Windows'
-
-      - run: echo $(nimble path c2nim)
-
-      - name: Update path to include c2nim
-        run: echo $(nimble path c2nim) >> $GITHUB_PATH
+        if: ${{ runner.os != 'Windows' }}
       - name: Run converter and check files
         run: nimble convert
       - name: Assemble megatest from examples

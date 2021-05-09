@@ -11,10 +11,8 @@ when defined(emscripten):
   proc emscriptenSetMainLoop*(f: emCallbackFunc, fps: cint, simulateInfiniteLoop: cint) {.
     cdecl, importc: "emscripten_set_main_loop", header: "<emscripten.h>".}
 
-when not defined(linkingOverride):
-  when defined(static):
-    import raylib_build_static
-  else:
+when not defined(nimraylib_now_linkingOverride):
+  when defined(nimraylib_now_shared):
     when defined(windows):
       when defined(vcc):
         # Should it be `link` instead of passL?
@@ -23,6 +21,8 @@ when not defined(linkingOverride):
         {.passL:"libraylibdll.a".}
     else:
       {.passL:"-lraylib".}
+  else:
+    import raylib_build_static
 
 ## *********************************************************************************************
 ##
