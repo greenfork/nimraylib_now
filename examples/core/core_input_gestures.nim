@@ -24,8 +24,8 @@ var touchPosition: Vector2 = (0.0, 0.0)
 var touchArea: Rectangle = (220.0, 10.0, (float)screenWidth - 230, (float)screenHeight - 20)
 var gesturesCount = 0
 var gestureStrings: array[MaxGestureStrings, cstring]
-var currentGesture = GestureType.None
-var lastGesture = GestureType.None
+var currentGesture = Gestures.None
+var lastGesture = Gestures.None
 ## SetGesturesEnabled(0b0000000000001001);   // Enable only some gestures to be detected
 setTargetFPS(60)
 ##  Set our game to run at 60 frames-per-second
@@ -35,10 +35,10 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
   ##  Update
   ## ----------------------------------------------------------------------------------
   lastGesture = currentGesture
-  currentGesture = getGestureDetected().GestureType
+  currentGesture = getGestureDetected().Gestures
   touchPosition = getTouchPosition(0)
   if checkCollisionPointRec(touchPosition, touchArea) and
-      (currentGesture != GestureType.None):
+      (currentGesture != Gestures.None):
     if currentGesture != lastGesture:
       ##  Store gesture string
       case currentGesture
@@ -91,7 +91,7 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
     inc(i)
   drawRectangleLines(10, 29, 200, screenHeight - 50, Gray)
   drawText("DETECTED GESTURES", 50, 15, 10, Gray)
-  if currentGesture != GestureType.None:
+  if currentGesture != Gestures.None:
     drawCircleV(touchPosition, 30, Maroon)
   endDrawing()
 ## ----------------------------------------------------------------------------------

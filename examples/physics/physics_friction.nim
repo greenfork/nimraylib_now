@@ -57,7 +57,7 @@ setTargetFPS(60)
 while not windowShouldClose(): ##  Detect window close button or ESC key
   ##  Update
   ## ----------------------------------------------------------------------------------
-  runPhysicsStep()
+  updatePhysics()
   if isKeyPressed(R):
     ##  Reset dynamic physics bodies position, velocity and rotation
     ##             bodyA->position = (Vector2){ 35, screenHeight*0.6f };

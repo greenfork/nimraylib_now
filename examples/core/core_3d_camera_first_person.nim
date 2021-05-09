@@ -27,7 +27,7 @@ camera.position = (x: 4.0, y: 2.0, z: 4.0)
 camera.target = (x: 0.0, y: 1.8, z: 0.0)
 camera.up = (x: 0.0, y: 1.0, z: 0.0)
 camera.fovy = 60.0
-camera.`type` = Perspective
+camera.projection = Perspective
 
 #  Generates some random columns
 var

@@ -1,0 +1,31 @@
+name: GitHub Actions Demo
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+          submodules: true
+      - name: Install raylib
+        run: |
+          sudo apt-get update
+          sudo apt-get install build-essential
+          sudo apt-get install libasound2-dev mesa-common-dev libx11-dev libxrandr-dev libxi-dev xorg-dev libgl1-mesa-dev libglu1-mesa-dev
+          cd raylib/src
+          make PLATFORM=PLATFORM_DESKTOP RAYLIB_LIBTYPE=SHARED
+          sudo make install RAYLIB_LIBTYPE=SHARED
+      - name: Install Nim
+        uses: jiro4989/setup-nim-action@v1
+      - name: Install dependencies
+        run: nimble install --depsOnly --accept
+      - name: Install c2nim
+        run: nimble install --accept c2nim
+      - name: Run converter and check files
+        run: nimble convert
+      - name: Assemble megatest from examples
+        run: nim r tools/make_tests_from_examples.nim
+      - name: Run megatest
+        run: nimble testExamples

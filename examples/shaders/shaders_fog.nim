@@ -44,7 +44,7 @@ var camera = Camera(
   target: (0.0, 0.5, 0.0),
   up: (0.0, 1.0, 0.0),
   fovy: 45.0,
-  type: Perspective
+  projection: Perspective
 )
 ##  Load models and texture
 var modelA: Model = loadModelFromMesh(genMeshTorus(0.4, 1.0, 16, 32))

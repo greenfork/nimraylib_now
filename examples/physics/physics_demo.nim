@@ -36,7 +36,7 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
   ##  Update
   ## ----------------------------------------------------------------------------------
   ##  Delay initialization of variables due to physics reset async
-  runPhysicsStep()
+  updatePhysics()
   if needsReset:
     floor = createPhysicsBodyRectangle((screenWidth.float/2.0, screenHeight.float), 500.0, 100.0, 10.0)
     floor.enabled = false

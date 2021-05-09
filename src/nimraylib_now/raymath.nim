@@ -341,8 +341,6 @@ proc rotateZ*(angle: cfloat): Matrix {.inline, cdecl, importc: "MatrixRotateZ",
 proc rotateXYZ*(ang: Vector3): Matrix {.inline, cdecl,
     importc: "MatrixRotateXYZ", header: raymathHeader.}
 ##  Returns zyx-rotation matrix (angles in radians)
-##  TODO: This solution is suboptimal, it should be possible to create this matrix in one go
-##  instead of using a 3 matrix multiplication
 
 proc rotateZYX*(ang: Vector3): Matrix {.inline, cdecl,
     importc: "MatrixRotateZYX", header: raymathHeader.}
@@ -454,9 +452,10 @@ proc fromAxisAngle*(axis: Vector3; angle: cfloat): Quaternion {.inline,
 
 proc toAxisAngle*(q: Quaternion; outAxis: ptr Vector3; outAngle: ptr cfloat) {.
     inline, cdecl, importc: "QuaternionToAxisAngle", header: raymathHeader.}
-##  Returns he quaternion equivalent to Euler angles
+##  Returns the quaternion equivalent to Euler angles
+##  NOTE: Rotation order is ZYX
 
-proc fromEuler*(roll: cfloat; pitch: cfloat; yaw: cfloat): Quaternion {.
+proc fromEuler*(pitch: cfloat; yaw: cfloat; roll: cfloat): Quaternion {.
     inline, cdecl, importc: "QuaternionFromEuler", header: raymathHeader.}
 ##  Return the Euler angles equivalent to quaternion (roll, pitch, yaw)
 ##  NOTE: Angles are returned in a Vector3 struct in degrees

@@ -50,6 +50,10 @@ const
     "LoadText", # deprecated function name
     "GetExtension", # deprecated function name
     "GetImageData", # deprecated function name
+    "FILTER_POINT", # deprecated enum value
+    "FILTER_BILINEAR", # deprecated enum value
+    "MAP_DIFFUSE", # deprecated enum value
+    "UNCOMPRESSED_R8G8B8A8", # deprecated enum value
     "PI", # already in math module
     "DEG2RAD", # already in math module
     "RAD2DEG", # already in math module
@@ -60,6 +64,10 @@ const
     "MAP_SPECULAR", # deprecated?
     "PHYSAC_PI", # already in math module
     "PHYSAC_DEG2RAD", # already in math module
+    "MATERIAL_MAP_DIFFUSE", # deprecated enum value
+    "MATERIAL_MAP_SPECULAR", # deprecated enum value
+    "SHADER_LOC_MAP_DIFFUSE", # deprecated enum value
+    "SHADER_LOC_MAP_SPECULAR", # deprecated enum value
   ]
   allowIfs = [
     "RAYGUI_SUPPORT_ICONS"
@@ -90,16 +98,18 @@ const
 #  prefix KEY_
 #  prefix MOUSE_
 #  prefix GAMEPAD_
-#  prefix LOC_
-#  prefix UNIFORM_
-#  prefix MAP_
-#  prefix FILTER_
-#  prefix WRAP_
-#  prefix CUBEMAP_
 #  prefix FONT_
 #  prefix BLEND_
 #  prefix GESTURE_
 #  prefix CAMERA_
+#  prefix MATERIAL_MAP_
+#  prefix SHADER_LOC_
+#  prefix SHADER_UNIFORM_
+#  prefix PIXELFORMAT_
+#  prefix TEXTURE_FILTER_
+#  prefix TEXTURE_WRAP_
+#  prefix NPATCH_
+#  prefix CUBEMAP_LAYOUT_
 #  mangle va_list va_list
 #@
 # Functions on C varargs
@@ -110,14 +120,19 @@ proc vprintf*(format: cstring, args: va_list) {.cdecl, importc: "vprintf", heade
 from os import parentDir, `/`
 const raylibHeader = currentSourcePath().parentDir()/"raylib.h"
 
-when defined(windows):
-  when defined(vcc):
-    # Should it be `link` instead of passL?
-    {.passL:"raylibdll.lib".}
-  else:
-    {.passL:"libraylibdll.a".}
+when defined(emscripten):
+  type emCallbackFunc* = proc() {.cdecl.}
+  proc emscriptenSetMainLoop*(f: emCallbackFunc, fps: cint, simulateInfiniteLoop: cint) {.
+    cdecl, importc: "emscripten_set_main_loop", header: "<emscripten.h>".}
 else:
-  {.passL:"-lraylib".}
+  when defined(windows):
+    when defined(vcc):
+      # Should it be `link` instead of passL?
+      {.passL:"raylibdll.lib".}
+    else:
+      {.passL:"libraylibdll.a".}
+  else:
+    {.passL:"-lraylib".}
 @#
 #endif
 """
@@ -131,6 +146,10 @@ else:
 #  prefix rlgl
 #  prefix rl
 #  prefix RL_
+#  prefix PIXELFORMAT_
+#  prefix TEXTURE_FILTER_
+#  prefix SHADER_LOC_
+#  prefix SHADER_UNIFORM_
 #@
 import raylib
 
@@ -288,7 +307,7 @@ for (filepath, c2nimheader) in raylibFiles:
             enumName.removePrefix(prefix)
             break
         let convertType =
-          if enumName == "ConfigFlag": "cuint"
+          if enumName == "ConfigFlags": "cuint"
           else: "cint"
         appendToVeryEnd.add(
           fmt("converter {enumName}ToInt*(self: {enumName}): {convertType} = self.{convertType}\n")
@@ -488,6 +507,11 @@ template `-`*[T: Vector2 | Vector3](v1: T): T = negate(v1)
           var newProcName = procName[mathType.len..^1]
           newProcName[0] = newProcName[0].toLowerAscii
           rs.add line.replace(procName, newProcName) & "\n"
+        i.inc
+      elif filename == "raylib" and line == "  MENU = R":
+        # This is a duplicated enum value. Nim forbids duplicated values for
+        # enums and `c2nim` converts it to const but doesn't import it.
+        rs.add "  MENU* = R" & "\n"
         i.inc
       else:
         rs.add line & "\n"

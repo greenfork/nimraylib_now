@@ -23,7 +23,7 @@ camera.position = (10.0, 10.0, 10.0)
 camera.target = (0.0, 0.0, 0.0)
 camera.up = (0.0, 1.0, 0.0).Vector3
 camera.fovy = 45.0
-camera.`type` = Perspective
+camera.projection = Perspective
 var cubePosition: Vector3 = (0.0, 0.0, 0.0)
 var cubeScreenPosition: Vector2 = (0.0, 0.0)
 setCameraMode(camera, Free)

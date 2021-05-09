@@ -26,7 +26,7 @@ camera.position = (x: 10.0, y: 10.0, z: 10.0)  #  Camera position
 camera.target = (x: 0.0, y: 0.0, z: 0.0)       #  Camera looking at point
 camera.up = (x: 0.0, y: 1.0, z: 0.0)           #  Camera up vector (rotation towards target)
 camera.fovy = 45.0                             #  Camera field-of-view Y
-camera.`type` = Perspective                    #  Camera mode type
+camera.projection = Perspective                    #  Camera mode type
 
 var
   cubePosition = (x: 0.0, y: 1.0, z: 0.0)

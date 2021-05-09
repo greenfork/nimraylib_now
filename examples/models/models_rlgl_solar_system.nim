@@ -46,7 +46,7 @@ camera.position = (x: 16.0, y: 16.0, z: 16.0)
 camera.target   = (x: 0.0, y: 0.0, z: 0.0)
 camera.up       = (x: 0.0, y: 1.0, z: 0.0)
 camera.fovy     = 45.0
-camera.`type`    = Perspective
+camera.projection    = Perspective
 
 camera.setCameraMode Free
 
