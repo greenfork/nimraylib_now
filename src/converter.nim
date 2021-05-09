@@ -1,31 +1,10 @@
 import strutils, strformat
-from sequtils import any
-from os import `/`, fileExists, extractFilename, changeFileExt, parentDir,
-  copyFileToDir, findExe
+from sequtils import anyIt
+from os import `/`, extractFilename, changeFileExt, findExe
 from osproc import execCmd
-from sugar import `=>`
 import regex
 
-
-# Copy header files from C sources to build directory
-
-const
-  projectDir = currentSourcePath().parentDir().parentDir()
-  raylibDir = projectDir/"raylib"
-  rayguiDir = projectDir/"raygui"
-  filesToConvert = [
-    raylibDir/"src/raylib.h",
-    raylibDir/"src/rlgl.h",
-    raylibDir/"src/raymath.h",
-    rayguiDir/"src/raygui.h",
-    raylibDir/"src/physac.h",
-  ]
-  buildDir = projectDir/"build"
-  targetDir = projectDir/"src"/"nimraylib_now"
-
-for file in filesToConvert:
-  copyFileToDir(file, buildDir)
-  copyFileToDir(file, targetDir)
+from mangle_names import buildDir, targetDir
 
 
 # Parse files to (((Nim))) wrappers
@@ -88,6 +67,7 @@ const
 
   raylibHeader = """
 #ifdef C2NIM
+#  prefix NmrlbNow_
 #  def RLAPI
 #  header raylibHeader
 #  cdecl
@@ -142,6 +122,7 @@ when not defined(nimraylib_now_linkingOverride):
 """
   rlglHeader = """
 #ifdef C2NIM
+#  prefix NmrlbNow_
 #  def RLAPI
 #  header rlglHeader
 #  cdecl
@@ -164,6 +145,7 @@ const rlglHeader = currentSourcePath().parentDir()/"rlgl.h"
 """
   raymathHeader = """
 #ifdef C2NIM
+#  prefix NmrlbNow_
 #  def RMDEF static inline
 #  header raymathHeader
 #  cdecl
@@ -181,6 +163,7 @@ const raymathHeader = currentSourcePath().parentDir()/"raymath.h"
 """
   rayguiHeader = """
 #ifdef C2NIM
+#  prefix NmrlbNow_
 #  def RAYGUIDEF
 #  header rayguiHeader
 #  cdecl
@@ -200,6 +183,7 @@ const rayguiHeader = currentSourcePath().parentDir()/"raygui.h"
 """
   physacHeader = """
 #ifdef C2NIM
+#  prefix NmrlbNow_
 #  def PHYSACDEF
 #  header physacHeader
 #  cdecl
@@ -218,7 +202,7 @@ const physacHeader = currentSourcePath().parentDir()/"physac.h"
 #endif
 """
 
-  raylibFiles = [
+  raylibHeaders = [
     (buildDir/"raylib.h", raylibHeader),
     (buildDir/"rlgl.h", rlglHeader),
     (buildDir/"raymath.h", raymathHeader),
@@ -238,7 +222,7 @@ const physacHeader = currentSourcePath().parentDir()/"physac.h"
 
 
 # Start processing all files
-for (filepath, c2nimheader) in raylibFiles:
+for (filepath, c2nimheader) in raylibHeaders:
   let filename = filepath.extractFilename.changeFileExt("")
 
   # Preprocessing of C header file before feeding it to c2nim
@@ -258,7 +242,7 @@ for (filepath, c2nimheader) in raylibFiles:
       let
         line = raylibhLines[i]
         words = line.splitWhitespace
-      if selfModuleDeclarationNames.any((name) => name in line):
+      if selfModuleDeclarationNames.anyIt(it in line):
         if "#endif" in line: # this is the end of h file and start of implementation
           echo "Reached end of header part: " & line
           break
@@ -319,7 +303,7 @@ for (filepath, c2nimheader) in raylibFiles:
         # Remember to still add this line
         rs.add line & "\n"
       elif words.len > 0 and (words[0] == "#if" or words[0] == "#ifndef") and
-           allowIfs.any((ident) => ident notin line):
+           allowIfs.anyIt(it notin line):
         echo "Ignore branch: " & line
         var nestLevels = 1
         while nestLevels > 0:

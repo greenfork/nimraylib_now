@@ -14,9 +14,13 @@ when not defined(nimraylib_now_linkingOverride):
     CurrentDirectory = currentSourcePath().parentDir()
     NimraylibNowProjectPath = CurrentDirectory.parentDir().parentDir()
     RaylibSrcPath = NimraylibNowProjectPath / "raylib" / "src"
+    NimraylibNowSrcPath = NimraylibNowProjectPath / "src" / "nimraylib_now"
     # Use relative paths just in case
     # https://github.com/nim-lang/Nim/issues/9370
     RaylibSrcPathRelative = relativePath(RaylibSrcPath, CurrentDirectory)
+    # We also use mangled names to avoid conflicts with `windows.h`, see
+    # `src/mangle_names.nim` for more info.
+    NimraylibNowSrcPathRelative = relativePath(NimraylibNowSrcPath, CurrentDirectory)
 
   {.passC: "-Wall -D_DEFAULT_SOURCE -Wno-missing-braces -Werror=pointer-arith -fno-strict-aliasing".}
   {.passC: "-std=c99".}
@@ -35,12 +39,13 @@ when not defined(nimraylib_now_linkingOverride):
     else:
       {.passL: "-lX11".}
 
+  # *BSD platforms need to be tested.
   when defined(bsd):
     {.passC: "-I/usr/local/include".}
     {.passL: "-L" & RaylibSrcPath.}
-    {.passL: "-L" & RaylibSrcPath & "/src".}
+    # {.passL: "-L" & RaylibSrcPath & "/src".}
     {.passL: "-L/usr/local/lib".}
-    {.passL: "-L" & RaylibReleasePath.}
+    {.passL: "-L" & NimraylibNowSrcPath.}
 
   when defined(macosx):
     {.passL: "-framework CoreVideo".}
@@ -53,10 +58,11 @@ when not defined(nimraylib_now_linkingOverride):
     {.compile(RaylibSrcPathRelative & "/rglfw.c", "-x objective-c").}
   else:
     {.compile: RaylibSrcPathRelative & "/rglfw.c".}
-  {.compile: RaylibSrcPathRelative & "/shapes.c".}
-  {.compile: RaylibSrcPathRelative & "/textures.c".}
-  {.compile: RaylibSrcPathRelative & "/text.c".}
-  {.compile: RaylibSrcPathRelative & "/utils.c".}
-  {.compile: RaylibSrcPathRelative & "/models.c".}
-  {.compile: RaylibSrcPathRelative & "/raudio.c".}
-  {.compile: RaylibSrcPathRelative & "/core.c".}
+
+  {.compile: NimraylibNowSrcPathRelative & "/shapes.c".}
+  {.compile: NimraylibNowSrcPathRelative & "/textures.c".}
+  {.compile: NimraylibNowSrcPathRelative & "/text.c".}
+  {.compile: NimraylibNowSrcPathRelative & "/utils.c".}
+  {.compile: NimraylibNowSrcPathRelative & "/models.c".}
+  {.compile: NimraylibNowSrcPathRelative & "/raudio.c".}
+  {.compile: NimraylibNowSrcPathRelative & "/core.c".}
