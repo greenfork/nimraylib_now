@@ -124,15 +124,20 @@ when defined(emscripten):
   type emCallbackFunc* = proc() {.cdecl.}
   proc emscriptenSetMainLoop*(f: emCallbackFunc, fps: cint, simulateInfiniteLoop: cint) {.
     cdecl, importc: "emscripten_set_main_loop", header: "<emscripten.h>".}
-else:
-  when defined(windows):
-    when defined(vcc):
-      # Should it be `link` instead of passL?
-      {.passL:"raylibdll.lib".}
-    else:
-      {.passL:"libraylibdll.a".}
+
+when not defined(linkingOverride):
+  when defined(static):
+    import raylib_build_static
   else:
-    {.passL:"-lraylib".}
+    when defined(windows):
+      when defined(vcc):
+        # Should it be `link` instead of passL?
+        {.passL:"raylibdll.lib".}
+      else:
+        {.passL:"libraylibdll.a".}
+    else:
+      {.passL:"-lraylib".}
+
 @#
 #endif
 """
