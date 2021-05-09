@@ -22,7 +22,7 @@ when not defined(nimraylib_now_linkingOverride):
     else:
       {.passL:"-lraylib".}
   else:
-    import raylib_build_static
+    include raylib_build_static
 
 ## *********************************************************************************************
 ##

@@ -32,7 +32,7 @@ const
     "from ../../src/nimraylib_now/rlgl as rl import nil\n" &
     "import ../examples/shaders/rlights\n" &
     "\n"
-  # Don't test shared options for windows
+  # Don't test shared library for windows
   testTemplateWindows =
     "discard \"\"\"\n" &
     "  action: \"compile\"\n" &
