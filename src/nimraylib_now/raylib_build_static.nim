@@ -32,6 +32,10 @@ when not defined(nimraylib_now_linkingOverride):
     {.passC: "-fPIC".}
     when defined(nimraylib_now_wayland):
       {.passC: "-D_GLFW_WAYLAND".}
+      {.passL: "-lwayland-client".}
+      {.passL: "-lwayland-cursor".}
+      {.passL: "-lwayland-egl".}
+      {.passL: "-lxkbcommon".}
     else:
       {.passL: "-lX11".}
 
@@ -43,6 +47,13 @@ when not defined(nimraylib_now_linkingOverride):
     {.passL: "-L/usr/local/lib".}
     {.passL: "-L" & RaylibSrcPath.}
 
+    {.passL: "-lX11".}
+    {.passL: "-lXrandr".}
+    {.passL: "-lXinerama".}
+    {.passL: "-lXi".}
+    {.passL: "-lXxf86vm".}
+    {.passL: "-lXcursor".}
+
   when defined(macosx):
     {.passL: "-framework CoreVideo".}
     {.passL: "-framework IOKit".}
@@ -52,6 +63,10 @@ when not defined(nimraylib_now_linkingOverride):
 
   when defined(windows):
     {.passL: "-lgdi32".}
+    {.passL: "-lopengl32".}
+    {.passL: "-lwinmm".}
+    {.passL: "-Wl,--subsystem,windows".}
+    {.passL: "-static".}
 
   when defined(macosx):
     {.compile(RaylibSrcPathRelative & "/rglfw.c", "-x objective-c").}
