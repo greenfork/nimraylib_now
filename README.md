@@ -53,17 +53,22 @@ side it should mainly consist of renaming, please try they wonderful tool
 ## How to use Raylib?
 
 You have 3 options:
+
 1. Static library linking - this is the default setting, Raylib will be linked
    statically to your executable. This means that its code will be directly
-   embedded into the executable file.
+   embedded into your game file.
+
 2. Shared library linking - this is activated with `-d:nimraylib_now_shared`
-   flag passed to the Nim compiler. This requires a present `raylib.dll` or
-   similar file depending on your OS. This is usually preferable for Linux.
+   flag passed to the Nim compiler and it requires a present `libraylib.so` or
+   similar file depending on your OS in your library load path. Shared linking
+   means that all Raylib functionality is inside a separate file and several
+   game files can all use this same shared Raylib file. This option is usually
+   preferable for Linux.
+
 3. Manual library linking - this is activated with `-d:nimraylib_now_overrideLinking`
    flag passed to the Nim compiler. This means that you build the Raylib
-   library yourself and link it yourself, for example with option `--passL:`
-   passed to the Nim compiler. This is a preferable option for any
-   non-desktop targets such as Android or Emscripten.
+   library yourself and link it, for example with option `--passL:`. This is a
+   preferable option for any non-desktop targets such as Android or Emscripten.
 
 ## Install Raylib as a static library
 
@@ -72,7 +77,14 @@ are included in this library and compiled automatically.
 
 ## Install Raylib as a shared library
 ### Windows
-Download latest library from [raylib releases] page for MinGW compiler, for version 3.7.0
+
+It is recommended to use static linking.
+
+Currently shared library linking is broken because of name conflicts with
+`windows.h` file. But if you really want to, you can rename all conflicting
+names inside `windows.h` and still use it as a shared library.
+
+Download the latest library from [raylib releases] page for MinGW compiler, for version 3.7.0
 the name is `raylib-3.7.0_win64_mingw-w64.zip`. Extract it and **make sure**
 that files `libraylibdll.a` and `raylib.dll` are always in the same directory
 as your game `.exe` file.
@@ -83,7 +95,7 @@ Use your package manager, for example for Arch Linux:
 $ sudo pacman -Syu raylib
 ```
 
-Alternatively download latest library from [raylib releases] page, for version 3.7.0
+Alternatively download the latest library from [raylib releases] page, for version 3.7.0
 the name is `raylib-3.7.0_linux_amd64.tar.gz`. Extract it and put all `.so`
 files into `/usr/local/lib`.
 
@@ -93,7 +105,7 @@ With brew package manager:
 $ brew install raylib
 ```
 
-Alternatively download latest library from [raylib releases] page, for version 3.7.0
+Alternatively download the latest library from [raylib releases] page, for version 3.7.0
 the name is `raylib-3.7.0_macos.tar.gz`. Extract it and put all `.dylib`
 files into `/usr/local/lib`.
 
@@ -107,6 +119,7 @@ browser.
 [how to use Emscripten]: examples/emscripten/
 
 ## Install NimraylibNow!
+
 Install this library with nimble (takes **6-10(!) minutes** because of huge
 original raylib repository):
 ```shell
