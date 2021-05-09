@@ -28,8 +28,8 @@ const
     "  disabled: \"win\"\n" &
     "\"\"\"\n" &
     "import lenientops, math, times, strformat, atomics, system/ansi_c\n" &
-    "import ../../src/nimraylib_now/[raylib, raygui, raymath, physac]\n" &
-    "from ../../src/nimraylib_now/rlgl as rl import nil\n" &
+    "import ../src/nimraylib_now/[raylib, raygui, raymath, physac]\n" &
+    "from ../src/nimraylib_now/rlgl as rl import nil\n" &
     "import ../examples/shaders/rlights\n" &
     "\n"
   # Don't test shared library for windows
@@ -43,8 +43,8 @@ const
     "  disabled: \"macosx\"\n" &
     "\"\"\"\n" &
     "import lenientops, math, times, strformat, atomics, system/ansi_c\n" &
-    "import ../../src/nimraylib_now/[raylib, raygui, raymath, physac]\n" &
-    "from ../../src/nimraylib_now/rlgl as rl import nil\n" &
+    "import ../src/nimraylib_now/[raylib, raygui, raymath, physac]\n" &
+    "from ../src/nimraylib_now/rlgl as rl import nil\n" &
     "import ../examples/shaders/rlights\n" &
     "\n"
 

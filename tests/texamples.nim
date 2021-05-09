@@ -5,8 +5,8 @@ discard """
   disabled: "win"
 """
 import lenientops, math, times, strformat, atomics, system/ansi_c
-import ../../src/nimraylib_now/[raylib, raygui, raymath, physac]
-from ../../src/nimraylib_now/rlgl as rl import nil
+import ../src/nimraylib_now/[raylib, raygui, raymath, physac]
+from ../src/nimraylib_now/rlgl as rl import nil
 import ../examples/shaders/rlights
 
 block audio_module_playing:

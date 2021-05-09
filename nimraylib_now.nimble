@@ -5,7 +5,7 @@ author = "Dmitry Matveyev"
 description = "The Ultimate Raylib gaming library wrapper"
 license = "MIT"
 srcDir = "src"
-skipFiles = @["converter.nim"]
+skipFiles = @["converter.nim", "mangle_names.nim"]
 backend = "c"
 
 # Dependencies
@@ -18,11 +18,14 @@ from os import `/`
 task convert, "run with c2nim":
   let
     converterFile = "src"/"converter.nim"
+    manglerFile = "src"/"mangle_names.nim"
     raylibFile = "src"/"nimraylib_now"/"raylib.nim"
     rayguiFile = "src"/"nimraylib_now"/"raygui.nim"
     rlglFile = "src"/"nimraylib_now"/"rlgl.nim"
     raymathFile = "src"/"nimraylib_now"/"raymath.nim"
     physacFile = "src"/"nimraylib_now"/"physac.nim"
+  echo "Running name mangler\n"
+  exec "nim r " & manglerFile
   echo "Running converter\n"
   exec "nim r " & converterFile
   echo "\nExecuting nim check\n"
@@ -31,12 +34,6 @@ task convert, "run with c2nim":
   exec "nim check " & raymathFile
   exec "nim check " & rayguiFile
   exec "nim check " & physacFile
-
-task buildRaygui, "build raygui as a dynamic library":
-  let sourceFile = "raygui"/"src"/"raygui.h"
-  exec "cc -x c -fPIC -c -o raygui.o -DRAYGUI_IMPLEMENTATION -DRAYGUI_SUPPORT_ICONS " & sourceFile
-  exec "cc -shared -o libraygui.so -lraylib raygui.o"
-  rmFile "raygui.o"
 
 task testExamples, "checks that all examples are correctly compiled":
   exec "testament run texamples.nim"

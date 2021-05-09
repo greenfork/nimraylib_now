@@ -32,15 +32,27 @@ when not defined(nimraylib_now_linkingOverride):
     {.passC: "-fPIC".}
     when defined(nimraylib_now_wayland):
       {.passC: "-D_GLFW_WAYLAND".}
+      {.passL: "-lwayland-client".}
+      {.passL: "-lwayland-cursor".}
+      {.passL: "-lwayland-egl".}
+      {.passL: "-lxkbcommon".}
     else:
       {.passL: "-lX11".}
 
+  # *BSD platforms need to be tested.
   when defined(bsd):
     {.passC: "-I/usr/local/include".}
     {.passL: "-L" & RaylibSrcPath.}
-    {.passL: "-L" & RaylibSrcPath & "/src".}
+    # {.passL: "-L" & RaylibSrcPath & "/src".}
     {.passL: "-L/usr/local/lib".}
-    {.passL: "-L" & RaylibReleasePath.}
+    {.passL: "-L" & RaylibSrcPath.}
+
+    {.passL: "-lX11".}
+    {.passL: "-lXrandr".}
+    {.passL: "-lXinerama".}
+    {.passL: "-lXi".}
+    {.passL: "-lXxf86vm".}
+    {.passL: "-lXcursor".}
 
   when defined(macosx):
     {.passL: "-framework CoreVideo".}
@@ -49,10 +61,18 @@ when not defined(nimraylib_now_linkingOverride):
     {.passL: "-framework GLUT".}
     {.passL: "-framework OpenGL".}
 
+  when defined(windows):
+    {.passL: "-lgdi32".}
+    {.passL: "-lopengl32".}
+    {.passL: "-lwinmm".}
+    {.passL: "-Wl,--subsystem,windows".}
+    {.passL: "-static".}
+
   when defined(macosx):
     {.compile(RaylibSrcPathRelative & "/rglfw.c", "-x objective-c").}
   else:
     {.compile: RaylibSrcPathRelative & "/rglfw.c".}
+
   {.compile: RaylibSrcPathRelative & "/shapes.c".}
   {.compile: RaylibSrcPathRelative & "/textures.c".}
   {.compile: RaylibSrcPathRelative & "/text.c".}

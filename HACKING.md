@@ -1,14 +1,18 @@
 # How wrapping works
 
-`nimble convert` runs `src/converter.nim` script and checks that the resulting
-files are valid Nim files.
+`nimble convert` runs `src/mangle_names.nim` and `src/converter.nim` scripts
+and checks that the resulting files are valid Nim files.
 
-There are 4 steps during conversion:
+There are 7 steps during conversion:
 
-1. Get C header files
-2. Modify C header files (preprocessing)
-3. Run [c2nim] on modified C header files (processing)
-4. Modify resulting Nim files (postprocessing)
+1. Get C source and header files
+2. Mangle names in C source and header files
+3. Copy mangled C files to release C files, next modifications on C files
+   are kept just for build purposes
+4. Modify C header files (preprocessing)
+5. Run [c2nim] on modified C header files (processing)
+6. Modify resulting Nim files (postprocessing)
+7. Copy modified Nim files to release Nim files
 
 [c2nim]: https://github.com/nim-lang/c2nim
 
