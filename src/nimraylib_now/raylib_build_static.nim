@@ -5,7 +5,7 @@
 
 # Add the ability to do all the linking manually.
 when not defined(linkingOverride):
-  import os, strformat
+  from os import parentDir, relativePath, `/`
 
   const
     Platform = "PLATFORM_DESKTOP"
@@ -48,13 +48,13 @@ when not defined(linkingOverride):
   {.passC: "-D" & Graphics.}
 
   when defined(macosx):
-    {.compile(fmt"{RaylibSrcPathRelative}/rglfw.c", "-x objective-c").}
+    {.compile(RaylibSrcPathRelative & "/rglfw.c", "-x objective-c").}
   else:
-    {.compile: fmt"{RaylibSrcPathRelative}/rglfw.c".}
-  {.compile: fmt"{RaylibSrcPathRelative}/shapes.c".}
-  {.compile: fmt"{RaylibSrcPathRelative}/textures.c".}
-  {.compile: fmt"{RaylibSrcPathRelative}/text.c".}
-  {.compile: fmt"{RaylibSrcPathRelative}/utils.c".}
-  {.compile: fmt"{RaylibSrcPathRelative}/models.c".}
-  {.compile: fmt"{RaylibSrcPathRelative}/raudio.c".}
-  {.compile: fmt"{RaylibSrcPathRelative}/core.c".}
+    {.compile: RaylibSrcPathRelative & "/rglfw.c".}
+  {.compile: RaylibSrcPathRelative & "/shapes.c".}
+  {.compile: RaylibSrcPathRelative & "/textures.c".}
+  {.compile: RaylibSrcPathRelative & "/text.c".}
+  {.compile: RaylibSrcPathRelative & "/utils.c".}
+  {.compile: RaylibSrcPathRelative & "/models.c".}
+  {.compile: RaylibSrcPathRelative & "/raudio.c".}
+  {.compile: RaylibSrcPathRelative & "/core.c".}
