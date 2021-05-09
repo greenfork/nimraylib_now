@@ -1,8 +1,10 @@
 discard """
   action: "compile"
   joinable: false
-  matrix: "; -d:release; --gc:orc -d:release; -d:nimraylib_now_shared -d:release; -d:nimraylib_now_shared -d:release --gc:orc"
-  disabled: "win"
+  matrix: "; -d:release; --gc:orc -d:release;"
+  disabled: "linux"
+  disabled: "bsd"
+  disabled: "macosx"
 """
 import lenientops, math, times, strformat, atomics, system/ansi_c
 import ../../src/nimraylib_now/[raylib, raygui, raymath, physac]
