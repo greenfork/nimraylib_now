@@ -49,6 +49,9 @@ const
     re"\b(Rectangle)\b",
     re"\b(CloseWindow)\b",
     re"\b(ShowCursor)\b",
+    re"\b(LoadImage)\b",
+    re"\b(DrawText)\b",
+    re"\b(DrawTextEx)\b",
   ]
   manglePrefix* = "NmrlbNow_"
 
