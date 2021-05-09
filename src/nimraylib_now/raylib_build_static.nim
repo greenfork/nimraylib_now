@@ -43,11 +43,11 @@ when not defined(linkingOverride):
     {.passL: "-L" & RaylibReleasePath.}
 
   when defined(macosx):
-    {.passC: "-framework CoreVideo".}
-    {.passC: "-framework IOKit".}
-    {.passC: "-framework Cocoa".}
-    {.passC: "-framework GLUT".}
-    {.passC: "-framework OpenGL".}
+    {.passL: "-framework CoreVideo".}
+    {.passL: "-framework IOKit".}
+    {.passL: "-framework Cocoa".}
+    {.passL: "-framework GLUT".}
+    {.passL: "-framework OpenGL".}
 
   when defined(macosx):
     {.compile(RaylibSrcPathRelative & "/rglfw.c", "-x objective-c").}
