@@ -59,7 +59,6 @@ while not windowShouldClose():#  Detect window close button or ESC key
 
     if mouseOnText: framesCounter.inc else: framesCounter = 0
     # ----------------------------------------------------------------------------------
-
     #  Draw
     # ----------------------------------------------------------------------------------
     beginDrawing()
@@ -85,20 +84,9 @@ while not windowShouldClose():#  Detect window close button or ESC key
         else: drawText "Press BACKSPACE to delete chars...", 230, 300, 20, GRAY
 
     endDrawing()
-    # ----------------------------------------------------------------------------------
 
+# ----------------------------------------------------------------------------------
 #  De-Initialization
 # --------------------------------------------------------------------------------------
 closeWindow()        #  Close window and OpenGL context
 # --------------------------------------------------------------------------------------
-
-#  Check if any key is pressed
-#  NOTE: We limit keys check to keys between 32 (KEY_SPACE) and 126
-proc isAnyKeyPressed(): bool =
-    var
-        keyPressed = false
-        key = getKeyPressed()
-
-    if key >= 32 and key <= 126: keyPressed = true
-
-    return keyPressed

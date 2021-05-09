@@ -26,7 +26,6 @@ const GLSL_VERSION = 330
 
 const MAX_PALETTES       = 3
 const COLORS_PER_PALETTE = 8
-const VALUES_PER_COLOR   = 3
 
 var palettes = [
     [   #  3-BIT RGB

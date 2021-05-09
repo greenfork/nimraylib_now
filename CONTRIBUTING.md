@@ -9,13 +9,13 @@ Any ideas on how to improve documentation are welcome!
 You can help by converting missing examples from original C library doing
 the following:
 1. Find a missing example in C, you can use helper script for that:
-   `nim r tools/find_missing_examples.nim`.
-2. Compile and run `tools/c2nim_example_converter.nim` on this C file, it helps
+   `nim r scripts/find_missing_examples.nim`.
+2. Compile and run `scripts/c2nim_example_converter.nim` on this C file, it helps
    with conversion.
 3. Edit resulting Nim file, make sure it runs.
 4. Put this file into a correct category in `examples` (`original` is for
    self-developed examples).
-5. Compile and run `tools/make_tests_from_examples.nim` without any arguments,
+5. Compile and run `scripts/make_tests_from_examples.nim` without any arguments,
    it should create a test file in `tests/examples/yourcategory`.
 6. Run `nimble testExamples` and make sure that your example passes the test.
    If it doesn't pass the test, create an issue or ask me any other way, I will

@@ -2719,7 +2719,7 @@ block crown:
     target: (0.0, 0.0, 0.0),     # Camera target it looks-at
     up: (0.0, 1.0, 0.0),         # Camera up vector (rotation over its axis)
     fovy: 45.0,                  # Camera field-of-view apperture in Y (degrees)
-    projection: Perspective            # Defines projection type, see CameraType
+    projection: Perspective      # Defines projection type, see CameraProjection
   )
   camera.setCameraMode(Orbital)  # Several modes available, see CameraMode
 
@@ -4101,7 +4101,6 @@ block shaders_palette_switch:
 
   const MAX_PALETTES       = 3
   const COLORS_PER_PALETTE = 8
-  const VALUES_PER_COLOR   = 3
 
   var palettes = [
       [   #  3-BIT RGB
@@ -4696,7 +4695,6 @@ block text_input_box:
 
       if mouseOnText: framesCounter.inc else: framesCounter = 0
       # ----------------------------------------------------------------------------------
-
       #  Draw
       # ----------------------------------------------------------------------------------
       beginDrawing()
@@ -4722,23 +4720,12 @@ block text_input_box:
           else: drawText "Press BACKSPACE to delete chars...", 230, 300, 20, GRAY
 
       endDrawing()
-      # ----------------------------------------------------------------------------------
 
+  # ----------------------------------------------------------------------------------
   #  De-Initialization
   # --------------------------------------------------------------------------------------
   closeWindow()        #  Close window and OpenGL context
   # --------------------------------------------------------------------------------------
-
-  #  Check if any key is pressed
-  #  NOTE: We limit keys check to keys between 32 (KEY_SPACE) and 126
-  proc isAnyKeyPressed(): bool =
-      var
-          keyPressed = false
-          key = getKeyPressed()
-
-      if key >= 32 and key <= 126: keyPressed = true
-
-      return keyPressed
 
 
 block text_rectangle_bound:
