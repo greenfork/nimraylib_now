@@ -39,15 +39,15 @@ const
 
 # Do clean up
 
-# for file in queryPerfFiles:
-#   var content: string
-#   for line in file.lines:
-#     if "int __stdcall QueryPerformanceCounter" in line or
-#        "int __stdcall QueryPerformanceFrequency" in line:
-#       echo "Ignore: " & line
-#     else:
-#       content.add line & "\n"
-#   writeFile(file, content)
+for file in queryPerfFiles:
+  var content: string
+  for line in file.lines:
+    if "int __stdcall QueryPerformanceCounter" in line or
+       "int __stdcall QueryPerformanceFrequency" in line:
+      echo "Ignore: " & line
+    else:
+      content.add line & "\n"
+  writeFile(file, content)
 
 
 # Do name mangling
