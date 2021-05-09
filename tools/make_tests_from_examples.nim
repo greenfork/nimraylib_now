@@ -16,8 +16,8 @@ for dir in walkDirs(testsDir/"*"):
 var exampleCategories: seq[string]
 for dir in walkDirs(examplesDir/"*"):
   let dirName = dir.lastPathPart
-  exampleCategories.add dirName
-  # createDir(testsDir/dirName)
+  if dirName != "emscripten":
+    exampleCategories.add dirName
 
 const testTemplate =
   "discard \"\"\"\n" &

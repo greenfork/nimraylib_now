@@ -65,7 +65,7 @@ setTargetFPS(60)
 while not windowShouldClose(): ##  Detect window close button or ESC key
   ##  Update
   ## ----------------------------------------------------------------------------------
-  runPhysicsStep()
+  updatePhysics()
   if isKeyPressed(R):
     ##  Reset movement physics body position, velocity and rotation
     body.position = (screenWidth.float / 2.0, screenHeight.float / 2.0)

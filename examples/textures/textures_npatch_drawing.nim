@@ -38,7 +38,7 @@ var ninePatchInfo1: NPatchInfo = NPatchInfo(
   top: 40,
   right: 12,
   bottom: 12,
-  type: NPT_9PATCH
+  layout: NINE_PATCH
 )
 var ninePatchInfo2: NPatchInfo = NPatchInfo(
   source: (0.0, 128.0, 64.0, 64.0),
@@ -46,7 +46,7 @@ var ninePatchInfo2: NPatchInfo = NPatchInfo(
   top: 16,
   right: 16,
   bottom: 16,
-  type: NPT_9PATCH
+  layout: NINE_PATCH
 )
 ##  A horizontal 3-patch (NPT_3PATCH_HORIZONTAL) changes its sizes along the x axis only
 var h3PatchInfo: NPatchInfo = NPatchInfo(
@@ -55,7 +55,7 @@ var h3PatchInfo: NPatchInfo = NPatchInfo(
   top: 8,
   right: 8,
   bottom: 8,
-  type: NPT_3PATCH_HORIZONTAL
+  layout: THREE_PATCH_HORIZONTAL
 )
 ##  A vertical 3-patch (NPT_3PATCH_VERTICAL) changes its sizes along the y axis only
 var v3PatchInfo: NPatchInfo = NPatchInfo(
@@ -64,7 +64,7 @@ var v3PatchInfo: NPatchInfo = NPatchInfo(
   top: 6,
   right: 6,
   bottom: 6,
-  type: NPT_3PATCH_VERTICAL
+  layout: THREE_PATCH_VERTICAL
 )
 setTargetFPS(60)
 ## ---------------------------------------------------------------------------------------

@@ -6,7 +6,7 @@ const physacHeader = currentSourcePath().parentDir()/"physac.h"
 {.passC: "-DPHYSAC_NO_THREADS".}
 ## *********************************************************************************************
 ##
-##    Physac v1.0 - 2D Physics library for videogames
+##    Physac v1.1 - 2D Physics library for videogames
 ##
 ##    DESCRIPTION:
 ##
@@ -26,38 +26,44 @@ const physacHeader = currentSourcePath().parentDir()/"physac.h"
 ##        The generated implementation will stay private inside implementation file and all
 ##        internal symbols and functions will only be visible inside that file.
 ##
-##    #define PHYSAC_NO_THREADS
-##        The generated implementation won't include pthread library and user must create a secondary thread to call PhysicsThread().
-##        It is so important that the thread where PhysicsThread() is called must not have v-sync or any other CPU limitation.
-##
-##    #define PHYSAC_STANDALONE
-##        Avoid raylib.h header inclusion in this file. Data types defined on raylib are defined
-##        internally in the library and input management and drawing functions must be provided by
-##        the user (check library implementation for further details).
-##
 ##    #define PHYSAC_DEBUG
-##        Traces log messages when creating and destroying physics bodies and detects errors in physics
-##        calculations and reference exceptions; it is useful for debug purposes
+##        Show debug traces log messages about physic bodies creation/destruction, physic system errors,
+##        some calculations results and NULL reference exceptions
+##
+##    #define PHYSAC_DEFINE_VECTOR2_TYPE
+##        Forces library to define struct Vector2 data type (float x; float y)
+##
+##    #define PHYSAC_AVOID_TIMMING_SYSTEM
+##        Disables internal timming system, used by UpdatePhysics() to launch timmed physic steps,
+##        it allows just running UpdatePhysics() automatically on a separate thread at a desired time step.
+##        In case physics steps update needs to be controlled by user with a custom timming mechanism,
+##        just define this flag and the internal timming mechanism will be avoided, in that case,
+##        timming libraries are neither required by the module.
 ##
 ##    #define PHYSAC_MALLOC()
+##    #define PHYSAC_CALLOC()
 ##    #define PHYSAC_FREE()
 ##        You can define your own malloc/free implementation replacing stdlib.h malloc()/free() functions.
 ##        Otherwise it will include stdlib.h and use the C standard library malloc()/free() function.
 ##
+##    COMPILATION:
 ##
-##    NOTE 1: Physac requires multi-threading, when InitPhysics() a second thread is created to manage physics calculations.
-##    NOTE 2: Physac requires static C library linkage to avoid dependency on MinGW DLL (-static -lpthread)
+##    Use the following code to compile with GCC:
+##        gcc -o $(NAME_PART).exe $(FILE_NAME) -s -static -lraylib -lopengl32 -lgdi32 -lwinmm -std=c99
 ##
-##    Use the following code to compile:
-##    gcc -o $(NAME_PART).exe $(FILE_NAME) -s -static -lraylib -lpthread -lopengl32 -lgdi32 -lwinmm -std=c99
-##
-##    VERY THANKS TO:
-##        Ramon Santamaria (github: @raysan5)
+##    VERSIONS HISTORY:
+##        1.1 (20-Jan-2021) @raysan5: Library general revision
+##                Removed threading system (up to the user)
+##                Support MSVC C++ compilation using CLITERAL()
+##                Review DEBUG mechanism for TRACELOG() and all TRACELOG() messages
+##                Review internal variables/functions naming for consistency
+##                Allow option to avoid internal timming system, to allow app manage the steps
+##        1.0 (12-Jun-2017) First release of the library
 ##
 ##
 ##    LICENSE: zlib/libpng
 ##
-##    Copyright (c) 2016-2018 Victor Fisac (github: @victorfisac)
+##    Copyright (c) 2016-2021 Victor Fisac (@victorfisac) and Ramon Santamaria (@raysan5)
 ##
 ##    This software is provided "as-is", without any express or implied warranty. In no event
 ##    will the authors be held liable for any damages arising from the use of this software.
@@ -84,22 +90,18 @@ const
   MAX_BODIES* = 64
   MAX_MANIFOLDS* = 4096
   MAX_VERTICES* = 24
-  CIRCLE_VERTICES* = 24
+  DEFAULT_CIRCLE_VERTICES* = 24
   COLLISION_ITERATIONS* = 100
   PENETRATION_ALLOWANCE* = 0.05
   PENETRATION_CORRECTION* = 0.4
 
-## ----------------------------------------------------------------------------------
-##  Types and Structures Definition
-##  NOTE: Below types are required for PHYSAC_STANDALONE usage
-## ----------------------------------------------------------------------------------
 ## ----------------------------------------------------------------------------------
 ##  Data Types Structure Definition
 ## ----------------------------------------------------------------------------------
 
 type
   PhysicsShapeType* {.size: sizeof(cint), pure.} = enum
-    CIRCLE, POLYGON
+    CIRCLE = 0, POLYGON
 
 
 ##  Previously defined to be used in PhysicsShape struct as circular dependencies
@@ -112,20 +114,20 @@ type
     m10* {.importc: "m10".}: cfloat
     m11* {.importc: "m11".}: cfloat
 
-  PolygonData* {.importc: "PolygonData", header: physacHeader, bycopy.} = object
-    vertexCount* {.importc: "vertexCount".}: cuint ##  Current used vertex and normals count
-    positions* {.importc: "positions".}: array[MAX_VERTICES, Vector2] ##  Polygon vertex positions vectors
-    normals* {.importc: "normals".}: array[MAX_VERTICES, Vector2] ##  Polygon vertex normals vectors
+  PhysicsVertexData* {.importc: "PhysicsVertexData", header: physacHeader, bycopy.} = object
+    vertexCount* {.importc: "vertexCount".}: cuint ##  Vertex count (positions and normals)
+    positions* {.importc: "positions".}: array[MAX_VERTICES, Vector2] ##  Vertex positions vectors
+    normals* {.importc: "normals".}: array[MAX_VERTICES, Vector2] ##  Vertex normals vectors
 
   PhysicsShape* {.importc: "PhysicsShape", header: physacHeader, bycopy.} = object
-    `type`* {.importc: "type".}: PhysicsShapeType ##  Physics shape type (circle or polygon)
-    body* {.importc: "body".}: PhysicsBody ##  Shape physics body reference
-    radius* {.importc: "radius".}: cfloat ##  Circle shape radius (used for circle shapes)
+    `type`* {.importc: "type".}: PhysicsShapeType ##  Shape type (circle or polygon)
+    body* {.importc: "body".}: PhysicsBody ##  Shape physics body data pointer
+    vertexData* {.importc: "vertexData".}: PhysicsVertexData ##  Shape vertices data (used for polygon shapes)
+    radius* {.importc: "radius".}: cfloat ##  Shape radius (used for circle shapes)
     transform* {.importc: "transform".}: Matrix2x2 ##  Vertices transform matrix 2x2
-    vertexData* {.importc: "vertexData".}: PolygonData ##  Polygon shape vertices position and normals data (just used for polygon shapes)
 
   PhysicsBodyData* {.importc: "PhysicsBodyData", header: physacHeader, bycopy.} = object
-    id* {.importc: "id".}: cuint ##  Reference unique identifier
+    id* {.importc: "id".}: cuint ##  Unique identifier
     enabled* {.importc: "enabled".}: bool ##  Enabled dynamics state (collisions are calculated anyway)
     position* {.importc: "position".}: Vector2 ##  Physics body shape pivot
     velocity* {.importc: "velocity".}: Vector2 ##  Current linear velocity applied to position
@@ -143,11 +145,11 @@ type
     useGravity* {.importc: "useGravity".}: bool ##  Apply gravity force to dynamics
     isGrounded* {.importc: "isGrounded".}: bool ##  Physics grounded on other body state
     freezeOrient* {.importc: "freezeOrient".}: bool ##  Physics rotation constraint
-    shape* {.importc: "shape".}: PhysicsShape ##  Physics body shape information (type, radius, vertices, normals)
+    shape* {.importc: "shape".}: PhysicsShape ##  Physics body shape information (type, radius, vertices, transform)
 
   PhysicsBody* = ptr PhysicsBodyData
   PhysicsManifoldData* {.importc: "PhysicsManifoldData", header: physacHeader, bycopy.} = object
-    id* {.importc: "id".}: cuint ##  Reference unique identifier
+    id* {.importc: "id".}: cuint ##  Unique identifier
     bodyA* {.importc: "bodyA".}: PhysicsBody ##  Manifold first physics body reference
     bodyB* {.importc: "bodyB".}: PhysicsBody ##  Manifold second physics body reference
     penetration* {.importc: "penetration".}: cfloat ##  Depth of penetration from collision
@@ -163,24 +165,28 @@ type
 ## ----------------------------------------------------------------------------------
 ##  Module Functions Declaration
 ## ----------------------------------------------------------------------------------
+##  Physics system management
 
 proc initPhysics*() {.cdecl, importc: "InitPhysics", header: physacHeader.}
-##  Initializes physics values, pointers and creates physics loop thread
+##  Initializes physics system
 
-proc runPhysicsStep*() {.cdecl, importc: "RunPhysicsStep", header: physacHeader.}
-##  Run physics step, to be used if PHYSICS_NO_THREADS is set in your main loop
+proc updatePhysics*() {.cdecl, importc: "UpdatePhysics", header: physacHeader.}
+##  Update physics system
+
+proc resetPhysics*() {.cdecl, importc: "ResetPhysics", header: physacHeader.}
+##  Reset physics system (global variables)
+
+proc closePhysics*() {.cdecl, importc: "ClosePhysics", header: physacHeader.}
+##  Close physics system and unload used memory
 
 proc setPhysicsTimeStep*(delta: cdouble) {.cdecl, importc: "SetPhysicsTimeStep",
                                         header: physacHeader.}
 ##  Sets physics fixed time step in milliseconds. 1.666666 by default
 
-proc isPhysicsEnabled*(): bool {.cdecl, importc: "IsPhysicsEnabled",
-                              header: physacHeader.}
-##  Returns true if physics thread is currently enabled
-
 proc setPhysicsGravity*(x: cfloat; y: cfloat) {.cdecl, importc: "SetPhysicsGravity",
     header: physacHeader.}
 ##  Sets physics global gravity force
+##  Physic body creation/destroy
 
 proc createPhysicsBodyCircle*(pos: Vector2; radius: cfloat; density: cfloat): PhysicsBody {.
     cdecl, importc: "CreatePhysicsBodyCircle", header: physacHeader.}
@@ -196,6 +202,11 @@ proc createPhysicsBodyPolygon*(pos: Vector2; radius: cfloat; sides: cint;
     importc: "CreatePhysicsBodyPolygon", header: physacHeader.}
 ##  Creates a new polygon physics body with generic parameters
 
+proc destroyPhysicsBody*(body: PhysicsBody) {.cdecl, importc: "DestroyPhysicsBody",
+    header: physacHeader.}
+##  Destroy a physics body
+##  Physic body forces
+
 proc physicsAddForce*(body: PhysicsBody; force: Vector2) {.cdecl,
     importc: "PhysicsAddForce", header: physacHeader.}
 ##  Adds a force to a physics body
@@ -208,13 +219,18 @@ proc physicsShatter*(body: PhysicsBody; position: Vector2; force: cfloat) {.cdec
     importc: "PhysicsShatter", header: physacHeader.}
 ##  Shatters a polygon shape physics body to little physics bodies with explosion force
 
-proc getPhysicsBodiesCount*(): cint {.cdecl, importc: "GetPhysicsBodiesCount",
-                                   header: physacHeader.}
-##  Returns the current amount of created physics bodies
+proc setPhysicsBodyRotation*(body: PhysicsBody; radians: cfloat) {.cdecl,
+    importc: "SetPhysicsBodyRotation", header: physacHeader.}
+##  Sets physics body shape transform based on radians parameter
+##  Query physics info
 
 proc getPhysicsBody*(index: cint): PhysicsBody {.cdecl, importc: "GetPhysicsBody",
     header: physacHeader.}
 ##  Returns a physics body of the bodies pool at a specific index
+
+proc getPhysicsBodiesCount*(): cint {.cdecl, importc: "GetPhysicsBodiesCount",
+                                   header: physacHeader.}
+##  Returns the current amount of created physics bodies
 
 proc getPhysicsShapeType*(index: cint): cint {.cdecl, importc: "GetPhysicsShapeType",
     header: physacHeader.}
@@ -227,18 +243,4 @@ proc getPhysicsShapeVerticesCount*(index: cint): cint {.cdecl,
 proc getPhysicsShapeVertex*(body: PhysicsBody; vertex: cint): Vector2 {.cdecl,
     importc: "GetPhysicsShapeVertex", header: physacHeader.}
 ##  Returns transformed position of a body shape (body position + vertex transformed position)
-
-proc setPhysicsBodyRotation*(body: PhysicsBody; radians: cfloat) {.cdecl,
-    importc: "SetPhysicsBodyRotation", header: physacHeader.}
-##  Sets physics body shape transform based on radians parameter
-
-proc destroyPhysicsBody*(body: PhysicsBody) {.cdecl, importc: "DestroyPhysicsBody",
-    header: physacHeader.}
-##  Unitializes and destroy a physics body
-
-proc resetPhysics*() {.cdecl, importc: "ResetPhysics", header: physacHeader.}
-##  Destroys created physics bodies and manifolds and resets global values
-
-proc closePhysics*() {.cdecl, importc: "ClosePhysics", header: physacHeader.}
-##  Unitializes physics pointers and closes physics loop thread
 

@@ -26,7 +26,7 @@ camera.position = (x: 0.0, y: 10.0, z: 10.0)
 camera.target   = (x: 0.0, y: 0.0, z: 0.0)
 camera.up       = (x: 0.0, y: 1.0, z: 0.0)
 camera.fovy     = 45.0
-camera.`type`   = PERSPECTIVE
+camera.projection   = PERSPECTIVE
 
 60.setTargetFPS                #  Set our game to run at 60 frames-per-second
 # --------------------------------------------------------------------------------------

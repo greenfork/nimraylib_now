@@ -40,6 +40,25 @@ $ nimble testExamples  # make sure every example still compiles
 $ git commit --all --verbose
 $ git tag -a v1.2.0  # version 1.2.0 is from nimble file earlier
 $ git push --all
+$ git push --tags
 ```
 
 [semver]: https://semver.org/
+
+# Notes on updating
+## Aliases of deprecated values
+
+Look fore new `const` in generated Nim file, they are translated from C
+`#define` and usually are for deprecated names. Some of these deprecated
+names include enum values and can't be written in Nim because Nim uses
+typed enums. In this case just add them to `ignoreDefines` array in converter
+script. If desired, any not enum values can be equivalently translated from
+C using `template`.
+
+## Changed const/enum prefixes
+
+When there's a diff related to the name changed across many enum values, it is
+likely that their prefix was changed. Look for `#  prefix CAMERA_` declarations
+used by `c2nim` in converter script and see if it needs to be changed,
+for example to `#  prefix CAMERA_TYPE_`. The diff should help to guess what
+was changed `git diff src/nimraylib_now/raylib.nim`.

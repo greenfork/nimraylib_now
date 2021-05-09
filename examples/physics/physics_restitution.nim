@@ -54,7 +54,7 @@ setTargetFPS(60)
 while not windowShouldClose(): ##  Detect window close button or ESC key
   ##  Update
   ## ----------------------------------------------------------------------------------
-  runPhysicsStep()
+  updatePhysics()
   if isKeyPressed(R):
     ##  Reset circles physics bodies position and velocity
     circleA.position = Vector2(x: screenWidth.float * 0.25, y: screenHeight.float / 2.0)

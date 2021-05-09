@@ -39,4 +39,4 @@ task buildRaygui, "build raygui as a dynamic library":
   rmFile "raygui.o"
 
 task testExamples, "checks that all examples are correctly compiled":
-  exec "testament run texamples"
+  exec "testament run texamples.nim"

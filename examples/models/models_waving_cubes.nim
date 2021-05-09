@@ -29,7 +29,7 @@ camera.position = (x: 30.0, y: 20.0, z: 30.0)
 camera.target   = (x: 0.0, y: 0.0, z: 0.0)
 camera.up       = (x: 0.0, y: 1.0, z: 0.0)
 camera.fovy     = 70.0
-camera.`type`   = PERSPECTIVE
+camera.projection   = PERSPECTIVE
 
 #  Specify the amount of blocks in each direction
 const numBlocks = 15
