@@ -106,7 +106,7 @@ when defined(emscripten):
   proc emscriptenSetMainLoop*(f: emCallbackFunc, fps: cint, simulateInfiniteLoop: cint) {.
     cdecl, importc: "emscripten_set_main_loop", header: "<emscripten.h>".}
 
-when not defined(nimraylib_now_linkingOverride):
+when not defined(nimraylib_now_linkingOverride) and not defined(emscripten):
   when defined(nimraylib_now_shared):
     when defined(windows):
       when defined(vcc):
