@@ -10,8 +10,6 @@ when not defined(nimraylib_now_linkingOverride):
   import ../filenames
 
   const
-    Platform = "PLATFORM_DESKTOP"
-    Graphics = "GRAPHICS_API_OPENGL_33"
     CurrentDirectory = currentSourcePath().parentDir()
     RaylibRootPath {.used.} = raylibSrcDir.parentDir()
     RaylibSrcPath = raylibBuildDir
@@ -19,10 +17,25 @@ when not defined(nimraylib_now_linkingOverride):
     # https://github.com/nim-lang/Nim/issues/9370
     RaylibSrcPathRelative = relativePath(RaylibSrcPath, CurrentDirectory)
 
+  when defined(emscripten):
+    const Platform = "PLATFORM_WEB"
+    const Graphics = "GRAPHICS_API_OPENGL_ES2"
+  else:
+    const Platform = "PLATFORM_DESKTOP"
+    const Graphics = "GRAPHICS_API_OPENGL_33"
+
   {.passC: "-Wall -D_DEFAULT_SOURCE -Wno-missing-braces -Werror=pointer-arith -fno-strict-aliasing".}
-  {.passC: "-std=c99".}
-  {.passC: "-s -O1".}
-  {.passC: "-Werror=implicit-function-declaration".}
+
+  when defined(emscripten):
+    {.passC: "-std=gnu99".}
+    {.passC: "-Os".}
+
+    {.passL: "-s USE_GLFW=3".}
+  else:
+    {.passC: "-std=c99".}
+    {.passC: "-s -O1".}
+    {.passC: "-Werror=implicit-function-declaration".}
+
   {.passC: "-I" & RaylibSrcPath.}
   {.passC: "-I" & RaylibSrcPath & "/external/glfw/include".}
   {.passC: "-I" & RaylibSrcPath & "/external/glfw/deps/mingw".}
@@ -31,22 +44,23 @@ when not defined(nimraylib_now_linkingOverride):
 
   when defined(linux):
     {.passC: "-fPIC".}
-    when defined(nimraylib_now_wayland):
-      {.passC: "-D_GLFW_WAYLAND".}
-      {.passL: "-lwayland-client".}
-      {.passL: "-lwayland-cursor".}
-      {.passL: "-lwayland-egl".}
-      {.passL: "-lxkbcommon".}
-    else:
-      {.passL: "-lX11".}
+
+    when not defined(emscripten):
+      when defined(nimraylib_now_wayland):
+        {.passC: "-D_GLFW_WAYLAND".}
+        {.passL: "-lwayland-client".}
+        {.passL: "-lwayland-cursor".}
+        {.passL: "-lwayland-egl".}
+        {.passL: "-lxkbcommon".}
+      else:
+        {.passL: "-lX11".}
 
   # *BSD platforms need to be tested.
-  when defined(bsd):
+  when defined(bsd) and not defined(emscripten):
     {.passC: "-I/usr/local/include".}
     {.passL: "-L" & RaylibRootPath.}
     {.passL: "-L" & RaylibSrcPath & "/src".}
     {.passL: "-L/usr/local/lib".}
-
     {.passL: "-lX11".}
     {.passL: "-lXrandr".}
     {.passL: "-lXinerama".}
@@ -54,24 +68,25 @@ when not defined(nimraylib_now_linkingOverride):
     {.passL: "-lXxf86vm".}
     {.passL: "-lXcursor".}
 
-  when defined(macosx):
+  when defined(macosx) and not defined(emscripten):
     {.passL: "-framework CoreVideo".}
     {.passL: "-framework IOKit".}
     {.passL: "-framework Cocoa".}
     {.passL: "-framework GLUT".}
     {.passL: "-framework OpenGL".}
 
-  when defined(windows):
+  when defined(windows) and not defined(emscripten):
     {.passL: "-lgdi32".}
     {.passL: "-lopengl32".}
     {.passL: "-lwinmm".}
     {.passL: "-Wl,--subsystem,windows".}
     {.passL: "-static".}
 
-  when defined(macosx):
-    {.compile(RaylibSrcPathRelative & "/rglfw.c", "-x objective-c").}
-  else:
-    {.compile: RaylibSrcPathRelative & "/rglfw.c".}
+  when not defined(emscripten):
+    when defined(macosx):
+      {.compile(RaylibSrcPathRelative & "/rglfw.c", "-x objective-c").}
+    else:
+      {.compile: RaylibSrcPathRelative & "/rglfw.c".}
 
   {.compile: RaylibSrcPathRelative & "/shapes.c".}
   {.compile: RaylibSrcPathRelative & "/textures.c".}
