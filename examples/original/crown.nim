@@ -1,7 +1,7 @@
 # Developed in 2021 by greenfork
 
 import math
-import ../../src/nimraylib_now/raylib
+import ../../src/nimraylib_now
 
 const
   nimFg: Color = (0xff, 0xc2, 0x00)          # Use this shortcut with alpha = 255!

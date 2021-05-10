@@ -295,10 +295,8 @@ for (filepath, c2nimheader) in raylibHeaders:
             enumName.removePrefix(prefix)
             break
         let convertType =
-          if enumName in ["ConfigFlags", "Gestures"]:
-            "cuint"
-          else:
-            "cint"
+          if enumName == "ConfigFlags": "cuint"
+          else: "cint"
         nimEnumConverters.add(
           fmt("converter {enumName}ToInt*(self: {enumName}): {convertType} = self.{convertType}\n")
         )
