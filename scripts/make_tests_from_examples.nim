@@ -22,9 +22,23 @@ for dir in walkDirs(examplesDir/"*"):
 const
   testTemplate =
     "discard \"\"\"\n" &
+    "  cmd: \"nim c --listCmd $options $file\"\n" &
     "  action: \"compile\"\n" &
     "  joinable: false\n" &
-    "  matrix: \"; -d:release; --gc:orc -d:release; -d:nimraylib_now_shared -d:release; -d:nimraylib_now_shared -d:release --gc:orc\"\n" &
+    "  matrix: \"; -d:release; --gc:orc -d:release\"\n" &
+    "  disabled: \"win\"\n" &
+    "\"\"\"\n" &
+    "import lenientops, math, times, strformat, atomics, system/ansi_c\n" &
+    "import ../src/nimraylib_now\n" &
+    "from ../src/nimraylib_now/rlgl as rl import nil\n" &
+    "import ../examples/shaders/rlights\n" &
+    "\n"
+  testTemplateShared =
+    "discard \"\"\"\n" &
+    "  cmd: \"nim c -d:nimraylib_now_shared --listCmd $options $file\"\n" &
+    "  action: \"compile\"\n" &
+    "  joinable: false\n" &
+    "  matrix: \"; -d:release; --gc:orc -d:release\"\n" &
     "  disabled: \"win\"\n" &
     "\"\"\"\n" &
     "import lenientops, math, times, strformat, atomics, system/ansi_c\n" &
@@ -35,6 +49,7 @@ const
   # Don't test shared library for windows
   testTemplateWindows =
     "discard \"\"\"\n" &
+    "  cmd: \"nim c --listCmd $options $file\"\n" &
     "  action: \"compile\"\n" &
     "  joinable: false\n" &
     "  matrix: \"; -d:release; --gc:orc -d:release;\"\n" &
@@ -51,6 +66,7 @@ const
 # Create one big megatest
 const testFilename = projectDir/"tests"/"texamples.nim"
 const testFilenameWindows = projectDir/"tests"/"texamples_windows.nim"
+const testFilenameShared = projectDir/"tests"/"texamples_shared.nim"
 removeFile(testFilename)
 var texamples: string
 for category in exampleCategories:
@@ -65,4 +81,6 @@ for category in exampleCategories:
     texamples.add "\n\n"
 
 writeFile(testFilename, testTemplate & texamples)
+# Test after fixing mangling problem
+# writeFile(testFilenameShared, testTemplateShared & texamples)
 writeFile(testFilenameWindows, testTemplateWindows & texamples)

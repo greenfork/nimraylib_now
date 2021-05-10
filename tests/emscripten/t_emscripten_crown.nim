@@ -1,5 +1,5 @@
 discard """
-  cmd: "nim c -d:emscripten $options $file"
+  cmd: "nim c -d:emscripten --listCmd $options $file"
   action: "compile"
   joinable: false
   matrix: ";-d:release"

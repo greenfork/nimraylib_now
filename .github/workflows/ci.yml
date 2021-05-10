@@ -7,12 +7,9 @@ jobs:
       matrix:
         os: [windows-latest, ubuntu-18.04, macos-10.15]
         nim-version: ['1.4.2']
-        # emsdk: ['no-emsdk', 'emsdk']
-        emsdk: ['emsdk']
         include:
           - os: ubuntu-latest
             nim-version: devel
-            emsdk: false
     runs-on: ${{ matrix.os }}
     steps:
       - name: Check out repository code
@@ -22,21 +19,20 @@ jobs:
           submodules: true
 
       - name: Install Linux dependencies
-        if: ${{ matrix.emsdk == 'no-emsdk' && runner.os == 'Linux' }}
+        if: ${{ runner.os == 'Linux' }}
         run: |
           sudo apt-get update
           sudo apt-get install build-essential
           sudo apt-get install libasound2-dev mesa-common-dev libx11-dev libxrandr-dev libxi-dev xorg-dev libgl1-mesa-dev libglu1-mesa-dev
 
       - name: Install shared Raylib library
-        if: ${{ matrix.emsdk == 'no-emsdk' && (runner.os == 'macOS' || runner.os == 'Linux') }}
+        if: ${{ runner.os == 'macOS' || runner.os == 'Linux' }}
         run: |
           cd raylib/src
           make PLATFORM=PLATFORM_DESKTOP RAYLIB_LIBTYPE=SHARED
           sudo make install RAYLIB_LIBTYPE=SHARED
 
       - name: Install emsdk dependency
-        if: ${{ matrix.emsdk == 'emsdk' }}
         uses: mymindstorm/setup-emsdk@v9
         with:
           actions-cache-folder: 'emsdk-cache'
@@ -60,9 +56,7 @@ jobs:
         run: nimble convert
 
       - name: Run megatest
-        if: ${{ matrix.emsdk == 'no-emsdk' }}
         run: nimble testExamples
 
       - name: Run emsdk test
-        if: ${{ matrix.emsdk == 'emsdk' }}
         run: nimble testEmscriptenExample

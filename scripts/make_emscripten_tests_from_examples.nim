@@ -13,7 +13,7 @@ copyFileToDir(emscriptenExampleDir/"config.nims", emscriptenTestDir)
 const
   testTemplate =
     "discard \"\"\"\n" &
-    "  cmd: \"nim c -d:emscripten $options $file\"\n" &
+    "  cmd: \"nim c -d:emscripten --listCmd $options $file\"\n" &
     "  action: \"compile\"\n" &
     "  joinable: false\n" &
     "  matrix: \";-d:release\"\n" &
