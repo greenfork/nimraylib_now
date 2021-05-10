@@ -7,13 +7,15 @@
 when not defined(nimraylib_now_linkingOverride):
   from os import parentDir, relativePath, `/`
 
+  import ../filenames
+
   const
     Platform = "PLATFORM_DESKTOP"
     Graphics = "GRAPHICS_API_OPENGL_33"
 
     CurrentDirectory = currentSourcePath().parentDir()
-    NimraylibNowProjectPath = CurrentDirectory.parentDir().parentDir()
-    RaylibSrcPath = NimraylibNowProjectPath / "raylib" / "src"
+    RaylibRootPath = raylibSrcDir.parentDir()
+    RaylibSrcPath = raylibBuildDir
     # Use relative paths just in case
     # https://github.com/nim-lang/Nim/issues/9370
     RaylibSrcPathRelative = relativePath(RaylibSrcPath, CurrentDirectory)
@@ -42,10 +44,9 @@ when not defined(nimraylib_now_linkingOverride):
   # *BSD platforms need to be tested.
   when defined(bsd):
     {.passC: "-I/usr/local/include".}
-    {.passL: "-L" & RaylibSrcPath.}
-    # {.passL: "-L" & RaylibSrcPath & "/src".}
+    {.passL: "-L" & RaylibRootPath.}
+    {.passL: "-L" & RaylibSrcPath & "/src".}
     {.passL: "-L/usr/local/lib".}
-    {.passL: "-L" & RaylibSrcPath.}
 
     {.passL: "-lX11".}
     {.passL: "-lXrandr".}

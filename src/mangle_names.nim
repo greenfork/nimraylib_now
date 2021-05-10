@@ -3,48 +3,38 @@
 # normal names in Nim.
 # https://github.com/greenfork/nimraylib_now/issues/5
 
-from os import `/`, parentDir, copyFileToDir, removeDir, createDir, walkDir
+from os import `/`, parentDir, copyFileToDir, removeDir, createDir, walkDir,
+  copyDir
 import strutils
 import regex
 
+import ./filenames
+
 # Copy C headers and sources to build directory
 
+removeDir(buildDir)
+createDir(buildDir)
+writeFile(buildDir/".gitkeep", "")
+createDir(raylibBuildDir)
+createDir(rayguiBuildDir)
+copyDir(raylibSrcDir, raylibBuildDir)
+copyDir(rayguiSrcDir, rayguiBuildDir)
+
+
+# Some strange names that also collide with `windows.h`
+
 const
-  projectDir = currentSourcePath().parentDir().parentDir()
-  raylibDir = projectDir/"raylib"
-  rayguiDir = projectDir/"raygui"
-  raylibHeaders = [
-    raylibDir/"src"/"raylib.h",
-    raylibDir/"src"/"rlgl.h",
-    raylibDir/"src"/"raymath.h",
-    rayguiDir/"src"/"raygui.h",
-    raylibDir/"src"/"physac.h",
-  ]
-  raylibSources = [
-    raylibDir/"src"/"shapes.c",
-    raylibDir/"src"/"textures.c",
-    raylibDir/"src"/"text.c",
-    raylibDir/"src"/"utils.c",
-    raylibDir/"src"/"models.c",
-    raylibDir/"src"/"raudio.c",
-    raylibDir/"src"/"core.c",
-  ]
   queryPerfFiles = [
-    raylibDir/"src"/"gestures.h",
-    raylibDir/"src"/"physac.h",
+    raylibBuildDir/"gestures.h",
+    raylibBuildDir/"physac.h",
   ]
-  buildDir* = projectDir/"build"
-  targetDir* = projectDir/"src"/"nimraylib_now"
-
-
-# Do clean up
 
 for file in queryPerfFiles:
   var content: string
   for line in file.lines:
     if "int __stdcall QueryPerformanceCounter" in line or
        "int __stdcall QueryPerformanceFrequency" in line:
-      echo "Ignore: " & line
+      echo "Ignore: " & line & "\n"
     else:
       content.add line & "\n"
   writeFile(file, content)
@@ -53,6 +43,24 @@ for file in queryPerfFiles:
 # Do name mangling
 
 const
+  raylibHeaders = [
+    raylibBuildFile,
+    rlglBuildFile,
+    raymathBuildFile,
+    physacBuildFile,
+    rayguiBuildFile,
+  ]
+  raylibSources = [
+    raylibBuildDir/"shapes.c",
+    raylibBuildDir/"textures.c",
+    raylibBuildDir/"text.c",
+    raylibBuildDir/"utils.c",
+    raylibBuildDir/"models.c",
+    raylibBuildDir/"raudio.c",
+    raylibBuildDir/"core.c",
+  ]
+
+  manglePrefix* = "NmrlbNow_"
   mangleNameRegexes = [
     re"\b(Rectangle)\b",
     re"\b(CloseWindow)\b",
@@ -62,14 +70,12 @@ const
     re"\b(DrawTextEx)\b",
     re"\b(GetCurrentTime)\b",
   ]
-  manglePrefix* = "NmrlbNow_"
 
 func mangle(line: string): string =
   result = line
   for reName in mangleNameRegexes:
     result = result.replace(reName, manglePrefix & "$1")
 
-# We re-created directory, so all the files inside are needed.
 for file in raylibHeaders:
   let fileContent = readFile(file)
   writeFile(file, mangle(fileContent))
@@ -77,12 +83,8 @@ for file in raylibSources:
   let fileContent = readFile(file)
   writeFile(file, mangle(fileContent))
 
-# Copy files to build directory
-
-removeDir(buildDir)
-createDir(buildDir)
-writeFile(buildDir/".gitkeep", "")
-
+# Copy files to build directory for converting to Nim files
+# Copy files to target directory to be used during linking with Nim files
 for file in raylibHeaders:
   copyFileToDir(file, buildDir)
   copyFileToDir(file, targetDir)

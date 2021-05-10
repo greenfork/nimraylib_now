@@ -23,11 +23,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install build-essential
           sudo apt-get install libasound2-dev mesa-common-dev libx11-dev libxrandr-dev libxi-dev xorg-dev libgl1-mesa-dev libglu1-mesa-dev
-      # - name: Install MacOS dependencies
-      #   if: ${{ runner.os == 'macOS' }}
-      #   run: |
-      #     # /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-      #     xcode-select --install
       - name: Install shared Raylib library
         if: ${{ runner.os == 'macOS' || runner.os == 'Linux' }}
         run: |
@@ -51,7 +46,5 @@ jobs:
         if: ${{ runner.os != 'Windows' }}
       - name: Run converter and check files
         run: nimble convert
-      - name: Assemble megatest from examples
-        run: nim r scripts/make_tests_from_examples.nim
       - name: Run megatest
         run: nimble testExamples

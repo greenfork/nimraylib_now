@@ -4,10 +4,8 @@ from os import `/`, extractFilename, changeFileExt, findExe
 from osproc import execCmd
 import regex
 
-from mangle_names import buildDir, targetDir
+import ./filenames
 
-
-# Parse files to (((Nim))) wrappers
 
 # Formatting of identifiers
 func fmtConst(s: string): string =
@@ -203,11 +201,11 @@ const physacHeader = currentSourcePath().parentDir()/"physac.h"
 """
 
   raylibHeaders = [
-    (buildDir/"raylib.h", raylibHeader),
-    (buildDir/"rlgl.h", rlglHeader),
-    (buildDir/"raymath.h", raymathHeader),
-    (buildDir/"raygui.h", rayguiHeader),
-    (buildDir/"physac.h", physacHeader),
+    (raylibBuildFile, raylibHeader),
+    (rlglBuildFile, rlglHeader),
+    (raymathBuildFile, raymathHeader),
+    (physacBuildFile, physacHeader),
+    (rayguiBuildFile, rayguiHeader),
   ]
   selfModuleDeclarationNames = [
     re"\bRAYLIB_H\b",

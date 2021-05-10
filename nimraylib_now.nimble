@@ -36,5 +36,6 @@ task convert, "run with c2nim":
   exec "nim check " & physacFile
 
 task testExamples, "checks that all examples are correctly compiled":
+  exec "nim r " & "scripts"/"make_tests_from_examples.nim"
   exec "testament run texamples.nim"
   exec "testament run texamples_windows.nim"
