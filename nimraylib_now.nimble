@@ -46,3 +46,7 @@ task testExamples, "checks that all examples are correctly compiled":
 task testIndividualExamples, "slower but check that all examples compile individually":
   exec "nim r " & "scripts"/"make_individual_tests_from_examples.nim"
   exec "testament pattern 'tests/examples/t_*.nim'"
+
+task testEmscriptenExample, "run a single test with emsdk installed":
+  exec "nim r " & "scripts"/"make_emscripten_tests_from_examples.nim"
+  exec "testament pattern 'tests/emscripten/t_*.nim'"

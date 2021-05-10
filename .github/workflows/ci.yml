@@ -7,7 +7,8 @@ jobs:
       matrix:
         os: [windows-latest, ubuntu-18.04, macos-10.15]
         nim-version: ['1.4.2']
-        emsdk: ['false', 'true']
+        # emsdk: ['false', 'true']
+        emsdk: ['true']
         include:
           - os: ubuntu-latest
             nim-version: devel
@@ -57,5 +58,11 @@ jobs:
         if: ${{ runner.os != 'Windows' }}
       - name: Run converter and check files
         run: nimble convert
+
       - name: Run megatest
+        if: ${{ matrix.emsdk == 'false' }}
         run: nimble testExamples
+
+      - name: Run emsdk test
+        if: ${{ matrix.emsdk == 'true' }}
+        run: nimble testEmsdk

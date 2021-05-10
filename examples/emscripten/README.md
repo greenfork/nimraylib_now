@@ -6,7 +6,7 @@ This is experimental support for Emscripten. Please report any bugs.
    only steps 0, 1 and 2 work, it is okay if 3 and 4 do not compile.
 2. Compile the Nim source file:
 ```
-$ nim c -d:emscripten emscripten_crown.nim
+$ nim c -d:emscripten -o:public/index.html emscripten_crown.nim
 ```
 3. Install and run `nimhttpd` server:
 ```
