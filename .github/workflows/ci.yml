@@ -65,4 +65,4 @@ jobs:
 
       - name: Run emsdk test
         if: ${{ matrix.emsdk == 'emsdk' }}
-        run: nimble testEmsdk
+        run: nimble testEmscriptenExample
