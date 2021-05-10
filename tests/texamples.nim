@@ -1,7 +1,8 @@
 discard """
+  cmd: "nim c --listCmd $options $file"
   action: "compile"
   joinable: false
-  matrix: "; -d:release; --gc:orc -d:release; -d:nimraylib_now_shared -d:release; -d:nimraylib_now_shared -d:release --gc:orc"
+  matrix: "; -d:release; --gc:orc -d:release"
   disabled: "win"
 """
 import lenientops, math, times, strformat, atomics, system/ansi_c

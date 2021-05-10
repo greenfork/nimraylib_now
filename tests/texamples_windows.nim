@@ -1,4 +1,5 @@
 discard """
+  cmd: "nim c --listCmd $options $file"
   action: "compile"
   joinable: false
   matrix: "; -d:release; --gc:orc -d:release;"

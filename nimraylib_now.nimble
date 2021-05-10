@@ -40,9 +40,14 @@ task convert, "run with c2nim":
 task testExamples, "checks that all examples are correctly compiled":
   exec "nim r " & "scripts"/"make_tests_from_examples.nim"
   exec "testament run texamples.nim"
+  # exec "testament run texamples_shared.nim"
   exec "testament run texamples_windows.nim"
 
 # Can fail on Windows due to globbing rules
 task testIndividualExamples, "slower but check that all examples compile individually":
   exec "nim r " & "scripts"/"make_individual_tests_from_examples.nim"
   exec "testament pattern 'tests/examples/t_*.nim'"
+
+task testEmscriptenExample, "run a single test with emsdk installed":
+  exec "nim r " & "scripts"/"make_emscripten_tests_from_examples.nim"
+  exec "testament pattern 'tests/emscripten/t_*.nim'"

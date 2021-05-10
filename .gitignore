@@ -16,6 +16,7 @@
 *.iss
 *.log
 *.pdb
+*.wasm
 
 a.out
 
@@ -24,3 +25,4 @@ a.out
 /tests/megatest.nim
 /outputGotten.txt
 /testresults
+/tests/emscripten/*.js
