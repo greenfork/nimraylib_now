@@ -1,12 +1,12 @@
 # Package
 
-version = "0.12.2"
+version = "0.12.1"
 author = "Dmitry Matveyev"
 description = "The Ultimate Raylib gaming library wrapper"
 license = "MIT"
 srcDir = "src"
-skipFiles = @["convert_c_to_nim.nim", "prepare_build_files.nim", "filenames.nim",
-  "common_files_setup.nim"]
+# skipFiles = @["convert_c_to_nim.nim", "prepare_build_files.nim", "filenames.nim",
+#   "common_files_setup.nim", "raylib_build_static.nim"]
 backend = "c"
 
 # Dependencies
