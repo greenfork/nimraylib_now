@@ -29,11 +29,11 @@ for category in exampleCategories:
     if example.endsWith("rlights.nim"): continue
 
     var testContent = testTemplate
-
-    # testContent &= readFile(example)
-    let (exdir, exname, _) = splitFile(example)
-    let examplePath = relativePath(exdir, examplesTestDir)
-    testContent &= "include " & examplePath / exname & "\n"
+    let exampleContent = readFile(example)
+    testContent &= exampleContent.replace(
+      "import nimraylib_now",
+      "import ../../src/nimraylib_now"
+    )
 
     let testName = "t_" & extractFilename(example)
     writeFile(examplesTestDir/testName, testContent)
