@@ -1,3 +1,7 @@
+# Everything is broken, don't install just yet
+
+Progress in https://github.com/greenfork/nimraylib_now/issues/25
+
 # NimraylibNow! - The Ultimate Raylib wrapper for Nim
 
 The most idiomatic and up-to-date wrapper for [Raylib] gaming C library.
