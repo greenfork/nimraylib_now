@@ -26,11 +26,17 @@ jobs:
           sudo apt-get install libasound2-dev mesa-common-dev libx11-dev libxrandr-dev libxi-dev xorg-dev libgl1-mesa-dev libglu1-mesa-dev
 
       - name: Install shared Raylib library
-        if: ${{ runner.os == 'macOS' || runner.os == 'Linux' }}
+        if: ${{ runner.os == 'Linux' }}
         run: |
           cd raylib/src
           make PLATFORM=PLATFORM_DESKTOP RAYLIB_LIBTYPE=SHARED
           sudo make install RAYLIB_LIBTYPE=SHARED
+
+      - name: Install shared Raylib library
+        if: ${{ runner.os == 'macOS' }}
+        run: |
+          /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+          brew install raylib
 
       - name: Install emsdk dependency
         uses: mymindstorm/setup-emsdk@v9
