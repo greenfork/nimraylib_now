@@ -1,4 +1,4 @@
-import nimraylib_now
+import ../../src/nimraylib_now
 
 from os import parentDir, `/`
 const rlightsHeader = currentSourcePath().parentDir()/"rlights.h"
