@@ -110,11 +110,18 @@ when not defined(nimraylib_now_linkingOverride) and not defined(emscripten):
   when defined(nimraylib_now_shared):
     when defined(windows):
       when defined(vcc):
-        {.passL:"raylibdll.lib".}
+        {.passL: "raylibdll.lib".}
       else:
-        {.passL:"libraylibdll.a".}
+        {.passL: "libraylibdll.a".}
+    elif defined(macosx):
+      {.passL: "-framework CoreVideo".}
+      {.passL: "-framework IOKit".}
+      {.passL: "-framework Cocoa".}
+      {.passL: "-framework GLUT".}
+      {.passL: "-framework OpenGL".}
+      {.passL: "-lraylib".}
     else:
-      {.passL:"-lraylib".}
+      {.passL: "-lraylib".}
   else:
     include ../raylib_build_static
 
