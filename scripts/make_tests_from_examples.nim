@@ -81,6 +81,5 @@ for category in exampleCategories:
     texamples.add "\n\n"
 
 writeFile(testFilename, testTemplate & texamples)
-# Test after fixing mangling problem
-# writeFile(testFilenameShared, testTemplateShared & texamples)
+writeFile(testFilenameShared, testTemplateShared & texamples)
 writeFile(testFilenameWindows, testTemplateWindows & texamples)
