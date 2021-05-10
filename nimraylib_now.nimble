@@ -24,6 +24,7 @@ task convert, "run with c2nim":
     rlglFile = "src"/"nimraylib_now"/"rlgl.nim"
     raymathFile = "src"/"nimraylib_now"/"raymath.nim"
     physacFile = "src"/"nimraylib_now"/"physac.nim"
+    convFile = "src"/"nimraylib_now"/"conv.nim"
   echo "Running name mangler\n"
   exec "nim r " & manglerFile
   echo "Running converter\n"
@@ -34,6 +35,7 @@ task convert, "run with c2nim":
   exec "nim check " & raymathFile
   exec "nim check " & rayguiFile
   exec "nim check " & physacFile
+  exec "nim check " & convFile
 
 task testExamples, "checks that all examples are correctly compiled":
   exec "nim r " & "scripts"/"make_tests_from_examples.nim"
