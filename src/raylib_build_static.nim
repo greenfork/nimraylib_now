@@ -78,7 +78,6 @@ when not defined(nimraylib_now_linkingOverride):
     {.passL: "-lopengl32".}
     {.passL: "-lwinmm".}
     {.passL: "-Wl,--subsystem,windows".}
-    {.passL: "-static".}
 
   when defined(emscripten):
     {.passL: "-s USE_GLFW=3".}
