@@ -1,29 +1,47 @@
+# Quickstart
+
+1. Clone with submodules and install dependencies:
+```shell
+$ git clone --recurse-submodules --shallow-submodules https://github.com/greenfork/nimraylib_now
+$ cd nimraylib_now
+$ nimble install --depsOnly
+$ nimble install c2nim
+```
+2. Open and modify `src/convert_c_to_nim.nim` file
+3. Run `nimble convert`
+4. Check the changes `git diff`
+5. Run testing suite `nimble testExamples`
+6. Commit the changes
+
 # How wrapping works
 
-`nimble convert` runs `src/prepare_build_files.nim` and `src/convert_c_to_nim.nim`
-scripts and checks that the resulting files are valid Nim files.
+Wrapper is generated in fully reproducible fashion. The directory
+`src/nimraylib_now/` is recursively removed before each generation.
 
-There are 7 steps during conversion:
+`nimble convert` task generates bindings by running the following scripts:
 
-1. Get C source and header files
-2. Mangle names in C source and header files
-3. Copy mangled C files to release C files, next modifications on C files
-   are kept just for build purposes
-4. Modify C header files (preprocessing)
-5. Run [c2nim] on modified C header files (processing)
-6. Modify resulting Nim files (postprocessing)
-7. Copy modified Nim files to release Nim files
+## `src/common_files_setup.nim`
+
+Removes `src/nimraylib_now/` directory and re-creates it with the common files
+used in all binding variations.
+
+## `src/prepare_build_files.nim`
+
+Removes `build/` directory and re-populates it with all the necessary files
+for building, optionally performing name mangling of C sources.
+
+## `src/convert_c_to_nim.nim`
+
+Performs the following tasks:
+1. Modify C header files (preprocessing)
+2. Run [c2nim] on modified C header files (processing)
+3. Modify resulting Nim files (postprocessing)
+4. Copy modified Nim files to release Nim files
 
 [c2nim]: https://github.com/nim-lang/c2nim
 
 Since every step is done automatically, updating to the next version should
 be a comparatively easy task.
-
-# What to run after changing this library
-
-1. `nimble convert` - re-generates Nim files from C files
-2. `nimble testExamples` - re-generates big test file and runs it
-3. `nimble testIndividualExamples` - re-generates individual test files and runs them
 
 # How to update this library
 

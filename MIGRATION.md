@@ -7,6 +7,8 @@ Additionally you can consult [Raylib's changelog](https://github.com/raysan5/ray
 
 ## From Raylib v3.5 to v3.7 and from NimraylibNow! v0.10 to v0.12
 
+Renamed:
+
 - `Camera.type` was renamed to `Camera.projection`
 - `CameraType` was renamed to `CameraProjection`
 - `GestureType` was renamed to `Gestures`
@@ -20,6 +22,13 @@ Additionally you can consult [Raylib's changelog](https://github.com/raysan5/ray
 - `NPatchType` was renamed to `NPatchLayout`
 - `NPatchLayout` enum values were renamed to use English words instead of numbers
 - `beginVrDrawing` was renamed to `beginVrStereoMode`
-- VR handling was changed significantly, see updated example `core/core_vr_simulator.nim`
 - `runPhysicsStep` was renamed to `updatePhysics`
 - `getShaderDefault` and freinds were moved from `raylib` module to `rlgl`
+
+Misc changes:
+
+- VR handling was changed significantly, see updated example `core/core_vr_simulator.nim`
+- Importing just `nimraylib_now` is now possible and it imports all libraries
+  but `rlgl`
+- "Tuple to object converters for geometry" feature requires importing
+  `nimraylib_now/converters` or just `nimraylib_now`
