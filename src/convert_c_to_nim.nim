@@ -544,4 +544,4 @@ converter tupleToRectangle*(self: tuple[x,y,width,height: float]): Rectangle =
 
 """
 
-writeFile(targetDir/"conv.nim", baseConverters & nimEnumConverters)
+writeFile(targetDir/"converters.nim", baseConverters & nimEnumConverters)

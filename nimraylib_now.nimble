@@ -5,7 +5,7 @@ author = "Dmitry Matveyev"
 description = "The Ultimate Raylib gaming library wrapper"
 license = "MIT"
 srcDir = "src"
-skipFiles = @["converter.nim", "mangle_names.nim", "filenames.nim"]
+skipFiles = @["convert_c_to_nim.nim", "mangle_names.nim", "filenames.nim"]
 backend = "c"
 
 # Dependencies
@@ -17,25 +17,25 @@ from os import `/`
 
 task convert, "run with c2nim":
   let
-    converterFile = "src"/"converter.nim"
+    convert_c_to_nimFile = "src"/"convert_c_to_nim.nim"
     manglerFile = "src"/"mangle_names.nim"
     raylibFile = "src"/"nimraylib_now"/"raylib.nim"
     rayguiFile = "src"/"nimraylib_now"/"raygui.nim"
     rlglFile = "src"/"nimraylib_now"/"rlgl.nim"
     raymathFile = "src"/"nimraylib_now"/"raymath.nim"
     physacFile = "src"/"nimraylib_now"/"physac.nim"
-    convFile = "src"/"nimraylib_now"/"conv.nim"
+    convertersFile = "src"/"nimraylib_now"/"converters.nim"
   echo "Running name mangler\n"
   exec "nim r " & manglerFile
   echo "Running converter\n"
-  exec "nim r " & converterFile
+  exec "nim r " & convert_c_to_nimFile
   echo "\nExecuting nim check\n"
   exec "nim check " & raylibFile
   exec "nim check " & rlglFile
   exec "nim check " & raymathFile
   exec "nim check " & rayguiFile
   exec "nim check " & physacFile
-  exec "nim check " & convFile
+  exec "nim check " & convertersFile
 
 task testExamples, "checks that all examples are correctly compiled":
   exec "nim r " & "scripts"/"make_tests_from_examples.nim"
