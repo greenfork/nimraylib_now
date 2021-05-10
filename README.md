@@ -18,6 +18,7 @@ to do it. Please file a bug report if any of that is too far from the reality.
 * Idiomatic Nim naming and conventions so you write **Nim** code, not C
 * 60+ [examples](examples/) converted from C to Nim
 * Includes modules: [raylib], [raymath], [rlgl], [raygui], [physac]
+* Emscripten support, see [Emscripten example]
 * Conversion script is included in the library, no manual work is required
   to update the bindings*
 
@@ -28,6 +29,7 @@ to do it. Please file a bug report if any of that is too far from the reality.
 [rlgl]: https://github.com/raysan5/raylib/blob/master/src/rlgl.h
 [raygui]: https://github.com/raysan5/raygui
 [physac]: https://github.com/raysan5/raylib/blob/master/src/physac.h
+[Emscripten example]: examples/emscripten/
 
 ## Contributing
 
@@ -65,7 +67,7 @@ You have 3 options:
    game files can all use this same shared Raylib file. This option is usually
    preferable for Linux.
 
-3. Manual library linking - this is activated with `-d:nimraylib_now_overrideLinking`
+3. Manual library linking - this is activated with `-d:nimraylib_now_linkingOverride`
    flag passed to the Nim compiler. This means that you build the Raylib
    library yourself and link it, for example with option `--passL:`. This is a
    preferable option for any non-desktop targets such as Android or Emscripten.
@@ -111,12 +113,9 @@ files into `/usr/local/lib`.
 
 ## Install Raylib manually
 
-Consult [Raylib wiki] on how to build Raylib for different targets. Also see
-an example of [how to use Emscripten] to build Raylib for execution in the
-browser.
+Consult [Raylib wiki] on how to build Raylib for different targets.
 
 [Raylib wiki]: https://github.com/raysan5/raylib/wiki
-[how to use Emscripten]: examples/emscripten/
 
 ## Install NimraylibNow!
 
@@ -132,6 +131,16 @@ requires "nimraylib_now"
 ```
 
 [raylib releases]: https://github.com/raysan5/raylib/releases
+
+## Exposed compilation flags
+
+NimraylibNow! provides several **optional** flags for compilation:
+
+| Compilation flag                   | Meaning                                                  |
+| ---------------------------------  | ------------------------------------------------------   |
+| `-d:nimraylib_now_shared`          | link with dynamic Raylib library, search in system paths |
+| `-d:nimraylib_now_linkingOverride` | link with your own provided library via `--passL` flag   |
+| `-d:nimraylib_now_wayland`         | use Wayland flags during static compilation              |
 
 ## How to use NimraylibNow!
 
