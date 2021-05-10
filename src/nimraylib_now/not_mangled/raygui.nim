@@ -5,7 +5,7 @@ const rayguiHeader = currentSourcePath().parentDir()/"raygui.h"
 {.passC: "-DRAYGUI_IMPLEMENTATION".}
 ## ******************************************************************************************
 ##
-##    raygui v2.8 - A simple and easy-to-use immediate-mode gui library
+##    raygui v2.9-dev - A simple and easy-to-use immediate-mode gui library
 ##
 ##    DESCRIPTION:
 ##
@@ -74,6 +74,7 @@ const rayguiHeader = currentSourcePath().parentDir()/"raygui.h"
 ##
 ##
 ##    VERSIONS HISTORY:
+##        2.9 (17-Mar-2021) Removed tooltip API
 ##        2.8 (03-May-2020) Centralized rectangles drawing to GuiDrawRectangle()
 ##        2.7 (20-Feb-2020) Added possible tooltips API
 ##        2.6 (09-Sep-2019) ADDED: GuiTextInputBox()
@@ -133,7 +134,7 @@ const rayguiHeader = currentSourcePath().parentDir()/"raygui.h"
 ## ********************************************************************************************
 
 const
-  RAYGUI_VERSION* = "2.6-dev"
+  RAYGUI_VERSION* = "2.9-dev"
 
 ##  Define functions scope to be used internally (static) or externally (extern) to the module including this file
 ##  Allow custom memory allocators
@@ -343,20 +344,6 @@ proc setStyle*(control: cint; property: cint; value: cint) {.cdecl,
 proc getStyle*(control: cint; property: cint): cint {.cdecl, importc: "GuiGetStyle",
     header: rayguiHeader.}
 ##  Get one style property
-##  Tooltips set functions
-
-proc enableTooltip*() {.cdecl, importc: "GuiEnableTooltip", header: rayguiHeader.}
-##  Enable gui tooltips
-
-proc disableTooltip*() {.cdecl, importc: "GuiDisableTooltip", header: rayguiHeader.}
-##  Disable gui tooltips
-
-proc setTooltip*(tooltip: cstring) {.cdecl, importc: "GuiSetTooltip",
-                                  header: rayguiHeader.}
-##  Set current tooltip for display
-
-proc clearTooltip*() {.cdecl, importc: "GuiClearTooltip", header: rayguiHeader.}
-##  Clear any tooltip registered
 ##  Container/separator controls, useful for controls organization
 
 proc windowBox*(bounds: Rectangle; title: cstring): bool {.cdecl,

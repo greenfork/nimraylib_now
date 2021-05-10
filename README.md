@@ -41,7 +41,7 @@ If you would like to know how it works or how to update it, check out [HACKING](
 
 ## Current version and upgrading from previous versions
 
-This is a wrapper for [Raylib v3.7.0].
+This is a wrapper for [Raylib v3.7.0] and [Raygui v2.9].
 
 See [MIGRATION](MIGRATION.md) for any tips on how to upgrade your code.
 There are not a lot of possibilities to use proper deprecation warnings
@@ -51,6 +51,7 @@ side it should mainly consist of renaming, please try they wonderful tool
 `nimgrep`, it is shipped with Nim and has a useful "replace" functionality.
 
 [Raylib v3.7.0]: https://github.com/raysan5/raylib/releases/tag/3.7.0
+[Raygui v2.9]: https://github.com/raysan5/raygui/tree/806b216e2024a13522eb1e17ae7a2641dfd51a98
 
 ## How to use Raylib, the original C library?
 
