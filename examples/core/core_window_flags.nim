@@ -11,7 +11,7 @@
 # ******************************************************************************************
 
 import lenientops
-import ../../src/nimraylib_now/raylib
+import nimraylib_now
 
 ##  Initialization
 ## ---------------------------------------------------------
@@ -40,7 +40,7 @@ var ballPosition: Vector2 = (getScreenWidth().float / 2.0, getScreenHeight().flo
 var ballSpeed: Vector2 = (5.0, 4.0)
 var ballRadius = 20
 var framesCounter = 0
-## SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
+setTargetFPS(60)
 ## ----------------------------------------------------------
 ##  Main game loop
 while not windowShouldClose(): ##  Detect window close button or ESC key
@@ -114,7 +114,7 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
   else:
     clearBackground(Raywhite)
   drawCircleV(ballPosition, ballRadius.float, Maroon)
-  drawRectangleLinesEx((0.0, 0.0, getScreenWidth().float, getScreenHeight().float), 4, Raywhite);
+  drawRectangleLinesEx((0.0, 0.0, getScreenWidth().float, getScreenHeight().float), 4, Raywhite)
   drawCircleV(getMousePosition(), 10, Darkblue)
   drawFPS(10, 10)
   drawText(textFormat("Screen Size: [%i, %i]", getScreenWidth(),

@@ -14,7 +14,7 @@
 #*******************************************************************************************
 
 import math, lenientops
-import ../../src/nimraylib_now/raylib
+import nimraylib_now
 
 #  Initialization
 # --------------------------------------------------------------------------------------
@@ -43,7 +43,7 @@ while not windowShouldClose():    #  Detect window close button or ESC key
     #  Update
     # ----------------------------------------------------------------------------------
     let
-        time = raylib.getTime()
+        time = nimraylib_now.getTime()
 
         #  Calculate time scale for cube position and size
         scale = (2.0 + sin(time))*0.7
@@ -84,7 +84,7 @@ while not windowShouldClose():    #  Detect window close button or ESC key
                   cubeColor = colorFromHSV((((x + y + z)*18)%%360)/1.0, 0.75f, 0.9)
 
                   #  Calculate cube size
-                  cubeSize = (2.4 - scale)*blockScale;
+                  cubeSize = (2.4 - scale)*blockScale
 
                 #  And finally, draw the cube!
                 drawCube cubePos, cubeSize, cubeSize, cubeSize, cubeColor

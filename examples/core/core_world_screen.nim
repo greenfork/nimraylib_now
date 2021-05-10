@@ -10,7 +10,7 @@
 #
 # ******************************************************************************************
 
-import ../../src/nimraylib_now/raylib
+import nimraylib_now
 
 ##  Initialization
 ## --------------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
   updateCamera(addr(camera))
   ## Update camera
   ## Calculate cube screen space position (with a little offset to be in top)
-  cubeScreenPosition = getWorldToScreen((cubePosition.x.float, cubePosition.y + 2.5, cubePosition.z.float), camera);
+  cubeScreenPosition = getWorldToScreen((cubePosition.x.float, cubePosition.y + 2.5, cubePosition.z.float), camera)
   ## ----------------------------------------------------------------------------------
   ##  Draw
   ## ----------------------------------------------------------------------------------

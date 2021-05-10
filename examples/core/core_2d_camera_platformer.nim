@@ -13,7 +13,7 @@
 # ******************************************************************************************
 
 import lenientops
-import ../../src/nimraylib_now/[raylib, raymath]
+import nimraylib_now
 
 const
   G = 400
@@ -31,22 +31,22 @@ type
     blocking: bool
     color: Color
 
-proc updatePlayer(player: var Player; envItems: var openArray[EnvItem];  delta: float)
-proc updateCameraCenter(camera: var Camera2D; player: var Player;
-                        envItems: var openArray[EnvItem]; delta: float;
-                        width: int; height: int)
-proc updateCameraCenterInsideMap(camera: var Camera2D; player: var Player;
-                                 envItems: var openArray[EnvItem];
-                                 delta: float; width: int; height: int)
-proc updateCameraCenterSmoothFollow(camera: var Camera2D; player: var Player;
-                                    envItems: var openArray[EnvItem];
-                                    delta: float; width: int; height: int)
-proc updateCameraEvenOutOnLanding(camera: var Camera2D; player: var Player;
-                                  envItems: var openArray[EnvItem];
-                                  delta: float; width: int; height: int)
-proc updateCameraPlayerBoundsPush(camera: var Camera2D; player: var Player;
-                                  envItems: var openArray[EnvItem];
-                                  delta: float; width: int; height: int)
+proc updatePlayer(player: var Player, envItems: var openArray[EnvItem],  delta: float)
+proc updateCameraCenter(camera: var Camera2D, player: var Player,
+                        envItems: var openArray[EnvItem], delta: float,
+                        width: int, height: int)
+proc updateCameraCenterInsideMap(camera: var Camera2D, player: var Player,
+                                 envItems: var openArray[EnvItem],
+                                 delta: float, width: int, height: int)
+proc updateCameraCenterSmoothFollow(camera: var Camera2D, player: var Player,
+                                    envItems: var openArray[EnvItem],
+                                    delta: float, width: int, height: int)
+proc updateCameraEvenOutOnLanding(camera: var Camera2D, player: var Player,
+                                  envItems: var openArray[EnvItem],
+                                  delta: float, width: int, height: int)
+proc updateCameraPlayerBoundsPush(camera: var Camera2D, player: var Player,
+                                  envItems: var openArray[EnvItem],
+                                  delta: float, width: int, height: int)
 ##  Initialization
 ## --------------------------------------------------------------------------------------
 var screenWidth = 800
@@ -94,7 +94,7 @@ while not windowShouldClose():
     camera.zoom = 0.25
   if isKeyPressed(R):
     camera.zoom = 1.0
-    player.position = (x: 400.0, y: 280.0);
+    player.position = (x: 400.0, y: 280.0)
   if isKeyPressed(C):
     cameraOption = (cameraOption + 1) mod cameraUpdaters.len
   cameraUpdaters[cameraOption](camera, player, envItems,
@@ -129,7 +129,7 @@ closeWindow()
 ##  Close window and OpenGL context
 ## --------------------------------------------------------------------------------------
 
-proc updatePlayer(player: var Player; envItems: var openArray[EnvItem]; delta: float) =
+proc updatePlayer(player: var Player, envItems: var openArray[EnvItem], delta: float) =
   if isKeyDown(Left):
     player.position.x -= PLAYER_HOR_SPD * delta
   if isKeyDown(Right):
@@ -155,17 +155,17 @@ proc updatePlayer(player: var Player; envItems: var openArray[EnvItem]; delta: f
   else:
     player.canJump = true
 
-proc updateCameraCenter(camera: var Camera2D; player: var Player;
-                        envItems: var openArray[EnvItem]; delta: float;
-                        width: int; height: int) =
-  camera.offset = (x: width/2, y: height/2);
+proc updateCameraCenter(camera: var Camera2D, player: var Player,
+                        envItems: var openArray[EnvItem], delta: float,
+                        width: int, height: int) =
+  camera.offset = (x: width/2, y: height/2)
   camera.target = player.position
 
-proc updateCameraCenterInsideMap(camera: var Camera2D; player: var Player;
-                                 envItems: var openArray[EnvItem];
-                                 delta: float; width: int; height: int) =
+proc updateCameraCenterInsideMap(camera: var Camera2D, player: var Player,
+                                 envItems: var openArray[EnvItem],
+                                 delta: float, width: int, height: int) =
   camera.target = player.position
-  camera.offset = (x: width/2, y: height/2);
+  camera.offset = (x: width/2, y: height/2)
   var
     minX: float = 1000
     minY: float = 1000
@@ -191,13 +191,13 @@ proc updateCameraCenterInsideMap(camera: var Camera2D; player: var Player;
   if minV.y > 0:
     camera.offset.y = height div 2 - minV.y
 
-proc updateCameraCenterSmoothFollow(camera: var Camera2D; player: var Player;
-                                    envItems: var openArray[EnvItem];
-                                    delta: float; width: int; height: int) =
+proc updateCameraCenterSmoothFollow(camera: var Camera2D, player: var Player,
+                                    envItems: var openArray[EnvItem],
+                                    delta: float, width: int, height: int) =
   var minSpeed = 30.0
   var minEffectLength = 10.0
   var fractionSpeed = 0.8
-  camera.offset = (x: width/2, y: height/2);
+  camera.offset = (x: width/2, y: height/2)
   var diff: Vector2 = subtract(player.position, camera.target)
   var length = length(diff)
   if length > minEffectLength:
@@ -206,11 +206,11 @@ proc updateCameraCenterSmoothFollow(camera: var Camera2D; player: var Player;
 
 var eveningOut = false
 var evenOutTarget: float
-proc updateCameraEvenOutOnLanding(camera: var Camera2D; player: var Player;
-                                  envItems: var openArray[EnvItem];
-                                  delta: float; width: int; height: int) =
+proc updateCameraEvenOutOnLanding(camera: var Camera2D, player: var Player,
+                                  envItems: var openArray[EnvItem],
+                                  delta: float, width: int, height: int) =
   var evenOutSpeed = 700.0
-  camera.offset = (x: width/2, y: height/2);
+  camera.offset = (x: width/2, y: height/2)
   camera.target.x = player.position.x
   if eveningOut:
     if evenOutTarget > camera.target.y:
@@ -229,9 +229,9 @@ proc updateCameraEvenOutOnLanding(camera: var Camera2D; player: var Player;
       eveningOut = true
       evenOutTarget = player.position.y
 
-proc updateCameraPlayerBoundsPush(camera: var Camera2D; player: var Player;
-                                  envItems: var openArray[EnvItem];
-                                  delta: float; width: int; height: int) =
+proc updateCameraPlayerBoundsPush(camera: var Camera2D, player: var Player,
+                                  envItems: var openArray[EnvItem],
+                                  delta: float, width: int, height: int) =
   var
     bbox = (x: 0.2, y: 0.2)
     bboxWorldMin = getScreenToWorld2D(
@@ -242,7 +242,7 @@ proc updateCameraPlayerBoundsPush(camera: var Camera2D; player: var Player;
       (x: (1 + bbox.x)*0.5f*width, y: (1 + bbox.y)*0.5f*height),
       camera
     )
-  camera.offset = (x: (1 - bbox.x)*0.5f * width, y: (1 - bbox.y)*0.5f*height);
+  camera.offset = (x: (1 - bbox.x)*0.5f * width, y: (1 - bbox.y)*0.5f*height)
   if player.position.x < bboxWorldMin.x:
     camera.target.x = player.position.x
   if player.position.y < bboxWorldMin.y:

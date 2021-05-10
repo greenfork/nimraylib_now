@@ -13,7 +13,7 @@
 #
 #*******************************************************************************************
 
-import ../../src/nimraylib_now/raylib
+import nimraylib_now
 import system/[ansi_c]
 
 const NUM_PROCESSES = 8
