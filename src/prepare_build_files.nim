@@ -10,7 +10,7 @@ import regex
 
 import ./filenames
 
-# Copy C headers and sources to build directory
+# Copy C headers and sources to build directory into their separate directories
 
 removeDir(buildDir)
 createDir(buildDir)
@@ -40,7 +40,8 @@ for file in queryPerfFiles:
   writeFile(file, content)
 
 
-# Do name mangling
+# Copy C sources and headers which are used for building
+# Do name mangling if necessary
 
 const
   raylibHeaders = [

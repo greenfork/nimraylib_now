@@ -5,7 +5,7 @@ author = "Dmitry Matveyev"
 description = "The Ultimate Raylib gaming library wrapper"
 license = "MIT"
 srcDir = "src"
-skipFiles = @["convert_c_to_nim.nim", "mangle_names.nim", "filenames.nim",
+skipFiles = @["convert_c_to_nim.nim", "prepare_build_files.nim", "filenames.nim",
   "common_files_setup.nim", "raylib_build_static.nim"]
 backend = "c"
 
@@ -20,7 +20,7 @@ task convert, "run with c2nim":
   let
     common_files_setupFile = "src"/"common_files_setup.nim"
     convert_c_to_nimFile = "src"/"convert_c_to_nim.nim"
-    manglerFile = "src"/"mangle_names.nim"
+    prepare_build_filesFile = "src"/"prepare_build_files.nim"
 
     nimraylibNowDir = "src"/"nimraylib_now"
 
@@ -34,13 +34,13 @@ task convert, "run with c2nim":
   echo "Running clear target directories\n"
   exec "nim r " & common_files_setupFile
 
-  echo "Running name mangler\n"
-  exec "nim r " & manglerFile
+  echo "Running prepare build files\n"
+  exec "nim r " & prepare_build_filesFile
   echo "Running converter\n"
   exec "nim r " & convert_c_to_nimFile
 
-  echo "Running name mangler -d:nimraylib_now_mangle\n"
-  exec "nim r -d:nimraylib_now_mangle " & manglerFile
+  echo "Running prepare build files -d:nimraylib_now_mangle\n"
+  exec "nim r -d:nimraylib_now_mangle " & prepare_build_filesFile
   echo "Running converter -d:nimraylib_now_mangle\n"
   exec "nim r -d:nimraylib_now_mangle " & convert_c_to_nimFile
 
