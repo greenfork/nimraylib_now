@@ -34,8 +34,6 @@ jobs:
 
       - name: Install emsdk dependency
         uses: mymindstorm/setup-emsdk@v9
-        with:
-          actions-cache-folder: 'emsdk-cache'
 
       - name: Install Nim
         uses: jiro4989/setup-nim-action@v1
@@ -58,5 +56,5 @@ jobs:
       - name: Run megatest
         run: nimble testExamples
 
-      - name: Run emsdk test
+      - name: Run emscripten test
         run: nimble testEmscriptenExample
