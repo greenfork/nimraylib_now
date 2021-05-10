@@ -29,8 +29,6 @@ when not defined(nimraylib_now_linkingOverride):
   when defined(emscripten):
     {.passC: "-std=gnu99".}
     {.passC: "-Os".}
-
-    {.passL: "-s USE_GLFW=3".}
   else:
     {.passC: "-std=c99".}
     {.passC: "-s -O1".}
@@ -82,11 +80,12 @@ when not defined(nimraylib_now_linkingOverride):
     {.passL: "-Wl,--subsystem,windows".}
     {.passL: "-static".}
 
-  when not defined(emscripten):
-    when defined(macosx):
-      {.compile(RaylibSrcPathRelative & "/rglfw.c", "-x objective-c").}
-    else:
-      {.compile: RaylibSrcPathRelative & "/rglfw.c".}
+  when defined(emscripten):
+    {.passL: "-s USE_GLFW=3".}
+  elif defined(macosx):
+    {.compile(RaylibSrcPathRelative & "/rglfw.c", "-x objective-c").}
+  else:
+    {.compile: RaylibSrcPathRelative & "/rglfw.c".}
 
   {.compile: RaylibSrcPathRelative & "/shapes.c".}
   {.compile: RaylibSrcPathRelative & "/textures.c".}
