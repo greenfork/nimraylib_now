@@ -11,8 +11,8 @@ when defined(emscripten):
   proc emscriptenSetMainLoop*(f: emCallbackFunc, fps: cint, simulateInfiniteLoop: cint) {.
     cdecl, importc: "emscripten_set_main_loop", header: "<emscripten.h>".}
 
-when not defined(nimraylib_now_linkingOverride) and not defined(emscripten):
-  when defined(nimraylib_now_shared):
+when not defined(nimraylib_now_linkingOverride):
+  when defined(nimraylib_now_shared) and not defined(emscripten):
     when defined(windows):
       when defined(vcc):
         {.passL: "raylibdll.lib".}

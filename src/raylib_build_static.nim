@@ -1,7 +1,5 @@
 ## Static compilation of Raylib
 ## Conversion of raylib/src/Makefile
-## Right now it supports only Desktop targets, any other targets should be
-## compiled and linkedin manually.
 
 # Add the ability to do all the linking manually.
 from os import parentDir, relativePath, `/`
