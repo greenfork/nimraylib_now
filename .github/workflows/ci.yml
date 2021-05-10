@@ -25,14 +25,14 @@ jobs:
           sudo apt-get install build-essential
           sudo apt-get install libasound2-dev mesa-common-dev libx11-dev libxrandr-dev libxi-dev xorg-dev libgl1-mesa-dev libglu1-mesa-dev
 
-      - name: Install shared Raylib library
+      - name: Install shared Raylib library on Linux
         if: ${{ runner.os == 'Linux' }}
         run: |
           cd raylib/src
           make PLATFORM=PLATFORM_DESKTOP RAYLIB_LIBTYPE=SHARED
           sudo make install RAYLIB_LIBTYPE=SHARED
 
-      - name: Install shared Raylib library
+      - name: Install shared Raylib library on MacOS
         if: ${{ runner.os == 'macOS' }}
         run: |
           /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
@@ -49,13 +49,6 @@ jobs:
         run: nimble install --depsOnly --accept
       - name: Install c2nim
         run: nimble install --accept c2nim
-      - name: Cache nimble
-        id: cache-nimble
-        uses: actions/cache@v1
-        with:
-          path: ~/.nimble
-          key: ${{ runner.os }}-nimble-${{ hashFiles('*.nimble') }}
-        if: ${{ runner.os != 'Windows' }}
       - name: Run converter and check files
         run: nimble convert
 
