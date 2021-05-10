@@ -6,7 +6,7 @@ description = "The Ultimate Raylib gaming library wrapper"
 license = "MIT"
 srcDir = "src"
 skipFiles = @["convert_c_to_nim.nim", "mangle_names.nim", "filenames.nim",
-  "clear_target_directories.nim", "raylib_build_static.nim"]
+  "common_files_setup.nim", "raylib_build_static.nim"]
 backend = "c"
 
 # Dependencies
@@ -18,28 +18,46 @@ from os import `/`
 
 task convert, "run with c2nim":
   let
-    clear_target_directoriesFile = "src"/"clear_target_directories.nim"
+    common_files_setupFile = "src"/"common_files_setup.nim"
     convert_c_to_nimFile = "src"/"convert_c_to_nim.nim"
     manglerFile = "src"/"mangle_names.nim"
+
+    nimraylibNowDir = "src"/"nimraylib_now"
+
     raylibFile = "src"/"nimraylib_now"/"raylib.nim"
     rayguiFile = "src"/"nimraylib_now"/"raygui.nim"
     rlglFile = "src"/"nimraylib_now"/"rlgl.nim"
     raymathFile = "src"/"nimraylib_now"/"raymath.nim"
     physacFile = "src"/"nimraylib_now"/"physac.nim"
     convertersFile = "src"/"nimraylib_now"/"converters.nim"
+
   echo "Running clear target directories\n"
-  exec "nim r " & clear_target_directoriesFile
+  exec "nim r " & common_files_setupFile
+
   echo "Running name mangler\n"
   exec "nim r " & manglerFile
   echo "Running converter\n"
   exec "nim r " & convert_c_to_nimFile
+
+  echo "Running name mangler -d:nimraylib_now_mangle\n"
+  exec "nim r -d:nimraylib_now_mangle " & manglerFile
+  echo "Running converter -d:nimraylib_now_mangle\n"
+  exec "nim r -d:nimraylib_now_mangle " & convert_c_to_nimFile
+
   echo "\nExecuting nim check\n"
-  exec "nim check " & raylibFile
-  exec "nim check " & rlglFile
-  exec "nim check " & raymathFile
-  exec "nim check " & rayguiFile
-  exec "nim check " & physacFile
-  exec "nim check " & convertersFile
+  exec "nim check " & nimraylibNowDir/"mangled"/"raylib.nim"
+  exec "nim check " & nimraylibNowDir/"mangled"/"raygui.nim"
+  exec "nim check " & nimraylibNowDir/"mangled"/"rlgl.nim"
+  exec "nim check " & nimraylibNowDir/"mangled"/"raymath.nim"
+  exec "nim check " & nimraylibNowDir/"mangled"/"physac.nim"
+  exec "nim check " & nimraylibNowDir/"mangled"/"converters.nim"
+
+  exec "nim check " & nimraylibNowDir/"not_mangled"/"raylib.nim"
+  exec "nim check " & nimraylibNowDir/"not_mangled"/"raygui.nim"
+  exec "nim check " & nimraylibNowDir/"not_mangled"/"rlgl.nim"
+  exec "nim check " & nimraylibNowDir/"not_mangled"/"raymath.nim"
+  exec "nim check " & nimraylibNowDir/"not_mangled"/"physac.nim"
+  exec "nim check " & nimraylibNowDir/"not_mangled"/"converters.nim"
 
 task testExamples, "checks that all examples are correctly compiled":
   exec "nim r " & "scripts"/"make_tests_from_examples.nim"

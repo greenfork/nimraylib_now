@@ -78,10 +78,16 @@ func mangle(line: string): string =
 
 for file in raylibHeaders:
   let fileContent = readFile(file)
-  writeFile(file, mangle(fileContent))
+  when defined(nimraylib_now_mangle):
+    writeFile(file, mangle(fileContent))
+  else:
+    writeFile(file, fileContent)
 for file in raylibSources:
   let fileContent = readFile(file)
-  writeFile(file, mangle(fileContent))
+  when defined(nimraylib_now_mangle):
+    writeFile(file, mangle(fileContent))
+  else:
+    writeFile(file, fileContent)
 
 # Copy files to build directory for converting to Nim files
 # Copy files to target directory to be used during linking with Nim files

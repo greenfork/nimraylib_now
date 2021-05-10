@@ -113,7 +113,7 @@ when not defined(nimraylib_now_linkingOverride):
     else:
       {.passL:"-lraylib".}
   else:
-    include raylib_build_static
+    include ../raylib_build_static
 
 @#
 #endif
