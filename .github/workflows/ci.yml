@@ -5,7 +5,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, ubuntu-18.04, macos-10.15]
+        os: [windows-latest, ubuntu-18.04, macos-latest]
         nim-version: ['1.4.2']
         include:
           - os: ubuntu-latest
