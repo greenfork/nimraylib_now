@@ -18,7 +18,6 @@ copyDir(raylibSrcDir, raylibBuildDir)
 copyDir(rayguiSrcDir, rayguiBuildDir)
 
 const
-  manglePrefix* = "NmrlbNow_"
   raylibHeaders = [
     raylibBuildFile,
     rlglBuildFile,

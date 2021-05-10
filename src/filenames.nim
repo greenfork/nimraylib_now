@@ -15,6 +15,8 @@ const
   physacBuildFile*  = raylibBuildDir/"physac.h"
   rayguiBuildFile*  = rayguiBuildDir/"raygui.h"
 
+  manglePrefix*     = "NmrlbNow_"
+
 when defined(nimraylib_now_mangle):
   const targetDir* = nimraylibNowDir/"mangled"
 else:

@@ -63,14 +63,17 @@ const
   # } ConfigFlag;
   reTypedefEnd = re"^\} (\w+);"
 
-  raylibHeader = """
+  c2nimHeaderPreamble = fmt"""
 #ifdef C2NIM
-#  prefix NmrlbNow_
-#  def RLAPI
-#  header raylibHeader
+#  prefix {manglePrefix}
 #  cdecl
 #  nep1
 #  skipinclude
+"""
+
+  raylibHeader = c2nimHeaderPreamble & """
+#  def RLAPI
+#  header raylibHeader
 #  prefix FLAG_
 #  prefix LOG_
 #  prefix KEY_
@@ -118,14 +121,9 @@ when not defined(nimraylib_now_linkingOverride):
 @#
 #endif
 """
-  rlglHeader = """
-#ifdef C2NIM
-#  prefix NmrlbNow_
+  rlglHeader = c2nimHeaderPreamble & """
 #  def RLAPI
 #  header rlglHeader
-#  cdecl
-#  nep1
-#  skipinclude
 #  prefix rlgl
 #  prefix rl
 #  prefix RL_
@@ -141,14 +139,9 @@ const rlglHeader = currentSourcePath().parentDir()/"rlgl.h"
 @#
 #endif
 """
-  raymathHeader = """
-#ifdef C2NIM
-#  prefix NmrlbNow_
+  raymathHeader = c2nimHeaderPreamble & """
 #  def RMDEF static inline
 #  header raymathHeader
-#  cdecl
-#  nep1
-#  skipinclude
 #  mangle float3 Float3
 #  mangle float16 Float16
 #@
@@ -159,14 +152,9 @@ const raymathHeader = currentSourcePath().parentDir()/"raymath.h"
 @#
 #endif
 """
-  rayguiHeader = """
-#ifdef C2NIM
-#  prefix NmrlbNow_
+  rayguiHeader = c2nimHeaderPreamble & """
 #  def RAYGUIDEF
 #  header rayguiHeader
-#  cdecl
-#  nep1
-#  skipinclude
 #  prefix Gui
 #  prefix GUI_
 #  prefix gui
@@ -179,14 +167,9 @@ const rayguiHeader = currentSourcePath().parentDir()/"raygui.h"
 @#
 #endif
 """
-  physacHeader = """
-#ifdef C2NIM
-#  prefix NmrlbNow_
+  physacHeader = c2nimHeaderPreamble & """
 #  def PHYSACDEF
 #  header physacHeader
-#  cdecl
-#  nep1
-#  skipinclude
 #  prefix PHYSICS_
 #  prefix PHYSAC_
 #@
