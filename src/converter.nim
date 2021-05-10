@@ -260,7 +260,7 @@ for (filepath, c2nimheader) in raylibHeaders:
         # declaration actually happens
         let
           structName = m.groupFirstCapture(0, line)
-          typename = m.groupFirstCapture(1, line)
+          typeName = m.groupFirstCapture(1, line)
         if typeName == structName:
           rs.add fmt"typedef struct {structName} {{}} {structName};"
         elif structName == "PhysicsBodyData" and typeName == "*PhysicsBody":
