@@ -1,6 +1,6 @@
 # How wrapping works
 
-`nimble convert` runs `src/mangle_names.nim` and `src/convert_c_to_nim.nim`
+`nimble convert` runs `src/prepare_build_files.nim` and `src/convert_c_to_nim.nim`
 scripts and checks that the resulting files are valid Nim files.
 
 There are 7 steps during conversion:
