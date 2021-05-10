@@ -5,7 +5,8 @@ author = "Dmitry Matveyev"
 description = "The Ultimate Raylib gaming library wrapper"
 license = "MIT"
 srcDir = "src"
-skipFiles = @["convert_c_to_nim.nim", "mangle_names.nim", "filenames.nim"]
+skipFiles = @["convert_c_to_nim.nim", "mangle_names.nim", "filenames.nim",
+  "clear_target_directories.nim", "raylib_build_static.nim"]
 backend = "c"
 
 # Dependencies
@@ -17,6 +18,7 @@ from os import `/`
 
 task convert, "run with c2nim":
   let
+    clear_target_directoriesFile = "src"/"clear_target_directories.nim"
     convert_c_to_nimFile = "src"/"convert_c_to_nim.nim"
     manglerFile = "src"/"mangle_names.nim"
     raylibFile = "src"/"nimraylib_now"/"raylib.nim"
@@ -25,6 +27,8 @@ task convert, "run with c2nim":
     raymathFile = "src"/"nimraylib_now"/"raymath.nim"
     physacFile = "src"/"nimraylib_now"/"physac.nim"
     convertersFile = "src"/"nimraylib_now"/"converters.nim"
+  echo "Running clear target directories\n"
+  exec "nim r " & clear_target_directoriesFile
   echo "Running name mangler\n"
   exec "nim r " & manglerFile
   echo "Running converter\n"
