@@ -1,7 +1,7 @@
 # How wrapping works
 
-`nimble convert` runs `src/mangle_names.nim` and `src/converter.nim` scripts
-and checks that the resulting files are valid Nim files.
+`nimble convert` runs `src/mangle_names.nim` and `src/convert_c_to_nim.nim`
+scripts and checks that the resulting files are valid Nim files.
 
 There are 7 steps during conversion:
 
@@ -18,6 +18,12 @@ There are 7 steps during conversion:
 
 Since every step is done automatically, updating to the next version should
 be a comparatively easy task.
+
+# What to run after changing this library
+
+1. `nimble convert` - re-generates Nim files from C files
+2. `nimble testExamples` - re-generates big test file and runs it
+3. `nimble testIndividualExamples` - re-generates individual test files and runs them
 
 # How to update this library
 

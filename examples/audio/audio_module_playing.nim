@@ -11,7 +11,7 @@
 #
 #*******************************************************************************************
 
-import ../../src/nimraylib_now/raylib, lenientops
+import nimraylib_now, lenientops
 
 const MAX_CIRCLES = 64
 
@@ -39,7 +39,7 @@ let colors = [ORANGE, RED, GOLD, LIME, BLUE, VIOLET, BROWN, LIGHTGRAY, PINK, YEL
 var circles: array[MAX_CIRCLES, CircleWave]
 
 for i in (MAX_CIRCLES-1).countdown 0:
-    circles[i].alpha = 0.0f;
+    circles[i].alpha = 0.0f
     circles[i].radius = getRandomValue(10, 40).float
     circles[i].position.x = getRandomValue(circles[i].radius.int32, screenWidth - circles[i].radius.int32).float
     circles[i].position.y = getRandomValue(circles[i].radius.int32, screenHeight - circles[i].radius.int32).float
@@ -81,18 +81,18 @@ while not windowShouldClose():    #  Detect window close button or ESC key
     #  Color circles animation
     for i in (MAX_CIRCLES-1).countdown 0:
         if pause: break
-        circles[i].alpha += circles[i].speed;
-        circles[i].radius += circles[i].speed*10.0f;
+        circles[i].alpha += circles[i].speed
+        circles[i].radius += circles[i].speed*10.0f
 
         if circles[i].alpha > 1.0f: circles[i].speed *= -1
 
         if (circles[i].alpha <= 0.0f):
-            circles[i].alpha = 0.0f;
+            circles[i].alpha = 0.0f
             circles[i].radius = getRandomValue(10, 40).float
             circles[i].position.x = getRandomValue(circles[i].radius.int32, screenWidth - circles[i].radius.int32).float
             circles[i].position.y = getRandomValue(circles[i].radius.int32, screenHeight - circles[i].radius.int32).float
-            circles[i].color = colors[getRandomValue(0, 13)];
-            circles[i].speed = (float)getRandomValue(1, 100)/2000.0f;
+            circles[i].color = colors[getRandomValue(0, 13)]
+            circles[i].speed = (float)getRandomValue(1, 100)/2000.0f
     # ----------------------------------------------------------------------------------
 
     #  Draw

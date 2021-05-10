@@ -5,7 +5,7 @@ discard """
   disabled: "win"
 """
 import lenientops, math, times, strformat, atomics, system/ansi_c
-import ../src/nimraylib_now/[raylib, raygui, raymath, physac]
+import ../src/nimraylib_now
 from ../src/nimraylib_now/rlgl as rl import nil
 import ../examples/shaders/rlights
 
@@ -50,7 +50,7 @@ block audio_module_playing:
   var circles: array[MAX_CIRCLES, CircleWave]
 
   for i in (MAX_CIRCLES-1).countdown 0:
-      circles[i].alpha = 0.0f;
+      circles[i].alpha = 0.0f
       circles[i].radius = getRandomValue(10, 40).float
       circles[i].position.x = getRandomValue(circles[i].radius.int32, screenWidth - circles[i].radius.int32).float
       circles[i].position.y = getRandomValue(circles[i].radius.int32, screenHeight - circles[i].radius.int32).float
@@ -92,18 +92,18 @@ block audio_module_playing:
       #  Color circles animation
       for i in (MAX_CIRCLES-1).countdown 0:
           if pause: break
-          circles[i].alpha += circles[i].speed;
-          circles[i].radius += circles[i].speed*10.0f;
+          circles[i].alpha += circles[i].speed
+          circles[i].radius += circles[i].speed*10.0f
 
           if circles[i].alpha > 1.0f: circles[i].speed *= -1
 
           if (circles[i].alpha <= 0.0f):
-              circles[i].alpha = 0.0f;
+              circles[i].alpha = 0.0f
               circles[i].radius = getRandomValue(10, 40).float
               circles[i].position.x = getRandomValue(circles[i].radius.int32, screenWidth - circles[i].radius.int32).float
               circles[i].position.y = getRandomValue(circles[i].radius.int32, screenHeight - circles[i].radius.int32).float
-              circles[i].color = colors[getRandomValue(0, 13)];
-              circles[i].speed = (float)getRandomValue(1, 100)/2000.0f;
+              circles[i].color = colors[getRandomValue(0, 13)]
+              circles[i].speed = (float)getRandomValue(1, 100)/2000.0f
       # ----------------------------------------------------------------------------------
 
       #  Draw
@@ -382,10 +382,10 @@ block audio_raw_stream:
 
           while writeCursor < MAX_SAMPLES_PER_UPDATE:
               #  Start by trying to write the whole chunk at once
-              var writeLength = MAX_SAMPLES_PER_UPDATE-writeCursor;
+              var writeLength = MAX_SAMPLES_PER_UPDATE-writeCursor
 
               #  Limit to the maximum readable size
-              let readLength = waveLength-readCursor;
+              let readLength = waveLength-readCursor
 
               if writeLength > readLength: writeLength = readLength
 
@@ -564,22 +564,22 @@ block core_2d_camera_platformer:
       blocking: bool
       color: Color
 
-  proc updatePlayer(player: var Player; envItems: var openArray[EnvItem];  delta: float)
-  proc updateCameraCenter(camera: var Camera2D; player: var Player;
-                          envItems: var openArray[EnvItem]; delta: float;
-                          width: int; height: int)
-  proc updateCameraCenterInsideMap(camera: var Camera2D; player: var Player;
-                                   envItems: var openArray[EnvItem];
-                                   delta: float; width: int; height: int)
-  proc updateCameraCenterSmoothFollow(camera: var Camera2D; player: var Player;
-                                      envItems: var openArray[EnvItem];
-                                      delta: float; width: int; height: int)
-  proc updateCameraEvenOutOnLanding(camera: var Camera2D; player: var Player;
-                                    envItems: var openArray[EnvItem];
-                                    delta: float; width: int; height: int)
-  proc updateCameraPlayerBoundsPush(camera: var Camera2D; player: var Player;
-                                    envItems: var openArray[EnvItem];
-                                    delta: float; width: int; height: int)
+  proc updatePlayer(player: var Player, envItems: var openArray[EnvItem],  delta: float)
+  proc updateCameraCenter(camera: var Camera2D, player: var Player,
+                          envItems: var openArray[EnvItem], delta: float,
+                          width: int, height: int)
+  proc updateCameraCenterInsideMap(camera: var Camera2D, player: var Player,
+                                   envItems: var openArray[EnvItem],
+                                   delta: float, width: int, height: int)
+  proc updateCameraCenterSmoothFollow(camera: var Camera2D, player: var Player,
+                                      envItems: var openArray[EnvItem],
+                                      delta: float, width: int, height: int)
+  proc updateCameraEvenOutOnLanding(camera: var Camera2D, player: var Player,
+                                    envItems: var openArray[EnvItem],
+                                    delta: float, width: int, height: int)
+  proc updateCameraPlayerBoundsPush(camera: var Camera2D, player: var Player,
+                                    envItems: var openArray[EnvItem],
+                                    delta: float, width: int, height: int)
   ##  Initialization
   ## --------------------------------------------------------------------------------------
   var screenWidth = 800
@@ -627,7 +627,7 @@ block core_2d_camera_platformer:
       camera.zoom = 0.25
     if isKeyPressed(R):
       camera.zoom = 1.0
-      player.position = (x: 400.0, y: 280.0);
+      player.position = (x: 400.0, y: 280.0)
     if isKeyPressed(C):
       cameraOption = (cameraOption + 1) mod cameraUpdaters.len
     cameraUpdaters[cameraOption](camera, player, envItems,
@@ -662,7 +662,7 @@ block core_2d_camera_platformer:
   ##  Close window and OpenGL context
   ## --------------------------------------------------------------------------------------
 
-  proc updatePlayer(player: var Player; envItems: var openArray[EnvItem]; delta: float) =
+  proc updatePlayer(player: var Player, envItems: var openArray[EnvItem], delta: float) =
     if isKeyDown(Left):
       player.position.x -= PLAYER_HOR_SPD * delta
     if isKeyDown(Right):
@@ -688,17 +688,17 @@ block core_2d_camera_platformer:
     else:
       player.canJump = true
 
-  proc updateCameraCenter(camera: var Camera2D; player: var Player;
-                          envItems: var openArray[EnvItem]; delta: float;
-                          width: int; height: int) =
-    camera.offset = (x: width/2, y: height/2);
+  proc updateCameraCenter(camera: var Camera2D, player: var Player,
+                          envItems: var openArray[EnvItem], delta: float,
+                          width: int, height: int) =
+    camera.offset = (x: width/2, y: height/2)
     camera.target = player.position
 
-  proc updateCameraCenterInsideMap(camera: var Camera2D; player: var Player;
-                                   envItems: var openArray[EnvItem];
-                                   delta: float; width: int; height: int) =
+  proc updateCameraCenterInsideMap(camera: var Camera2D, player: var Player,
+                                   envItems: var openArray[EnvItem],
+                                   delta: float, width: int, height: int) =
     camera.target = player.position
-    camera.offset = (x: width/2, y: height/2);
+    camera.offset = (x: width/2, y: height/2)
     var
       minX: float = 1000
       minY: float = 1000
@@ -724,13 +724,13 @@ block core_2d_camera_platformer:
     if minV.y > 0:
       camera.offset.y = height div 2 - minV.y
 
-  proc updateCameraCenterSmoothFollow(camera: var Camera2D; player: var Player;
-                                      envItems: var openArray[EnvItem];
-                                      delta: float; width: int; height: int) =
+  proc updateCameraCenterSmoothFollow(camera: var Camera2D, player: var Player,
+                                      envItems: var openArray[EnvItem],
+                                      delta: float, width: int, height: int) =
     var minSpeed = 30.0
     var minEffectLength = 10.0
     var fractionSpeed = 0.8
-    camera.offset = (x: width/2, y: height/2);
+    camera.offset = (x: width/2, y: height/2)
     var diff: Vector2 = subtract(player.position, camera.target)
     var length = length(diff)
     if length > minEffectLength:
@@ -739,11 +739,11 @@ block core_2d_camera_platformer:
 
   var eveningOut = false
   var evenOutTarget: float
-  proc updateCameraEvenOutOnLanding(camera: var Camera2D; player: var Player;
-                                    envItems: var openArray[EnvItem];
-                                    delta: float; width: int; height: int) =
+  proc updateCameraEvenOutOnLanding(camera: var Camera2D, player: var Player,
+                                    envItems: var openArray[EnvItem],
+                                    delta: float, width: int, height: int) =
     var evenOutSpeed = 700.0
-    camera.offset = (x: width/2, y: height/2);
+    camera.offset = (x: width/2, y: height/2)
     camera.target.x = player.position.x
     if eveningOut:
       if evenOutTarget > camera.target.y:
@@ -762,9 +762,9 @@ block core_2d_camera_platformer:
         eveningOut = true
         evenOutTarget = player.position.y
 
-  proc updateCameraPlayerBoundsPush(camera: var Camera2D; player: var Player;
-                                    envItems: var openArray[EnvItem];
-                                    delta: float; width: int; height: int) =
+  proc updateCameraPlayerBoundsPush(camera: var Camera2D, player: var Player,
+                                    envItems: var openArray[EnvItem],
+                                    delta: float, width: int, height: int) =
     var
       bbox = (x: 0.2, y: 0.2)
       bboxWorldMin = getScreenToWorld2D(
@@ -775,7 +775,7 @@ block core_2d_camera_platformer:
         (x: (1 + bbox.x)*0.5f*width, y: (1 + bbox.y)*0.5f*height),
         camera
       )
-    camera.offset = (x: (1 - bbox.x)*0.5f * width, y: (1 - bbox.y)*0.5f*height);
+    camera.offset = (x: (1 - bbox.x)*0.5f * width, y: (1 - bbox.y)*0.5f*height)
     if player.position.x < bboxWorldMin.x:
       camera.target.x = player.position.x
     if player.position.y < bboxWorldMin.y:
@@ -1052,7 +1052,7 @@ block core_3d_picking:
 
     if MouseButton.LeftButton.isMouseButtonPressed():
       if not collision:
-        ray = getMouseRay(getMousePosition(), camera);
+        ray = getMouseRay(getMousePosition(), camera)
 
         #  Check collision between ray and box
         collision = checkCollisionRayBox(
@@ -1655,13 +1655,13 @@ block core_quat_conversion:
 
       beginMode3D(camera):
         model.transform = m1
-        drawModel(model, (-1.0, 0.0, 0.0), 1.0, Red);
+        drawModel(model, (-1.0, 0.0, 0.0), 1.0, Red)
         model.transform = m2
-        drawModel(model, (1.0, 0.0, 0.0), 1.0, Red);
+        drawModel(model, (1.0, 0.0, 0.0), 1.0, Red)
         model.transform = m3
-        drawModel(model, (0.0, 0.0, 0.0), 1.0, Red);
+        drawModel(model, (0.0, 0.0, 0.0), 1.0, Red)
         model.transform = m4
-        drawModel(model, (0.0, 0.0, -1.0), 1.0, Red);
+        drawModel(model, (0.0, 0.0, -1.0), 1.0, Red)
         drawGrid(10, 1.0)
 
       if v2.x < 0:
@@ -1857,22 +1857,22 @@ block core_vr_simulator:
 
   ## Update distortion shader with lens and distortion-scale parameters
   setShaderValue(distortion, getShaderLocation(distortion, "leftLensCenter"),
-                 cast[pointer](config.leftLensCenter.addr), ShaderUniformDataType.Vec2);
+                 cast[pointer](config.leftLensCenter.addr), ShaderUniformDataType.Vec2)
   setShaderValue(distortion, getShaderLocation(distortion, "rightLensCenter"),
-                 cast[pointer](config.rightLensCenter.addr), ShaderUniformDataType.Vec2);
+                 cast[pointer](config.rightLensCenter.addr), ShaderUniformDataType.Vec2)
   setShaderValue(distortion, getShaderLocation(distortion, "leftScreenCenter"),
-                 cast[pointer](config.leftScreenCenter.addr), ShaderUniformDataType.Vec2);
+                 cast[pointer](config.leftScreenCenter.addr), ShaderUniformDataType.Vec2)
   setShaderValue(distortion, getShaderLocation(distortion, "rightScreenCenter"),
-                 cast[pointer](config.rightScreenCenter.addr), ShaderUniformDataType.Vec2);
+                 cast[pointer](config.rightScreenCenter.addr), ShaderUniformDataType.Vec2)
 
   setShaderValue(distortion, getShaderLocation(distortion, "scale"),
-                 cast[pointer](config.scale.addr), ShaderUniformDataType.Vec2);
+                 cast[pointer](config.scale.addr), ShaderUniformDataType.Vec2)
   setShaderValue(distortion, getShaderLocation(distortion, "scaleIn"),
-                 cast[pointer](config.scaleIn.addr), ShaderUniformDataType.Vec2);
+                 cast[pointer](config.scaleIn.addr), ShaderUniformDataType.Vec2)
   setShaderValue(distortion, getShaderLocation(distortion, "deviceWarpParam"),
-                 cast[pointer](device.lensDistortionValues.addr), ShaderUniformDataType.Vec4);
+                 cast[pointer](device.lensDistortionValues.addr), ShaderUniformDataType.Vec4)
   setShaderValue(distortion, getShaderLocation(distortion, "chromaAbParam"),
-                 cast[pointer](device.chromaAbCorrection.addr), ShaderUniformDataType.Vec4);
+                 cast[pointer](device.chromaAbCorrection.addr), ShaderUniformDataType.Vec4)
 
   var target = loadRenderTexture(getScreenWidth(), getScreenHeight())
 
@@ -1969,7 +1969,7 @@ block core_window_flags:
   var ballSpeed: Vector2 = (5.0, 4.0)
   var ballRadius = 20
   var framesCounter = 0
-  ## SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
+  setTargetFPS(60)
   ## ----------------------------------------------------------
   ##  Main game loop
   while not windowShouldClose(): ##  Detect window close button or ESC key
@@ -2043,7 +2043,7 @@ block core_window_flags:
     else:
       clearBackground(Raywhite)
     drawCircleV(ballPosition, ballRadius.float, Maroon)
-    drawRectangleLinesEx((0.0, 0.0, getScreenWidth().float, getScreenHeight().float), 4, Raywhite);
+    drawRectangleLinesEx((0.0, 0.0, getScreenWidth().float, getScreenHeight().float), 4, Raywhite)
     drawCircleV(getMousePosition(), 10, Darkblue)
     drawFPS(10, 10)
     drawText(textFormat("Screen Size: [%i, %i]", getScreenWidth(),
@@ -2131,7 +2131,7 @@ block core_window_letterbox:
 
   ##  Clamp Vector2 value with min and max and return a new vector2
   ##  NOTE: Required for virtual mouse, to clamp inside virtual game size
-  proc clampValue(value: Vector2; minV: Vector2; maxV: Vector2): Vector2 =
+  proc clampValue(value: Vector2, minV: Vector2, maxV: Vector2): Vector2 =
     result = value
     result.x = if (result.x > maxV.x): maxV.x else: result.x
     result.x = if (result.x < minV.x): minV.x else: result.x
@@ -2176,9 +2176,12 @@ block core_window_letterbox:
     virtualMouse.y = (mouse.y - (getScreenHeight() - (gameScreenHeight * scale)) * 0.5) / scale
     virtualMouse = clampValue(virtualMouse, (0.0, 0.0), (gameScreenWidth.float, gameScreenHeight.float))
     ##  Apply the same transformation as the virtual mouse to the real mouse (i.e. to work with raygui)
-    ## SetMouseOffset(-(GetScreenWidth() - (gameScreenWidth*scale))*0.5f, -(GetScreenHeight() - (gameScreenHeight*scale))*0.5f);
-    ## SetMouseScale(1/scale, 1/scale);
-    ##
+    setMouseOffset(
+      -(getScreenWidth() - (gameScreenWidth * scale)*0.5).cint,
+      -(getScreenHeight() - (gameScreenHeight * scale)*0.5).cint
+    )
+    setMouseScale(1.0/scale, 1.0/scale)
+
     ## ----------------------------------------------------------------------------------
     ##  Draw
     ##
@@ -2213,7 +2216,7 @@ block core_window_letterbox:
       (0.0, 0.0),
       0.0,
       White
-    );
+    )
     endDrawing()
   ## --------------------------------------------------------------------------------------
   ##  De-Initialization
@@ -2265,7 +2268,7 @@ block core_world_screen:
     updateCamera(addr(camera))
     ## Update camera
     ## Calculate cube screen space position (with a little offset to be in top)
-    cubeScreenPosition = getWorldToScreen((cubePosition.x.float, cubePosition.y + 2.5, cubePosition.z.float), camera);
+    cubeScreenPosition = getWorldToScreen((cubePosition.x.float, cubePosition.y + 2.5, cubePosition.z.float), camera)
     ## ----------------------------------------------------------------------------------
     ##  Draw
     ## ----------------------------------------------------------------------------------
@@ -2576,7 +2579,7 @@ block models_waving_cubes:
       #  Update
       # ----------------------------------------------------------------------------------
       let
-          time = raylib.getTime()
+          time = nimraylib_now.getTime()
 
           #  Calculate time scale for cube position and size
           scale = (2.0 + sin(time))*0.7
@@ -2617,7 +2620,7 @@ block models_waving_cubes:
                     cubeColor = colorFromHSV((((x + y + z)*18)%%360)/1.0, 0.75f, 0.9)
 
                     #  Calculate cube size
-                    cubeSize = (2.4 - scale)*blockScale;
+                    cubeSize = (2.4 - scale)*blockScale
 
                   #  And finally, draw the cube!
                   drawCube cubePos, cubeSize, cubeSize, cubeSize, cubeColor
@@ -2957,8 +2960,6 @@ block physics_friction:
     updatePhysics()
     if isKeyPressed(R):
       ##  Reset dynamic physics bodies position, velocity and rotation
-      ##             bodyA->position = (Vector2){ 35, screenHeight*0.6f };
-      ##             bodyA->velocity = (Vector2){ 0, 0 };
       bodyA.position = Vector2(x: 35, y: screenHeight.float * 0.6)
       bodyA.velocity = Vector2(x: 0, y: 0)
       bodyA.angularVelocity = 0
@@ -3063,7 +3064,6 @@ block physics_movement:
   wallLeft.enabled = false
   wallRight.enabled = false
   ##  Create movement physics body
-  ##     PhysicsBody body = CreatePhysicsBodyRectangle((Vector2){ screenWidth/2, screenHeight/2 }, 50, 50, 1);
   var
     body = createPhysicsBodyRectangle(
       Vector2(x: (float) screenWidth div 2, y: (float) screenHeight div 2),
@@ -3749,7 +3749,7 @@ block shaders_fog:
   ##  Ambient light level
   var ambientLoc = getShaderLocation(shader, "ambient")
   var shaderPosition = [0.2.cfloat, 0.2, 0.2, 1.0]
-  setShaderValue(shader, ambientLoc, shaderPosition.addr, VEC4);
+  setShaderValue(shader, ambientLoc, shaderPosition.addr, VEC4)
   var fogDensity: cfloat = 0.15
   var fogDensityLoc = getShaderLocation(shader, "fogDensity")
   setShaderValue(shader, fogDensityLoc, addr(fogDensity), Float)
@@ -4525,8 +4525,8 @@ block shapes_following_eyes:
 
       #  Check not inside the left eye sclera
       if not checkCollisionPointCircle(irisLeftPosition, scleraLeftPosition, scleraRadius - 20):
-          dx = irisLeftPosition.x - scleraLeftPosition.x;
-          dy = irisLeftPosition.y - scleraLeftPosition.y;
+          dx = irisLeftPosition.x - scleraLeftPosition.x
+          dy = irisLeftPosition.y - scleraLeftPosition.y
 
           angle = arctan2(dy, dx)
 

@@ -14,8 +14,8 @@
 # ******************************************************************************************
 
 import times
-import ../../src/nimraylib_now/raylib
-import ../../src/nimraylib_now/rlgl as rl
+import nimraylib_now
+import nimraylib_now/rlgl as rl
 
 const GLSL_VERSION = 330
 

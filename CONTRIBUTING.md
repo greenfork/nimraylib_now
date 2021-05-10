@@ -44,6 +44,6 @@ $ nimble testExamples
 ```
 
 Then workflow is as follows:
-1. Change `src/converter.nim` file
+1. Change `src/convert_c_to_nim.nim` file
 2. Run `nimble convert` and see if you achieved desired changes
 3. Run `nimble testExamples` to see that all examples are still compiled

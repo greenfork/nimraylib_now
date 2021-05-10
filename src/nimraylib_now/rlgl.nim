@@ -676,11 +676,6 @@ proc loadDrawCube*() {.cdecl, importc: "rlLoadDrawCube", header: rlglHeader.}
 proc loadDrawQuad*() {.cdecl, importc: "rlLoadDrawQuad", header: rlglHeader.}
 ##  Load and draw a quad
 
-converter GlVersionToInt*(self: GlVersion): cint = self.cint
-converter FramebufferAttachTypeToInt*(self: FramebufferAttachType): cint = self.cint
-converter FramebufferAttachTextureTypeToInt*(self: FramebufferAttachTextureType): cint = self.cint
-converter ShaderAttributeDataTypeToInt*(self: ShaderAttributeDataType): cint = self.cint
-
 template begin*(mode: cint; body: untyped) =
   begin(mode)
   block:

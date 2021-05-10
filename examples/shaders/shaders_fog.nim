@@ -26,8 +26,8 @@
 #
 # ******************************************************************************************
 
-import ../../src/nimraylib_now/[raylib, raymath]
-import rlights
+import nimraylib_now
+import ./rlights
 
 const GLSL_VERSION = 330
 
@@ -64,7 +64,7 @@ shader.locs[int(Vector_View)] = getShaderLocation(shader, "viewPos")
 ##  Ambient light level
 var ambientLoc = getShaderLocation(shader, "ambient")
 var shaderPosition = [0.2.cfloat, 0.2, 0.2, 1.0]
-setShaderValue(shader, ambientLoc, shaderPosition.addr, VEC4);
+setShaderValue(shader, ambientLoc, shaderPosition.addr, VEC4)
 var fogDensity: cfloat = 0.15
 var fogDensityLoc = getShaderLocation(shader, "fogDensity")
 setShaderValue(shader, fogDensityLoc, addr(fogDensity), Float)

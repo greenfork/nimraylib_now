@@ -6,7 +6,7 @@
 ##
 ## ******************************************************************************************
 
-import ../../src/nimraylib_now/[raylib, physac]
+import nimraylib_now
 
 const
   Velocity = 0.5
@@ -51,7 +51,6 @@ platformRight.enabled = false
 wallLeft.enabled = false
 wallRight.enabled = false
 ##  Create movement physics body
-##     PhysicsBody body = CreatePhysicsBodyRectangle((Vector2){ screenWidth/2, screenHeight/2 }, 50, 50, 1);
 var
   body = createPhysicsBodyRectangle(
     Vector2(x: (float) screenWidth div 2, y: (float) screenHeight div 2),

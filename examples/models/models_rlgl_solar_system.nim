@@ -14,7 +14,7 @@
 #*******************************************************************************************
 
 import math, lenientops
-import ../../src/nimraylib_now/raylib
+import nimraylib_now
 from ../../src/nimraylib_now/rlgl as rl import nil
 
 # ------------------------------------------------------------------------------------

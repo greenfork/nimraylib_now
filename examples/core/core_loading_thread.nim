@@ -17,7 +17,7 @@
 # nim c --threads:on <file>
 
 import times, atomics
-import ../../src/nimraylib_now/raylib
+import nimraylib_now
 
 type State {.pure.} = enum
   Waiting, Loading, Finished

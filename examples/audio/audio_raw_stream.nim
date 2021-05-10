@@ -13,7 +13,7 @@
 #
 #*******************************************************************************************
 
-import ../../src/nimraylib_now/raylib, math, lenientops
+import nimraylib_now, math, lenientops
 
 const MAX_SAMPLES            = 512
 const MAX_SAMPLES_PER_UPDATE = 4096
@@ -92,10 +92,10 @@ while not windowShouldClose():  #  Detect window close button or ESC key
 
         while writeCursor < MAX_SAMPLES_PER_UPDATE:
             #  Start by trying to write the whole chunk at once
-            var writeLength = MAX_SAMPLES_PER_UPDATE-writeCursor;
+            var writeLength = MAX_SAMPLES_PER_UPDATE-writeCursor
 
             #  Limit to the maximum readable size
-            let readLength = waveLength-readCursor;
+            let readLength = waveLength-readCursor
 
             if writeLength > readLength: writeLength = readLength
 

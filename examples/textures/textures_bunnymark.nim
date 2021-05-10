@@ -11,7 +11,7 @@
 # ******************************************************************************************
 
 import lenientops
-import ../../src/nimraylib_now/raylib
+import nimraylib_now
 
 const
   MAX_BUNNIES = 50000

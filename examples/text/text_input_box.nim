@@ -11,7 +11,7 @@
 #
 #*******************************************************************************************
 
-import ../../src/nimraylib_now/raylib
+import nimraylib_now
 
 const MAX_INPUT_CHARS = 9
 

@@ -13,11 +13,11 @@
 # ******************************************************************************************
 
 import lenientops
-import ../../src/nimraylib_now/raylib
+import nimraylib_now
 
 ##  Clamp Vector2 value with min and max and return a new vector2
 ##  NOTE: Required for virtual mouse, to clamp inside virtual game size
-proc clampValue(value: Vector2; minV: Vector2; maxV: Vector2): Vector2 =
+proc clampValue(value: Vector2, minV: Vector2, maxV: Vector2): Vector2 =
   result = value
   result.x = if (result.x > maxV.x): maxV.x else: result.x
   result.x = if (result.x < minV.x): minV.x else: result.x
@@ -62,9 +62,12 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
   virtualMouse.y = (mouse.y - (getScreenHeight() - (gameScreenHeight * scale)) * 0.5) / scale
   virtualMouse = clampValue(virtualMouse, (0.0, 0.0), (gameScreenWidth.float, gameScreenHeight.float))
   ##  Apply the same transformation as the virtual mouse to the real mouse (i.e. to work with raygui)
-  ## SetMouseOffset(-(GetScreenWidth() - (gameScreenWidth*scale))*0.5f, -(GetScreenHeight() - (gameScreenHeight*scale))*0.5f);
-  ## SetMouseScale(1/scale, 1/scale);
-  ##
+  setMouseOffset(
+    -(getScreenWidth() - (gameScreenWidth * scale)*0.5).cint,
+    -(getScreenHeight() - (gameScreenHeight * scale)*0.5).cint
+  )
+  setMouseScale(1.0/scale, 1.0/scale)
+
   ## ----------------------------------------------------------------------------------
   ##  Draw
   ##
@@ -99,7 +102,7 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
     (0.0, 0.0),
     0.0,
     White
-  );
+  )
   endDrawing()
 ## --------------------------------------------------------------------------------------
 ##  De-Initialization

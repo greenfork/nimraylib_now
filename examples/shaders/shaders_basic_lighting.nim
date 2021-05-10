@@ -27,8 +27,8 @@
 # ******************************************************************************************
 
 import math
-import ../../src/nimraylib_now/[raylib, raymath]
-import rlights
+import nimraylib_now
+import ./rlights
 
 const GLSL_VERSION = 330
 
