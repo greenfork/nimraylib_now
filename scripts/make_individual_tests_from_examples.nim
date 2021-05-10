@@ -42,11 +42,5 @@ const
   rlightsnim = projectDir/"examples"/"shaders"/"rlights.nim"
   rlightsh = projectDir/"examples"/"shaders"/"rlights.h"
 
-let
-  rlightsnimContent = readFile(rlightsnim)
-  rlightsnimNewContent = rlightsnimContent.replace(
-    "import nimraylib_now",
-    "import ../../src/nimraylib_now"
-  )
-writeFile(examplesTestDir/"rlights.nim", rlightsnimNewContent)
+copyFileToDir(rlightsnim, examplesTestDir)
 copyFileToDir(rlightsh, examplesTestDir)
