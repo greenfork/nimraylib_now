@@ -50,7 +50,7 @@ side it should mainly consist of renaming, please try they wonderful tool
 
 [Raylib v3.7.0]: https://github.com/raysan5/raylib/releases/tag/3.7.0
 
-## How to use Raylib?
+## How to use Raylib, the original C library?
 
 You have 3 options:
 
@@ -133,7 +133,7 @@ requires "nimraylib_now"
 
 [raylib releases]: https://github.com/raysan5/raylib/releases
 
-## How to use
+## How to use NimraylibNow!
 
 Import any necessary modules and use it:
 
