@@ -20,7 +20,8 @@
 
 a.out
 
-/src/build
+# /src/build
+/src/build/*_modified.*
 
 /build
 /nimcache
