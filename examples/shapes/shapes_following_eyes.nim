@@ -12,7 +12,7 @@
 #*******************************************************************************************
 
 import math
-import ../../src/nimraylib_now/raylib
+import nimraylib_now
 
 #  Initialization
 # --------------------------------------------------------------------------------------
@@ -48,8 +48,8 @@ while not windowShouldClose():  #  Detect window close button or ESC key
 
     #  Check not inside the left eye sclera
     if not checkCollisionPointCircle(irisLeftPosition, scleraLeftPosition, scleraRadius - 20):
-        dx = irisLeftPosition.x - scleraLeftPosition.x;
-        dy = irisLeftPosition.y - scleraLeftPosition.y;
+        dx = irisLeftPosition.x - scleraLeftPosition.x
+        dy = irisLeftPosition.y - scleraLeftPosition.y
 
         angle = arctan2(dy, dx)
 

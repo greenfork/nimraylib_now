@@ -4,7 +4,7 @@
 # Adapted in 2021 by greenfork
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- #
 
-import ../../src/nimraylib_now/[raylib, raygui]
+import nimraylib_now
 
 initWindow 800, 600, "[nim]RaylibNow!"
 60.setTargetFPS

@@ -10,7 +10,7 @@
 #
 # ******************************************************************************************
 
-import ../../src/nimraylib_now/raylib
+import nimraylib_now
 
 # Change GLSL this version to see different effects!
 const
@@ -55,22 +55,22 @@ var distortion: Shader = loadShader("", textFormat("resources/distortion%i.fs", 
 
 ## Update distortion shader with lens and distortion-scale parameters
 setShaderValue(distortion, getShaderLocation(distortion, "leftLensCenter"),
-               cast[pointer](config.leftLensCenter.addr), ShaderUniformDataType.Vec2);
+               cast[pointer](config.leftLensCenter.addr), ShaderUniformDataType.Vec2)
 setShaderValue(distortion, getShaderLocation(distortion, "rightLensCenter"),
-               cast[pointer](config.rightLensCenter.addr), ShaderUniformDataType.Vec2);
+               cast[pointer](config.rightLensCenter.addr), ShaderUniformDataType.Vec2)
 setShaderValue(distortion, getShaderLocation(distortion, "leftScreenCenter"),
-               cast[pointer](config.leftScreenCenter.addr), ShaderUniformDataType.Vec2);
+               cast[pointer](config.leftScreenCenter.addr), ShaderUniformDataType.Vec2)
 setShaderValue(distortion, getShaderLocation(distortion, "rightScreenCenter"),
-               cast[pointer](config.rightScreenCenter.addr), ShaderUniformDataType.Vec2);
+               cast[pointer](config.rightScreenCenter.addr), ShaderUniformDataType.Vec2)
 
 setShaderValue(distortion, getShaderLocation(distortion, "scale"),
-               cast[pointer](config.scale.addr), ShaderUniformDataType.Vec2);
+               cast[pointer](config.scale.addr), ShaderUniformDataType.Vec2)
 setShaderValue(distortion, getShaderLocation(distortion, "scaleIn"),
-               cast[pointer](config.scaleIn.addr), ShaderUniformDataType.Vec2);
+               cast[pointer](config.scaleIn.addr), ShaderUniformDataType.Vec2)
 setShaderValue(distortion, getShaderLocation(distortion, "deviceWarpParam"),
-               cast[pointer](device.lensDistortionValues.addr), ShaderUniformDataType.Vec4);
+               cast[pointer](device.lensDistortionValues.addr), ShaderUniformDataType.Vec4)
 setShaderValue(distortion, getShaderLocation(distortion, "chromaAbParam"),
-               cast[pointer](device.chromaAbCorrection.addr), ShaderUniformDataType.Vec4);
+               cast[pointer](device.chromaAbCorrection.addr), ShaderUniformDataType.Vec4)
 
 var target = loadRenderTexture(getScreenWidth(), getScreenHeight())
 

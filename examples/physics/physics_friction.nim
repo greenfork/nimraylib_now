@@ -7,7 +7,7 @@
 ## ******************************************************************************************
 
 import math
-import ../../src/nimraylib_now/[raylib, physac]
+import nimraylib_now
 
 ##  Initialization
 ## --------------------------------------------------------------------------------------
@@ -60,8 +60,6 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
   updatePhysics()
   if isKeyPressed(R):
     ##  Reset dynamic physics bodies position, velocity and rotation
-    ##             bodyA->position = (Vector2){ 35, screenHeight*0.6f };
-    ##             bodyA->velocity = (Vector2){ 0, 0 };
     bodyA.position = Vector2(x: 35, y: screenHeight.float * 0.6)
     bodyA.velocity = Vector2(x: 0, y: 0)
     bodyA.angularVelocity = 0

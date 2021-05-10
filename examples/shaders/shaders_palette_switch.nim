@@ -20,7 +20,7 @@
 #
 #*******************************************************************************************
 
-import ../../src/nimraylib_now/raylib
+import nimraylib_now
 
 const GLSL_VERSION = 330
 

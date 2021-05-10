@@ -50,7 +50,7 @@ side it should mainly consist of renaming, please try they wonderful tool
 
 [Raylib v3.7.0]: https://github.com/raysan5/raylib/releases/tag/3.7.0
 
-## How to use Raylib?
+## How to use Raylib, the original C library?
 
 You have 3 options:
 
@@ -133,11 +133,15 @@ requires "nimraylib_now"
 
 [raylib releases]: https://github.com/raysan5/raylib/releases
 
-## How to use
+## How to use NimraylibNow!
 
 Import any necessary modules and use it:
 
 ```nim
+# Import everything but rlgl, should be enough for most cases!
+import nimraylib_now
+
+# Import only necessary modules for more granularity
 import nimraylib_now/raylib
 import nimraylib_now/[raylib, raymath, raygui]
 from nimraylib_now/rlgl as rl import nil  # import rlgl with a mandatory prefix rl
@@ -155,7 +159,7 @@ Here is a long example to showcase most features
 
 ```nim
 import math
-import nimraylib_now/raylib
+import nimraylib_now
 
 const
   nimFg: Color = (0xff, 0xc2, 0x00)          # Use this shortcut with alpha = 255!
@@ -380,9 +384,10 @@ endDrawing()
 ```
 
 ### Reserved words
-Be careful when using fields or functions which are also reserved words in Nim:
+Be careful and use "stropping" when using fields or functions which are also
+reserved words in Nim:
 ```nim
-camera.projection = CameraProjection.Perspective
+`end`()
 ```
 
 ### Enums

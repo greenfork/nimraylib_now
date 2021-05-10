@@ -13,7 +13,7 @@
 # ******************************************************************************************
 
 import times, strformat
-import ../../src/nimraylib_now/raylib
+import nimraylib_now
 
 ##  Custom logging funtion
 proc logCustom(msgType: int32; text: cstring; args: va_list) {.cdecl.} =

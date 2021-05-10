@@ -14,7 +14,7 @@
 #
 # ******************************************************************************************
 
-import ../../src/nimraylib_now/raylib
+import nimraylib_now
 
 
 ##  Initialization

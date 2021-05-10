@@ -12,9 +12,8 @@ when not defined(nimraylib_now_linkingOverride):
   const
     Platform = "PLATFORM_DESKTOP"
     Graphics = "GRAPHICS_API_OPENGL_33"
-
     CurrentDirectory = currentSourcePath().parentDir()
-    RaylibRootPath = raylibSrcDir.parentDir()
+    RaylibRootPath {.used.} = raylibSrcDir.parentDir()
     RaylibSrcPath = raylibBuildDir
     # Use relative paths just in case
     # https://github.com/nim-lang/Nim/issues/9370

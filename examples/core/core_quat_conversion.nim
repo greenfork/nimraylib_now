@@ -16,7 +16,7 @@
 # ******************************************************************************************
 
 import math
-import ../../src/nimraylib_now/[raylib, raymath]
+import nimraylib_now
 
 ##  Initialization
 ## --------------------------------------------------------------------------------------
@@ -78,13 +78,13 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
 
     beginMode3D(camera):
       model.transform = m1
-      drawModel(model, (-1.0, 0.0, 0.0), 1.0, Red);
+      drawModel(model, (-1.0, 0.0, 0.0), 1.0, Red)
       model.transform = m2
-      drawModel(model, (1.0, 0.0, 0.0), 1.0, Red);
+      drawModel(model, (1.0, 0.0, 0.0), 1.0, Red)
       model.transform = m3
-      drawModel(model, (0.0, 0.0, 0.0), 1.0, Red);
+      drawModel(model, (0.0, 0.0, 0.0), 1.0, Red)
       model.transform = m4
-      drawModel(model, (0.0, 0.0, -1.0), 1.0, Red);
+      drawModel(model, (0.0, 0.0, -1.0), 1.0, Red)
       drawGrid(10, 1.0)
 
     if v2.x < 0:

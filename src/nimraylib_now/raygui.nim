@@ -543,21 +543,3 @@ when defined(raygui_Support_Icons):
   proc checkIconPixel*(iconId: cint; x: cint; y: cint): bool {.cdecl,
       importc: "GuiCheckIconPixel", header: rayguiHeader.}
   ##  Check icon pixel value
-converter ControlStateToInt*(self: ControlState): cint = self.cint
-converter TextAlignmentToInt*(self: TextAlignment): cint = self.cint
-converter ControlToInt*(self: Control): cint = self.cint
-converter ControlPropertyToInt*(self: ControlProperty): cint = self.cint
-converter DefaultPropertyToInt*(self: DefaultProperty): cint = self.cint
-converter TogglePropertyToInt*(self: ToggleProperty): cint = self.cint
-converter SliderPropertyToInt*(self: SliderProperty): cint = self.cint
-converter ProgressBarPropertyToInt*(self: ProgressBarProperty): cint = self.cint
-converter CheckBoxPropertyToInt*(self: CheckBoxProperty): cint = self.cint
-converter ComboBoxPropertyToInt*(self: ComboBoxProperty): cint = self.cint
-converter DropdownBoxPropertyToInt*(self: DropdownBoxProperty): cint = self.cint
-converter TextBoxPropertyToInt*(self: TextBoxProperty): cint = self.cint
-converter SpinnerPropertyToInt*(self: SpinnerProperty): cint = self.cint
-converter ScrollBarPropertyToInt*(self: ScrollBarProperty): cint = self.cint
-converter ScrollBarSideToInt*(self: ScrollBarSide): cint = self.cint
-converter ListViewPropertyToInt*(self: ListViewProperty): cint = self.cint
-converter ColorPickerPropertyToInt*(self: ColorPickerProperty): cint = self.cint
-
