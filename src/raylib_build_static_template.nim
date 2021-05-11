@@ -9,7 +9,7 @@ import ../filenames
 const
   CurrentDirectory = currentSourcePath().parentDir()
   # RaylibRootPath {.used.} = raylibSrcDir.parentDir()
-  RaylibSrcPath = raylibBuildDir
+  RaylibSrcPath = raylibMangledCSourcesDir
   # Use relative paths just in case
   # https://github.com/nim-lang/Nim/issues/9370
   RaylibSrcPathRelative = relativePath(RaylibSrcPath, CurrentDirectory)

@@ -85,6 +85,13 @@ when defined(nimraylib_now_mangle):
     let fileContent = readFile(file)
     writeFile(file, mangle(fileContent))
 
+  # Copy mangled C sources to src/csources
+  # for file in raylibSources:
+  #   copyFileToDir(file, raylibMangledCSourcesDir)
+  # for file in raylibHeaders:
+  #   copyFileToDir(file, raylibMangledCSourcesDir)
+  copyDir(raylibBuildDir, raylibMangledCSourcesDir)
+
 
 # Copy files to build directory for converting to Nim files
 # Copy files to target directory to be used during linking with Nim files
