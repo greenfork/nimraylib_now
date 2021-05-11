@@ -6,14 +6,6 @@ from os import parentDir, relativePath, `/`
 
 import ../filenames
 
-# static:
-#   when defined(nimraylib_now_shared) or defined(nimraylib_now_linkingOverride):
-#     let (_, code) = gorgeEx("nim r ../prepare_build_files.nim")
-#     assert code == 0
-#   else:
-#     let (_, code) = gorgeEx("nim r -d:nimraylib_now_mangle ../prepare_build_files.nim")
-#     assert code == 0
-
 const
   CurrentDirectory = currentSourcePath().parentDir()
   # RaylibRootPath {.used.} = raylibSrcDir.parentDir()

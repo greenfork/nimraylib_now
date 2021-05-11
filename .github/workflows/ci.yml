@@ -52,9 +52,6 @@ jobs:
       - name: Run converter and check files
         run: nimble convert
 
-      - name: Clean up build directory
-        run: rm -r build/*
-
       - name: Run megatest
         run: nimble testExamples
 

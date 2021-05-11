@@ -2,7 +2,7 @@ from os import `/`, parentDir
 
 const
   projectDir*       = currentSourcePath().parentDir().parentDir()
-  buildDir*         = projectDir/"src"/"build"
+  buildDir*         = projectDir/"build"
   nimraylibNowDir*  = projectDir/"src"/"nimraylib_now"
   raylibSrcDir*     = projectDir/"raylib"/"src"
   rayguiSrcDir*     = projectDir/"raygui"/"src"
