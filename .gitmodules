@@ -1,6 +1,8 @@
 [submodule "raygui"]
 	path = raygui
 	url = https://github.com/raysan5/raygui.git
+	shallow = true
 [submodule "raylib"]
 	path = raylib
 	url = https://github.com/raysan5/raylib.git
+	shallow = true
