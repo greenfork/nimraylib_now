@@ -45,15 +45,16 @@ jobs:
         uses: jiro4989/setup-nim-action@v1
         with:
           nim-version: ${{ matrix.nim-version }}
-      - name: Install dependencies
-        run: nimble install --depsOnly --accept
+
+      - name: Install NimraylibNow! and dependencies
+        run: nimble install --accept
+      - name: Try compiling a file with local installation
+        run: nim c examples/original/crown.nim
+
       - name: Install c2nim
         run: nimble install --accept c2nim
       - name: Run converter and check files
         run: nimble convert
-
-      - name: Clean up build directory
-        run: rm -r build/*
 
       - name: Run megatest
         run: nimble testExamples

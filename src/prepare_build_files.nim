@@ -78,12 +78,16 @@ when defined(nimraylib_now_mangle):
     for reName in mangleNameRegexes:
       result = result.replace(reName, manglePrefix & "$1")
 
+  # Modify raylib files in-place inside build/ directory
   for file in raylibHeaders:
     let fileContent = readFile(file)
     writeFile(file, mangle(fileContent))
   for file in raylibSources:
     let fileContent = readFile(file)
     writeFile(file, mangle(fileContent))
+
+  # Copy mangled C sources from build/ to src/csources
+  copyDir(raylibBuildDir, raylibMangledCSourcesDir)
 
 
 # Copy files to build directory for converting to Nim files

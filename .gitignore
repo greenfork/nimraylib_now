@@ -20,9 +20,6 @@
 
 a.out
 
-# /src/build
-/src/build/*_modified.*
-
 /build
 /nimcache
 /tests/megatest.nim

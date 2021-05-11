@@ -1,15 +1,23 @@
-from os import `/`, removeDir, createDir, copyFileToDir
+from os import `/`, removeDir, createDir, copyFileToDir, moveFile
 import strformat
 
 import ./filenames
-
-const buildScript = projectDir/"src"/"raylib_build_static.nim"
 
 removeDir(nimraylibNowDir)
 createDir(nimraylibNowDir)
 createDir(nimraylibNowDir/"mangled")
 createDir(nimraylibNowDir/"not_mangled")
-copyFileToDir(buildScript, nimraylibNowDir)
+copyFileToDir(
+  projectDir/"src"/"raylib_build_static_template.nim",
+  nimraylibNowDir
+)
+moveFile(
+  nimraylibNowDir/"raylib_build_static_template.nim",
+  nimraylibNowDir/"raylib_build_static.nim"
+)
+removeDir(cSourcesDir)
+createDir(cSourcesDir)
+createDir(raylibMangledCSourcesDir)
 
 const
   alternatingNimFiles* = [

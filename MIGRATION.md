@@ -7,6 +7,10 @@ Additionally you can consult [Raylib's changelog](https://github.com/raysan5/ray
 
 ## From Raylib v3.5 to v3.7 and from NimraylibNow! v0.10 to v0.12
 
+Recommended:
+
+- Change all imports except for `rlgl` to just `import nimraylib_now`
+
 Renamed:
 
 - `Camera.type` was renamed to `Camera.projection`

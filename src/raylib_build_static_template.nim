@@ -6,18 +6,10 @@ from os import parentDir, relativePath, `/`
 
 import ../filenames
 
-# static:
-#   when defined(nimraylib_now_shared) or defined(nimraylib_now_linkingOverride):
-#     let (_, code) = gorgeEx("nim r ../prepare_build_files.nim")
-#     assert code == 0
-#   else:
-#     let (_, code) = gorgeEx("nim r -d:nimraylib_now_mangle ../prepare_build_files.nim")
-#     assert code == 0
-
 const
   CurrentDirectory = currentSourcePath().parentDir()
   # RaylibRootPath {.used.} = raylibSrcDir.parentDir()
-  RaylibSrcPath = raylibBuildDir
+  RaylibSrcPath = raylibMangledCSourcesDir
   # Use relative paths just in case
   # https://github.com/nim-lang/Nim/issues/9370
   RaylibSrcPathRelative = relativePath(RaylibSrcPath, CurrentDirectory)
@@ -40,8 +32,8 @@ else:
   {.passC: "-Werror=implicit-function-declaration".}
 
 {.passC: "-I" & RaylibSrcPath.}
-{.passC: "-I" & RaylibSrcPath & "/external/glfw/include".}
-{.passC: "-I" & RaylibSrcPath & "/external/glfw/deps/mingw".}
+{.passC: "-I" & RaylibSrcPath / "external"/"glfw"/"include".}
+{.passC: "-I" & RaylibSrcPath / "external"/"glfw"/"deps"/"mingw".}
 {.passC: "-D" & Platform.}
 {.passC: "-D" & Graphics.}
 
@@ -57,19 +49,21 @@ when defined(linux):
       {.passL: "-lxkbcommon".}
     else:
       {.passL: "-lX11".}
+      {.passL: "-lpthread".}
 
 # *BSD platforms need to be tested.
 when defined(bsd) and not defined(emscripten):
-  {.passC: "-I/usr/local/include".}
+  {.passC: "-I"/"usr"/"local"/"include".}
   # {.passL: "-L" & RaylibRootPath.}
-  {.passL: "-L" & RaylibSrcPath & "/src".}
-  {.passL: "-L/usr/local/lib".}
+  {.passL: "-L" & RaylibSrcPath / "src".}
+  {.passL: "-L"/"usr"/"local"/"lib".}
   {.passL: "-lX11".}
   {.passL: "-lXrandr".}
   {.passL: "-lXinerama".}
   {.passL: "-lXi".}
   {.passL: "-lXxf86vm".}
   {.passL: "-lXcursor".}
+  {.passL: "-lpthread".}
 
 when defined(macosx) and not defined(emscripten):
   {.passL: "-framework CoreVideo".}
@@ -87,14 +81,14 @@ when defined(windows) and not defined(emscripten):
 when defined(emscripten):
   {.passL: "-s USE_GLFW=3".}
 elif defined(macosx):
-  {.compile(RaylibSrcPathRelative & "/rglfw.c", "-x objective-c").}
+  {.compile(RaylibSrcPathRelative / "rglfw.c", "-x objective-c").}
 else:
-  {.compile: RaylibSrcPathRelative & "/rglfw.c".}
+  {.compile: RaylibSrcPathRelative / "rglfw.c".}
 
-{.compile: RaylibSrcPathRelative & "/shapes.c".}
-{.compile: RaylibSrcPathRelative & "/textures.c".}
-{.compile: RaylibSrcPathRelative & "/text.c".}
-{.compile: RaylibSrcPathRelative & "/utils.c".}
-{.compile: RaylibSrcPathRelative & "/models.c".}
-{.compile: RaylibSrcPathRelative & "/raudio.c".}
-{.compile: RaylibSrcPathRelative & "/core.c".}
+{.compile: RaylibSrcPathRelative / "shapes.c".}
+{.compile: RaylibSrcPathRelative / "textures.c".}
+{.compile: RaylibSrcPathRelative / "text.c".}
+{.compile: RaylibSrcPathRelative / "utils.c".}
+{.compile: RaylibSrcPathRelative / "models.c".}
+{.compile: RaylibSrcPathRelative / "raudio.c".}
+{.compile: RaylibSrcPathRelative / "core.c".}
