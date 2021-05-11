@@ -49,6 +49,7 @@ when defined(linux):
       {.passL: "-lxkbcommon".}
     else:
       {.passL: "-lX11".}
+      {.passL: "-lpthread".}
 
 # *BSD platforms need to be tested.
 when defined(bsd) and not defined(emscripten):
@@ -62,6 +63,7 @@ when defined(bsd) and not defined(emscripten):
   {.passL: "-lXi".}
   {.passL: "-lXxf86vm".}
   {.passL: "-lXcursor".}
+  {.passL: "-lpthread".}
 
 when defined(macosx) and not defined(emscripten):
   {.passL: "-framework CoreVideo".}
