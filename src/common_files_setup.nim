@@ -15,6 +15,9 @@ moveFile(
   projectDir/"src"/"nimraylib_now"/"raylib_build_static_template.nim",
   projectDir/"src"/"nimraylib_now"/"raylib_build_static.nim"
 )
+removeDir(cSourcesDir)
+createDir(cSourcesDir)
+createDir(raylibMangledCSourcesDir)
 
 const
   alternatingNimFiles* = [
