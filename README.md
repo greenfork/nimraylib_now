@@ -46,7 +46,7 @@ See [MIGRATION](MIGRATION.md) for any tips on how to upgrade your code.
 There are not a lot of possibilities to use proper deprecation warnings
 since it is not always possible to translate `#define` declarations from C.
 Sadly upgrades of user code is a necessary part of migration. On the bright
-side it should mainly consist of renaming, please try they wonderful tool
+side it should mainly consist of renaming, please try the wonderful tool
 `nimgrep`, it is shipped with Nim and has a useful "replace" functionality.
 
 [Raylib v3.7.0]: https://github.com/raysan5/raylib/releases/tag/3.7.0
