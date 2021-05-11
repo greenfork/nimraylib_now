@@ -5,7 +5,7 @@ author = "Dmitry Matveyev"
 description = "The Ultimate Raylib gaming library wrapper"
 license = "MIT"
 srcDir = "src"
-skipFiles = @["convert_c_to_nim.nim", "prepare_build_files.nim", "filenames.nim",
+skipFiles = @["convert_c_to_nim.nim", "prepare_build_files.nim",
   "common_files_setup.nim", "raylib_build_static_template.nim"]
 backend = "c"
 
