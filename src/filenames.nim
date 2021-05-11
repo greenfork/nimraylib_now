@@ -9,7 +9,10 @@ const
   raylibBuildDir*              = buildDir/"raylib_src"
   rayguiBuildDir*              = buildDir/"raygui_src"
 
-  cSourcesDir*                 = projectDir/"src"/"csources"
+  # Must assume that there's no `projectDir` as if it is installed as a nimble
+  # package.
+  srcDir*                      = currentSourcePath().parentDir()
+  cSourcesDir*                 = srcDir/"csources"
   raylibMangledCSourcesDir*    = cSourcesDir/"raylib_mangled"
 
   raylibBuildFile*             = raylibBuildDir/"raylib.h"

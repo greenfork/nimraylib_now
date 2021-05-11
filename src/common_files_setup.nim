@@ -3,17 +3,17 @@ import strformat
 
 import ./filenames
 
-const
-  buildScriptTemplate = projectDir/"src"/"raylib_build_static_template.nim"
-
 removeDir(nimraylibNowDir)
 createDir(nimraylibNowDir)
 createDir(nimraylibNowDir/"mangled")
 createDir(nimraylibNowDir/"not_mangled")
-copyFileToDir(buildScriptTemplate, nimraylibNowDir)
+copyFileToDir(
+  projectDir/"src"/"raylib_build_static_template.nim",
+  nimraylibNowDir
+)
 moveFile(
-  projectDir/"src"/"nimraylib_now"/"raylib_build_static_template.nim",
-  projectDir/"src"/"nimraylib_now"/"raylib_build_static.nim"
+  nimraylibNowDir/"raylib_build_static_template.nim",
+  nimraylibNowDir/"raylib_build_static.nim"
 )
 removeDir(cSourcesDir)
 createDir(cSourcesDir)
