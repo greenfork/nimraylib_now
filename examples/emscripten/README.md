@@ -4,9 +4,9 @@ This is experimental support for Emscripten. Please report any bugs.
 
 1. Follow an amazing treeform's guide [Nim Emscripten tutorial]. As of 2021-05-08
    only steps 0, 1 and 2 work, it is okay if 3 and 4 do not compile.
-2. Compile the Nim source file:
+2. Compile the Nim source file (`-d:release -d:danger` for extra speed):
 ```
-$ nim c -o:public/index.html emscripten_crown.nim
+$ nim c -d:release -d:danger -o:public/index.html emscripten_crown.nim
 ```
 3. Install and run `nimhttpd` server:
 ```

@@ -30,6 +30,18 @@ to do it. Please file a bug report if any of that is too far from the reality.
 [physac]: https://github.com/raysan5/raylib/blob/master/src/physac.h
 [Emscripten example]: examples/emscripten/
 
+## Quickstart
+
+1. Install NimraylibNow!
+```shell
+$ nimble install nimraylib_now  # wait 10 minutes for download, sorry
+```
+2. Copy any example to your file, for instance [crown.nim](examples/original/crown.nim)
+3. Compile and run it (`-d:release -d:danger` for extra speed):
+```shell
+$ nim c -r -d:release -d:danger crown.nim
+```
+
 ## Contributing
 
 Do you want to contribute but don't know how? Check out [CONTRIBUTING](CONTRIBUTING.md)!
@@ -117,6 +129,16 @@ Consult [Raylib wiki] on how to build Raylib for different targets.
 
 [Raylib wiki]: https://github.com/raysan5/raylib/wiki
 
+## Exposed compilation flags
+
+NimraylibNow! provides several **optional** flags for compilation:
+
+| Compilation flag                   | Meaning                                                  |
+| ---------------------------------  | ------------------------------------------------------   |
+| `-d:nimraylib_now_shared`          | link with dynamic Raylib library, search in system paths |
+| `-d:nimraylib_now_linkingOverride` | link with your own provided library via `--passL` flag   |
+| `-d:nimraylib_now_wayland`         | use Wayland flags during static compilation              |
+
 ## Install NimraylibNow!
 
 Install this library with nimble (takes **6-10(!) minutes** because of huge
@@ -131,16 +153,6 @@ requires "nimraylib_now"
 ```
 
 [raylib releases]: https://github.com/raysan5/raylib/releases
-
-## Exposed compilation flags
-
-NimraylibNow! provides several **optional** flags for compilation:
-
-| Compilation flag                   | Meaning                                                  |
-| ---------------------------------  | ------------------------------------------------------   |
-| `-d:nimraylib_now_shared`          | link with dynamic Raylib library, search in system paths |
-| `-d:nimraylib_now_linkingOverride` | link with your own provided library via `--passL` flag   |
-| `-d:nimraylib_now_wayland`         | use Wayland flags during static compilation              |
 
 ## How to use NimraylibNow!
 
@@ -161,7 +173,7 @@ You should generally be able to follow any tutorials for official C bindings,
 just mind the [naming](#naming-differences-with-c). Also see official
 [cheatsheet](https://www.raylib.com/cheatsheet/cheatsheet.html) and
 directly inspect the binding sources, e.g. for
-[raylib](src/nimraylib_now/raylib.nim).
+[raylib](src/nimraylib_now/not_mangled/raylib.nim).
 
 Here is a long example to showcase most features
 ([crown.nim](examples/original/crown.nim)).
