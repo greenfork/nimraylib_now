@@ -238,11 +238,11 @@ use them (and encouraged to) as `FullscreenMode` in code.
 
 All prefixes specific to types were omitted where possible:
 ```c
-Vector2 Vector2Zero(void)
-Vector3 Vector3Zero(void)
+Vector2 Vector2Zero(void);
+Vector3 Vector3Zero(void);
 
-Vector2 Vector2Add(Vector2 v1, Vector2 v2)
-Vector3 Vector3Add(Vector3 v1, Vector3 v2)
+Vector2 Vector2Add(Vector2 v1, Vector2 v2);
+Vector3 Vector3Add(Vector3 v1, Vector3 v2);
 ```
 to
 ```nim
