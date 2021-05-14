@@ -8,20 +8,21 @@ be easily upgraded to any future version of [Raylib]. Anyone should be able to
 upgrade it with some effort and [HACKING](HACKING.md) should be a guide on how
 to do it. Please file a bug report if any of that is too far from the reality.
 
-
 [Nim]: https://nim-lang.org/
 
 ## Features
 
-* Automated generation of the wrapper for the latest version of Raylib using
-  the power of (((Nim)))
-* Idiomatic Nim naming and conventions so you write **Nim** code, not C
-* 60+ [examples](examples/) converted from C to Nim
-* Includes modules: [raylib], [raymath], [rlgl], [raygui], [physac]
-* Supports Windows, Linux, MacOS, Emscripten (see [Emscripten example])
-* Fully reproducible build, no manual work is required to update the bindings*
+* Automated generation of the wrapper using the power of (((Nim)))
 
-*_minor changes at most_
+* Idiomatic Nim naming and conventions so you write **Nim** code, not C
+
+* 60+ [examples](examples/) converted from C to Nim
+
+* Includes modules: [raylib], [raymath], [rlgl], [raygui], [physac]
+
+* Supports Windows, Linux, MacOS, Emscripten (see [Emscripten example])
+
+* Supports static compilation, dynamic linking - you choose
 
 [raylib]: https://github.com/raysan5/raylib
 [raymath]: https://github.com/raysan5/raylib/blob/master/src/raymath.h
@@ -42,102 +43,15 @@ $ nimble install nimraylib_now  # wait 10 minutes for download, sorry
 $ nim c -r -d:release -d:danger crown.nim
 ```
 
-## Contributing
-
-Do you want to contribute but don't know how? Check out [CONTRIBUTING](CONTRIBUTING.md)!
-
-## How does it work?
-
-If you would like to know how it works or how to update it, check out [HACKING](HACKING.md).
-
 ## Current version and upgrading from previous versions
 
-This is a wrapper for [Raylib v3.7.0] and [Raygui v2.9].
+NimraylibNow! v0.12 is a wrapper for [Raylib v3.7.0] and [Raygui v2.9].
 
-See [MIGRATION](MIGRATION.md) for any tips on how to upgrade your code.
-There are not a lot of possibilities to use proper deprecation warnings
-since it is not always possible to translate `#define` declarations from C.
-Sadly upgrades of user code is a necessary part of migration. On the bright
-side it should mainly consist of renaming, please try the wonderful tool
-`nimgrep`, it is shipped with Nim and has a useful "replace" functionality.
+See [MIGRATION](MIGRATION.md) for any tips on how to upgrade your code
+from previous versions.
 
 [Raylib v3.7.0]: https://github.com/raysan5/raylib/releases/tag/3.7.0
 [Raygui v2.9]: https://github.com/raysan5/raygui/tree/806b216e2024a13522eb1e17ae7a2641dfd51a98
-
-## How to use Raylib, the original C library?
-
-You have 3 options:
-
-1. Static library linking - this is the default setting, Raylib will be linked
-   statically to your executable. This means that its code will be directly
-   embedded into your game file.
-
-2. Shared library linking - this is activated with `-d:nimraylib_now_shared`
-   flag passed to the Nim compiler and it requires a present `libraylib.so` or
-   similar file depending on your OS in your library load path. Shared linking
-   means that all Raylib functionality is contained inside a separate file and
-   several game files can all use this same shared Raylib file.
-   This option is usually preferable for Linux.
-
-3. Manual library linking - this is activated with `-d:nimraylib_now_linkingOverride`
-   flag passed to the Nim compiler. This means that you build the Raylib
-   library yourself and link it, for example with option `--passL:`. This is a
-   preferable option for unsupported targets such as Android or Raspberry Pi.
-
-## Install Raylib as a static library
-
-You don't have to do anything here, this is the default option. Raylib C sources
-are included in this library and compiled automatically.
-
-## Install Raylib as a shared library
-### Windows
-
-It is recommended to use static linking.
-
-Currently shared library linking is broken because of name conflicts with
-`windows.h` file. But if you really want to, you can rename all conflicting
-names inside `windows.h` and still use it as a shared library.
-
-Download the latest library from [raylib releases] page for MinGW compiler, for version 3.7.0
-the name is `raylib-3.7.0_win64_mingw-w64.zip`. Extract it and **make sure**
-that files `libraylibdll.a` and `raylib.dll` are always in the same directory
-as your game `.exe` file.
-
-### Linux
-Use your package manager, for example for Arch Linux:
-```shell
-$ sudo pacman -Syu raylib
-```
-
-Alternatively download the latest library from [raylib releases] page, for version 3.7.0
-the name is `raylib-3.7.0_linux_amd64.tar.gz`. Extract it and put all `.so`
-files into `/usr/local/lib`.
-
-### MacOS
-With brew package manager:
-```shell
-$ brew install raylib
-```
-
-Alternatively download the latest library from [raylib releases] page, for version 3.7.0
-the name is `raylib-3.7.0_macos.tar.gz`. Extract it and put all `.dylib`
-files into `/usr/local/lib`.
-
-## Install Raylib manually
-
-Consult [Raylib wiki] on how to build Raylib for different targets.
-
-[Raylib wiki]: https://github.com/raysan5/raylib/wiki
-
-## Exposed compilation flags
-
-NimraylibNow! provides several **optional** flags for compilation:
-
-| Compilation flag                   | Meaning                                                  |
-| ---------------------------------  | ------------------------------------------------------   |
-| `-d:nimraylib_now_shared`          | link with dynamic Raylib library, search in system paths |
-| `-d:nimraylib_now_linkingOverride` | link with your own provided library via `--passL` flag   |
-| `-d:nimraylib_now_wayland`         | use Wayland flags during static compilation              |
 
 ## Install NimraylibNow!
 
@@ -151,8 +65,6 @@ Or put it into your `.nimble` file:
 ```nim
 requires "nimraylib_now"
 ```
-
-[raylib releases]: https://github.com/raysan5/raylib/releases
 
 ## How to use NimraylibNow!
 
@@ -429,6 +341,22 @@ let
   v2 = Vector3(x: 3, y: 0, z: 0)
 assert v1 - v2 == Vector3(x: 2.0, y: 2.0, z: 1.0)
 ```
+
+## Raylib, the original C library
+
+If you would like to know more about how this wrapper uses [Raylib] library
+and see all the different options, check [USING_RAYLIB](/USING_RAYLIB.md),
+it should help.
+
+## Contributing
+
+Do you want to contribute but don't know how? Check out
+[CONTRIBUTING](CONTRIBUTING.md)!
+
+## How does wrapper work?
+
+If you would like to know how this wrapper works or how to update it, check
+out [HACKING](HACKING.md).
 
 ## Troubleshooting
 ### Freezes on Wayland
