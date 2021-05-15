@@ -294,7 +294,7 @@ rlgl.begin(rlgl.Triangles)
 # draw something
 rlgl.end()
 ```
-which can be enforced by compiler by importing `rlgl` module like this:
+which can be enforced by the compiler by importing `rlgl` module like this:
 ```nim
 from nimraylib_now/rlgl import nil
 
