@@ -8,6 +8,10 @@ Any ideas on how to improve documentation are welcome!
 
 ## Convert examples
 
+Code in examples strives to be as close to [NEP1] style guide as possible.
+
+[NEP1]: https://nim-lang.org/docs/nep1.html
+
 You can help by converting missing examples from original C library doing
 the following:
 
@@ -27,7 +31,6 @@ the following:
 
 I cannot port a number of examples:
 * `core_drop_files.c` - I can't test it on my machine (Wayland on Linux)
-* `core_input_gamepad.c` - I don't have a gamepad
 * `core_input_multitouch.c` - probably requires a phone to test it?
 * `core_storage_values.c` - I can't compile the original C example, values
   are reset to 0,0 when I press Space

@@ -89,7 +89,7 @@ void UpdateLightValues(Shader shader, Light light);         // Send light proper
 
 #if defined(RLIGHTS_IMPLEMENTATION)
 
-#include "../../src/nimraylib_now/raylib.h"
+#include "../../src/nimraylib_now/not_mangled/raylib.h"
 
 //----------------------------------------------------------------------------------
 // Defines and Macros
