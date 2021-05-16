@@ -3,6 +3,12 @@
 This guide documents migration between different versions of NimraylibNow!
 and and if necessary simultaneously different versions of Raylib library.
 
+There are not a lot of possibilities to use proper deprecation warnings
+since it is not always possible to translate `#define` declarations from C.
+Sadly upgrades of user code is a necessary part of migration. On the bright
+side it should mainly consist of renaming, please try the wonderful tool
+`nimgrep`, it is shipped with Nim and has a useful "replace" functionality.
+
 Additionally you can consult [Raylib's changelog](https://github.com/raysan5/raylib/blob/master/CHANGELOG).
 
 ## From Raylib v3.5 to v3.7 and from NimraylibNow! v0.10 to v0.12
