@@ -13,6 +13,10 @@ $ nimble install c2nim
 5. Run testing suite `nimble testExamples`
 6. Commit the changes
 
+Please use [NEP1] style guide for the code.
+
+[NEP1]: https://nim-lang.org/docs/nep1.html
+
 # How wrapping works
 
 Wrapper is generated in fully reproducible fashion. Directories
