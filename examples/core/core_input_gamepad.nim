@@ -17,6 +17,7 @@
 ********************************************************************************************]#
 
 import nimraylib_now
+import strformat
 
 # NOTE: Gamepad name ID depends on drivers and OS
 when defined(PLATFORM_RPI):
@@ -30,8 +31,7 @@ const
   screenWidth = 800
   screenHeight = 450
 
-type tex_names = enum PS3Pad, XboxPad
-var texs:array[tex_names,Texture2D]
+var texPs3Pad,texXboxPad:Texture2D
 
 
 proc init() =
@@ -39,55 +39,55 @@ proc init() =
 
   initWindow(screenWidth, screenHeight, "raylib [core] example - gamepad input")
 
-  texs[Ps3Pad] = loadTexture("resources/ps3.png")
-  texs[XboxPad] = loadTexture("resources/xbox.png")
+  texPs3Pad = loadTexture("resources/ps3.png")
+  texXboxPad = loadTexture("resources/xbox.png")
 
-  setTargetFPS( 60)
+  setTargetFPS(60)
 
-proc pad_draw_xbox
-proc pad_draw_psx
+proc padDrawXbox
+proc padDrawPsx
 
 
 proc main() =
   while not windowShouldClose():
-      beginDrawing:
-        clearBackground( RAYWHITE)
-        if isGamepadAvailable( 0):
-          let gamepad_name = getGamePadName( 0)
-          drawText( "GP1: " & $gamepad_name, 10, 10, 10, BLACK);
+    beginDrawing:
+      clearBackground(RAYWHITE)
+      if isGamepadAvailable(0):
+        let gamepadName = getGamePadName(0)
+        drawText("GP1: {gamepadName}".fmt, 10, 10, 10, BLACK);
 
-          case $gamepad_name:
-            of XBOX360_NAME_ID, XBOX360_LEGACY_NAME_ID:
-              pad_draw_xbox()
-            of PS3_NAME_ID:
-              pad_draw_psx()
-            else:
-              # well … for me it will be a PS pad view as a « USB Gamepad »
-              pad_draw_psx()
-
-          drawText( "DETECTED AXIS: " & $getGamepadAxisCount(0), 10, 50, 10, MAROON)
-          for i in 0..getGamepadAxisCount(0):
-            #drawText(TextFormat("AXIS %i: %.02f", i, GetGamepadAxisMovement(0, i)), 20, 70 + 20*i, 10, DARKGRAY);
-            drawText( "AXIS " & $i & " : " & $getGamepadAxisMovement(0, i), 20, 70 + 20*i, 10, DARKGRAY)
-
-          if (getGamepadButtonPressed() != -1):
-            drawText( "DETECTED BUTTON: " & $getGamepadButtonPressed(), 10, 430, 10, RED)
+        case $gamepadName:
+          of XBOX360_NAME_ID, XBOX360_LEGACY_NAME_ID:
+            padDrawXbox()
+          of PS3_NAME_ID:
+            padDrawPsx()
           else:
-            drawText("DETECTED BUTTON: NONE", 10, 430, 10, GRAY)
+            # a pad has been detected, but not identified. Fallback is to show PSX pad.
+            drawText("GP1: Unidentified (fallback to PSX pad)", 10, 25, 10, BLUE);
+            padDrawPsx()
 
+        drawText("DETECTED AXIS: {getGamepadAxisCount(0)}".fmt, 10, 50, 10, MAROON)
+        for i in 0..getGamepadAxisCount(0):
+          drawText("AXIS {i} : {getGamepadAxisMovement(0, i)}".fmt, 20, 70 + 20*i, 10, DARKGRAY)
+
+        if (getGamepadButtonPressed() != -1):
+          drawText("DETECTED BUTTON: {getGamepadButtonPressed()}".fmt, 10, 430, 10, RED)
         else:
-          drawText("GP1: NOT DETECTED", 10, 10, 10, GRAY);
-          drawTexture(texs[XboxPad], 0, 0, LIGHTGRAY);
+          drawText("DETECTED BUTTON: NONE", 10, 430, 10, GRAY)
+
+      else:
+        drawText("GP1: NOT DETECTED", 10, 10, 10, GRAY);
+        drawTexture(texXboxPad, 0, 0, LIGHTGRAY);
 
 
 proc finish() =
-  for t in texs:
-    unloadTexture( t)
+  unloadTexture(texPs3Pad)
+  unloadTexture(texXboxPad)
   closeWindow()
 
 
-proc pad_draw_xbox() =
-  drawTexture( texs[XboxPad], 0, 0, DARKGRAY)
+proc padDrawXbox() =
+  drawTexture(texXboxPad, 0, 0, DARKGRAY)
   # draw buttons: xbox home
   if (isGamepadButtonDown(0, BUTTON_MIDDLE)): drawCircle(394, 89, 19, YELLOW)
 
@@ -130,14 +130,14 @@ proc pad_draw_xbox() =
   drawRectangle(604, 30, 15, (((1 + getGamepadAxisMovement(0, AXIS_RIGHT_TRIGGER))/2)*70).int, YELLOW)
 
 
-proc pad_draw_psx() =
-  drawTexture( texs[Ps3Pad], 0, 0, DARKGRAY)
+proc padDrawPsx() =
+  drawTexture(texPs3Pad, 0, 0, DARKGRAY)
   # Draw buttons: ps
-  if ( isGamepadButtonDown( 0, BUTTON_MIDDLE)): drawCircle(396, 222, 13, YELLOW)
+  if (isGamepadButtonDown(0, BUTTON_MIDDLE)): drawCircle(396, 222, 13, YELLOW)
 
   # Draw buttons: basic
   if (isGamepadButtonDown(0, BUTTON_MIDDLE_LEFT)): drawRectangle(328, 170, 32, 13, YELLOW)
-  if (isGamepadButtonDown(0, BUTTON_MIDDLE_RIGHT)): drawTriangle( Vector2(x:436, y:168 ), Vector2( x:436, y:185), Vector2( x:464, y:177 ), YELLOW)
+  if (isGamepadButtonDown(0, BUTTON_MIDDLE_RIGHT)): drawTriangle(Vector2(x:436, y:168 ), Vector2(x:436, y:185), Vector2(x:464, y:177 ), YELLOW)
   if (isGamepadButtonDown(0, BUTTON_RIGHT_FACE_UP)): drawCircle(557, 144, 13, LIME)
   if (isGamepadButtonDown(0, BUTTON_RIGHT_FACE_RIGHT)): drawCircle(586, 173, 13, YELLOW)
   if (isGamepadButtonDown(0, BUTTON_RIGHT_FACE_DOWN)): drawCircle(557, 203, 13, VIOLET)
