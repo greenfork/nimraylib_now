@@ -2,7 +2,8 @@ import os
 
 const
   projectDir = currentSourcePath().parentDir().parentDir()
-  originalRaylibExamplesDir = projectDir/"raylib"/"examples"
+  #originalRaylibExamplesDir = projectDir/"raylib"/"examples"
+  originalRaylibExamplesDir = "/home/jseb/sources/raylib_jseb/examples"
   nimraylibNowExamplesDir = projectDir/"examples"
 
 for dir in walkDirs(originalRaylibExamplesDir/"*"):
