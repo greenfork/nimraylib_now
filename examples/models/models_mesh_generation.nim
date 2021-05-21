@@ -21,8 +21,8 @@ func allocateMeshData(mesh:var Mesh, triangleCount:int) =
     mesh.triangleCount = triangleCount
 
     mesh.vertices = cast[ptr cfloat](memAlloc(mesh.vertexCount * 3 * sizeof(float)) )
-    mesh.texcoords = cast[ptr cfloat](memAlloc(mesh.vertexCount * 2 * sizeof(float)) )
     mesh.normals = cast[ptr cfloat](memAlloc(mesh.vertexCount * 3 * sizeof(float)) )
+    mesh.texcoords = cast[ptr cfloat](memAlloc(mesh.vertexCount * 2 * sizeof(float)) )
 
 
 proc makeMesh() :Mesh =
@@ -34,7 +34,6 @@ proc makeMesh() :Mesh =
   result.vertices = cast[ptr cfloat](vertices.addr)
   result.normals = cast[ptr cfloat](normals.addr)
   result.texcoords = cast[ptr cfloat](texcoords.addr)
-
 
 proc init() =
   const
@@ -97,7 +96,8 @@ proc run() =
 proc exit() =
   unloadTexture(texture)
 
-  for m in models:
+  for i,m in models.pairs:
+    echo i,m
     unloadModel(m)
 
   closeWindow()
