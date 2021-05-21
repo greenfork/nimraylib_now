@@ -5029,40 +5029,6 @@ block text_rectangle_bound:
   # --------------------------------------------------------------------------------------
 
 
-block cast_ptr:
-
-  # var intsseq: seq[int]
-  # var ints: array[10, int]
-  # for i in 0..<10:
-  #   intsseq.add i
-  #   ints[i] = i
-  # echo repr(addr(ints))
-  # echo repr(toOpenArray(intsseq, 0, intsseq.len-1))
-
-  let
-    width: int32 = 2
-    height: int32 = 1
-
-  var pixels = newSeq[Color](width*height)
-
-  for y in 0..<height:
-    for x in 0..<width:
-      pixels[y*width + x] = (if (((x div 32+y div 32) div 1) %% 2 == 0): Orange else: Gold)
-
-  # echo repr(pixels)
-
-  # echo repr(Gold)
-
-  # echo repr(cast[ptr Color](pixels))
-
-  var pixelsUnchecked = cast[ptr UncheckedArray[Color]](alloc0(width*height))
-  for y in 0..<height:
-    for x in 0..<width:
-      pixelsUnchecked[y*width + x] = (if (((x div 32+y div 32) div 1) %% 2 == 0): Orange else: Gold)
-
-  echo repr(pixelsUnchecked.toOpenArray(0, width*height-1))
-
-
 block textures_background_scrolling:
   # ******************************************************************************************
   #
