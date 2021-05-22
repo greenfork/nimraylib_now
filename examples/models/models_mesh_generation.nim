@@ -10,7 +10,7 @@
 *
 ********************************************************************************************]#
 
-import ../../src/nimraylib_now
+import nimraylib_now
 
 proc allocateMeshData(mesh: var Mesh, triangleCount: int) =
   mesh.vertexCount = triangleCount * 3
