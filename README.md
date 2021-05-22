@@ -45,7 +45,7 @@ $ nim c -r -d:release -d:danger crown.nim
 
 ## Current version and upgrading from previous versions
 
-NimraylibNow! v0.12 is a wrapper for [Raylib v3.7.0] and [Raygui v2.9].
+NimraylibNow! v0.13 is a wrapper for [Raylib v3.7.0] and [Raygui v2.9].
 
 See [MIGRATION](MIGRATION.md) for any tips on how to upgrade your code
 from previous versions.
