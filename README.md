@@ -377,6 +377,11 @@ Make sure to include MinGW's bin folder in your PATH. The path to MinGW's bin
 folder looks something like this by default:
 `C:\Program Files\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin`.
 
+## Community
+
+Find us at `#raylib-nim` channel
+in the official [Raylib discord server](https://discord.gg/raylib).
+
 ## Thanks
 
 Many thanks to V.A. Guevara for the efforts on [Raylib-Forever] library which
