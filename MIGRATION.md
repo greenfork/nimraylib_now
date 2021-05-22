@@ -11,6 +11,10 @@ side it should mainly consist of renaming, please try the wonderful tool
 
 Additionally you can consult [Raylib's changelog](https://github.com/raysan5/raylib/blob/master/CHANGELOG).
 
+## From NimraylibNow! v0.12 to v0.13
+
+- `Mesh` has most of its fields changed from `ptr cfloat` to `ptr UncheckedArray[cfloat]`
+
 ## From Raylib v3.5 to v3.7 and from NimraylibNow! v0.10 to v0.12
 
 Recommended:

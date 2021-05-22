@@ -313,18 +313,18 @@ type
     vertexCount* {.importc: "vertexCount".}: cint ##  Number of vertices stored in arrays
     triangleCount* {.importc: "triangleCount".}: cint ##  Number of triangles stored (indexed or not)
                                                   ##  Default vertex data
-    vertices* {.importc: "vertices".}: ptr cfloat ##  Vertex position (XYZ - 3 components per vertex) (shader-location = 0)
-    texcoords* {.importc: "texcoords".}: ptr cfloat ##  Vertex texture coordinates (UV - 2 components per vertex) (shader-location = 1)
-    texcoords2* {.importc: "texcoords2".}: ptr cfloat ##  Vertex second texture coordinates (useful for lightmaps) (shader-location = 5)
-    normals* {.importc: "normals".}: ptr cfloat ##  Vertex normals (XYZ - 3 components per vertex) (shader-location = 2)
-    tangents* {.importc: "tangents".}: ptr cfloat ##  Vertex tangents (XYZW - 4 components per vertex) (shader-location = 4)
-    colors* {.importc: "colors".}: ptr uint8 ##  Vertex colors (RGBA - 4 components per vertex) (shader-location = 3)
-    indices* {.importc: "indices".}: ptr cushort ##  Vertex indices (in case vertex data comes indexed)
+    vertices* {.importc: "vertices".}: ptr UncheckedArray[cfloat] ##  Vertex position (XYZ - 3 components per vertex) (shader-location = 0)
+    texcoords* {.importc: "texcoords".}: ptr UncheckedArray[cfloat] ##  Vertex texture coordinates (UV - 2 components per vertex) (shader-location = 1)
+    texcoords2* {.importc: "texcoords2".}: ptr UncheckedArray[cfloat] ##  Vertex second texture coordinates (useful for lightmaps) (shader-location = 5)
+    normals* {.importc: "normals".}: ptr UncheckedArray[cfloat] ##  Vertex normals (XYZ - 3 components per vertex) (shader-location = 2)
+    tangents* {.importc: "tangents".}: ptr UncheckedArray[cfloat] ##  Vertex tangents (XYZW - 4 components per vertex) (shader-location = 4)
+    colors* {.importc: "colors".}: ptr UncheckedArray[uint8] ##  Vertex colors (RGBA - 4 components per vertex) (shader-location = 3)
+    indices* {.importc: "indices".}: ptr UncheckedArray[cushort] ##  Vertex indices (in case vertex data comes indexed)
                                             ##  Animation vertex data
-    animVertices* {.importc: "animVertices".}: ptr cfloat ##  Animated vertex positions (after bones transformations)
-    animNormals* {.importc: "animNormals".}: ptr cfloat ##  Animated normals (after bones transformations)
-    boneIds* {.importc: "boneIds".}: ptr cint ##  Vertex bone ids, up to 4 bones influence by vertex (skinning)
-    boneWeights* {.importc: "boneWeights".}: ptr cfloat ##  Vertex bone weight, up to 4 bones influence by vertex (skinning)
+    animVertices* {.importc: "animVertices".}: ptr UncheckedArray[cfloat] ##  Animated vertex positions (after bones transformations)
+    animNormals* {.importc: "animNormals".}: ptr UncheckedArray[cfloat] ##  Animated normals (after bones transformations)
+    boneIds* {.importc: "boneIds".}: ptr UncheckedArray[cint] ##  Vertex bone ids, up to 4 bones influence by vertex (skinning)
+    boneWeights* {.importc: "boneWeights".}: ptr UncheckedArray[cfloat] ##  Vertex bone weight, up to 4 bones influence by vertex (skinning)
                                                    ##  OpenGL identifiers
     vaoId* {.importc: "vaoId".}: cuint ##  OpenGL Vertex Array Object id
     vboId* {.importc: "vboId".}: ptr cuint ##  OpenGL Vertex Buffer Objects id (default vertex data)

@@ -391,6 +391,29 @@ template `-`*[T: Vector2 | Vector3](v1: T): T = negate(v1)
         # In ModelAnimation
         ("framePoses* {.importc: \"framePoses\".}: ptr ptr Transform",
          "framePoses* {.importc: \"framePoses\".}: ptr UncheckedArray[ptr Transform]"),
+        # In Mesh
+        ("vertices* {.importc: \"vertices\".}: ptr cfloat",
+         "vertices* {.importc: \"vertices\".}: ptr UncheckedArray[cfloat]"),
+        ("texcoords* {.importc: \"texcoords\".}: ptr cfloat",
+         "texcoords* {.importc: \"texcoords\".}: ptr UncheckedArray[cfloat]"),
+        ("texcoords2* {.importc: \"texcoords2\".}: ptr cfloat",
+         "texcoords2* {.importc: \"texcoords2\".}: ptr UncheckedArray[cfloat]"),
+        ("normals* {.importc: \"normals\".}: ptr cfloat",
+         "normals* {.importc: \"normals\".}: ptr UncheckedArray[cfloat]"),
+        ("tangents* {.importc: \"tangents\".}: ptr cfloat",
+         "tangents* {.importc: \"tangents\".}: ptr UncheckedArray[cfloat]"),
+        ("colors* {.importc: \"colors\".}: ptr uint8",
+         "colors* {.importc: \"colors\".}: ptr UncheckedArray[uint8]"),
+        ("indices* {.importc: \"indices\".}: ptr cushort",
+         "indices* {.importc: \"indices\".}: ptr UncheckedArray[cushort]"),
+        ("animVertices* {.importc: \"animVertices\".}: ptr cfloat",
+         "animVertices* {.importc: \"animVertices\".}: ptr UncheckedArray[cfloat]"),
+        ("animNormals* {.importc: \"animNormals\".}: ptr cfloat",
+         "animNormals* {.importc: \"animNormals\".}: ptr UncheckedArray[cfloat]"),
+        ("boneIds* {.importc: \"boneIds\".}: ptr cint",
+         "boneIds* {.importc: \"boneIds\".}: ptr UncheckedArray[cint]"),
+        ("boneWeights* {.importc: \"boneWeights\".}: ptr cfloat",
+         "boneWeights* {.importc: \"boneWeights\".}: ptr UncheckedArray[cfloat]"),
       ]
     let
       raylibnim = readFile(buildDir/fmt"{filename}_modified.nim")

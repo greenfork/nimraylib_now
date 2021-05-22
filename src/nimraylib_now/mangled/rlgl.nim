@@ -146,9 +146,9 @@ type
     vCounter* {.importc: "vCounter".}: cint ##  Vertex position counter to process (and draw) from full buffer
     tcCounter* {.importc: "tcCounter".}: cint ##  Vertex texcoord counter to process (and draw) from full buffer
     cCounter* {.importc: "cCounter".}: cint ##  Vertex color counter to process (and draw) from full buffer
-    vertices* {.importc: "vertices".}: ptr cfloat ##  Vertex position (XYZ - 3 components per vertex) (shader-location = 0)
-    texcoords* {.importc: "texcoords".}: ptr cfloat ##  Vertex texture coordinates (UV - 2 components per vertex) (shader-location = 1)
-    colors* {.importc: "colors".}: ptr uint8 ##  Vertex colors (RGBA - 4 components per vertex) (shader-location = 3)
+    vertices* {.importc: "vertices".}: ptr UncheckedArray[cfloat] ##  Vertex position (XYZ - 3 components per vertex) (shader-location = 0)
+    texcoords* {.importc: "texcoords".}: ptr UncheckedArray[cfloat] ##  Vertex texture coordinates (UV - 2 components per vertex) (shader-location = 1)
+    colors* {.importc: "colors".}: ptr UncheckedArray[uint8] ##  Vertex colors (RGBA - 4 components per vertex) (shader-location = 3)
     vaoId* {.importc: "vaoId".}: cuint ##  OpenGL Vertex Array Object id
     vboId* {.importc: "vboId".}: array[4, cuint] ##  OpenGL Vertex Buffer Objects id (4 types of vertex data)
 
