@@ -508,25 +508,30 @@ proc loadStyleDefault*() {.cdecl, importc: "GuiLoadStyleDefault",
 proc iconText*(iconId: cint; text: cstring): cstring {.cdecl, importc: "GuiIconText",
     header: rayguiHeader.}
 ##  Get text with icon id prepended (if supported)
+##  Gui icons functionality
 
-when defined(raygui_Support_Icons):
-  ##  Gui icons functionality
-  proc drawIcon*(iconId: cint; position: Vector2; pixelSize: cint; color: Color) {.cdecl,
-      importc: "GuiDrawIcon", header: rayguiHeader.}
-  proc getIcons*(): ptr cuint {.cdecl, importc: "GuiGetIcons", header: rayguiHeader.}
-  ##  Get full icons data pointer
-  proc getIconData*(iconId: cint): ptr cuint {.cdecl, importc: "GuiGetIconData",
-      header: rayguiHeader.}
-  ##  Get icon bit data
-  proc setIconData*(iconId: cint; data: ptr cuint) {.cdecl, importc: "GuiSetIconData",
-      header: rayguiHeader.}
-  ##  Set icon bit data
-  proc setIconPixel*(iconId: cint; x: cint; y: cint) {.cdecl,
-      importc: "GuiSetIconPixel", header: rayguiHeader.}
-  ##  Set icon pixel value
-  proc clearIconPixel*(iconId: cint; x: cint; y: cint) {.cdecl,
-      importc: "GuiClearIconPixel", header: rayguiHeader.}
-  ##  Clear icon pixel value
-  proc checkIconPixel*(iconId: cint; x: cint; y: cint): bool {.cdecl,
-      importc: "GuiCheckIconPixel", header: rayguiHeader.}
-  ##  Check icon pixel value
+proc drawIcon*(iconId: cint; position: Vector2; pixelSize: cint; color: Color) {.cdecl,
+    importc: "GuiDrawIcon", header: rayguiHeader.}
+proc getIcons*(): ptr cuint {.cdecl, importc: "GuiGetIcons", header: rayguiHeader.}
+##  Get full icons data pointer
+
+proc getIconData*(iconId: cint): ptr cuint {.cdecl, importc: "GuiGetIconData",
+                                        header: rayguiHeader.}
+##  Get icon bit data
+
+proc setIconData*(iconId: cint; data: ptr cuint) {.cdecl, importc: "GuiSetIconData",
+    header: rayguiHeader.}
+##  Set icon bit data
+
+proc setIconPixel*(iconId: cint; x: cint; y: cint) {.cdecl, importc: "GuiSetIconPixel",
+    header: rayguiHeader.}
+##  Set icon pixel value
+
+proc clearIconPixel*(iconId: cint; x: cint; y: cint) {.cdecl,
+    importc: "GuiClearIconPixel", header: rayguiHeader.}
+##  Clear icon pixel value
+
+proc checkIconPixel*(iconId: cint; x: cint; y: cint): bool {.cdecl,
+    importc: "GuiCheckIconPixel", header: rayguiHeader.}
+##  Check icon pixel value
+

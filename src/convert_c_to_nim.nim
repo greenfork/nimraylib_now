@@ -49,6 +49,9 @@ const
   allowIfs = [
     "RAYGUI_SUPPORT_ICONS"
   ]
+  ignoreLines = [
+    "#if defined(RAYGUI_SUPPORT_ICONS)"
+  ]
 
   # #define LIGHTGRAY  CLITERAL(Color){ 200, 200, 200, 255 }   // Light Gray
   reDefineColor = re"^#define ([[:word:]]+)\s*CLITERAL\(Color\)\{ (\d+), (\d+), (\d+), (\d+) \}.*"
@@ -239,6 +242,8 @@ for (filepath, c2nimheader) in raylibHeaders:
           echo "Reached end of header part: " & line
           break
         echo "Ignore: " & line # skip all self-header module definitions
+      elif ignoreLines.anyIt(it in line):
+        echo "Ignore: " & line
       elif line.match(reDefineColor, m):
         let
           colorName = m.groupFirstCapture(0, line)
