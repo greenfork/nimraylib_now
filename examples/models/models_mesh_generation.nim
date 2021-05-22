@@ -73,7 +73,7 @@ proc init() =
 
 proc run() =
   var currentModel = 0
-  var position = Vector3(x:0.0, y:0.0, z:0.0)
+  var position = Vector3(x: 0.0, y: 0.0, z: 0.0)
 
   while not windowShouldClose():
     updateCamera(camera.addr)
@@ -93,9 +93,9 @@ proc run() =
       drawRectangleLines(30, 400, 310, 30, fade(DarkBlue, 0.5f))
       drawText("MOUSE LEFT BUTTON to CYCLE PROCEDURAL MODELS", 40, 410, 10, Blue)
 
-      let listeModels = [ ("PLANE",680), ("CUBE",680), ("SPHERE",680), ("HEMISPHERE",640), ("CYLINDER",680),
-                          ("TORUS",680), ("KNOT",680), ("POLY",680), ("Parametric(custom)",580) ]
-      drawText(listeModels[currentModel][0], listeModels[currentModel][1], 10, 20, DarkBlue)
+      let listModels = [("PLANE",680), ("CUBE",680), ("SPHERE",680), ("HEMISPHERE",640), ("CYLINDER",680),
+                          ("TORUS",680), ("KNOT",680), ("POLY",680), ("Parametric(custom)",580)]
+      drawText(listModels[currentModel][0], listModels[currentModel][1], 10, 20, DarkBlue)
 
 proc exit() =
   unloadTexture(texture)
