@@ -77,8 +77,10 @@ const
 #  prefix FLAG_
 #  prefix LOG_
 #  prefix KEY_
+#  prefix MOUSE_CURSOR_
 #  prefix MOUSE_
-#  prefix GAMEPAD_
+#  prefix GAMEPAD_BUTTON_
+#  prefix GAMEPAD_AXIS_
 #  prefix FONT_
 #  prefix BLEND_
 #  prefix GESTURE_

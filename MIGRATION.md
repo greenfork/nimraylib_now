@@ -14,6 +14,9 @@ Additionally you can consult [Raylib's changelog](https://github.com/raysan5/ray
 ## From NimraylibNow! v0.12 to v0.13
 
 - `Mesh` has most of its fields changed from `ptr cfloat` to `ptr UncheckedArray[cfloat]`
+- `MouseCursor` has no `CURSOR_` prefix, e.g. `CURSOR_ARROW` is now `ARROW`
+- `GamepadButton` has no `BUTTON_` prefix e.g. `BUTTON_LEFT_FACE_UP` is now `LEFT_FACE_UP`
+- `GamepadAxis` has no `AXIS_` prefix, e.g. `AXIS_LEFT_X` is now `LEFT_X`
 
 ## From Raylib v3.5 to v3.7 and from NimraylibNow! v0.10 to v0.12
 
