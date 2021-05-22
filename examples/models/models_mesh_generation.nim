@@ -34,6 +34,8 @@ proc makeMesh(): Mesh =
   for idx, val in [0.cfloat,0, 0.5,1, 1,0]:
     result.texcoords[idx] = val
 
+  uploadMesh(result.addr, false)
+
 proc init() =
   const
     screenWidth = 800
