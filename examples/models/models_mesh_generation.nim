@@ -12,17 +12,13 @@
 
 import ../../src/nimraylib_now
 
-var camera = Camera3D()
-var texture: Texture2D
-var models: seq[Model]
-
 proc allocateMeshData(mesh: var Mesh, triangleCount: int) =
   mesh.vertexCount = triangleCount * 3
   mesh.triangleCount = triangleCount
 
   mesh.vertices = cast[ptr UncheckedArray[cfloat]](alloc0(mesh.vertexCount * 3 * sizeof(cfloat)))
   mesh.texcoords = cast[ptr UncheckedArray[cfloat]](alloc0(mesh.vertexCount * 2 * sizeof(cfloat)))
-  mesh.normals = cast[ptr UncheckedArray[cfloat]](alloc0(mesh.vertexCount * 3 * sizeof(cfloat)) )
+  mesh.normals = cast[ptr UncheckedArray[cfloat]](alloc0(mesh.vertexCount * 3 * sizeof(cfloat)))
 
 proc makeMesh(): Mesh =
   allocateMeshData(result, 1)
@@ -36,7 +32,9 @@ proc makeMesh(): Mesh =
 
   uploadMesh(result.addr, false)
 
-proc init() =
+proc main() =
+  # Initialization
+  #--------------------------------------------------------------------------------------
   const
     screenWidth = 800
     screenHeight = 450
@@ -57,34 +55,48 @@ proc init() =
 
   # We generate a checked image for texturing
   var checked: Image = genImageChecked(2, 2, 1, 1, Red, Green)
-  texture = loadTextureFromImage(checked)
+  var texture: Texture2D = loadTextureFromImage(checked)
   unloadImage(checked)
 
+  # Set checked texture as default diffuse component for all models material
+  var models: seq[Model]
   for mesh in meshes:
     var m = loadModelFromMesh(mesh)
     m.materials[0].maps[MaterialMapIndex.Albedo.int].texture = texture # MATERIAL_MAP_DIFFUSE is now ALBEDO
     models.add(m)
 
-  camera.position = (5.0, 5.0, 5.0)
-  camera.target = (0.0, 0.0, 0.0)
-  camera.up = (0.0, 1.0, 0.0)
-  camera.fovy = 45.0
-  camera.projection = Perspective
-  camera.setCameraMode(Orbital)
-  setTargetFPS(60)
+  # Define the camera to look into our 3d world
+  var camera = Camera3D(
+    position: (5.0, 5.0, 5.0),
+    target: (0.0, 0.0, 0.0),
+    up: (0.0, 1.0, 0.0),
+    fovy: 45.0,
+    projection: Perspective
+  )
 
-proc run() =
-  var currentModel = 0
   var position = Vector3(x: 0.0, y: 0.0, z: 0.0)
+  var currentModel = 0
 
-  while not windowShouldClose():
-    updateCamera(camera.addr)
+  camera.setCameraMode(Orbital)
+
+  setTargetFPS(60)
+  #--------------------------------------------------------------------------------------
+
+  # Main game loop
+  while not windowShouldClose():  # Detect window close button or ESC key
+
+    # Update
+    #----------------------------------------------------------------------------------
+    updateCamera(camera.addr)  # Update internal camera and our camera
     if isMouseButtonPressed(LEFT_BUTTON) or isKeyPressed(RIGHT):
-      currentModel = (currentModel + 1) mod models.len
+      currentModel = (currentModel + 1) mod models.len  # Cycle between the textures
     if isKeyPressed(LEFT):
       currentModel = currentModel - 1
       if currentModel < 0: currentModel = models.len - 1
+    #--------------------------------------------------------------------------------------
 
+    # Draw
+    #----------------------------------------------------------------------------------
     beginDrawing:
       clearBackground(White)
       camera.beginMode3D:
@@ -98,16 +110,16 @@ proc run() =
       let listModels = [("PLANE",680), ("CUBE",680), ("SPHERE",680), ("HEMISPHERE",640), ("CYLINDER",680),
                           ("TORUS",680), ("KNOT",680), ("POLY",680), ("Parametric(custom)",580)]
       drawText(listModels[currentModel][0], listModels[currentModel][1], 10, 20, DarkBlue)
+    #--------------------------------------------------------------------------------------
 
-proc exit() =
+  # De-Initialization
+  #--------------------------------------------------------------------------------------
   unloadTexture(texture)
 
-  for m in models:
-    unloadModel(m)
+  # Unload models data (GPU VRAM)
+  for m in models: unloadModel(m)
 
-  closeWindow()
+  closeWindow()  # Close window and OpenGL context
+  #--------------------------------------------------------------------------------------
 
-
-init()
-run()
-exit()
+main()
