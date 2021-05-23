@@ -2,7 +2,7 @@ discard """
   cmd: "nim c -d:nimraylib_now_shared --listCmd $options $file"
   action: "compile"
   joinable: false
-  matrix: "; -d:release; --gc:orc -d:release"
+  matrix: "; -d:release; --gc:orc -d:useMalloc -d:release"
   disabled: "win"
 """
 import lenientops, math, times, strformat, atomics, system/ansi_c

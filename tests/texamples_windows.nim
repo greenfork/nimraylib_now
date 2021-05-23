@@ -2,7 +2,7 @@ discard """
   cmd: "nim c --listCmd $options $file"
   action: "compile"
   joinable: false
-  matrix: "; -d:release; --gc:orc -d:release;"
+  matrix: "; -d:release; --gc:orc -d:useMalloc -d:release;"
   disabled: "linux"
   disabled: "bsd"
   disabled: "macosx"
