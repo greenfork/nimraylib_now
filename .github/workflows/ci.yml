@@ -26,17 +26,17 @@ jobs:
           sudo apt-get install libasound2-dev mesa-common-dev libx11-dev libxrandr-dev libxi-dev xorg-dev libgl1-mesa-dev libglu1-mesa-dev
 
       - name: Install shared Raylib library on Linux
-        if: ${{ runner.os == 'Linux' }}
+        # if: ${{ runner.os == 'Linux' }}
         run: |
           cd raylib/src
-          make PLATFORM=PLATFORM_DESKTOP RAYLIB_LIBTYPE=SHARED
+          make PLATFORM=PLATFORM_DESKTOP RAYLIB_LIBTYPE=SHARED RAYLIB_MODULE_RAYGUI=TRUE RAYLIB_MODULE_PHYSAC=TRUE
           sudo make install RAYLIB_LIBTYPE=SHARED
 
-      - name: Install shared Raylib library on MacOS
-        if: ${{ runner.os == 'macOS' }}
-        run: |
-          /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-          brew install raylib
+      # - name: Install shared Raylib library on MacOS
+      #   if: ${{ runner.os == 'macOS' }}
+      #   run: |
+      #     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+      #     brew install raylib
 
       - name: Install emsdk dependency
         uses: mymindstorm/setup-emsdk@v9
@@ -49,7 +49,9 @@ jobs:
       - name: Install NimraylibNow! and dependencies
         run: nimble install --accept
       - name: Try compiling a file with local installation
-        run: nim c examples/original/crown.nim
+        run: nim c --gc:orc -d:useMalloc examples/original/crown.nim
+      - name: Try running a file with local installation
+        run: nim c --gc:orc -d:useMalloc -r tests/tcrown_for_running.nim
 
       - name: Install c2nim
         run: nimble install --accept c2nim
