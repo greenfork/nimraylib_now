@@ -45,7 +45,7 @@ $ nim c -r -d:release -d:danger crown.nim
 
 ## Current version and upgrading from previous versions
 
-NimraylibNow! v0.12 is a wrapper for [Raylib v3.7.0] and [Raygui v2.9].
+NimraylibNow! v0.13 is a wrapper for [Raylib v3.7.0] and [Raygui v2.9].
 
 See [MIGRATION](MIGRATION.md) for any tips on how to upgrade your code
 from previous versions.
@@ -376,6 +376,11 @@ you do not have path set correctly and MinGW can't find correct library files.
 Make sure to include MinGW's bin folder in your PATH. The path to MinGW's bin
 folder looks something like this by default:
 `C:\Program Files\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin`.
+
+## Community
+
+Find us at `#raylib-nim` channel
+in the official [Raylib discord server](https://discord.gg/raylib).
 
 ## Thanks
 

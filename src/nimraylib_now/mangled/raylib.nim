@@ -313,18 +313,18 @@ type
     vertexCount* {.importc: "vertexCount".}: cint ##  Number of vertices stored in arrays
     triangleCount* {.importc: "triangleCount".}: cint ##  Number of triangles stored (indexed or not)
                                                   ##  Default vertex data
-    vertices* {.importc: "vertices".}: ptr cfloat ##  Vertex position (XYZ - 3 components per vertex) (shader-location = 0)
-    texcoords* {.importc: "texcoords".}: ptr cfloat ##  Vertex texture coordinates (UV - 2 components per vertex) (shader-location = 1)
-    texcoords2* {.importc: "texcoords2".}: ptr cfloat ##  Vertex second texture coordinates (useful for lightmaps) (shader-location = 5)
-    normals* {.importc: "normals".}: ptr cfloat ##  Vertex normals (XYZ - 3 components per vertex) (shader-location = 2)
-    tangents* {.importc: "tangents".}: ptr cfloat ##  Vertex tangents (XYZW - 4 components per vertex) (shader-location = 4)
-    colors* {.importc: "colors".}: ptr uint8 ##  Vertex colors (RGBA - 4 components per vertex) (shader-location = 3)
-    indices* {.importc: "indices".}: ptr cushort ##  Vertex indices (in case vertex data comes indexed)
+    vertices* {.importc: "vertices".}: ptr UncheckedArray[cfloat] ##  Vertex position (XYZ - 3 components per vertex) (shader-location = 0)
+    texcoords* {.importc: "texcoords".}: ptr UncheckedArray[cfloat] ##  Vertex texture coordinates (UV - 2 components per vertex) (shader-location = 1)
+    texcoords2* {.importc: "texcoords2".}: ptr UncheckedArray[cfloat] ##  Vertex second texture coordinates (useful for lightmaps) (shader-location = 5)
+    normals* {.importc: "normals".}: ptr UncheckedArray[cfloat] ##  Vertex normals (XYZ - 3 components per vertex) (shader-location = 2)
+    tangents* {.importc: "tangents".}: ptr UncheckedArray[cfloat] ##  Vertex tangents (XYZW - 4 components per vertex) (shader-location = 4)
+    colors* {.importc: "colors".}: ptr UncheckedArray[uint8] ##  Vertex colors (RGBA - 4 components per vertex) (shader-location = 3)
+    indices* {.importc: "indices".}: ptr UncheckedArray[cushort] ##  Vertex indices (in case vertex data comes indexed)
                                             ##  Animation vertex data
-    animVertices* {.importc: "animVertices".}: ptr cfloat ##  Animated vertex positions (after bones transformations)
-    animNormals* {.importc: "animNormals".}: ptr cfloat ##  Animated normals (after bones transformations)
-    boneIds* {.importc: "boneIds".}: ptr cint ##  Vertex bone ids, up to 4 bones influence by vertex (skinning)
-    boneWeights* {.importc: "boneWeights".}: ptr cfloat ##  Vertex bone weight, up to 4 bones influence by vertex (skinning)
+    animVertices* {.importc: "animVertices".}: ptr UncheckedArray[cfloat] ##  Animated vertex positions (after bones transformations)
+    animNormals* {.importc: "animNormals".}: ptr UncheckedArray[cfloat] ##  Animated normals (after bones transformations)
+    boneIds* {.importc: "boneIds".}: ptr UncheckedArray[cint] ##  Vertex bone ids, up to 4 bones influence by vertex (skinning)
+    boneWeights* {.importc: "boneWeights".}: ptr UncheckedArray[cfloat] ##  Vertex bone weight, up to 4 bones influence by vertex (skinning)
                                                    ##  OpenGL identifiers
     vaoId* {.importc: "vaoId".}: cuint ##  OpenGL Vertex Array Object id
     vboId* {.importc: "vboId".}: ptr cuint ##  OpenGL Vertex Buffer Objects id (default vertex data)
@@ -570,41 +570,40 @@ type
 
 type
   MouseCursor* {.size: sizeof(cint), pure.} = enum
-    CURSOR_DEFAULT = 0, CURSOR_ARROW = 1, CURSOR_IBEAM = 2, CURSOR_CROSSHAIR = 3,
-    CURSOR_POINTING_HAND = 4, CURSOR_RESIZE_EW = 5, ##  The horizontal resize/move arrow shape
-    CURSOR_RESIZE_NS = 6,       ##  The vertical resize/move arrow shape
-    CURSOR_RESIZE_NWSE = 7,     ##  The top-left to bottom-right diagonal resize/move arrow shape
-    CURSOR_RESIZE_NESW = 8,     ##  The top-right to bottom-left diagonal resize/move arrow shape
-    CURSOR_RESIZE_ALL = 9,      ##  The omni-directional resize/move cursor shape
-    CURSOR_NOT_ALLOWED = 10
+    DEFAULT = 0, ARROW = 1, IBEAM = 2, CROSSHAIR = 3, POINTING_HAND = 4, RESIZE_EW = 5, ##  The horizontal resize/move arrow shape
+    RESIZE_NS = 6,              ##  The vertical resize/move arrow shape
+    RESIZE_NWSE = 7,            ##  The top-left to bottom-right diagonal resize/move arrow shape
+    RESIZE_NESW = 8,            ##  The top-right to bottom-left diagonal resize/move arrow shape
+    RESIZE_ALL = 9,             ##  The omni-directional resize/move cursor shape
+    NOT_ALLOWED = 10
 
 
 ##  Gamepad buttons
 
 type                          ##  This is here just for error checking
   GamepadButton* {.size: sizeof(cint), pure.} = enum
-    BUTTON_UNKNOWN = 0,         ##  This is normally a DPAD
-    BUTTON_LEFT_FACE_UP, BUTTON_LEFT_FACE_RIGHT, BUTTON_LEFT_FACE_DOWN, BUTTON_LEFT_FACE_LEFT, ##  This normally corresponds with PlayStation and Xbox controllers
-                                                                                           ##  XBOX: [Y,X,A,B]
-                                                                                           ##  PS3: [Triangle,Square,Cross,Circle]
-                                                                                           ##  No support for 6 button controllers though..
-    BUTTON_RIGHT_FACE_UP, BUTTON_RIGHT_FACE_RIGHT, BUTTON_RIGHT_FACE_DOWN, BUTTON_RIGHT_FACE_LEFT, ##  Triggers
-    BUTTON_LEFT_TRIGGER_1, BUTTON_LEFT_TRIGGER_2, BUTTON_RIGHT_TRIGGER_1, BUTTON_RIGHT_TRIGGER_2, ##  These are buttons in the center of the gamepad
-    BUTTON_MIDDLE_LEFT,       ##  PS3 Select
-    BUTTON_MIDDLE,            ##  PS Button/XBOX Button
-    BUTTON_MIDDLE_RIGHT,      ##  PS3 Start
-                        ##  These are the joystick press in buttons
-    BUTTON_LEFT_THUMB, BUTTON_RIGHT_THUMB
+    UNKNOWN = 0,                ##  This is normally a DPAD
+    LEFT_FACE_UP, LEFT_FACE_RIGHT, LEFT_FACE_DOWN, LEFT_FACE_LEFT, ##  This normally corresponds with PlayStation and Xbox controllers
+                                                               ##  XBOX: [Y,X,A,B]
+                                                               ##  PS3: [Triangle,Square,Cross,Circle]
+                                                               ##  No support for 6 button controllers though..
+    RIGHT_FACE_UP, RIGHT_FACE_RIGHT, RIGHT_FACE_DOWN, RIGHT_FACE_LEFT, ##  Triggers
+    LEFT_TRIGGER_1, LEFT_TRIGGER_2, RIGHT_TRIGGER_1, RIGHT_TRIGGER_2, ##  These are buttons in the center of the gamepad
+    MIDDLE_LEFT,              ##  PS3 Select
+    MIDDLE,                   ##  PS Button/XBOX Button
+    MIDDLE_RIGHT,             ##  PS3 Start
+                 ##  These are the joystick press in buttons
+    LEFT_THUMB, RIGHT_THUMB
 
 
 ##  Gamepad axis
 
 type                          ##  Left stick
   GamepadAxis* {.size: sizeof(cint), pure.} = enum
-    AXIS_LEFT_X = 0, AXIS_LEFT_Y = 1, ##  Right stick
-    AXIS_RIGHT_X = 2, AXIS_RIGHT_Y = 3, ##  Pressure levels for the back triggers
-    AXIS_LEFT_TRIGGER = 4,      ##  [1..-1] (pressure-level)
-    AXIS_RIGHT_TRIGGER = 5
+    LEFT_X = 0, LEFT_Y = 1,        ##  Right stick
+    RIGHT_X = 2, RIGHT_Y = 3,      ##  Pressure levels for the back triggers
+    LEFT_TRIGGER = 4,           ##  [1..-1] (pressure-level)
+    RIGHT_TRIGGER = 5
 
 
 ##  Material map index

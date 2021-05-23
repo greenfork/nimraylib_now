@@ -49,6 +49,9 @@ const
   allowIfs = [
     "RAYGUI_SUPPORT_ICONS"
   ]
+  ignoreLines = [
+    "#if defined(RAYGUI_SUPPORT_ICONS)"
+  ]
 
   # #define LIGHTGRAY  CLITERAL(Color){ 200, 200, 200, 255 }   // Light Gray
   reDefineColor = re"^#define ([[:word:]]+)\s*CLITERAL\(Color\)\{ (\d+), (\d+), (\d+), (\d+) \}.*"
@@ -77,8 +80,10 @@ const
 #  prefix FLAG_
 #  prefix LOG_
 #  prefix KEY_
+#  prefix MOUSE_CURSOR_
 #  prefix MOUSE_
-#  prefix GAMEPAD_
+#  prefix GAMEPAD_BUTTON_
+#  prefix GAMEPAD_AXIS_
 #  prefix FONT_
 #  prefix BLEND_
 #  prefix GESTURE_
@@ -237,6 +242,8 @@ for (filepath, c2nimheader) in raylibHeaders:
           echo "Reached end of header part: " & line
           break
         echo "Ignore: " & line # skip all self-header module definitions
+      elif ignoreLines.anyIt(it in line):
+        echo "Ignore: " & line
       elif line.match(reDefineColor, m):
         let
           colorName = m.groupFirstCapture(0, line)
@@ -391,6 +398,29 @@ template `-`*[T: Vector2 | Vector3](v1: T): T = negate(v1)
         # In ModelAnimation
         ("framePoses* {.importc: \"framePoses\".}: ptr ptr Transform",
          "framePoses* {.importc: \"framePoses\".}: ptr UncheckedArray[ptr Transform]"),
+        # In Mesh
+        ("vertices* {.importc: \"vertices\".}: ptr cfloat",
+         "vertices* {.importc: \"vertices\".}: ptr UncheckedArray[cfloat]"),
+        ("texcoords* {.importc: \"texcoords\".}: ptr cfloat",
+         "texcoords* {.importc: \"texcoords\".}: ptr UncheckedArray[cfloat]"),
+        ("texcoords2* {.importc: \"texcoords2\".}: ptr cfloat",
+         "texcoords2* {.importc: \"texcoords2\".}: ptr UncheckedArray[cfloat]"),
+        ("normals* {.importc: \"normals\".}: ptr cfloat",
+         "normals* {.importc: \"normals\".}: ptr UncheckedArray[cfloat]"),
+        ("tangents* {.importc: \"tangents\".}: ptr cfloat",
+         "tangents* {.importc: \"tangents\".}: ptr UncheckedArray[cfloat]"),
+        ("colors* {.importc: \"colors\".}: ptr uint8",
+         "colors* {.importc: \"colors\".}: ptr UncheckedArray[uint8]"),
+        ("indices* {.importc: \"indices\".}: ptr cushort",
+         "indices* {.importc: \"indices\".}: ptr UncheckedArray[cushort]"),
+        ("animVertices* {.importc: \"animVertices\".}: ptr cfloat",
+         "animVertices* {.importc: \"animVertices\".}: ptr UncheckedArray[cfloat]"),
+        ("animNormals* {.importc: \"animNormals\".}: ptr cfloat",
+         "animNormals* {.importc: \"animNormals\".}: ptr UncheckedArray[cfloat]"),
+        ("boneIds* {.importc: \"boneIds\".}: ptr cint",
+         "boneIds* {.importc: \"boneIds\".}: ptr UncheckedArray[cint]"),
+        ("boneWeights* {.importc: \"boneWeights\".}: ptr cfloat",
+         "boneWeights* {.importc: \"boneWeights\".}: ptr UncheckedArray[cfloat]"),
       ]
     let
       raylibnim = readFile(buildDir/fmt"{filename}_modified.nim")

@@ -11,6 +11,14 @@ side it should mainly consist of renaming, please try the wonderful tool
 
 Additionally you can consult [Raylib's changelog](https://github.com/raysan5/raylib/blob/master/CHANGELOG).
 
+## From NimraylibNow! v0.12 to v0.13
+
+- `Mesh` type has most of its fields changed from `ptr cfloat` to `ptr UncheckedArray[cfloat]`
+- `MouseCursor` enum has no `CURSOR_` prefix, e.g. `CURSOR_ARROW` is now `ARROW`
+- `GamepadButton` enum has no `BUTTON_` prefix e.g. `BUTTON_LEFT_FACE_UP` is now `LEFT_FACE_UP`
+- `GamepadAxis` enum has no `AXIS_` prefix, e.g. `AXIS_LEFT_X` is now `LEFT_X`
+- `raygui_Support_Icons` define was removed from Raygui, it is enabled by default
+
 ## From Raylib v3.5 to v3.7 and from NimraylibNow! v0.10 to v0.12
 
 Recommended:

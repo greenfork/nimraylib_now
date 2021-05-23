@@ -1310,89 +1310,89 @@ block core_input_gamepad:
   proc padDrawXbox() =
     drawTexture(texXboxPad, 0, 0, DARKGRAY)
     # draw buttons: xbox home
-    if (isGamepadButtonDown(0, BUTTON_MIDDLE)): drawCircle(394, 89, 19, YELLOW)
+    if (isGamepadButtonDown(0, MIDDLE)): drawCircle(394, 89, 19, YELLOW)
 
     # draw buttons: basic
-    if (isGamepadButtonDown(0, BUTTON_MIDDLE_RIGHT)): drawCircle(436, 150, 9, YELLOW)
-    if (isGamepadButtonDown(0, BUTTON_MIDDLE_LEFT)): drawCircle(352, 150, 9, YELLOW)
-    if (isGamepadButtonDown(0, BUTTON_RIGHT_FACE_LEFT)): drawCircle(501, 151, 15, BLUE)
-    if (isGamepadButtonDown(0, BUTTON_RIGHT_FACE_DOWN)): drawCircle(536, 187, 15, LIME)
-    if (isGamepadButtonDown(0, BUTTON_RIGHT_FACE_RIGHT)): drawCircle(572, 151, 15, MAROON)
-    if (isGamepadButtonDown(0, BUTTON_RIGHT_FACE_UP)): drawCircle(536, 115, 15, GOLD)
+    if (isGamepadButtonDown(0, MIDDLE_RIGHT)): drawCircle(436, 150, 9, YELLOW)
+    if (isGamepadButtonDown(0, MIDDLE_LEFT)): drawCircle(352, 150, 9, YELLOW)
+    if (isGamepadButtonDown(0, RIGHT_FACE_LEFT)): drawCircle(501, 151, 15, BLUE)
+    if (isGamepadButtonDown(0, RIGHT_FACE_DOWN)): drawCircle(536, 187, 15, LIME)
+    if (isGamepadButtonDown(0, RIGHT_FACE_RIGHT)): drawCircle(572, 151, 15, MAROON)
+    if (isGamepadButtonDown(0, RIGHT_FACE_UP)): drawCircle(536, 115, 15, GOLD)
 
     # draw buttons: d-pad
     drawRectangle(317, 202, 19, 71, BLACK)
     drawRectangle(293, 228, 69, 19, BLACK)
-    if (isGamepadButtonDown(0, BUTTON_LEFT_FACE_UP)): drawRectangle(317, 202, 19, 26, YELLOW)
-    if (isGamepadButtonDown(0, BUTTON_LEFT_FACE_DOWN)): drawRectangle(317, 202 + 45, 19, 26, YELLOW)
-    if (isGamepadButtonDown(0, BUTTON_LEFT_FACE_LEFT)): drawRectangle(292, 228, 25, 19, YELLOW)
-    if (isGamepadButtonDown(0, BUTTON_LEFT_FACE_RIGHT)): drawRectangle(292 + 44, 228, 26, 19, YELLOW)
+    if (isGamepadButtonDown(0, LEFT_FACE_UP)): drawRectangle(317, 202, 19, 26, YELLOW)
+    if (isGamepadButtonDown(0, LEFT_FACE_DOWN)): drawRectangle(317, 202 + 45, 19, 26, YELLOW)
+    if (isGamepadButtonDown(0, LEFT_FACE_LEFT)): drawRectangle(292, 228, 25, 19, YELLOW)
+    if (isGamepadButtonDown(0, LEFT_FACE_RIGHT)): drawRectangle(292 + 44, 228, 26, 19, YELLOW)
 
     # draw buttons: left-right back
-    if (isGamepadButtonDown(0, BUTTON_LEFT_TRIGGER_1)): drawCircle(259, 61, 20, YELLOW)
-    if (isGamepadButtonDown(0, BUTTON_RIGHT_TRIGGER_1)): drawCircle(536, 61, 20, YELLOW)
+    if (isGamepadButtonDown(0, LEFT_TRIGGER_1)): drawCircle(259, 61, 20, YELLOW)
+    if (isGamepadButtonDown(0, RIGHT_TRIGGER_1)): drawCircle(536, 61, 20, YELLOW)
 
     # draw axis: left joystick
     drawCircle(259, 152, 39, BLACK)
     drawCircle(259, 152, 34, LIGHTGRAY)
-    drawCircle(259 + ((int)getGamepadAxisMovement(0, AXIS_LEFT_X)*20),
-               152 + ((int)getGamepadAxisMovement(0, AXIS_LEFT_Y)*20), 25, BLACK)
+    drawCircle(259 + ((int)getGamepadAxisMovement(0, LEFT_X)*20),
+               152 + ((int)getGamepadAxisMovement(0, LEFT_Y)*20), 25, BLACK)
 
     # draw axis: right joystick
     drawCircle(461, 237, 38, BLACK)
     drawCircle(461, 237, 33, LIGHTGRAY)
-    drawCircle(461 + ((int)getGamepadAxisMovement(0, AXIS_RIGHT_X)*20),
-               237 + ((int)getGamepadAxisMovement(0, AXIS_RIGHT_Y)*20), 25, BLACK)
+    drawCircle(461 + ((int)getGamepadAxisMovement(0, RIGHT_X)*20),
+               237 + ((int)getGamepadAxisMovement(0, RIGHT_Y)*20), 25, BLACK)
 
     # draw axis: left-right triggers
     drawRectangle(170, 30, 15, 70, GRAY)
     drawRectangle(604, 30, 15, 70, GRAY)
-    drawRectangle(170, 30, 15, (((1 + getGamepadAxisMovement(0, AXIS_LEFT_TRIGGER))/2)*70).int, YELLOW)
-    drawRectangle(604, 30, 15, (((1 + getGamepadAxisMovement(0, AXIS_RIGHT_TRIGGER))/2)*70).int, YELLOW)
+    drawRectangle(170, 30, 15, (((1 + getGamepadAxisMovement(0, LEFT_TRIGGER))/2)*70).int, YELLOW)
+    drawRectangle(604, 30, 15, (((1 + getGamepadAxisMovement(0, RIGHT_TRIGGER))/2)*70).int, YELLOW)
 
 
   proc padDrawPsx() =
     drawTexture(texPs3Pad, 0, 0, DARKGRAY)
     # Draw buttons: ps
-    if (isGamepadButtonDown(0, BUTTON_MIDDLE)): drawCircle(396, 222, 13, YELLOW)
+    if (isGamepadButtonDown(0, MIDDLE)): drawCircle(396, 222, 13, YELLOW)
 
     # Draw buttons: basic
-    if (isGamepadButtonDown(0, BUTTON_MIDDLE_LEFT)): drawRectangle(328, 170, 32, 13, YELLOW)
-    if (isGamepadButtonDown(0, BUTTON_MIDDLE_RIGHT)): drawTriangle(Vector2(x:436, y:168 ), Vector2(x:436, y:185), Vector2(x:464, y:177 ), YELLOW)
-    if (isGamepadButtonDown(0, BUTTON_RIGHT_FACE_UP)): drawCircle(557, 144, 13, LIME)
-    if (isGamepadButtonDown(0, BUTTON_RIGHT_FACE_RIGHT)): drawCircle(586, 173, 13, YELLOW)
-    if (isGamepadButtonDown(0, BUTTON_RIGHT_FACE_DOWN)): drawCircle(557, 203, 13, VIOLET)
-    if (isGamepadButtonDown(0, BUTTON_RIGHT_FACE_LEFT)): drawCircle(527, 173, 13, PINK)
+    if (isGamepadButtonDown(0, MIDDLE_LEFT)): drawRectangle(328, 170, 32, 13, YELLOW)
+    if (isGamepadButtonDown(0, MIDDLE_RIGHT)): drawTriangle(Vector2(x:436, y:168 ), Vector2(x:436, y:185), Vector2(x:464, y:177 ), YELLOW)
+    if (isGamepadButtonDown(0, RIGHT_FACE_UP)): drawCircle(557, 144, 13, LIME)
+    if (isGamepadButtonDown(0, RIGHT_FACE_RIGHT)): drawCircle(586, 173, 13, YELLOW)
+    if (isGamepadButtonDown(0, RIGHT_FACE_DOWN)): drawCircle(557, 203, 13, VIOLET)
+    if (isGamepadButtonDown(0, RIGHT_FACE_LEFT)): drawCircle(527, 173, 13, PINK)
 
     # draw buttons: d-pad
     drawRectangle(225, 132, 24, 84, BLACK)
     drawRectangle(195, 161, 84, 25, BLACK)
-    if (isGamepadButtonDown(0, BUTTON_LEFT_FACE_UP)): drawRectangle(225, 132, 24, 29, YELLOW)
-    if (isGamepadButtonDown(0, BUTTON_LEFT_FACE_DOWN)): drawRectangle(225, 132 + 54, 24, 30, YELLOW)
-    if (isGamepadButtonDown(0, BUTTON_LEFT_FACE_LEFT)): drawRectangle(195, 161, 30, 25, YELLOW)
-    if (isGamepadButtonDown(0, BUTTON_LEFT_FACE_RIGHT)): drawRectangle(195 + 54, 161, 30, 25, YELLOW)
+    if (isGamepadButtonDown(0, LEFT_FACE_UP)): drawRectangle(225, 132, 24, 29, YELLOW)
+    if (isGamepadButtonDown(0, LEFT_FACE_DOWN)): drawRectangle(225, 132 + 54, 24, 30, YELLOW)
+    if (isGamepadButtonDown(0, LEFT_FACE_LEFT)): drawRectangle(195, 161, 30, 25, YELLOW)
+    if (isGamepadButtonDown(0, LEFT_FACE_RIGHT)): drawRectangle(195 + 54, 161, 30, 25, YELLOW)
 
     # draw buttons: left-right back buttons
-    if (isGamepadButtonDown(0, BUTTON_LEFT_TRIGGER_1)): drawCircle(239, 82, 20, YELLOW)
-    if (isGamepadButtonDown(0, BUTTON_RIGHT_TRIGGER_1)): drawCircle(557, 82, 20, YELLOW)
+    if (isGamepadButtonDown(0, LEFT_TRIGGER_1)): drawCircle(239, 82, 20, YELLOW)
+    if (isGamepadButtonDown(0, RIGHT_TRIGGER_1)): drawCircle(557, 82, 20, YELLOW)
 
     # draw axis: left joystick
     drawCircle(319, 255, 35, BLACK)
     drawCircle(319, 255, 31, LIGHTGRAY)
-    drawCircle(319 + ((int)getGamepadAxisMovement(0, AXIS_LEFT_X) * 20),
-               255 + ((int)getGamepadAxisMovement(0, AXIS_LEFT_Y) * 20), 25, BLACK)
+    drawCircle(319 + ((int)getGamepadAxisMovement(0, LEFT_X) * 20),
+               255 + ((int)getGamepadAxisMovement(0, LEFT_Y) * 20), 25, BLACK)
 
     # draw axis: right joystick
     drawCircle(475, 255, 35, BLACK)
     drawCircle(475, 255, 31, LIGHTGRAY)
-    drawCircle(475 + ((int)getGamepadAxisMovement(0, AXIS_RIGHT_X)*20),
-               255 + ((int)getGamepadAxisMovement(0, AXIS_RIGHT_Y)*20), 25, BLACK)
+    drawCircle(475 + ((int)getGamepadAxisMovement(0, RIGHT_X)*20),
+               255 + ((int)getGamepadAxisMovement(0, RIGHT_Y)*20), 25, BLACK)
 
     # draw axis: left-right triggers
     drawRectangle(169, 48, 15, 70, GRAY)
     drawRectangle(611, 48, 15, 70, GRAY)
-    drawRectangle(169, 48, 15, (((1 - getGamepadAxisMovement(0, AXIS_LEFT_TRIGGER)) / 2) * 70).int, YELLOW)
-    drawRectangle(611, 48, 15, (((1 - getGamepadAxisMovement(0, AXIS_RIGHT_TRIGGER)) / 2) * 70).int, YELLOW)
+    drawRectangle(169, 48, 15, (((1 - getGamepadAxisMovement(0, LEFT_TRIGGER)) / 2) * 70).int, YELLOW)
+    drawRectangle(611, 48, 15, (((1 - getGamepadAxisMovement(0, RIGHT_TRIGGER)) / 2) * 70).int, YELLOW)
 
 
   init()
@@ -2558,6 +2558,133 @@ block models_geometric_shapes:
   # --------------------------------------------------------------------------------------
   closeWindow()        #  Close window and OpenGL context
   # --------------------------------------------------------------------------------------
+
+
+block models_mesh_generation:
+  #[*******************************************************************************************
+  *
+  *   raylib example - procedural mesh generation
+  *
+  *   This example has been created using raylib 1.8 (www.raylib.com)
+  *   raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+  *
+  *   Copyright (c) 2017 Ramon Santamaria (Ray San)
+  *   Adapted for Nim by jseb
+  *
+  ********************************************************************************************]#
+
+
+  proc allocateMeshData(mesh: var Mesh, triangleCount: int) =
+    mesh.vertexCount = triangleCount * 3
+    mesh.triangleCount = triangleCount
+
+    mesh.vertices = cast[ptr UncheckedArray[cfloat]](alloc0(mesh.vertexCount * 3 * sizeof(cfloat)))
+    mesh.texcoords = cast[ptr UncheckedArray[cfloat]](alloc0(mesh.vertexCount * 2 * sizeof(cfloat)))
+    mesh.normals = cast[ptr UncheckedArray[cfloat]](alloc0(mesh.vertexCount * 3 * sizeof(cfloat)))
+
+  proc makeMesh(): Mesh =
+    allocateMeshData(result, 1)
+
+    for idx, val in [0.cfloat,0,0, 1,0,2, 2,0,0]:
+      result.vertices[idx] = val
+    for idx, val in [0.cfloat,1,0, 0,1,0, 0,1,0]:
+      result.normals[idx] = val
+    for idx, val in [0.cfloat,0, 0.5,1, 1,0]:
+      result.texcoords[idx] = val
+
+    uploadMesh(result.addr, false)
+
+  proc main() =
+    # Initialization
+    #--------------------------------------------------------------------------------------
+    const
+      screenWidth = 800
+      screenHeight = 450
+
+    initWindow(screenWidth, screenHeight, "raylib [models] example - mesh generation")
+
+    let meshes = [
+      genMeshPlane(2,2,5,5),
+      genMeshCube(2.0f, 1.0f, 2.0f),
+      genMeshSphere(2, 32, 32),
+      genMeshHemiSphere(2, 16, 16),
+      genMeshCylinder(1, 2, 16),
+      genMeshTorus(0.25f, 4.0f, 16, 32),
+      genMeshKnot(1.0f, 2.0f, 16, 128),
+      genMeshPoly(5, 2.0f),
+      makeMesh()
+    ]
+
+    # We generate a checked image for texturing
+    var checked: Image = genImageChecked(2, 2, 1, 1, Red, Green)
+    var texture: Texture2D = loadTextureFromImage(checked)
+    unloadImage(checked)
+
+    # Set checked texture as default diffuse component for all models material
+    var models: seq[Model]
+    for mesh in meshes:
+      var m = loadModelFromMesh(mesh)
+      m.materials[0].maps[MaterialMapIndex.Albedo.int].texture = texture # MATERIAL_MAP_DIFFUSE is now ALBEDO
+      models.add(m)
+
+    # Define the camera to look into our 3d world
+    var camera = Camera3D(
+      position: (5.0, 5.0, 5.0),
+      target: (0.0, 0.0, 0.0),
+      up: (0.0, 1.0, 0.0),
+      fovy: 45.0,
+      projection: Perspective
+    )
+
+    var position = Vector3(x: 0.0, y: 0.0, z: 0.0)
+    var currentModel = 0
+
+    camera.setCameraMode(Orbital)
+
+    setTargetFPS(60)
+    #--------------------------------------------------------------------------------------
+
+    # Main game loop
+    while not windowShouldClose():  # Detect window close button or ESC key
+
+      # Update
+      #----------------------------------------------------------------------------------
+      updateCamera(camera.addr)  # Update internal camera and our camera
+      if isMouseButtonPressed(LEFT_BUTTON) or isKeyPressed(RIGHT):
+        currentModel = (currentModel + 1) mod models.len  # Cycle between the textures
+      if isKeyPressed(LEFT):
+        currentModel = currentModel - 1
+        if currentModel < 0: currentModel = models.len - 1
+      #--------------------------------------------------------------------------------------
+
+      # Draw
+      #----------------------------------------------------------------------------------
+      beginDrawing:
+        clearBackground(White)
+        camera.beginMode3D:
+          drawModel(models[currentModel], position, 1.0, White)
+          drawGrid(10, 1.0)
+
+        drawRectangle(30, 400, 310, 30, fade(SkyBlue, 0.5f))
+        drawRectangleLines(30, 400, 310, 30, fade(DarkBlue, 0.5f))
+        drawText("MOUSE LEFT BUTTON to CYCLE PROCEDURAL MODELS", 40, 410, 10, Blue)
+
+        let listModels = [("PLANE",680), ("CUBE",680), ("SPHERE",680), ("HEMISPHERE",640), ("CYLINDER",680),
+                            ("TORUS",680), ("KNOT",680), ("POLY",680), ("Parametric(custom)",580)]
+        drawText(listModels[currentModel][0], listModels[currentModel][1], 10, 20, DarkBlue)
+      #--------------------------------------------------------------------------------------
+
+    # De-Initialization
+    #--------------------------------------------------------------------------------------
+    unloadTexture(texture)
+
+    # Unload models data (GPU VRAM)
+    for m in models: unloadModel(m)
+
+    closeWindow()  # Close window and OpenGL context
+    #--------------------------------------------------------------------------------------
+
+  main()
 
 
 block models_rlgl_solar_system:
@@ -6369,60 +6496,70 @@ block textures_raw_data:
   const screenWidth = 800
   const screenHeight = 450
 
+  # Generate a checked texture by code
+  let
+    width: int32 = 960
+    height: int32 = 480
+
   initWindow screenWidth, screenHeight, "raylib [textures] example - texture from raw data"
 
-  #  NOTE: Textures MUST be loaded after Window initialization (OpenGL context is required)
+  # NOTE: Textures MUST be loaded after Window initialization (OpenGL context is required)
 
-  #  Load RAW image data (512x512, 32bit RGBA, no file header)
+  # Load RAW image data (512x512, 32bit RGBA, no file header)
   let
-      fudesumiRaw = loadImageRaw("resources/fudesumi.raw", 384, 512, UNCOMPRESSED_R8G8B8A8, 0)
-      fudesumi = loadTextureFromImage(fudesumiRaw)  #  Upload CPU (RAM) image to GPU (VRAM)
-  unloadImage fudesumiRaw                           #  Unload CPU (RAM) image data
+    fudesumiRaw = loadImageRaw("resources/fudesumi.raw", 384, 512, UNCOMPRESSED_R8G8B8A8, 0)
+    fudesumi = loadTextureFromImage(fudesumiRaw)  #  Upload CPU (RAM) image to GPU (VRAM)
+  # unloadImage fudesumiRaw                           #  Unload CPU (RAM) image data
 
-  #  Generate a checked texture by code
-  let
-      width: int32 = 960
-      height: int32 = 480
-
-  #  Dynamic memory allocation to store pixels data (Color type)
-  var pixels = newSeq[Color](width*height)
+  # Dynamic memory allocation to store pixels data (Color type)
+  var pixels = cast[ptr UncheckedArray[Color]](alloc0(width*height * sizeof(Color)))
 
   for y in 0..<height:
-      for x in 0..<width:
-          pixels[y*width + x] = (if (((x div 32+y div 32) div 1) %% 2 == 0): ORANGE else: GOLD)
+    for x in 0..<width:
+      pixels[y*width + x] = (if (((x div 32+y div 32) div 1) %% 2 == 0): Orange else: Gold)
 
-  #  Load pixels data into an image structure and create texture
+  # Load pixels data into an image structure and create texture
   let
-      checkedIm = Image(data:cast[ptr Color](pixels), width: width, height: height, format: UNCOMPRESSED_R8G8B8A8, mipmaps: 1)
-      checked = loadTextureFromImage(checkedIm)
+    checkedIm = Image(
+      data: pixels,
+      width: width,
+      height: height,
+      format: UNCOMPRESSED_R8G8B8A8,
+      mipmaps: 1
+    )
+    checked = loadTextureFromImage(checkedIm)
   #UnloadImage checkedIm         #  Unload CPU (RAM) image data (do not do this in Nim, seriously)
   # ---------------------------------------------------------------------------------------
 
   #  Main game loop
   while not windowShouldClose(): #  Detect window close button or ESC key
-      #  Update
-      # ----------------------------------------------------------------------------------
-      #  TODO: Update your variables here
-      # ----------------------------------------------------------------------------------
+    #  Update
+    # ----------------------------------------------------------------------------------
+    #  TODO: Update your variables here
+    # ----------------------------------------------------------------------------------
 
-      #  Draw
-      # ----------------------------------------------------------------------------------
-      beginDrawing()
+    #  Draw
+    # ----------------------------------------------------------------------------------
+    beginDrawing()
 
-      clearBackground(RAYWHITE)
+    clearBackground(RAYWHITE)
 
-      drawTexture checked, screenWidth div 2 - checked.width div 2, screenHeight div 2 - checked.height div 2, 
-          fade(WHITE, 0.5f)
-      drawTexture fudesumi, 430, -30, WHITE
+    drawTexture(
+      checked,
+      screenWidth div 2 - checked.width div 2,
+      screenHeight div 2 - checked.height div 2,
+      fade(White, 0.5f)
+    )
+    drawTexture fudesumi, 430, -30, White
 
-      drawText "CHECKED TEXTURE ", 84, 85, 30, BROWN
-      drawText "GENERATED by CODE", 72, 148, 30, BROWN
-      drawText "and RAW IMAGE LOADING", 46, 210, 30, BROWN
+    drawText "CHECKED TEXTURE ", 84, 85, 30, Brown
+    drawText "GENERATED by CODE", 72, 148, 30, Brown
+    drawText "and RAW IMAGE LOADING", 46, 210, 30, Brown
 
-      drawText "(c) Fudesumi sprite by Eiden Marsal", 310, screenHeight - 20, 10, BROWN
+    drawText "(c) Fudesumi sprite by Eiden Marsal", 310, screenHeight - 20, 10, Brown
 
-      endDrawing()
-      # ----------------------------------------------------------------------------------
+    endDrawing()
+  # ----------------------------------------------------------------------------------
 
   #  De-Initialization
   # --------------------------------------------------------------------------------------

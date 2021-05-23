@@ -1,6 +1,6 @@
 # Package
 
-version = "0.12.5"
+version = "0.13.0"
 author = "Dmitry Matveyev"
 description = "The Ultimate Raylib gaming library wrapper"
 license = "MIT"
@@ -59,17 +59,19 @@ task convert, "run with c2nim":
   exec "nim check " & nimraylibNowDir/"not_mangled"/"physac.nim"
   exec "nim check " & nimraylibNowDir/"not_mangled"/"converters.nim"
 
-task testExamples, "checks that all examples are correctly compiled":
+task prepareTests, "generate tests from examples":
   exec "nim r " & "scripts"/"make_tests_from_examples.nim"
+  exec "nim r " & "scripts"/"make_individual_tests_from_examples.nim"
+  exec "nim r " & "scripts"/"make_emscripten_tests_from_examples.nim"
+
+task testExamples, "checks that all examples are correctly compiled":
   exec "testament pattern tests/texamples.nim"
   exec "testament pattern tests/texamples_shared.nim"
   exec "testament pattern tests/texamples_windows.nim"
 
 # Can fail on Windows due to globbing rules
 task testIndividualExamples, "slower but check that all examples compile individually":
-  exec "nim r " & "scripts"/"make_individual_tests_from_examples.nim"
   exec "testament pattern 'tests/examples/t_*.nim'"
 
 task testEmscriptenExample, "run a single test with emsdk installed":
-  exec "nim r " & "scripts"/"make_emscripten_tests_from_examples.nim"
   exec "testament pattern 'tests/emscripten/t_*.nim'"

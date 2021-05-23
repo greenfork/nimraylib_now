@@ -56,6 +56,9 @@ jobs:
       - name: Run converter and check files
         run: nimble convert
 
+      - name: Generate tests
+        run: nimble prepareTests
+
       - name: Run megatest
         run: nimble testExamples
 
