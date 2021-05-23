@@ -32,17 +32,17 @@ task convert, "run with c2nim":
     convertersFile = "src"/"nimraylib_now"/"converters.nim"
 
   echo "Running clear target directories\n"
-  exec "nim r " & common_files_setupFile
+  exec "nim r --gc:orc " & common_files_setupFile
 
   echo "Running prepare build files\n"
-  exec "nim r " & prepare_build_filesFile
+  exec "nim r --gc:orc " & prepare_build_filesFile
   echo "Running converter\n"
-  exec "nim r " & convert_c_to_nimFile
+  exec "nim r --gc:orc " & convert_c_to_nimFile
 
   echo "Running prepare build files -d:nimraylib_now_mangle\n"
-  exec "nim r -d:nimraylib_now_mangle " & prepare_build_filesFile
+  exec "nim r --gc:orc -d:nimraylib_now_mangle " & prepare_build_filesFile
   echo "Running converter -d:nimraylib_now_mangle\n"
-  exec "nim r -d:nimraylib_now_mangle " & convert_c_to_nimFile
+  exec "nim r --gc:orc -d:nimraylib_now_mangle " & convert_c_to_nimFile
 
   echo "\nExecuting nim check\n"
   exec "nim check " & nimraylibNowDir/"mangled"/"raylib.nim"
@@ -60,9 +60,9 @@ task convert, "run with c2nim":
   exec "nim check " & nimraylibNowDir/"not_mangled"/"converters.nim"
 
 task prepareTests, "generate tests from examples":
-  exec "nim r " & "scripts"/"make_tests_from_examples.nim"
-  exec "nim r " & "scripts"/"make_individual_tests_from_examples.nim"
-  exec "nim r " & "scripts"/"make_emscripten_tests_from_examples.nim"
+  exec "nim r --gc:orc " & "scripts"/"make_tests_from_examples.nim"
+  exec "nim r --gc:orc " & "scripts"/"make_individual_tests_from_examples.nim"
+  exec "nim r --gc:orc " & "scripts"/"make_emscripten_tests_from_examples.nim"
 
 task testExamples, "checks that all examples are correctly compiled":
   exec "testament pattern tests/texamples.nim"

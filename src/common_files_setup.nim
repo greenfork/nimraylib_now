@@ -3,6 +3,8 @@ import strformat
 
 import ./filenames
 
+# Delete all source and re-create the directory structure.
+
 removeDir(nimraylibNowDir)
 createDir(nimraylibNowDir)
 createDir(nimraylibNowDir/"mangled")
