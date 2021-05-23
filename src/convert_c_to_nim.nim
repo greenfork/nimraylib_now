@@ -416,6 +416,8 @@ template `-`*[T: Vector2 | Vector3](v1: T): T = negate(v1)
 
       # These cannot be determined automatically, only through manual inspection.
       uncheckedArrayReplacements = [
+        # Header style
+
         # In Shader
         ("locs* {.importc: \"locs\".}: ptr cint",
          "locs* {.importc: \"locs\".}: ptr UncheckedArray[cint]"),
@@ -455,6 +457,48 @@ template `-`*[T: Vector2 | Vector3](v1: T): T = negate(v1)
          "boneIds* {.importc: \"boneIds\".}: ptr UncheckedArray[cint]"),
         ("boneWeights* {.importc: \"boneWeights\".}: ptr cfloat",
          "boneWeights* {.importc: \"boneWeights\".}: ptr UncheckedArray[cfloat]"),
+
+        # Dynlib style
+
+        # In Shader
+        ("locs*: ptr cint",
+         "locs*: ptr UncheckedArray[cint]"),
+        # In Material
+        ("maps*: ptr MaterialMap",
+         "maps*: ptr UncheckedArray[MaterialMap]"),
+        # In Model
+        ("meshes*: ptr Mesh",
+         "meshes*: ptr UncheckedArray[Mesh]"),
+        ("materials*: ptr Material",
+         "materials*: ptr UncheckedArray[Material]"),
+        ("meshMaterial*: ptr cint",
+         "meshMaterial*: ptr UncheckedArray[cint]"),
+        # In ModelAnimation
+        ("framePoses*: ptr ptr Transform",
+         "framePoses*: ptr UncheckedArray[ptr Transform]"),
+        # In Mesh
+        ("vertices*: ptr cfloat",
+         "vertices*: ptr UncheckedArray[cfloat]"),
+        ("texcoords*: ptr cfloat",
+         "texcoords*: ptr UncheckedArray[cfloat]"),
+        ("texcoords2*: ptr cfloat",
+         "texcoords2*: ptr UncheckedArray[cfloat]"),
+        ("normals*: ptr cfloat",
+         "normals*: ptr UncheckedArray[cfloat]"),
+        ("tangents*: ptr cfloat",
+         "tangents*: ptr UncheckedArray[cfloat]"),
+        ("colors*: ptr uint8",
+         "colors*: ptr UncheckedArray[uint8]"),
+        ("indices*: ptr cushort",
+         "indices*: ptr UncheckedArray[cushort]"),
+        ("animVertices*: ptr cfloat",
+         "animVertices*: ptr UncheckedArray[cfloat]"),
+        ("animNormals*: ptr cfloat",
+         "animNormals*: ptr UncheckedArray[cfloat]"),
+        ("boneIds*: ptr cint",
+         "boneIds*: ptr UncheckedArray[cint]"),
+        ("boneWeights*: ptr cfloat",
+         "boneWeights*: ptr UncheckedArray[cfloat]"),
       ]
     let
       raylibnim = readFile(buildDir/fmt"{filename}_modified.nim")

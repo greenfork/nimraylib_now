@@ -295,18 +295,18 @@ type
     vertexCount*: cint         ##  Number of vertices stored in arrays
     triangleCount*: cint       ##  Number of triangles stored (indexed or not)
                        ##  Default vertex data
-    vertices*: ptr cfloat       ##  Vertex position (XYZ - 3 components per vertex) (shader-location = 0)
-    texcoords*: ptr cfloat      ##  Vertex texture coordinates (UV - 2 components per vertex) (shader-location = 1)
-    texcoords2*: ptr cfloat     ##  Vertex second texture coordinates (useful for lightmaps) (shader-location = 5)
-    normals*: ptr cfloat        ##  Vertex normals (XYZ - 3 components per vertex) (shader-location = 2)
-    tangents*: ptr cfloat       ##  Vertex tangents (XYZW - 4 components per vertex) (shader-location = 4)
-    colors*: ptr uint8         ##  Vertex colors (RGBA - 4 components per vertex) (shader-location = 3)
-    indices*: ptr cushort ##  Vertex indices (in case vertex data comes indexed)
+    vertices*: ptr UncheckedArray[cfloat]       ##  Vertex position (XYZ - 3 components per vertex) (shader-location = 0)
+    texcoords*: ptr UncheckedArray[cfloat]      ##  Vertex texture coordinates (UV - 2 components per vertex) (shader-location = 1)
+    texcoords2*: ptr UncheckedArray[cfloat]     ##  Vertex second texture coordinates (useful for lightmaps) (shader-location = 5)
+    normals*: ptr UncheckedArray[cfloat]        ##  Vertex normals (XYZ - 3 components per vertex) (shader-location = 2)
+    tangents*: ptr UncheckedArray[cfloat]       ##  Vertex tangents (XYZW - 4 components per vertex) (shader-location = 4)
+    colors*: ptr UncheckedArray[uint8]         ##  Vertex colors (RGBA - 4 components per vertex) (shader-location = 3)
+    indices*: ptr UncheckedArray[cushort] ##  Vertex indices (in case vertex data comes indexed)
                        ##  Animation vertex data
-    animVertices*: ptr cfloat   ##  Animated vertex positions (after bones transformations)
-    animNormals*: ptr cfloat    ##  Animated normals (after bones transformations)
-    boneIds*: ptr cint          ##  Vertex bone ids, up to 4 bones influence by vertex (skinning)
-    boneWeights*: ptr cfloat ##  Vertex bone weight, up to 4 bones influence by vertex (skinning)
+    animVertices*: ptr UncheckedArray[cfloat]   ##  Animated vertex positions (after bones transformations)
+    animNormals*: ptr UncheckedArray[cfloat]    ##  Animated normals (after bones transformations)
+    boneIds*: ptr UncheckedArray[cint]          ##  Vertex bone ids, up to 4 bones influence by vertex (skinning)
+    boneWeights*: ptr UncheckedArray[cfloat] ##  Vertex bone weight, up to 4 bones influence by vertex (skinning)
                           ##  OpenGL identifiers
     vaoId*: cuint              ##  OpenGL Vertex Array Object id
     vboId*: ptr cuint           ##  OpenGL Vertex Buffer Objects id (default vertex data)
@@ -317,7 +317,7 @@ type
 type
   Shader* {.bycopy.} = object
     id*: cuint                 ##  Shader program id
-    locs*: ptr cint             ##  Shader locations array (MAX_SHADER_LOCATIONS)
+    locs*: ptr UncheckedArray[cint]             ##  Shader locations array (MAX_SHADER_LOCATIONS)
 
 
 ##  Material texture map
@@ -334,7 +334,7 @@ type
 type
   Material* {.bycopy.} = object
     shader*: Shader            ##  Material shader
-    maps*: ptr MaterialMap      ##  Material maps array (MAX_MATERIAL_MAPS)
+    maps*: ptr UncheckedArray[MaterialMap]      ##  Material maps array (MAX_MATERIAL_MAPS)
     params*: array[4, cfloat]   ##  Material generic parameters (if required)
 
 
@@ -362,9 +362,9 @@ type
     transform*: Matrix         ##  Local transform matrix
     meshCount*: cint           ##  Number of meshes
     materialCount*: cint       ##  Number of materials
-    meshes*: ptr Mesh           ##  Meshes array
-    materials*: ptr Material    ##  Materials array
-    meshMaterial*: ptr cint     ##  Mesh material number
+    meshes*: ptr UncheckedArray[Mesh]           ##  Meshes array
+    materials*: ptr UncheckedArray[Material]    ##  Materials array
+    meshMaterial*: ptr UncheckedArray[cint]     ##  Mesh material number
                          ##  Animation data
     boneCount*: cint           ##  Number of bones
     bones*: ptr BoneInfo        ##  Bones information (skeleton)
@@ -378,7 +378,7 @@ type
     boneCount*: cint           ##  Number of bones
     frameCount*: cint          ##  Number of animation frames
     bones*: ptr BoneInfo        ##  Bones information (skeleton)
-    framePoses*: ptr ptr Transform ##  Poses array by frame
+    framePoses*: ptr UncheckedArray[ptr Transform] ##  Poses array by frame
 
 
 ##  Ray type (useful for raycast)
