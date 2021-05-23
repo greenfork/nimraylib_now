@@ -1,7 +1,13 @@
+ {.deadCodeElim: on.}
 import raylib
+const dynlibLibraryName =
+  when defined(windows):
+    "raylib.dll"
+  elif defined(macosx):
+    "libraylib.dylib"
+  else:
+    "libraylib.so"
 
-from os import parentDir, `/`
-const rlglHeader = currentSourcePath().parentDir()/"rlgl.h"
 ## *********************************************************************************************
 ##
 ##    rlgl v3.7 - raylib OpenGL abstraction layer
@@ -141,16 +147,16 @@ type
 ##  Dynamic vertex buffers (position + texcoords + colors + indices arrays)
 
 type
-  VertexBuffer* {.importc: "VertexBuffer", header: rlglHeader, bycopy.} = object
-    elementsCount* {.importc: "elementsCount".}: cint ##  Number of elements in the buffer (QUADS)
-    vCounter* {.importc: "vCounter".}: cint ##  Vertex position counter to process (and draw) from full buffer
-    tcCounter* {.importc: "tcCounter".}: cint ##  Vertex texcoord counter to process (and draw) from full buffer
-    cCounter* {.importc: "cCounter".}: cint ##  Vertex color counter to process (and draw) from full buffer
-    vertices* {.importc: "vertices".}: ptr UncheckedArray[cfloat] ##  Vertex position (XYZ - 3 components per vertex) (shader-location = 0)
-    texcoords* {.importc: "texcoords".}: ptr UncheckedArray[cfloat] ##  Vertex texture coordinates (UV - 2 components per vertex) (shader-location = 1)
-    colors* {.importc: "colors".}: ptr UncheckedArray[uint8] ##  Vertex colors (RGBA - 4 components per vertex) (shader-location = 3)
-    vaoId* {.importc: "vaoId".}: cuint ##  OpenGL Vertex Array Object id
-    vboId* {.importc: "vboId".}: array[4, cuint] ##  OpenGL Vertex Buffer Objects id (4 types of vertex data)
+  VertexBuffer* {.bycopy.} = object
+    elementsCount*: cint       ##  Number of elements in the buffer (QUADS)
+    vCounter*: cint            ##  Vertex position counter to process (and draw) from full buffer
+    tcCounter*: cint           ##  Vertex texcoord counter to process (and draw) from full buffer
+    cCounter*: cint            ##  Vertex color counter to process (and draw) from full buffer
+    vertices*: ptr cfloat       ##  Vertex position (XYZ - 3 components per vertex) (shader-location = 0)
+    texcoords*: ptr cfloat      ##  Vertex texture coordinates (UV - 2 components per vertex) (shader-location = 1)
+    colors*: ptr uint8         ##  Vertex colors (RGBA - 4 components per vertex) (shader-location = 3)
+    vaoId*: cuint              ##  OpenGL Vertex Array Object id
+    vboId*: array[4, cuint]     ##  OpenGL Vertex Buffer Objects id (4 types of vertex data)
 
 
 ##  Draw call type
@@ -159,27 +165,27 @@ type
 ##  of those state-change happens (this is done in core module)
 
 type
-  DrawCall* {.importc: "DrawCall", header: rlglHeader, bycopy.} = object
-    mode* {.importc: "mode".}: cint ##  Drawing mode: LINES, TRIANGLES, QUADS
-    vertexCount* {.importc: "vertexCount".}: cint ##  Number of vertex of the draw
-    vertexAlignment* {.importc: "vertexAlignment".}: cint ##  Number of vertex required for index alignment (LINES, TRIANGLES)
-                                                      ## unsigned int vaoId;       // Vertex array id to be used on the draw -> Using RLGL.currentBatch->vertexBuffer.vaoId
-                                                      ## unsigned int shaderId;    // Shader id to be used on the draw -> Using RLGL.currentShader.id
-    textureId* {.importc: "textureId".}: cuint ##  Texture id to be used on the draw -> Use to create new draw call if changes
-                                           ## Matrix projection;        // Projection matrix for this draw -> Using RLGL.projection by default
-                                           ## Matrix modelview;         // Modelview matrix for this draw -> Using RLGL.modelview by default
+  DrawCall* {.bycopy.} = object
+    mode*: cint                ##  Drawing mode: LINES, TRIANGLES, QUADS
+    vertexCount*: cint         ##  Number of vertex of the draw
+    vertexAlignment*: cint ##  Number of vertex required for index alignment (LINES, TRIANGLES)
+                         ## unsigned int vaoId;       // Vertex array id to be used on the draw -> Using RLGL.currentBatch->vertexBuffer.vaoId
+                         ## unsigned int shaderId;    // Shader id to be used on the draw -> Using RLGL.currentShader.id
+    textureId*: cuint ##  Texture id to be used on the draw -> Use to create new draw call if changes
+                    ## Matrix projection;        // Projection matrix for this draw -> Using RLGL.projection by default
+                    ## Matrix modelview;         // Modelview matrix for this draw -> Using RLGL.modelview by default
 
 
 ##  RenderBatch type
 
 type
-  RenderBatch* {.importc: "RenderBatch", header: rlglHeader, bycopy.} = object
-    buffersCount* {.importc: "buffersCount".}: cint ##  Number of vertex buffers (multi-buffering support)
-    currentBuffer* {.importc: "currentBuffer".}: cint ##  Current buffer tracking in case of multi-buffering
-    vertexBuffer* {.importc: "vertexBuffer".}: ptr VertexBuffer ##  Dynamic buffer(s) for vertex data
-    draws* {.importc: "draws".}: ptr DrawCall ##  Draw calls array, depends on textureId
-    drawsCounter* {.importc: "drawsCounter".}: cint ##  Draw calls counter
-    currentDepth* {.importc: "currentDepth".}: cfloat ##  Current depth value for next draw
+  RenderBatch* {.bycopy.} = object
+    buffersCount*: cint        ##  Number of vertex buffers (multi-buffering support)
+    currentBuffer*: cint       ##  Current buffer tracking in case of multi-buffering
+    vertexBuffer*: ptr VertexBuffer ##  Dynamic buffer(s) for vertex data
+    draws*: ptr DrawCall        ##  Draw calls array, depends on textureId
+    drawsCounter*: cint        ##  Draw calls counter
+    currentDepth*: cfloat      ##  Current depth value for next draw
 
 
 ##  Shader attribute data types
@@ -194,80 +200,83 @@ type
 ##  Functions Declaration - Matrix operations
 ## ------------------------------------------------------------------------------------
 
-proc matrixMode*(mode: cint) {.cdecl, importc: "rlMatrixMode", header: rlglHeader.}
+proc matrixMode*(mode: cint) {.cdecl, importc: "rlMatrixMode",
+                            dynlib: dynlibLibraryName.}
 ##  Choose the current matrix to be transformed
 
-proc pushMatrix*() {.cdecl, importc: "rlPushMatrix", header: rlglHeader.}
+proc pushMatrix*() {.cdecl, importc: "rlPushMatrix", dynlib: dynlibLibraryName.}
 ##  Push the current matrix to stack
 
-proc popMatrix*() {.cdecl, importc: "rlPopMatrix", header: rlglHeader.}
+proc popMatrix*() {.cdecl, importc: "rlPopMatrix", dynlib: dynlibLibraryName.}
 ##  Pop lattest inserted matrix from stack
 
-proc loadIdentity*() {.cdecl, importc: "rlLoadIdentity", header: rlglHeader.}
+proc loadIdentity*() {.cdecl, importc: "rlLoadIdentity", dynlib: dynlibLibraryName.}
 ##  Reset current matrix to identity matrix
 
 proc translatef*(x: cfloat; y: cfloat; z: cfloat) {.cdecl, importc: "rlTranslatef",
-    header: rlglHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Multiply the current matrix by a translation matrix
 
 proc rotatef*(angleDeg: cfloat; x: cfloat; y: cfloat; z: cfloat) {.cdecl,
-    importc: "rlRotatef", header: rlglHeader.}
+    importc: "rlRotatef", dynlib: dynlibLibraryName.}
 ##  Multiply the current matrix by a rotation matrix
 
 proc scalef*(x: cfloat; y: cfloat; z: cfloat) {.cdecl, importc: "rlScalef",
-    header: rlglHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Multiply the current matrix by a scaling matrix
 
 proc multMatrixf*(matf: ptr cfloat) {.cdecl, importc: "rlMultMatrixf",
-                                  header: rlglHeader.}
+                                  dynlib: dynlibLibraryName.}
 ##  Multiply the current matrix by another matrix
 
 proc frustum*(left: cdouble; right: cdouble; bottom: cdouble; top: cdouble;
              znear: cdouble; zfar: cdouble) {.cdecl, importc: "rlFrustum",
-    header: rlglHeader.}
+    dynlib: dynlibLibraryName.}
 proc ortho*(left: cdouble; right: cdouble; bottom: cdouble; top: cdouble; znear: cdouble;
-           zfar: cdouble) {.cdecl, importc: "rlOrtho", header: rlglHeader.}
+           zfar: cdouble) {.cdecl, importc: "rlOrtho", dynlib: dynlibLibraryName.}
 proc viewport*(x: cint; y: cint; width: cint; height: cint) {.cdecl,
-    importc: "rlViewport", header: rlglHeader.}
+    importc: "rlViewport", dynlib: dynlibLibraryName.}
 ##  Set the viewport area
 ## ------------------------------------------------------------------------------------
 ##  Functions Declaration - Vertex level operations
 ## ------------------------------------------------------------------------------------
 
-proc begin*(mode: cint) {.cdecl, importc: "rlBegin", header: rlglHeader.}
+proc begin*(mode: cint) {.cdecl, importc: "rlBegin", dynlib: dynlibLibraryName.}
 ##  Initialize drawing mode (how to organize vertex)
 
-proc `end`*() {.cdecl, importc: "rlEnd", header: rlglHeader.}
+proc `end`*() {.cdecl, importc: "rlEnd", dynlib: dynlibLibraryName.}
 ##  Finish vertex providing
 
-proc vertex2i*(x: cint; y: cint) {.cdecl, importc: "rlVertex2i", header: rlglHeader.}
+proc vertex2i*(x: cint; y: cint) {.cdecl, importc: "rlVertex2i",
+                              dynlib: dynlibLibraryName.}
 ##  Define one vertex (position) - 2 int
 
-proc vertex2f*(x: cfloat; y: cfloat) {.cdecl, importc: "rlVertex2f", header: rlglHeader.}
+proc vertex2f*(x: cfloat; y: cfloat) {.cdecl, importc: "rlVertex2f",
+                                  dynlib: dynlibLibraryName.}
 ##  Define one vertex (position) - 2 float
 
 proc vertex3f*(x: cfloat; y: cfloat; z: cfloat) {.cdecl, importc: "rlVertex3f",
-    header: rlglHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Define one vertex (position) - 3 float
 
 proc texCoord2f*(x: cfloat; y: cfloat) {.cdecl, importc: "rlTexCoord2f",
-                                    header: rlglHeader.}
+                                    dynlib: dynlibLibraryName.}
 ##  Define one vertex (texture coordinate) - 2 float
 
 proc normal3f*(x: cfloat; y: cfloat; z: cfloat) {.cdecl, importc: "rlNormal3f",
-    header: rlglHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Define one vertex (normal) - 3 float
 
 proc color4ub*(r: uint8; g: uint8; b: uint8; a: uint8) {.cdecl, importc: "rlColor4ub",
-    header: rlglHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Define one vertex (color) - 4 byte
 
 proc color3f*(x: cfloat; y: cfloat; z: cfloat) {.cdecl, importc: "rlColor3f",
-    header: rlglHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Define one vertex (color) - 3 float
 
 proc color4f*(x: cfloat; y: cfloat; z: cfloat; w: cfloat) {.cdecl, importc: "rlColor4f",
-    header: rlglHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Define one vertex (color) - 4 float
 ## ------------------------------------------------------------------------------------
 ##  Functions Declaration - OpenGL style functions (common to 1.1, 3.3+, ES2)
@@ -277,403 +286,420 @@ proc color4f*(x: cfloat; y: cfloat; z: cfloat; w: cfloat) {.cdecl, importc: "rlC
 ##  Vertex buffers state
 
 proc enableVertexArray*(vaoId: cuint): bool {.cdecl, importc: "rlEnableVertexArray",
-    header: rlglHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Enable vertex array (VAO, if supported)
 
 proc disableVertexArray*() {.cdecl, importc: "rlDisableVertexArray",
-                           header: rlglHeader.}
+                           dynlib: dynlibLibraryName.}
 ##  Disable vertex array (VAO, if supported)
 
 proc enableVertexBuffer*(id: cuint) {.cdecl, importc: "rlEnableVertexBuffer",
-                                   header: rlglHeader.}
+                                   dynlib: dynlibLibraryName.}
 ##  Enable vertex buffer (VBO)
 
 proc disableVertexBuffer*() {.cdecl, importc: "rlDisableVertexBuffer",
-                            header: rlglHeader.}
+                            dynlib: dynlibLibraryName.}
 ##  Disable vertex buffer (VBO)
 
 proc enableVertexBufferElement*(id: cuint) {.cdecl,
-    importc: "rlEnableVertexBufferElement", header: rlglHeader.}
+    importc: "rlEnableVertexBufferElement", dynlib: dynlibLibraryName.}
 ##  Enable vertex buffer element (VBO element)
 
 proc disableVertexBufferElement*() {.cdecl,
                                    importc: "rlDisableVertexBufferElement",
-                                   header: rlglHeader.}
+                                   dynlib: dynlibLibraryName.}
 ##  Disable vertex buffer element (VBO element)
 
 proc enableVertexAttribute*(index: cuint) {.cdecl,
-    importc: "rlEnableVertexAttribute", header: rlglHeader.}
+    importc: "rlEnableVertexAttribute", dynlib: dynlibLibraryName.}
 ##  Enable vertex attribute index
 
 proc disableVertexAttribute*(index: cuint) {.cdecl,
-    importc: "rlDisableVertexAttribute", header: rlglHeader.}
+    importc: "rlDisableVertexAttribute", dynlib: dynlibLibraryName.}
 ##  Disable vertex attribute index
 ##  Textures state
 
 proc activeTextureSlot*(slot: cint) {.cdecl, importc: "rlActiveTextureSlot",
-                                   header: rlglHeader.}
+                                   dynlib: dynlibLibraryName.}
 ##  Select and active a texture slot
 
-proc enableTexture*(id: cuint) {.cdecl, importc: "rlEnableTexture", header: rlglHeader.}
+proc enableTexture*(id: cuint) {.cdecl, importc: "rlEnableTexture",
+                              dynlib: dynlibLibraryName.}
 ##  Enable texture
 
-proc disableTexture*() {.cdecl, importc: "rlDisableTexture", header: rlglHeader.}
+proc disableTexture*() {.cdecl, importc: "rlDisableTexture",
+                       dynlib: dynlibLibraryName.}
 ##  Disable texture
 
 proc enableTextureCubemap*(id: cuint) {.cdecl, importc: "rlEnableTextureCubemap",
-                                     header: rlglHeader.}
+                                     dynlib: dynlibLibraryName.}
 ##  Enable texture cubemap
 
 proc disableTextureCubemap*() {.cdecl, importc: "rlDisableTextureCubemap",
-                              header: rlglHeader.}
+                              dynlib: dynlibLibraryName.}
 ##  Disable texture cubemap
 
 proc textureParameters*(id: cuint; param: cint; value: cint) {.cdecl,
-    importc: "rlTextureParameters", header: rlglHeader.}
+    importc: "rlTextureParameters", dynlib: dynlibLibraryName.}
 ##  Set texture parameters (filter, wrap)
 ##  Shader state
 
-proc enableShader*(id: cuint) {.cdecl, importc: "rlEnableShader", header: rlglHeader.}
+proc enableShader*(id: cuint) {.cdecl, importc: "rlEnableShader",
+                             dynlib: dynlibLibraryName.}
 ##  Enable shader program
 
-proc disableShader*() {.cdecl, importc: "rlDisableShader", header: rlglHeader.}
+proc disableShader*() {.cdecl, importc: "rlDisableShader", dynlib: dynlibLibraryName.}
 ##  Disable shader program
 ##  Framebuffer state
 
 proc enableFramebuffer*(id: cuint) {.cdecl, importc: "rlEnableFramebuffer",
-                                  header: rlglHeader.}
+                                  dynlib: dynlibLibraryName.}
 ##  Enable render texture (fbo)
 
 proc disableFramebuffer*() {.cdecl, importc: "rlDisableFramebuffer",
-                           header: rlglHeader.}
+                           dynlib: dynlibLibraryName.}
 ##  Disable render texture (fbo), return to default framebuffer
 ##  General render state
 
-proc enableDepthTest*() {.cdecl, importc: "rlEnableDepthTest", header: rlglHeader.}
+proc enableDepthTest*() {.cdecl, importc: "rlEnableDepthTest",
+                        dynlib: dynlibLibraryName.}
 ##  Enable depth test
 
-proc disableDepthTest*() {.cdecl, importc: "rlDisableDepthTest", header: rlglHeader.}
+proc disableDepthTest*() {.cdecl, importc: "rlDisableDepthTest",
+                         dynlib: dynlibLibraryName.}
 ##  Disable depth test
 
-proc enableDepthMask*() {.cdecl, importc: "rlEnableDepthMask", header: rlglHeader.}
+proc enableDepthMask*() {.cdecl, importc: "rlEnableDepthMask",
+                        dynlib: dynlibLibraryName.}
 ##  Enable depth write
 
-proc disableDepthMask*() {.cdecl, importc: "rlDisableDepthMask", header: rlglHeader.}
+proc disableDepthMask*() {.cdecl, importc: "rlDisableDepthMask",
+                         dynlib: dynlibLibraryName.}
 ##  Disable depth write
 
 proc enableBackfaceCulling*() {.cdecl, importc: "rlEnableBackfaceCulling",
-                              header: rlglHeader.}
+                              dynlib: dynlibLibraryName.}
 ##  Enable backface culling
 
 proc disableBackfaceCulling*() {.cdecl, importc: "rlDisableBackfaceCulling",
-                               header: rlglHeader.}
+                               dynlib: dynlibLibraryName.}
 ##  Disable backface culling
 
-proc enableScissorTest*() {.cdecl, importc: "rlEnableScissorTest", header: rlglHeader.}
+proc enableScissorTest*() {.cdecl, importc: "rlEnableScissorTest",
+                          dynlib: dynlibLibraryName.}
 ##  Enable scissor test
 
 proc disableScissorTest*() {.cdecl, importc: "rlDisableScissorTest",
-                           header: rlglHeader.}
+                           dynlib: dynlibLibraryName.}
 ##  Disable scissor test
 
 proc scissor*(x: cint; y: cint; width: cint; height: cint) {.cdecl, importc: "rlScissor",
-    header: rlglHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Scissor test
 
-proc enableWireMode*() {.cdecl, importc: "rlEnableWireMode", header: rlglHeader.}
+proc enableWireMode*() {.cdecl, importc: "rlEnableWireMode",
+                       dynlib: dynlibLibraryName.}
 ##  Enable wire mode
 
-proc disableWireMode*() {.cdecl, importc: "rlDisableWireMode", header: rlglHeader.}
+proc disableWireMode*() {.cdecl, importc: "rlDisableWireMode",
+                        dynlib: dynlibLibraryName.}
 ##  Disable wire mode
 
 proc setLineWidth*(width: cfloat) {.cdecl, importc: "rlSetLineWidth",
-                                 header: rlglHeader.}
+                                 dynlib: dynlibLibraryName.}
 ##  Set the line drawing width
 
-proc getLineWidth*(): cfloat {.cdecl, importc: "rlGetLineWidth", header: rlglHeader.}
+proc getLineWidth*(): cfloat {.cdecl, importc: "rlGetLineWidth",
+                            dynlib: dynlibLibraryName.}
 ##  Get the line drawing width
 
-proc enableSmoothLines*() {.cdecl, importc: "rlEnableSmoothLines", header: rlglHeader.}
+proc enableSmoothLines*() {.cdecl, importc: "rlEnableSmoothLines",
+                          dynlib: dynlibLibraryName.}
 ##  Enable line aliasing
 
 proc disableSmoothLines*() {.cdecl, importc: "rlDisableSmoothLines",
-                           header: rlglHeader.}
+                           dynlib: dynlibLibraryName.}
 ##  Disable line aliasing
 
 proc enableStereoRender*() {.cdecl, importc: "rlEnableStereoRender",
-                           header: rlglHeader.}
+                           dynlib: dynlibLibraryName.}
 ##  Enable stereo rendering
 
 proc disableStereoRender*() {.cdecl, importc: "rlDisableStereoRender",
-                            header: rlglHeader.}
+                            dynlib: dynlibLibraryName.}
 ##  Disable stereo rendering
 
 proc isStereoRenderEnabled*(): bool {.cdecl, importc: "rlIsStereoRenderEnabled",
-                                   header: rlglHeader.}
+                                   dynlib: dynlibLibraryName.}
 ##  Check if stereo render is enabled
 
 proc clearColor*(r: uint8; g: uint8; b: uint8; a: uint8) {.cdecl,
-    importc: "rlClearColor", header: rlglHeader.}
+    importc: "rlClearColor", dynlib: dynlibLibraryName.}
 ##  Clear color buffer with color
 
 proc clearScreenBuffers*() {.cdecl, importc: "rlClearScreenBuffers",
-                           header: rlglHeader.}
+                           dynlib: dynlibLibraryName.}
 ##  Clear used screen buffers (color and depth)
 
-proc checkErrors*() {.cdecl, importc: "rlCheckErrors", header: rlglHeader.}
+proc checkErrors*() {.cdecl, importc: "rlCheckErrors", dynlib: dynlibLibraryName.}
 ##  Check and log OpenGL error codes
 
-proc setBlendMode*(mode: cint) {.cdecl, importc: "rlSetBlendMode", header: rlglHeader.}
+proc setBlendMode*(mode: cint) {.cdecl, importc: "rlSetBlendMode",
+                              dynlib: dynlibLibraryName.}
 ##  Set blending mode
 
 proc setBlendFactors*(glSrcFactor: cint; glDstFactor: cint; glEquation: cint) {.cdecl,
-    importc: "rlSetBlendFactors", header: rlglHeader.}
+    importc: "rlSetBlendFactors", dynlib: dynlibLibraryName.}
 ##  Set blending mode factor and equation (using OpenGL factors)
 ## ------------------------------------------------------------------------------------
 ##  Functions Declaration - rlgl functionality
 ## ------------------------------------------------------------------------------------
 ##  rlgl initialization functions
 
-proc init*(width: cint; height: cint) {.cdecl, importc: "rlglInit", header: rlglHeader.}
+proc init*(width: cint; height: cint) {.cdecl, importc: "rlglInit",
+                                   dynlib: dynlibLibraryName.}
 ##  Initialize rlgl (buffers, shaders, textures, states)
 
-proc close*() {.cdecl, importc: "rlglClose", header: rlglHeader.}
+proc close*() {.cdecl, importc: "rlglClose", dynlib: dynlibLibraryName.}
 ##  De-inititialize rlgl (buffers, shaders, textures)
 
 proc loadExtensions*(loader: pointer) {.cdecl, importc: "rlLoadExtensions",
-                                     header: rlglHeader.}
+                                     dynlib: dynlibLibraryName.}
 ##  Load OpenGL extensions (loader function required)
 
-proc getVersion*(): cint {.cdecl, importc: "rlGetVersion", header: rlglHeader.}
+proc getVersion*(): cint {.cdecl, importc: "rlGetVersion", dynlib: dynlibLibraryName.}
 ##  Returns current OpenGL version
 
 proc getFramebufferWidth*(): cint {.cdecl, importc: "rlGetFramebufferWidth",
-                                 header: rlglHeader.}
+                                 dynlib: dynlibLibraryName.}
 ##  Get default framebuffer width
 
 proc getFramebufferHeight*(): cint {.cdecl, importc: "rlGetFramebufferHeight",
-                                  header: rlglHeader.}
+                                  dynlib: dynlibLibraryName.}
 ##  Get default framebuffer height
 
 proc getShaderDefault*(): Shader {.cdecl, importc: "rlGetShaderDefault",
-                                header: rlglHeader.}
+                                dynlib: dynlibLibraryName.}
 ##  Get default shader
 
 proc getTextureDefault*(): Texture2D {.cdecl, importc: "rlGetTextureDefault",
-                                    header: rlglHeader.}
+                                    dynlib: dynlibLibraryName.}
 ##  Get default texture
 ##  Render batch management
 ##  NOTE: rlgl provides a default render batch to behave like OpenGL 1.1 immediate mode
 ##  but this render batch API is exposed in case of custom batches are required
 
 proc loadRenderBatch*(numBuffers: cint; bufferElements: cint): RenderBatch {.cdecl,
-    importc: "rlLoadRenderBatch", header: rlglHeader.}
+    importc: "rlLoadRenderBatch", dynlib: dynlibLibraryName.}
 ##  Load a render batch system
 
 proc unloadRenderBatch*(batch: RenderBatch) {.cdecl, importc: "rlUnloadRenderBatch",
-    header: rlglHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Unload render batch system
 
 proc drawRenderBatch*(batch: ptr RenderBatch) {.cdecl, importc: "rlDrawRenderBatch",
-    header: rlglHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Draw render batch data (Update->Draw->Reset)
 
 proc setRenderBatchActive*(batch: ptr RenderBatch) {.cdecl,
-    importc: "rlSetRenderBatchActive", header: rlglHeader.}
+    importc: "rlSetRenderBatchActive", dynlib: dynlibLibraryName.}
 ##  Set the active render batch for rlgl (NULL for default internal)
 
 proc drawRenderBatchActive*() {.cdecl, importc: "rlDrawRenderBatchActive",
-                              header: rlglHeader.}
+                              dynlib: dynlibLibraryName.}
 ##  Update and draw internal render batch
 
 proc checkRenderBatchLimit*(vCount: cint): bool {.cdecl,
-    importc: "rlCheckRenderBatchLimit", header: rlglHeader.}
+    importc: "rlCheckRenderBatchLimit", dynlib: dynlibLibraryName.}
 ##  Check internal buffer overflow for a given number of vertex
 
-proc setTexture*(id: cuint) {.cdecl, importc: "rlSetTexture", header: rlglHeader.}
+proc setTexture*(id: cuint) {.cdecl, importc: "rlSetTexture",
+                           dynlib: dynlibLibraryName.}
 ##  Set current texture for render batch and check buffers limits
 ## ------------------------------------------------------------------------------------------------------------------------
 ##  Vertex buffers management
 
 proc loadVertexArray*(): cuint {.cdecl, importc: "rlLoadVertexArray",
-                              header: rlglHeader.}
+                              dynlib: dynlibLibraryName.}
 ##  Load vertex array (vao) if supported
 
 proc loadVertexBuffer*(buffer: pointer; size: cint; dynamic: bool): cuint {.cdecl,
-    importc: "rlLoadVertexBuffer", header: rlglHeader.}
+    importc: "rlLoadVertexBuffer", dynlib: dynlibLibraryName.}
 ##  Load a vertex buffer attribute
 
 proc loadVertexBufferElement*(buffer: pointer; size: cint; dynamic: bool): cuint {.
-    cdecl, importc: "rlLoadVertexBufferElement", header: rlglHeader.}
+    cdecl, importc: "rlLoadVertexBufferElement", dynlib: dynlibLibraryName.}
 ##  Load a new attributes element buffer
 
 proc updateVertexBuffer*(bufferId: cint; data: pointer; dataSize: cint; offset: cint) {.
-    cdecl, importc: "rlUpdateVertexBuffer", header: rlglHeader.}
+    cdecl, importc: "rlUpdateVertexBuffer", dynlib: dynlibLibraryName.}
 ##  Update GPU buffer with new data
 
 proc unloadVertexArray*(vaoId: cuint) {.cdecl, importc: "rlUnloadVertexArray",
-                                     header: rlglHeader.}
+                                     dynlib: dynlibLibraryName.}
 proc unloadVertexBuffer*(vboId: cuint) {.cdecl, importc: "rlUnloadVertexBuffer",
-                                      header: rlglHeader.}
+                                      dynlib: dynlibLibraryName.}
 proc setVertexAttribute*(index: cuint; compSize: cint; `type`: cint; normalized: bool;
                         stride: cint; pointer: pointer) {.cdecl,
-    importc: "rlSetVertexAttribute", header: rlglHeader.}
+    importc: "rlSetVertexAttribute", dynlib: dynlibLibraryName.}
 proc setVertexAttributeDivisor*(index: cuint; divisor: cint) {.cdecl,
-    importc: "rlSetVertexAttributeDivisor", header: rlglHeader.}
+    importc: "rlSetVertexAttributeDivisor", dynlib: dynlibLibraryName.}
 proc setVertexAttributeDefault*(locIndex: cint; value: pointer; attribType: cint;
                                count: cint) {.cdecl,
-    importc: "rlSetVertexAttributeDefault", header: rlglHeader.}
+    importc: "rlSetVertexAttributeDefault", dynlib: dynlibLibraryName.}
 ##  Set vertex attribute default value
 
 proc drawVertexArray*(offset: cint; count: cint) {.cdecl,
-    importc: "rlDrawVertexArray", header: rlglHeader.}
+    importc: "rlDrawVertexArray", dynlib: dynlibLibraryName.}
 proc drawVertexArrayElements*(offset: cint; count: cint; buffer: pointer) {.cdecl,
-    importc: "rlDrawVertexArrayElements", header: rlglHeader.}
+    importc: "rlDrawVertexArrayElements", dynlib: dynlibLibraryName.}
 proc drawVertexArrayInstanced*(offset: cint; count: cint; instances: cint) {.cdecl,
-    importc: "rlDrawVertexArrayInstanced", header: rlglHeader.}
+    importc: "rlDrawVertexArrayInstanced", dynlib: dynlibLibraryName.}
 proc drawVertexArrayElementsInstanced*(offset: cint; count: cint; buffer: pointer;
                                       instances: cint) {.cdecl,
-    importc: "rlDrawVertexArrayElementsInstanced", header: rlglHeader.}
+    importc: "rlDrawVertexArrayElementsInstanced", dynlib: dynlibLibraryName.}
 ##  Textures management
 
 proc loadTexture*(data: pointer; width: cint; height: cint; format: cint;
                  mipmapCount: cint): cuint {.cdecl, importc: "rlLoadTexture",
-    header: rlglHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Load texture in GPU
 
 proc loadTextureDepth*(width: cint; height: cint; useRenderBuffer: bool): cuint {.cdecl,
-    importc: "rlLoadTextureDepth", header: rlglHeader.}
+    importc: "rlLoadTextureDepth", dynlib: dynlibLibraryName.}
 ##  Load depth texture/renderbuffer (to be attached to fbo)
 
 proc loadTextureCubemap*(data: pointer; size: cint; format: cint): cuint {.cdecl,
-    importc: "rlLoadTextureCubemap", header: rlglHeader.}
+    importc: "rlLoadTextureCubemap", dynlib: dynlibLibraryName.}
 ##  Load texture cubemap
 
 proc updateTexture*(id: cuint; offsetX: cint; offsetY: cint; width: cint; height: cint;
                    format: cint; data: pointer) {.cdecl, importc: "rlUpdateTexture",
-    header: rlglHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Update GPU texture with new data
 
 proc getGlTextureFormats*(format: cint; glInternalFormat: ptr cuint;
                          glFormat: ptr cuint; glType: ptr cuint) {.cdecl,
-    importc: "rlGetGlTextureFormats", header: rlglHeader.}
+    importc: "rlGetGlTextureFormats", dynlib: dynlibLibraryName.}
 ##  Get OpenGL internal formats
 
-proc unloadTexture*(id: cuint) {.cdecl, importc: "rlUnloadTexture", header: rlglHeader.}
+proc unloadTexture*(id: cuint) {.cdecl, importc: "rlUnloadTexture",
+                              dynlib: dynlibLibraryName.}
 ##  Unload texture from GPU memory
 
 proc generateMipmaps*(texture: ptr Texture2D) {.cdecl, importc: "rlGenerateMipmaps",
-    header: rlglHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Generate mipmap data for selected texture
 
 proc readTexturePixels*(texture: Texture2D): pointer {.cdecl,
-    importc: "rlReadTexturePixels", header: rlglHeader.}
+    importc: "rlReadTexturePixels", dynlib: dynlibLibraryName.}
 ##  Read texture pixel data
 
 proc readScreenPixels*(width: cint; height: cint): ptr uint8 {.cdecl,
-    importc: "rlReadScreenPixels", header: rlglHeader.}
+    importc: "rlReadScreenPixels", dynlib: dynlibLibraryName.}
 ##  Read screen pixel data (color buffer)
 ##  Framebuffer management (fbo)
 
 proc loadFramebuffer*(width: cint; height: cint): cuint {.cdecl,
-    importc: "rlLoadFramebuffer", header: rlglHeader.}
+    importc: "rlLoadFramebuffer", dynlib: dynlibLibraryName.}
 ##  Load an empty framebuffer
 
 proc framebufferAttach*(fboId: cuint; texId: cuint; attachType: cint; texType: cint;
                        mipLevel: cint) {.cdecl, importc: "rlFramebufferAttach",
-                                       header: rlglHeader.}
+                                       dynlib: dynlibLibraryName.}
 ##  Attach texture/renderbuffer to a framebuffer
 
 proc framebufferComplete*(id: cuint): bool {.cdecl, importc: "rlFramebufferComplete",
-    header: rlglHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Verify framebuffer is complete
 
 proc unloadFramebuffer*(id: cuint) {.cdecl, importc: "rlUnloadFramebuffer",
-                                  header: rlglHeader.}
+                                  dynlib: dynlibLibraryName.}
 ##  Delete framebuffer from GPU
 ##  Shaders management
 
 proc loadShaderCode*(vsCode: cstring; fsCode: cstring): cuint {.cdecl,
-    importc: "rlLoadShaderCode", header: rlglHeader.}
+    importc: "rlLoadShaderCode", dynlib: dynlibLibraryName.}
 ##  Load shader from code strings
 
 proc compileShader*(shaderCode: cstring; `type`: cint): cuint {.cdecl,
-    importc: "rlCompileShader", header: rlglHeader.}
+    importc: "rlCompileShader", dynlib: dynlibLibraryName.}
 ##  Compile custom shader and return shader id (type: GL_VERTEX_SHADER, GL_FRAGMENT_SHADER)
 
 proc loadShaderProgram*(vShaderId: cuint; fShaderId: cuint): cuint {.cdecl,
-    importc: "rlLoadShaderProgram", header: rlglHeader.}
+    importc: "rlLoadShaderProgram", dynlib: dynlibLibraryName.}
 ##  Load custom shader program
 
 proc unloadShaderProgram*(id: cuint) {.cdecl, importc: "rlUnloadShaderProgram",
-                                    header: rlglHeader.}
+                                    dynlib: dynlibLibraryName.}
 ##  Unload shader program
 
 proc getLocationUniform*(shaderId: cuint; uniformName: cstring): cint {.cdecl,
-    importc: "rlGetLocationUniform", header: rlglHeader.}
+    importc: "rlGetLocationUniform", dynlib: dynlibLibraryName.}
 ##  Get shader location uniform
 
 proc getLocationAttrib*(shaderId: cuint; attribName: cstring): cint {.cdecl,
-    importc: "rlGetLocationAttrib", header: rlglHeader.}
+    importc: "rlGetLocationAttrib", dynlib: dynlibLibraryName.}
 ##  Get shader location attribute
 
 proc setUniform*(locIndex: cint; value: pointer; uniformType: cint; count: cint) {.cdecl,
-    importc: "rlSetUniform", header: rlglHeader.}
+    importc: "rlSetUniform", dynlib: dynlibLibraryName.}
 ##  Set shader value uniform
 
 proc setUniformMatrix*(locIndex: cint; mat: Matrix) {.cdecl,
-    importc: "rlSetUniformMatrix", header: rlglHeader.}
+    importc: "rlSetUniformMatrix", dynlib: dynlibLibraryName.}
 ##  Set shader value matrix
 
 proc setUniformSampler*(locIndex: cint; textureId: cuint) {.cdecl,
-    importc: "rlSetUniformSampler", header: rlglHeader.}
+    importc: "rlSetUniformSampler", dynlib: dynlibLibraryName.}
 ##  Set shader value sampler
 
-proc setShader*(shader: Shader) {.cdecl, importc: "rlSetShader", header: rlglHeader.}
+proc setShader*(shader: Shader) {.cdecl, importc: "rlSetShader",
+                               dynlib: dynlibLibraryName.}
 ##  Set shader currently active
 ##  Matrix state management
 
 proc getMatrixModelview*(): Matrix {.cdecl, importc: "rlGetMatrixModelview",
-                                  header: rlglHeader.}
+                                  dynlib: dynlibLibraryName.}
 ##  Get internal modelview matrix
 
 proc getMatrixProjection*(): Matrix {.cdecl, importc: "rlGetMatrixProjection",
-                                   header: rlglHeader.}
+                                   dynlib: dynlibLibraryName.}
 ##  Get internal projection matrix
 
 proc getMatrixTransform*(): Matrix {.cdecl, importc: "rlGetMatrixTransform",
-                                  header: rlglHeader.}
+                                  dynlib: dynlibLibraryName.}
 ##  Get internal accumulated transform matrix
 
 proc getMatrixProjectionStereo*(eye: cint): Matrix {.cdecl,
-    importc: "rlGetMatrixProjectionStereo", header: rlglHeader.}
+    importc: "rlGetMatrixProjectionStereo", dynlib: dynlibLibraryName.}
 ##  Get internal projection matrix for stereo render (selected eye)
 
 proc getMatrixViewOffsetStereo*(eye: cint): Matrix {.cdecl,
-    importc: "rlGetMatrixViewOffsetStereo", header: rlglHeader.}
+    importc: "rlGetMatrixViewOffsetStereo", dynlib: dynlibLibraryName.}
 ##  Get internal view offset matrix for stereo render (selected eye)
 
 proc setMatrixProjection*(proj: Matrix) {.cdecl, importc: "rlSetMatrixProjection",
-                                       header: rlglHeader.}
+                                       dynlib: dynlibLibraryName.}
 ##  Set a custom projection matrix (replaces internal projection matrix)
 
 proc setMatrixModelview*(view: Matrix) {.cdecl, importc: "rlSetMatrixModelview",
-                                      header: rlglHeader.}
+                                      dynlib: dynlibLibraryName.}
 ##  Set a custom modelview matrix (replaces internal modelview matrix)
 
 proc setMatrixProjectionStereo*(right: Matrix; left: Matrix) {.cdecl,
-    importc: "rlSetMatrixProjectionStereo", header: rlglHeader.}
+    importc: "rlSetMatrixProjectionStereo", dynlib: dynlibLibraryName.}
 ##  Set eyes projection matrices for stereo rendering
 
 proc setMatrixViewOffsetStereo*(right: Matrix; left: Matrix) {.cdecl,
-    importc: "rlSetMatrixViewOffsetStereo", header: rlglHeader.}
+    importc: "rlSetMatrixViewOffsetStereo", dynlib: dynlibLibraryName.}
 ##  Set eyes view offsets matrices for stereo rendering
 ##  Quick and dirty cube/quad buffers load->draw->unload
 
-proc loadDrawCube*() {.cdecl, importc: "rlLoadDrawCube", header: rlglHeader.}
+proc loadDrawCube*() {.cdecl, importc: "rlLoadDrawCube", dynlib: dynlibLibraryName.}
 ##  Load and draw a cube
 
-proc loadDrawQuad*() {.cdecl, importc: "rlLoadDrawQuad", header: rlglHeader.}
+proc loadDrawQuad*() {.cdecl, importc: "rlLoadDrawQuad", dynlib: dynlibLibraryName.}
 ##  Load and draw a quad
 
 template begin*(mode: cint; body: untyped) =

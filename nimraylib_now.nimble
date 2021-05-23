@@ -39,10 +39,10 @@ task convert, "run with c2nim":
   echo "Running converter\n"
   exec "nim r --gc:orc " & convert_c_to_nimFile
 
-  echo "Running prepare build files -d:nimraylib_now_mangle\n"
-  exec "nim r --gc:orc -d:nimraylib_now_mangle " & prepare_build_filesFile
-  echo "Running converter -d:nimraylib_now_mangle\n"
-  exec "nim r --gc:orc -d:nimraylib_now_mangle " & convert_c_to_nimFile
+  echo "Running prepare build files -d:nimraylib_now_build_static\n"
+  exec "nim r --gc:orc -d:nimraylib_now_build_static " & prepare_build_filesFile
+  echo "Running converter -d:nimraylib_now_build_static\n"
+  exec "nim r --gc:orc -d:nimraylib_now_build_static " & convert_c_to_nimFile
 
   echo "\nExecuting nim check\n"
   exec "nim check " & nimraylibNowDir/"mangled"/"raylib.nim"

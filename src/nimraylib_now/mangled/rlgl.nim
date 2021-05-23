@@ -1,7 +1,7 @@
 import raylib
-
 from os import parentDir, `/`
 const rlglHeader = currentSourcePath().parentDir()/"rlgl.h"
+
 ## *********************************************************************************************
 ##
 ##    rlgl v3.7 - raylib OpenGL abstraction layer

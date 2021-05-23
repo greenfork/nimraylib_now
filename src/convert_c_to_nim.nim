@@ -74,9 +74,80 @@ const
 #  skipinclude
 """
 
-  raylibHeader = c2nimHeaderPreamble & """
+  dynlibLibraryName = """
+const dynlibLibraryName =
+  when defined(windows):
+    "raylib.dll"
+  elif defined(macosx):
+    "libraylib.dylib"
+  else:
+    "libraylib.so"
+"""
+
+  raylibEssentialDeclarations = """
+# Functions on C varargs
+# Used only for TraceLogCallback type, see core_custom_logging example
+type va_list* {.importc: "va_list", header: "<stdarg.h>".} = object
+proc vprintf*(format: cstring, args: va_list) {.cdecl, importc: "vprintf", header: "<stdio.h>"}
+"""
+
+when defined(nimraylib_now_build_static):
+  const
+    raylibc2nim  = "#  header raylibHeader"
+    rlglc2nim    = "#  header rlglHeader"
+    raymathc2nim = "#  header raymathHeader"
+    rayguic2nim  = "#  header rayguiHeader"
+    physacc2nim  = "#  header physacHeader"
+
+    raylibLinking = """
+from os import parentDir, `/`
+const raylibHeader = currentSourcePath().parentDir()/"raylib.h"
+
+include ../raylib_build_static
+
+when defined(emscripten):
+  type emCallbackFunc* = proc() {.cdecl.}
+  proc emscriptenSetMainLoop*(f: emCallbackFunc, fps: cint, simulateInfiniteLoop: cint) {.
+    cdecl, importc: "emscripten_set_main_loop", header: "<emscripten.h>".}
+"""
+    rlglLinking = """
+from os import parentDir, `/`
+const rlglHeader = currentSourcePath().parentDir()/"rlgl.h"
+"""
+    raymathLinking = """
+from os import parentDir, `/`
+const raymathHeader = currentSourcePath().parentDir()/"raymath.h"
+"""
+    rayguiLinking = """
+from os import parentDir, `/`
+const rayguiHeader = currentSourcePath().parentDir()/"raygui.h"
+{.passC: "-DRAYGUI_IMPLEMENTATION".}
+"""
+    physacLinking = """
+from os import parentDir, `/`
+const physacHeader = currentSourcePath().parentDir()/"physac.h"
+{.passC: "-DPHYSAC_IMPLEMENTATION".}
+{.passC: "-DPHYSAC_NO_THREADS".}
+"""
+else:
+  const
+    raylibc2nim  = "#  dynlib dynlibLibraryName"
+    rlglc2nim    = "#  dynlib dynlibLibraryName"
+    raymathc2nim = "#  dynlib dynlibLibraryName"
+    rayguic2nim  = "#  dynlib dynlibLibraryName"
+    physacc2nim  = "#  dynlib dynlibLibraryName"
+
+    raylibLinking  = dynlibLibraryName
+    rlglLinking    = dynlibLibraryName
+    raymathLinking = dynlibLibraryName
+    rayguiLinking  = dynlibLibraryName
+    physacLinking  = dynlibLibraryName
+
+const
+  raylibHeader = fmt"""
+{c2nimHeaderPreamble}
+{raylibc2nim}
 #  def RLAPI
-#  header raylibHeader
 #  prefix FLAG_
 #  prefix LOG_
 #  prefix KEY_
@@ -98,44 +169,15 @@ const
 #  prefix CUBEMAP_LAYOUT_
 #  mangle va_list va_list
 #@
-# Functions on C varargs
-# Used only for TraceLogCallback type, see core_custom_logging example
-type va_list* {.importc: "va_list", header: "<stdarg.h>".} = object
-proc vprintf*(format: cstring, args: va_list) {.cdecl, importc: "vprintf", header: "<stdio.h>"}
-
-from os import parentDir, `/`
-const raylibHeader = currentSourcePath().parentDir()/"raylib.h"
-
-when defined(emscripten):
-  type emCallbackFunc* = proc() {.cdecl.}
-  proc emscriptenSetMainLoop*(f: emCallbackFunc, fps: cint, simulateInfiniteLoop: cint) {.
-    cdecl, importc: "emscripten_set_main_loop", header: "<emscripten.h>".}
-
-when not defined(nimraylib_now_linkingOverride):
-  when defined(nimraylib_now_shared) and not defined(emscripten):
-    when defined(windows):
-      when defined(vcc):
-        {.passL: "raylibdll.lib".}
-      else:
-        {.passL: "libraylibdll.a".}
-    elif defined(macosx):
-      {.passL: "-framework CoreVideo".}
-      {.passL: "-framework IOKit".}
-      {.passL: "-framework Cocoa".}
-      {.passL: "-framework GLUT".}
-      {.passL: "-framework OpenGL".}
-      {.passL: "-lraylib".}
-    else:
-      {.passL: "-lraylib".}
-  else:
-    include ../raylib_build_static
-
+{raylibEssentialDeclarations}
+{raylibLinking}
 @#
 #endif
 """
-  rlglHeader = c2nimHeaderPreamble & """
+  rlglHeader = fmt"""
+{c2nimHeaderPreamble}
+{rlglc2nim}
 #  def RLAPI
-#  header rlglHeader
 #  prefix rlgl
 #  prefix rl
 #  prefix RL_
@@ -145,52 +187,44 @@ when not defined(nimraylib_now_linkingOverride):
 #  prefix SHADER_UNIFORM_
 #@
 import raylib
-
-from os import parentDir, `/`
-const rlglHeader = currentSourcePath().parentDir()/"rlgl.h"
+{rlglLinking}
 @#
 #endif
 """
-  raymathHeader = c2nimHeaderPreamble & """
+  raymathHeader = fmt"""
+{c2nimHeaderPreamble}
+{raymathc2nim}
 #  def RMDEF static inline
-#  header raymathHeader
 #  mangle float3 Float3
 #  mangle float16 Float16
 #@
 import raylib
-
-from os import parentDir, `/`
-const raymathHeader = currentSourcePath().parentDir()/"raymath.h"
+{raymathLinking}
 @#
 #endif
 """
-  rayguiHeader = c2nimHeaderPreamble & """
+  rayguiHeader = fmt"""
+{c2nimHeaderPreamble}
+{rayguic2nim}
 #  def RAYGUIDEF
-#  header rayguiHeader
 #  prefix Gui
 #  prefix GUI_
 #  prefix gui
 #@
 import raylib
-
-from os import parentDir, `/`
-const rayguiHeader = currentSourcePath().parentDir()/"raygui.h"
-{.passC: "-DRAYGUI_IMPLEMENTATION".}
+{rayguiLinking}
 @#
 #endif
 """
-  physacHeader = c2nimHeaderPreamble & """
+  physacHeader = fmt"""
+{c2nimHeaderPreamble}
+{physacc2nim}
 #  def PHYSACDEF
-#  header physacHeader
 #  prefix PHYSICS_
 #  prefix PHYSAC_
 #@
 import raylib
-
-from os import parentDir, `/`
-const physacHeader = currentSourcePath().parentDir()/"physac.h"
-{.passC: "-DPHYSAC_IMPLEMENTATION".}
-{.passC: "-DPHYSAC_NO_THREADS".}
+{physacLinking}
 @#
 #endif
 """

@@ -6,29 +6,12 @@ proc vprintf*(format: cstring, args: va_list) {.cdecl, importc: "vprintf", heade
 from os import parentDir, `/`
 const raylibHeader = currentSourcePath().parentDir()/"raylib.h"
 
+include ../raylib_build_static
+
 when defined(emscripten):
   type emCallbackFunc* = proc() {.cdecl.}
   proc emscriptenSetMainLoop*(f: emCallbackFunc, fps: cint, simulateInfiniteLoop: cint) {.
     cdecl, importc: "emscripten_set_main_loop", header: "<emscripten.h>".}
-
-when not defined(nimraylib_now_linkingOverride):
-  when defined(nimraylib_now_shared) and not defined(emscripten):
-    when defined(windows):
-      when defined(vcc):
-        {.passL: "raylibdll.lib".}
-      else:
-        {.passL: "libraylibdll.a".}
-    elif defined(macosx):
-      {.passL: "-framework CoreVideo".}
-      {.passL: "-framework IOKit".}
-      {.passL: "-framework Cocoa".}
-      {.passL: "-framework GLUT".}
-      {.passL: "-framework OpenGL".}
-      {.passL: "-lraylib".}
-    else:
-      {.passL: "-lraylib".}
-  else:
-    include ../raylib_build_static
 
 ## *********************************************************************************************
 ##

@@ -1,9 +1,13 @@
+ {.deadCodeElim: on.}
 import raylib
+const dynlibLibraryName =
+  when defined(windows):
+    "raylib.dll"
+  elif defined(macosx):
+    "libraylib.dylib"
+  else:
+    "libraylib.so"
 
-from os import parentDir, `/`
-const physacHeader = currentSourcePath().parentDir()/"physac.h"
-{.passC: "-DPHYSAC_IMPLEMENTATION".}
-{.passC: "-DPHYSAC_NO_THREADS".}
 ## *********************************************************************************************
 ##
 ##    Physac v1.1 - 2D Physics library for videogames
@@ -108,57 +112,57 @@ type
 ##  Matrix2x2 type (used for polygon shape rotation matrix)
 
 type
-  Matrix2x2* {.importc: "Matrix2x2", header: physacHeader, bycopy.} = object
-    m00* {.importc: "m00".}: cfloat
-    m01* {.importc: "m01".}: cfloat
-    m10* {.importc: "m10".}: cfloat
-    m11* {.importc: "m11".}: cfloat
+  Matrix2x2* {.bycopy.} = object
+    m00*: cfloat
+    m01*: cfloat
+    m10*: cfloat
+    m11*: cfloat
 
-  PhysicsVertexData* {.importc: "PhysicsVertexData", header: physacHeader, bycopy.} = object
-    vertexCount* {.importc: "vertexCount".}: cuint ##  Vertex count (positions and normals)
-    positions* {.importc: "positions".}: array[MAX_VERTICES, Vector2] ##  Vertex positions vectors
-    normals* {.importc: "normals".}: array[MAX_VERTICES, Vector2] ##  Vertex normals vectors
+  PhysicsVertexData* {.bycopy.} = object
+    vertexCount*: cuint        ##  Vertex count (positions and normals)
+    positions*: array[MAX_VERTICES, Vector2] ##  Vertex positions vectors
+    normals*: array[MAX_VERTICES, Vector2] ##  Vertex normals vectors
 
-  PhysicsShape* {.importc: "PhysicsShape", header: physacHeader, bycopy.} = object
-    `type`* {.importc: "type".}: PhysicsShapeType ##  Shape type (circle or polygon)
-    body* {.importc: "body".}: PhysicsBody ##  Shape physics body data pointer
-    vertexData* {.importc: "vertexData".}: PhysicsVertexData ##  Shape vertices data (used for polygon shapes)
-    radius* {.importc: "radius".}: cfloat ##  Shape radius (used for circle shapes)
-    transform* {.importc: "transform".}: Matrix2x2 ##  Vertices transform matrix 2x2
+  PhysicsShape* {.bycopy.} = object
+    `type`*: PhysicsShapeType  ##  Shape type (circle or polygon)
+    body*: PhysicsBody         ##  Shape physics body data pointer
+    vertexData*: PhysicsVertexData ##  Shape vertices data (used for polygon shapes)
+    radius*: cfloat            ##  Shape radius (used for circle shapes)
+    transform*: Matrix2x2      ##  Vertices transform matrix 2x2
 
-  PhysicsBodyData* {.importc: "PhysicsBodyData", header: physacHeader, bycopy.} = object
-    id* {.importc: "id".}: cuint ##  Unique identifier
-    enabled* {.importc: "enabled".}: bool ##  Enabled dynamics state (collisions are calculated anyway)
-    position* {.importc: "position".}: Vector2 ##  Physics body shape pivot
-    velocity* {.importc: "velocity".}: Vector2 ##  Current linear velocity applied to position
-    force* {.importc: "force".}: Vector2 ##  Current linear force (reset to 0 every step)
-    angularVelocity* {.importc: "angularVelocity".}: cfloat ##  Current angular velocity applied to orient
-    torque* {.importc: "torque".}: cfloat ##  Current angular force (reset to 0 every step)
-    orient* {.importc: "orient".}: cfloat ##  Rotation in radians
-    inertia* {.importc: "inertia".}: cfloat ##  Moment of inertia
-    inverseInertia* {.importc: "inverseInertia".}: cfloat ##  Inverse value of inertia
-    mass* {.importc: "mass".}: cfloat ##  Physics body mass
-    inverseMass* {.importc: "inverseMass".}: cfloat ##  Inverse value of mass
-    staticFriction* {.importc: "staticFriction".}: cfloat ##  Friction when the body has not movement (0 to 1)
-    dynamicFriction* {.importc: "dynamicFriction".}: cfloat ##  Friction when the body has movement (0 to 1)
-    restitution* {.importc: "restitution".}: cfloat ##  Restitution coefficient of the body (0 to 1)
-    useGravity* {.importc: "useGravity".}: bool ##  Apply gravity force to dynamics
-    isGrounded* {.importc: "isGrounded".}: bool ##  Physics grounded on other body state
-    freezeOrient* {.importc: "freezeOrient".}: bool ##  Physics rotation constraint
-    shape* {.importc: "shape".}: PhysicsShape ##  Physics body shape information (type, radius, vertices, transform)
+  PhysicsBodyData* {.bycopy.} = object
+    id*: cuint                 ##  Unique identifier
+    enabled*: bool             ##  Enabled dynamics state (collisions are calculated anyway)
+    position*: Vector2         ##  Physics body shape pivot
+    velocity*: Vector2         ##  Current linear velocity applied to position
+    force*: Vector2            ##  Current linear force (reset to 0 every step)
+    angularVelocity*: cfloat   ##  Current angular velocity applied to orient
+    torque*: cfloat            ##  Current angular force (reset to 0 every step)
+    orient*: cfloat            ##  Rotation in radians
+    inertia*: cfloat           ##  Moment of inertia
+    inverseInertia*: cfloat    ##  Inverse value of inertia
+    mass*: cfloat              ##  Physics body mass
+    inverseMass*: cfloat       ##  Inverse value of mass
+    staticFriction*: cfloat    ##  Friction when the body has not movement (0 to 1)
+    dynamicFriction*: cfloat   ##  Friction when the body has movement (0 to 1)
+    restitution*: cfloat       ##  Restitution coefficient of the body (0 to 1)
+    useGravity*: bool          ##  Apply gravity force to dynamics
+    isGrounded*: bool          ##  Physics grounded on other body state
+    freezeOrient*: bool        ##  Physics rotation constraint
+    shape*: PhysicsShape       ##  Physics body shape information (type, radius, vertices, transform)
 
   PhysicsBody* = ptr PhysicsBodyData
-  PhysicsManifoldData* {.importc: "PhysicsManifoldData", header: physacHeader, bycopy.} = object
-    id* {.importc: "id".}: cuint ##  Unique identifier
-    bodyA* {.importc: "bodyA".}: PhysicsBody ##  Manifold first physics body reference
-    bodyB* {.importc: "bodyB".}: PhysicsBody ##  Manifold second physics body reference
-    penetration* {.importc: "penetration".}: cfloat ##  Depth of penetration from collision
-    normal* {.importc: "normal".}: Vector2 ##  Normal direction vector from 'a' to 'b'
-    contacts* {.importc: "contacts".}: array[2, Vector2] ##  Points of contact during collision
-    contactsCount* {.importc: "contactsCount".}: cuint ##  Current collision number of contacts
-    restitution* {.importc: "restitution".}: cfloat ##  Mixed restitution during collision
-    dynamicFriction* {.importc: "dynamicFriction".}: cfloat ##  Mixed dynamic friction during collision
-    staticFriction* {.importc: "staticFriction".}: cfloat ##  Mixed static friction during collision
+  PhysicsManifoldData* {.bycopy.} = object
+    id*: cuint                 ##  Unique identifier
+    bodyA*: PhysicsBody        ##  Manifold first physics body reference
+    bodyB*: PhysicsBody        ##  Manifold second physics body reference
+    penetration*: cfloat       ##  Depth of penetration from collision
+    normal*: Vector2           ##  Normal direction vector from 'a' to 'b'
+    contacts*: array[2, Vector2] ##  Points of contact during collision
+    contactsCount*: cuint      ##  Current collision number of contacts
+    restitution*: cfloat       ##  Mixed restitution during collision
+    dynamicFriction*: cfloat   ##  Mixed dynamic friction during collision
+    staticFriction*: cfloat    ##  Mixed static friction during collision
 
   PhysicsManifold* = ptr PhysicsManifoldData
 
@@ -167,80 +171,80 @@ type
 ## ----------------------------------------------------------------------------------
 ##  Physics system management
 
-proc initPhysics*() {.cdecl, importc: "InitPhysics", header: physacHeader.}
+proc initPhysics*() {.cdecl, importc: "InitPhysics", dynlib: dynlibLibraryName.}
 ##  Initializes physics system
 
-proc updatePhysics*() {.cdecl, importc: "UpdatePhysics", header: physacHeader.}
+proc updatePhysics*() {.cdecl, importc: "UpdatePhysics", dynlib: dynlibLibraryName.}
 ##  Update physics system
 
-proc resetPhysics*() {.cdecl, importc: "ResetPhysics", header: physacHeader.}
+proc resetPhysics*() {.cdecl, importc: "ResetPhysics", dynlib: dynlibLibraryName.}
 ##  Reset physics system (global variables)
 
-proc closePhysics*() {.cdecl, importc: "ClosePhysics", header: physacHeader.}
+proc closePhysics*() {.cdecl, importc: "ClosePhysics", dynlib: dynlibLibraryName.}
 ##  Close physics system and unload used memory
 
 proc setPhysicsTimeStep*(delta: cdouble) {.cdecl, importc: "SetPhysicsTimeStep",
-                                        header: physacHeader.}
+                                        dynlib: dynlibLibraryName.}
 ##  Sets physics fixed time step in milliseconds. 1.666666 by default
 
 proc setPhysicsGravity*(x: cfloat; y: cfloat) {.cdecl, importc: "SetPhysicsGravity",
-    header: physacHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Sets physics global gravity force
 ##  Physic body creation/destroy
 
 proc createPhysicsBodyCircle*(pos: Vector2; radius: cfloat; density: cfloat): PhysicsBody {.
-    cdecl, importc: "CreatePhysicsBodyCircle", header: physacHeader.}
+    cdecl, importc: "CreatePhysicsBodyCircle", dynlib: dynlibLibraryName.}
 ##  Creates a new circle physics body with generic parameters
 
 proc createPhysicsBodyRectangle*(pos: Vector2; width: cfloat; height: cfloat;
                                 density: cfloat): PhysicsBody {.cdecl,
-    importc: "CreatePhysicsBodyRectangle", header: physacHeader.}
+    importc: "CreatePhysicsBodyRectangle", dynlib: dynlibLibraryName.}
 ##  Creates a new rectangle physics body with generic parameters
 
 proc createPhysicsBodyPolygon*(pos: Vector2; radius: cfloat; sides: cint;
                               density: cfloat): PhysicsBody {.cdecl,
-    importc: "CreatePhysicsBodyPolygon", header: physacHeader.}
+    importc: "CreatePhysicsBodyPolygon", dynlib: dynlibLibraryName.}
 ##  Creates a new polygon physics body with generic parameters
 
 proc destroyPhysicsBody*(body: PhysicsBody) {.cdecl, importc: "DestroyPhysicsBody",
-    header: physacHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Destroy a physics body
 ##  Physic body forces
 
 proc physicsAddForce*(body: PhysicsBody; force: Vector2) {.cdecl,
-    importc: "PhysicsAddForce", header: physacHeader.}
+    importc: "PhysicsAddForce", dynlib: dynlibLibraryName.}
 ##  Adds a force to a physics body
 
 proc physicsAddTorque*(body: PhysicsBody; amount: cfloat) {.cdecl,
-    importc: "PhysicsAddTorque", header: physacHeader.}
+    importc: "PhysicsAddTorque", dynlib: dynlibLibraryName.}
 ##  Adds an angular force to a physics body
 
 proc physicsShatter*(body: PhysicsBody; position: Vector2; force: cfloat) {.cdecl,
-    importc: "PhysicsShatter", header: physacHeader.}
+    importc: "PhysicsShatter", dynlib: dynlibLibraryName.}
 ##  Shatters a polygon shape physics body to little physics bodies with explosion force
 
 proc setPhysicsBodyRotation*(body: PhysicsBody; radians: cfloat) {.cdecl,
-    importc: "SetPhysicsBodyRotation", header: physacHeader.}
+    importc: "SetPhysicsBodyRotation", dynlib: dynlibLibraryName.}
 ##  Sets physics body shape transform based on radians parameter
 ##  Query physics info
 
 proc getPhysicsBody*(index: cint): PhysicsBody {.cdecl, importc: "GetPhysicsBody",
-    header: physacHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Returns a physics body of the bodies pool at a specific index
 
 proc getPhysicsBodiesCount*(): cint {.cdecl, importc: "GetPhysicsBodiesCount",
-                                   header: physacHeader.}
+                                   dynlib: dynlibLibraryName.}
 ##  Returns the current amount of created physics bodies
 
 proc getPhysicsShapeType*(index: cint): cint {.cdecl, importc: "GetPhysicsShapeType",
-    header: physacHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Returns the physics body shape type (PHYSICS_CIRCLE or PHYSICS_POLYGON)
 
 proc getPhysicsShapeVerticesCount*(index: cint): cint {.cdecl,
-    importc: "GetPhysicsShapeVerticesCount", header: physacHeader.}
+    importc: "GetPhysicsShapeVerticesCount", dynlib: dynlibLibraryName.}
 ##  Returns the amount of vertices of a physics body shape
 
 proc getPhysicsShapeVertex*(body: PhysicsBody; vertex: cint): Vector2 {.cdecl,
-    importc: "GetPhysicsShapeVertex", header: physacHeader.}
+    importc: "GetPhysicsShapeVertex", dynlib: dynlibLibraryName.}
 ##  Returns transformed position of a body shape (body position + vertex transformed position)
 

@@ -1,9 +1,9 @@
 import raylib
-
 from os import parentDir, `/`
 const physacHeader = currentSourcePath().parentDir()/"physac.h"
 {.passC: "-DPHYSAC_IMPLEMENTATION".}
 {.passC: "-DPHYSAC_NO_THREADS".}
+
 ## *********************************************************************************************
 ##
 ##    Physac v1.1 - 2D Physics library for videogames

@@ -27,7 +27,7 @@ const
   ]
 
 
-when defined(nimraylib_now_mangle):
+when defined(nimraylib_now_build_static):
   import strutils
   import regex
 
