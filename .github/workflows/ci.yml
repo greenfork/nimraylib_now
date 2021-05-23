@@ -30,8 +30,8 @@ jobs:
         run: |
           cp raygui/src/*.h raylib/src/
           cd raylib/src
-          make PLATFORM=PLATFORM_DESKTOP RAYLIB_LIBTYPE=SHARED RAYLIB_MODULE_RAYGUI=TRUE RAYLIB_MODULE_PHYSAC=TRUE
-          sudo make install RAYLIB_LIBTYPE=SHARED
+          make PLATFORM=PLATFORM_DESKTOP RAYLIB_LIBTYPE=SHARED RAYLIB_MODULE_RAYGUI=TRUE
+          make install RAYLIB_LIBTYPE=SHARED
 
       # - name: Install shared Raylib library on MacOS
       #   if: ${{ runner.os == 'macOS' }}
