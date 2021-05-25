@@ -76,7 +76,6 @@ when defined(windows) and not defined(emscripten):
   {.passL: "-lgdi32".}
   {.passL: "-lopengl32".}
   {.passL: "-lwinmm".}
-  {.passL: "-Wl,--subsystem,windows".}
 
 when defined(emscripten):
   {.passL: "-s USE_GLFW=3".}
