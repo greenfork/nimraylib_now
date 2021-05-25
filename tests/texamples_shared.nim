@@ -2,7 +2,7 @@ discard """
   cmd: "nim c -d:nimraylib_now_shared --listCmd $options $file"
   action: "compile"
   joinable: false
-  matrix: "; -d:release; --gc:orc -d:release"
+  matrix: "; -d:release; --gc:orc -d:useMalloc -d:release"
   disabled: "win"
 """
 import lenientops, math, times, strformat, atomics, system/ansi_c
@@ -2578,9 +2578,9 @@ block models_mesh_generation:
     mesh.vertexCount = triangleCount * 3
     mesh.triangleCount = triangleCount
 
-    mesh.vertices = cast[ptr UncheckedArray[cfloat]](alloc0(mesh.vertexCount * 3 * sizeof(cfloat)))
-    mesh.texcoords = cast[ptr UncheckedArray[cfloat]](alloc0(mesh.vertexCount * 2 * sizeof(cfloat)))
-    mesh.normals = cast[ptr UncheckedArray[cfloat]](alloc0(mesh.vertexCount * 3 * sizeof(cfloat)))
+    mesh.vertices = cast[ptr UncheckedArray[cfloat]](memAlloc(mesh.vertexCount * 3 * sizeof(cfloat)))
+    mesh.texcoords = cast[ptr UncheckedArray[cfloat]](memAlloc(mesh.vertexCount * 2 * sizeof(cfloat)))
+    mesh.normals = cast[ptr UncheckedArray[cfloat]](memAlloc(mesh.vertexCount * 3 * sizeof(cfloat)))
 
   proc makeMesh(): Mesh =
     allocateMeshData(result, 1)
@@ -6512,7 +6512,7 @@ block textures_raw_data:
   # unloadImage fudesumiRaw                           #  Unload CPU (RAM) image data
 
   # Dynamic memory allocation to store pixels data (Color type)
-  var pixels = cast[ptr UncheckedArray[Color]](alloc0(width*height * sizeof(Color)))
+  var pixels = cast[ptr UncheckedArray[Color]](memAlloc(width*height * sizeof(Color)))
 
   for y in 0..<height:
     for x in 0..<width:

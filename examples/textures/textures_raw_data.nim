@@ -36,7 +36,7 @@ let
 # unloadImage fudesumiRaw                           #  Unload CPU (RAM) image data
 
 # Dynamic memory allocation to store pixels data (Color type)
-var pixels = cast[ptr UncheckedArray[Color]](alloc0(width*height * sizeof(Color)))
+var pixels = cast[ptr UncheckedArray[Color]](memAlloc(width*height * sizeof(Color)))
 
 for y in 0..<height:
   for x in 0..<width:
