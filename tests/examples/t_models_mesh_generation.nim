@@ -1,3 +1,9 @@
+discard """
+  action: "compile"
+  joinable: false
+  matrix: "; -d:release; --gc:orc -d:release"
+"""
+
 #[*******************************************************************************************
 *
 *   raylib example - procedural mesh generation
@@ -10,7 +16,7 @@
 *
 ********************************************************************************************]#
 
-import nimraylib_now
+import ../../src/nimraylib_now
 
 proc allocateMeshData(mesh: var Mesh, triangleCount: int) =
   mesh.vertexCount = triangleCount * 3

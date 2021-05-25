@@ -238,6 +238,7 @@ for (filepath, c2nimheader) in raylibHeaders:
         line = raylibhLines[i]
         words = line.splitWhitespace
       if selfModuleDeclarationNames.anyIt(it in line):
+        # Remove module declaration start and end, we don't need it
         if "#endif" in line: # this is the end of h file and start of implementation
           echo "Reached end of header part: " & line
           break
@@ -245,6 +246,8 @@ for (filepath, c2nimheader) in raylibHeaders:
       elif ignoreLines.anyIt(it in line):
         echo "Ignore: " & line
       elif line.match(reDefineColor, m):
+        # Colors are defined with #define, we want to turn them into consts
+        # and remove from original C file
         let
           colorName = m.groupFirstCapture(0, line)
           red = m.groupFirstCapture(1, line)
