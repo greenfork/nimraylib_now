@@ -22,9 +22,9 @@ proc allocateMeshData(mesh: var Mesh, triangleCount: int) =
   mesh.vertexCount = triangleCount * 3
   mesh.triangleCount = triangleCount
 
-  mesh.vertices = cast[ptr UncheckedArray[cfloat]](alloc0(mesh.vertexCount * 3 * sizeof(cfloat)))
-  mesh.texcoords = cast[ptr UncheckedArray[cfloat]](alloc0(mesh.vertexCount * 2 * sizeof(cfloat)))
-  mesh.normals = cast[ptr UncheckedArray[cfloat]](alloc0(mesh.vertexCount * 3 * sizeof(cfloat)))
+  mesh.vertices = cast[ptr UncheckedArray[cfloat]](memAlloc(mesh.vertexCount * 3 * sizeof(cfloat)))
+  mesh.texcoords = cast[ptr UncheckedArray[cfloat]](memAlloc(mesh.vertexCount * 2 * sizeof(cfloat)))
+  mesh.normals = cast[ptr UncheckedArray[cfloat]](memAlloc(mesh.vertexCount * 3 * sizeof(cfloat)))
 
 proc makeMesh(): Mesh =
   allocateMeshData(result, 1)
