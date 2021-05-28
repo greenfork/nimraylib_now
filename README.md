@@ -40,13 +40,13 @@ $ nimble install nimraylib_now  # wait 10 minutes for download, sorry
 2. Copy any example to your file, for instance [crown.nim](examples/original/crown.nim)
 3. Compile and run it:
 ```shell
-$ nim c -r -d:release --gc:orc -d:useMalloc crown.nim
+$ nim c -r -d:release --gc:orc crown.nim
 ```
 
 Explanation of flags:
 - `-r` - run after compiling
 - `-d:release` - for speed, but also cuts away debugging information
-- `--gc:orc -d:useMalloc` - memory management without garbage collection and
+- `--gc:orc` - memory management without garbage collection and
   with better C interoperability
 
 ## Current version and upgrading from previous versions
