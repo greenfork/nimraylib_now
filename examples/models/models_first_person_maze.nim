@@ -34,7 +34,7 @@ proc main() =
   model.materials[0].maps[int(Albedo)].texture = mapTexture
 
   # Get map image data to be used for collision detection
-  let mapPixels = loadImageColors(imMap)
+  let mapPixels = cast[ptr UncheckedArray[Color]](loadImageColors(imMap))
   unloadImage(imMap) # no need to keep imMap in RAM, once loaded
 
   var modelPosition = Vector3( x: -16.0, y:0.0, z: -8.0)
@@ -47,8 +47,8 @@ proc main() =
     camera.addr.updateCamera()
 
     # Check player collision (we simplify to 2D collision detection)
-    let playerPos = (x: camera.position.x, y: camera.position.z)
-    const playerRadius = 0.1  # Collision radius (player is modelled as a cilinder for collision)
+    let playerPos:Vector2 = Vector2(x: camera.position.x, y: camera.position.z)
+    let playerRadius:cfloat = 0.1  # Collision radius (player is modelled as a cilinder for collision)
 
     var playerCellX = (playerPos.x - modelPosition.x + 0.5f).int
     var playerCellY = (playerPos.y - modelPosition.z + 0.5f).int
@@ -77,7 +77,7 @@ proc main() =
       drawRectangle(getScreenWidth() - cubicMapTexture.width*4 - 20 + playerCellX*4, 20 + playerCellY*4, 4, 4, Yellow)
       drawFPS(10, 10)
 
-  unloadImageColors(mapPixels) # Unload color array
+  unloadImageColors(mapPixels[0].addr) # Unload color array
   unloadTexture(cubicMapTexture) # Unload cubicmap texture
   unloadTexture(mapTexture) # Unload map texture
   unloadModel(model); # Unload map model
