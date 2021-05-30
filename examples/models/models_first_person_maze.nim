@@ -64,7 +64,7 @@ proc main() =
       for x in 0..<cubicMapTexture.width:
         var collisionRect = Rectangle(x: modelPosition.x - 0.5 + x.float, y: modelPosition.z - 0.5 + y.float, width: 1.0, height: 1.0)
         # collision: white pixel, red channel
-        if mapPixels[y*cubicMapTexture.width + x].r == 255 and checkCollisionCircleRec(playerPos, playerRadius, collisionRect) == true:
+        if mapPixels[y*cubicMapTexture.width + x].r == 255 and checkCollisionCircleRec(playerPos, playerRadius, collisionRect):
           camera.position = oldCamPos
 
     beginDrawing:
