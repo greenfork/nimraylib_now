@@ -2,6 +2,17 @@
 
 Any ideas are welcome. Open an issue to ask a question or suggest an idea.
 
+How to contribute:
+- Read [how to properly contribute to open source projects on GitHub].
+- Use a topic branch to easily amend a pull request later, if necessary.
+- Write [good commit messages].
+- Use the same coding conventions as the rest of the project, mostly [NEP1].
+- Open a [pull request] that relates to _only_ one subject with a clear title and description in grammatically correct, complete sentences.
+
+[how to properly contribute to open source projects on GitHub]: http://gun.io/blog/how-to-github-fork-branch-and-pull-request
+[good commit messages]: https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
+[pull request]: https://help.github.com/articles/using-pull-requests
+
 ## Documentation
 
 Any ideas on how to improve documentation are welcome!
