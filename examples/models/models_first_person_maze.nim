@@ -87,7 +87,7 @@ proc main() =
   unloadImageColors(mapPixels[0].addr) # Unload color array
   unloadTexture(cubicMapTexture) # Unload cubicmap texture
   unloadTexture(mapTexture) # Unload map texture
-  unloadModel(model); # Unload map model
+  unloadModel(model) # Unload map model
 
   closeWindow() # Close window and OpenGL context
 
