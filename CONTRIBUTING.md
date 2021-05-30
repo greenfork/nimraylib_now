@@ -34,11 +34,10 @@ the following:
 3. Edit resulting Nim file, make sure it runs `nim r examplefile.nim`.
 4. Put this file into a correct category in the `examples` directory
    (`original` is for self-developed examples).
-5. Run `nimble testExamples` and make sure that your example passes the test.
+5. Run `nimble prepareTests` to include this example into a test suite.
+6. Run `nimble testExamples` and make sure that your example passes the test.
    If it doesn't pass the test, create an issue or ask me any other way, I will
    help.
-6. Run `nim r make_individual_tests_from_examples.nim` to include this example
-   in the test suite.
 
 I cannot port a number of examples:
 * `core_drop_files.c` - I can't test it on my machine (Wayland on Linux)
