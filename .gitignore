@@ -26,3 +26,7 @@ a.out
 /outputGotten.txt
 /testresults
 /tests/emscripten/*.js
+
+.gitignore
+*.elf
+*jseb*
