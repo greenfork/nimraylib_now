@@ -2,6 +2,17 @@
 
 Any ideas are welcome. Open an issue to ask a question or suggest an idea.
 
+How to contribute:
+- Read [how to properly contribute to open source projects on GitHub].
+- Use a topic branch to easily amend a pull request later, if necessary.
+- Write [good commit messages].
+- Use the same coding conventions as the rest of the project, mostly [NEP1].
+- Open a [pull request] that relates to _only_ one subject with a clear title and description in grammatically correct, complete sentences.
+
+[how to properly contribute to open source projects on GitHub]: http://gun.io/blog/how-to-github-fork-branch-and-pull-request
+[good commit messages]: https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
+[pull request]: https://help.github.com/articles/using-pull-requests
+
 ## Documentation
 
 Any ideas on how to improve documentation are welcome!
@@ -23,11 +34,10 @@ the following:
 3. Edit resulting Nim file, make sure it runs `nim r examplefile.nim`.
 4. Put this file into a correct category in the `examples` directory
    (`original` is for self-developed examples).
-5. Run `nimble testExamples` and make sure that your example passes the test.
+5. Run `nimble prepareTests` to include this example into a test suite.
+6. Run `nimble testExamples` and make sure that your example passes the test.
    If it doesn't pass the test, create an issue or ask me any other way, I will
    help.
-6. Run `nim r make_individual_tests_from_examples.nim` to include this example
-   in the test suite.
 
 I cannot port a number of examples:
 * `core_drop_files.c` - I can't test it on my machine (Wayland on Linux)
