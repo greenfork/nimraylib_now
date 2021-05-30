@@ -25,7 +25,7 @@ const
     "  cmd: \"nim c --listCmd $options $file\"\n" &
     "  action: \"compile\"\n" &
     "  joinable: false\n" &
-    "  matrix: \"; -d:release; --gc:orc -d:useMalloc -d:release\"\n" &
+    "  matrix: \"; -d:release; --gc:orc -d:release\"\n" &
     "  disabled: \"win\"\n" &
     "\"\"\"\n" &
     "import lenientops, math, times, strformat, atomics, system/ansi_c\n" &
@@ -38,7 +38,7 @@ const
     "  cmd: \"nim c -d:nimraylib_now_shared --listCmd $options $file\"\n" &
     "  action: \"compile\"\n" &
     "  joinable: false\n" &
-    "  matrix: \"; -d:release; --gc:orc -d:useMalloc -d:release\"\n" &
+    "  matrix: \"; -d:release; --gc:orc -d:release\"\n" &
     "  disabled: \"win\"\n" &
     "\"\"\"\n" &
     "import lenientops, math, times, strformat, atomics, system/ansi_c\n" &
@@ -52,7 +52,7 @@ const
     "  cmd: \"nim c --listCmd $options $file\"\n" &
     "  action: \"compile\"\n" &
     "  joinable: false\n" &
-    "  matrix: \"; -d:release; --gc:orc -d:useMalloc -d:release;\"\n" &
+    "  matrix: \"; -d:release; --gc:orc -d:release;\"\n" &
     "  disabled: \"linux\"\n" &
     "  disabled: \"bsd\"\n" &
     "  disabled: \"macosx\"\n" &
