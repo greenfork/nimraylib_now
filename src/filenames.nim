@@ -23,7 +23,7 @@ const
 
   manglePrefix*                = "NmrlbNow_"
 
-when defined(nimraylib_now_mangle):
+when defined(nimraylib_now_build_static):
   const targetDir* = nimraylibNowDir/"mangled"
 else:
   const targetDir* = nimraylibNowDir/"not_mangled"

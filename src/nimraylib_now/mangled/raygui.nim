@@ -1,8 +1,8 @@
 import raylib
-
 from os import parentDir, `/`
 const rayguiHeader = currentSourcePath().parentDir()/"raygui.h"
 {.passC: "-DRAYGUI_IMPLEMENTATION".}
+
 ## ******************************************************************************************
 ##
 ##    raygui v2.9-dev - A simple and easy-to-use immediate-mode gui library

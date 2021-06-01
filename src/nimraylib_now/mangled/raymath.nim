@@ -1,7 +1,7 @@
 import raylib
-
 from os import parentDir, `/`
 const raymathHeader = currentSourcePath().parentDir()/"raymath.h"
+
 ## *********************************************************************************************
 ##
 ##    raymath v1.2 - Math functions to work with Vector3, Matrix and Quaternions

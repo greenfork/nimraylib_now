@@ -1,8 +1,13 @@
+ {.deadCodeElim: on.}
 import raylib
+const dynlibLibraryName =
+  when defined(windows):
+    "raylib.dll"
+  elif defined(macosx):
+    "libraylib.dylib"
+  else:
+    "libraylib.so"
 
-from os import parentDir, `/`
-const rayguiHeader = currentSourcePath().parentDir()/"raygui.h"
-{.passC: "-DRAYGUI_IMPLEMENTATION".}
 ## ******************************************************************************************
 ##
 ##    raygui v2.9-dev - A simple and easy-to-use immediate-mode gui library
@@ -155,10 +160,10 @@ const
 ##  Style property
 
 type
-  StyleProp* {.importc: "GuiStyleProp", header: rayguiHeader, bycopy.} = object
-    controlId* {.importc: "controlId".}: cushort
-    propertyId* {.importc: "propertyId".}: cushort
-    propertyValue* {.importc: "propertyValue".}: cint
+  StyleProp* {.bycopy.} = object
+    controlId*: cushort
+    propertyId*: cushort
+    propertyValue*: cint
 
 
 ##  Gui control state
@@ -308,196 +313,196 @@ type
 ## ----------------------------------------------------------------------------------
 ##  State modification functions
 
-proc enable*() {.cdecl, importc: "GuiEnable", header: rayguiHeader.}
+proc enable*() {.cdecl, importc: "GuiEnable", dynlib: dynlibLibraryName.}
 ##  Enable gui controls (global state)
 
-proc disable*() {.cdecl, importc: "GuiDisable", header: rayguiHeader.}
+proc disable*() {.cdecl, importc: "GuiDisable", dynlib: dynlibLibraryName.}
 ##  Disable gui controls (global state)
 
-proc lock*() {.cdecl, importc: "GuiLock", header: rayguiHeader.}
+proc lock*() {.cdecl, importc: "GuiLock", dynlib: dynlibLibraryName.}
 ##  Lock gui controls (global state)
 
-proc unlock*() {.cdecl, importc: "GuiUnlock", header: rayguiHeader.}
+proc unlock*() {.cdecl, importc: "GuiUnlock", dynlib: dynlibLibraryName.}
 ##  Unlock gui controls (global state)
 
-proc fade*(alpha: cfloat) {.cdecl, importc: "GuiFade", header: rayguiHeader.}
+proc fade*(alpha: cfloat) {.cdecl, importc: "GuiFade", dynlib: dynlibLibraryName.}
 ##  Set gui controls alpha (global state), alpha goes from 0.0f to 1.0f
 
-proc setState*(state: cint) {.cdecl, importc: "GuiSetState", header: rayguiHeader.}
+proc setState*(state: cint) {.cdecl, importc: "GuiSetState", dynlib: dynlibLibraryName.}
 ##  Set gui state (global state)
 
-proc getState*(): cint {.cdecl, importc: "GuiGetState", header: rayguiHeader.}
+proc getState*(): cint {.cdecl, importc: "GuiGetState", dynlib: dynlibLibraryName.}
 ##  Get gui state (global state)
 ##  Font set/get functions
 
-proc setFont*(font: Font) {.cdecl, importc: "GuiSetFont", header: rayguiHeader.}
+proc setFont*(font: Font) {.cdecl, importc: "GuiSetFont", dynlib: dynlibLibraryName.}
 ##  Set gui custom font (global state)
 
-proc getFont*(): Font {.cdecl, importc: "GuiGetFont", header: rayguiHeader.}
+proc getFont*(): Font {.cdecl, importc: "GuiGetFont", dynlib: dynlibLibraryName.}
 ##  Get gui custom font (global state)
 ##  Style set/get functions
 
 proc setStyle*(control: cint; property: cint; value: cint) {.cdecl,
-    importc: "GuiSetStyle", header: rayguiHeader.}
+    importc: "GuiSetStyle", dynlib: dynlibLibraryName.}
 ##  Set one style property
 
 proc getStyle*(control: cint; property: cint): cint {.cdecl, importc: "GuiGetStyle",
-    header: rayguiHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Get one style property
 ##  Container/separator controls, useful for controls organization
 
 proc windowBox*(bounds: Rectangle; title: cstring): bool {.cdecl,
-    importc: "GuiWindowBox", header: rayguiHeader.}
+    importc: "GuiWindowBox", dynlib: dynlibLibraryName.}
 ##  Window Box control, shows a window that can be closed
 
 proc groupBox*(bounds: Rectangle; text: cstring) {.cdecl, importc: "GuiGroupBox",
-    header: rayguiHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Group Box control with text name
 
 proc line*(bounds: Rectangle; text: cstring) {.cdecl, importc: "GuiLine",
-    header: rayguiHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Line separator control, could contain text
 
-proc panel*(bounds: Rectangle) {.cdecl, importc: "GuiPanel", header: rayguiHeader.}
+proc panel*(bounds: Rectangle) {.cdecl, importc: "GuiPanel", dynlib: dynlibLibraryName.}
 ##  Panel control, useful to group controls
 
 proc scrollPanel*(bounds: Rectangle; content: Rectangle; scroll: ptr Vector2): Rectangle {.
-    cdecl, importc: "GuiScrollPanel", header: rayguiHeader.}
+    cdecl, importc: "GuiScrollPanel", dynlib: dynlibLibraryName.}
 ##  Scroll Panel control
 ##  Basic controls set
 
 proc label*(bounds: Rectangle; text: cstring) {.cdecl, importc: "GuiLabel",
-    header: rayguiHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Label control, shows text
 
 proc button*(bounds: Rectangle; text: cstring): bool {.cdecl, importc: "GuiButton",
-    header: rayguiHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Button control, returns true when clicked
 
 proc labelButton*(bounds: Rectangle; text: cstring): bool {.cdecl,
-    importc: "GuiLabelButton", header: rayguiHeader.}
+    importc: "GuiLabelButton", dynlib: dynlibLibraryName.}
 ##  Label button control, show true when clicked
 
 proc imageButton*(bounds: Rectangle; text: cstring; texture: Texture2D): bool {.cdecl,
-    importc: "GuiImageButton", header: rayguiHeader.}
+    importc: "GuiImageButton", dynlib: dynlibLibraryName.}
 ##  Image button control, returns true when clicked
 
 proc imageButtonEx*(bounds: Rectangle; text: cstring; texture: Texture2D;
                    texSource: Rectangle): bool {.cdecl, importc: "GuiImageButtonEx",
-    header: rayguiHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Image button extended control, returns true when clicked
 
 proc toggle*(bounds: Rectangle; text: cstring; active: bool): bool {.cdecl,
-    importc: "GuiToggle", header: rayguiHeader.}
+    importc: "GuiToggle", dynlib: dynlibLibraryName.}
 ##  Toggle Button control, returns true when active
 
 proc toggleGroup*(bounds: Rectangle; text: cstring; active: cint): cint {.cdecl,
-    importc: "GuiToggleGroup", header: rayguiHeader.}
+    importc: "GuiToggleGroup", dynlib: dynlibLibraryName.}
 ##  Toggle Group control, returns active toggle index
 
 proc checkBox*(bounds: Rectangle; text: cstring; checked: bool): bool {.cdecl,
-    importc: "GuiCheckBox", header: rayguiHeader.}
+    importc: "GuiCheckBox", dynlib: dynlibLibraryName.}
 ##  Check Box control, returns true when active
 
 proc comboBox*(bounds: Rectangle; text: cstring; active: cint): cint {.cdecl,
-    importc: "GuiComboBox", header: rayguiHeader.}
+    importc: "GuiComboBox", dynlib: dynlibLibraryName.}
 ##  Combo Box control, returns selected item index
 
 proc dropdownBox*(bounds: Rectangle; text: cstring; active: ptr cint; editMode: bool): bool {.
-    cdecl, importc: "GuiDropdownBox", header: rayguiHeader.}
+    cdecl, importc: "GuiDropdownBox", dynlib: dynlibLibraryName.}
 ##  Dropdown Box control, returns selected item
 
 proc spinner*(bounds: Rectangle; text: cstring; value: ptr cint; minValue: cint;
              maxValue: cint; editMode: bool): bool {.cdecl, importc: "GuiSpinner",
-    header: rayguiHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Spinner control, returns selected value
 
 proc valueBox*(bounds: Rectangle; text: cstring; value: ptr cint; minValue: cint;
               maxValue: cint; editMode: bool): bool {.cdecl, importc: "GuiValueBox",
-    header: rayguiHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Value Box control, updates input text with numbers
 
 proc textBox*(bounds: Rectangle; text: cstring; textSize: cint; editMode: bool): bool {.
-    cdecl, importc: "GuiTextBox", header: rayguiHeader.}
+    cdecl, importc: "GuiTextBox", dynlib: dynlibLibraryName.}
 ##  Text Box control, updates input text
 
 proc textBoxMulti*(bounds: Rectangle; text: cstring; textSize: cint; editMode: bool): bool {.
-    cdecl, importc: "GuiTextBoxMulti", header: rayguiHeader.}
+    cdecl, importc: "GuiTextBoxMulti", dynlib: dynlibLibraryName.}
 ##  Text Box control with multiple lines
 
 proc slider*(bounds: Rectangle; textLeft: cstring; textRight: cstring; value: cfloat;
             minValue: cfloat; maxValue: cfloat): cfloat {.cdecl, importc: "GuiSlider",
-    header: rayguiHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Slider control, returns selected value
 
 proc sliderBar*(bounds: Rectangle; textLeft: cstring; textRight: cstring;
                value: cfloat; minValue: cfloat; maxValue: cfloat): cfloat {.cdecl,
-    importc: "GuiSliderBar", header: rayguiHeader.}
+    importc: "GuiSliderBar", dynlib: dynlibLibraryName.}
 ##  Slider Bar control, returns selected value
 
 proc progressBar*(bounds: Rectangle; textLeft: cstring; textRight: cstring;
                  value: cfloat; minValue: cfloat; maxValue: cfloat): cfloat {.cdecl,
-    importc: "GuiProgressBar", header: rayguiHeader.}
+    importc: "GuiProgressBar", dynlib: dynlibLibraryName.}
 ##  Progress Bar control, shows current progress value
 
 proc statusBar*(bounds: Rectangle; text: cstring) {.cdecl, importc: "GuiStatusBar",
-    header: rayguiHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Status Bar control, shows info text
 
 proc dummyRec*(bounds: Rectangle; text: cstring) {.cdecl, importc: "GuiDummyRec",
-    header: rayguiHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Dummy control for placeholders
 
 proc scrollBar*(bounds: Rectangle; value: cint; minValue: cint; maxValue: cint): cint {.
-    cdecl, importc: "GuiScrollBar", header: rayguiHeader.}
+    cdecl, importc: "GuiScrollBar", dynlib: dynlibLibraryName.}
 ##  Scroll Bar control
 
 proc grid*(bounds: Rectangle; spacing: cfloat; subdivs: cint): Vector2 {.cdecl,
-    importc: "GuiGrid", header: rayguiHeader.}
+    importc: "GuiGrid", dynlib: dynlibLibraryName.}
 ##  Grid control
 ##  Advance controls set
 
 proc listView*(bounds: Rectangle; text: cstring; scrollIndex: ptr cint; active: cint): cint {.
-    cdecl, importc: "GuiListView", header: rayguiHeader.}
+    cdecl, importc: "GuiListView", dynlib: dynlibLibraryName.}
 ##  List View control, returns selected list item index
 
 proc listViewEx*(bounds: Rectangle; text: cstringArray; count: cint; focus: ptr cint;
                 scrollIndex: ptr cint; active: cint): cint {.cdecl,
-    importc: "GuiListViewEx", header: rayguiHeader.}
+    importc: "GuiListViewEx", dynlib: dynlibLibraryName.}
 ##  List View with extended parameters
 
 proc messageBox*(bounds: Rectangle; title: cstring; message: cstring; buttons: cstring): cint {.
-    cdecl, importc: "GuiMessageBox", header: rayguiHeader.}
+    cdecl, importc: "GuiMessageBox", dynlib: dynlibLibraryName.}
 ##  Message Box control, displays a message
 
 proc textInputBox*(bounds: Rectangle; title: cstring; message: cstring;
                   buttons: cstring; text: cstring): cint {.cdecl,
-    importc: "GuiTextInputBox", header: rayguiHeader.}
+    importc: "GuiTextInputBox", dynlib: dynlibLibraryName.}
 ##  Text Input Box control, ask for text
 
 proc colorPicker*(bounds: Rectangle; color: Color): Color {.cdecl,
-    importc: "GuiColorPicker", header: rayguiHeader.}
+    importc: "GuiColorPicker", dynlib: dynlibLibraryName.}
 ##  Color Picker control (multiple color controls)
 
 proc colorPanel*(bounds: Rectangle; color: Color): Color {.cdecl,
-    importc: "GuiColorPanel", header: rayguiHeader.}
+    importc: "GuiColorPanel", dynlib: dynlibLibraryName.}
 ##  Color Panel control
 
 proc colorBarAlpha*(bounds: Rectangle; alpha: cfloat): cfloat {.cdecl,
-    importc: "GuiColorBarAlpha", header: rayguiHeader.}
+    importc: "GuiColorBarAlpha", dynlib: dynlibLibraryName.}
 ##  Color Bar Alpha control
 
 proc colorBarHue*(bounds: Rectangle; value: cfloat): cfloat {.cdecl,
-    importc: "GuiColorBarHue", header: rayguiHeader.}
+    importc: "GuiColorBarHue", dynlib: dynlibLibraryName.}
 ##  Color Bar Hue control
 ##  Styles loading functions
 
 proc loadStyle*(fileName: cstring) {.cdecl, importc: "GuiLoadStyle",
-                                  header: rayguiHeader.}
+                                  dynlib: dynlibLibraryName.}
 ##  Load style file (.rgs)
 
 proc loadStyleDefault*() {.cdecl, importc: "GuiLoadStyleDefault",
-                         header: rayguiHeader.}
+                         dynlib: dynlibLibraryName.}
 ##  Load style default over global style
 ##
 ## typedef GuiStyle (unsigned int *)
@@ -506,32 +511,32 @@ proc loadStyleDefault*() {.cdecl, importc: "GuiLoadStyleDefault",
 ##
 
 proc iconText*(iconId: cint; text: cstring): cstring {.cdecl, importc: "GuiIconText",
-    header: rayguiHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Get text with icon id prepended (if supported)
 ##  Gui icons functionality
 
 proc drawIcon*(iconId: cint; position: Vector2; pixelSize: cint; color: Color) {.cdecl,
-    importc: "GuiDrawIcon", header: rayguiHeader.}
-proc getIcons*(): ptr cuint {.cdecl, importc: "GuiGetIcons", header: rayguiHeader.}
+    importc: "GuiDrawIcon", dynlib: dynlibLibraryName.}
+proc getIcons*(): ptr cuint {.cdecl, importc: "GuiGetIcons", dynlib: dynlibLibraryName.}
 ##  Get full icons data pointer
 
 proc getIconData*(iconId: cint): ptr cuint {.cdecl, importc: "GuiGetIconData",
-                                        header: rayguiHeader.}
+                                        dynlib: dynlibLibraryName.}
 ##  Get icon bit data
 
 proc setIconData*(iconId: cint; data: ptr cuint) {.cdecl, importc: "GuiSetIconData",
-    header: rayguiHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Set icon bit data
 
 proc setIconPixel*(iconId: cint; x: cint; y: cint) {.cdecl, importc: "GuiSetIconPixel",
-    header: rayguiHeader.}
+    dynlib: dynlibLibraryName.}
 ##  Set icon pixel value
 
 proc clearIconPixel*(iconId: cint; x: cint; y: cint) {.cdecl,
-    importc: "GuiClearIconPixel", header: rayguiHeader.}
+    importc: "GuiClearIconPixel", dynlib: dynlibLibraryName.}
 ##  Clear icon pixel value
 
 proc checkIconPixel*(iconId: cint; x: cint; y: cint): bool {.cdecl,
-    importc: "GuiCheckIconPixel", header: rayguiHeader.}
+    importc: "GuiCheckIconPixel", dynlib: dynlibLibraryName.}
 ##  Check icon pixel value
 
