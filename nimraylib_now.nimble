@@ -1,6 +1,6 @@
 # Package
 
-version = "0.13.1"
+version = "0.13.2"
 author = "Dmitry Matveyev"
 description = "The Ultimate Raylib gaming library wrapper"
 license = "MIT"
