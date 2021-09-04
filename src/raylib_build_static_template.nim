@@ -2,7 +2,7 @@
 ## Conversion of raylib/src/Makefile
 
 # Add the ability to do all the linking manually.
-from os import parentDir, relativePath, `/`
+from os import parentDir, relativePath, `/`, quoteShell
 
 import ../filenames
 
@@ -31,11 +31,11 @@ else:
   {.passC: "-s -O1".}
   {.passC: "-Werror=implicit-function-declaration".}
 
-{.passC: "-I" & RaylibSrcPath.}
-{.passC: "-I" & RaylibSrcPath / "external"/"glfw"/"include".}
-{.passC: "-I" & RaylibSrcPath / "external"/"glfw"/"deps"/"mingw".}
-{.passC: "-D" & Platform.}
-{.passC: "-D" & Graphics.}
+{.passC: quoteShell("-I" & RaylibSrcPath).}
+{.passC: quoteShell("-I" & RaylibSrcPath / "external"/"glfw"/"include").}
+{.passC: quoteShell("-I" & RaylibSrcPath / "external"/"glfw"/"deps"/"mingw").}
+{.passC: quoteShell("-D" & Platform).}
+{.passC: quoteShell("-D" & Graphics).}
 
 when defined(linux):
   {.passC: "-fPIC".}
@@ -55,7 +55,7 @@ when defined(linux):
 when defined(bsd) and not defined(emscripten):
   {.passC: "-I"/"usr"/"local"/"include".}
   # {.passL: "-L" & RaylibRootPath.}
-  {.passL: "-L" & RaylibSrcPath / "src".}
+  {.passL: quoteShell("-L" & RaylibSrcPath / "src").}
   {.passL: "-L"/"usr"/"local"/"lib".}
   {.passL: "-lX11".}
   {.passL: "-lXrandr".}
@@ -80,14 +80,14 @@ when defined(windows) and not defined(emscripten):
 when defined(emscripten):
   {.passL: "-s USE_GLFW=3".}
 elif defined(macosx):
-  {.compile(RaylibSrcPathRelative / "rglfw.c", "-x objective-c").}
+  {.compile(quoteShell(RaylibSrcPathRelative / "rglfw.c"), "-x objective-c").}
 else:
-  {.compile: RaylibSrcPathRelative / "rglfw.c".}
+  {.compile: quoteShell(RaylibSrcPathRelative / "rglfw.c").}
 
-{.compile: RaylibSrcPathRelative / "shapes.c".}
-{.compile: RaylibSrcPathRelative / "textures.c".}
-{.compile: RaylibSrcPathRelative / "text.c".}
-{.compile: RaylibSrcPathRelative / "utils.c".}
-{.compile: RaylibSrcPathRelative / "models.c".}
-{.compile: RaylibSrcPathRelative / "raudio.c".}
-{.compile: RaylibSrcPathRelative / "core.c".}
+{.compile: quoteShell(RaylibSrcPathRelative / "shapes.c").}
+{.compile: quoteShell(RaylibSrcPathRelative / "textures.c").}
+{.compile: quoteShell(RaylibSrcPathRelative / "text.c").}
+{.compile: quoteShell(RaylibSrcPathRelative / "utils.c").}
+{.compile: quoteShell(RaylibSrcPathRelative / "models.c").}
+{.compile: quoteShell(RaylibSrcPathRelative / "raudio.c").}
+{.compile: quoteShell(RaylibSrcPathRelative / "core.c").}
