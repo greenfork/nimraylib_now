@@ -80,7 +80,7 @@ when defined(windows) and not defined(emscripten):
 when defined(emscripten):
   {.passL: "-s USE_GLFW=3".}
 elif defined(macosx):
-  {.compile(quoteShell(RaylibSrcPathRelative / "rglfw.c", "-x objective-c")).}
+  {.compile(quoteShell(RaylibSrcPathRelative / "rglfw.c"), "-x objective-c").}
 else:
   {.compile: quoteShell(RaylibSrcPathRelative / "rglfw.c").}
 
