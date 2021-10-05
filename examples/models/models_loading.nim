@@ -17,8 +17,8 @@ camera.projection = Perspective
 camera.setCameraMode Free
 
 # Model Setup
-var model = loadModel("castle.obj") # load model
-var texture: Texture2D = loadTexture("castle_diffuse.png") # load model texture
+var model = loadModel("resources/castle.obj") # load model
+var texture: Texture2D = loadTexture("resources/castle_diffuse.png") # load model texture
 model.materials[0].maps[MaterialMapIndex.Albedo.int].texture = texture # set map diffuse texture
   # NOTES ON ABOVE:
   # original C code: model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture
