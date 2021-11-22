@@ -130,9 +130,9 @@ closeWindow()
 ## --------------------------------------------------------------------------------------
 
 proc updatePlayer(player: var Player, envItems: var openArray[EnvItem], delta: float) =
-  if isKeyDown(Left):
+  if isKeyDown(KeyboardKey.Left):
     player.position.x -= PLAYER_HOR_SPD * delta
-  if isKeyDown(Right):
+  if isKeyDown(KeyboardKey.Right):
     player.position.x += PLAYER_JUMP_SPD * delta
   if isKeyDown(Space) and player.canJump:
     player.speed = -PLAYER_JUMP_SPD

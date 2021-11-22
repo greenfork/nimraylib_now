@@ -28,8 +28,8 @@ var ballPosition: Vector2 = (x: screenWidth/2, y: screenHeight/2)
 while not windowShouldClose():    # Detect window close button or ESC key
   #  Update
   # ----------------------------------------------------------------------------------
-  if isKeyDown(Right): ballPosition.x += 2.0
-  if isKeyDown(Left):  ballPosition.x -= 2.0
+  if isKeyDown(KeyboardKey.Right): ballPosition.x += 2.0
+  if isKeyDown(KeyboardKey.Left):  ballPosition.x -= 2.0
   if isKeyDown(Up):    ballPosition.y -= 2.0
   if isKeyDown(Down):  ballPosition.y += 2.0
   # ----------------------------------------------------------------------------------

@@ -11,6 +11,18 @@ side it should mainly consist of renaming, please try the wonderful tool
 
 Additionally you can consult [Raylib's changelog](https://github.com/raysan5/raylib/blob/master/CHANGELOG).
 
+## From NimraylibNow! v0.13 to v0.14 and Raylib v3.7 to v4.0
+
+NimraylibNow!-specific changes:
+- rlgl module has a lot of intersecting identifiers with raylib module,
+  you will have to fully specify some variables when both modules are
+  imported.
+- Mouse buttons and some keyboard keys will have to be fully specified,
+  `MouseButton.Left` instead of `LeftButton` since now they intersect
+  with keyboard buttons.
+
+Raylib-specific changes - consult [Raylib's changelog](https://github.com/raysan5/raylib/blob/master/CHANGELOG) file.
+
 ## From NimraylibNow! v0.12 to v0.13
 
 - `Mesh` type has most of its fields changed from `ptr cfloat` to `ptr UncheckedArray[cfloat]`

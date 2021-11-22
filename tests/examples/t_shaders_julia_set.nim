@@ -106,15 +106,15 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
   if isKeyPressed(F1):
     showControls = not showControls
   if not pause:
-    if isKeyPressed(Right):
+    if isKeyPressed(KeyboardKey.Right):
       inc(incrementSpeed)
-    elif isKeyPressed(Left): ##  TODO: The idea is to zoom and move around with mouse
+    elif isKeyPressed(KeyboardKey.Left): ##  TODO: The idea is to zoom and move around with mouse
                                ##  Probably offset movement should be proportional to zoom level
       dec(incrementSpeed)
-    if isMouseButtonDown(Left_Button) or isMouseButtonDown(Right_Button):
-      if isMouseButtonDown(Left_Button):
+    if isMouseButtonDown(MouseButton.Left) or isMouseButtonDown(MouseButton.Right):
+      if isMouseButtonDown(MouseButton.Left):
         zoom += zoom*0.003
-      if isMouseButtonDown(Right_Button):
+      if isMouseButtonDown(MouseButton.Right):
         zoom -= zoom*0.003
       var mousePos: Vector2 = getMousePosition()
       offsetSpeed.x = mousePos.x - (float)(screenWidth div 2)

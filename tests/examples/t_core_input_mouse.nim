@@ -33,11 +33,11 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
   ##  Update
   ## ----------------------------------------------------------------------------------
   ballPosition = getMousePosition()
-  if isMouseButtonPressed(LeftButton):
+  if isMouseButtonPressed(MouseButton.Left):
     ballColor = Maroon
-  elif isMouseButtonPressed(MiddleButton):
+  elif isMouseButtonPressed(MouseButton.Middle):
     ballColor = Lime
-  elif isMouseButtonPressed(RightButton):
+  elif isMouseButtonPressed(MouseButton.Right):
     ballColor = Darkblue
   ## ----------------------------------------------------------------------------------
   ##  Draw

@@ -100,7 +100,7 @@ let lineHeight = screenHeight div COLORS_PER_PALETTE
 while not windowShouldClose():         #  Detect window close button or ESC key
     #  Update
     # ----------------------------------------------------------------------------------
-    currentPalette += (if isKeyPressed(RIGHT): 1 elif isKeyPressed(LEFT): -1 else: 0)
+    currentPalette += (if isKeyPressed(KeyboardKey.Right): 1 elif isKeyPressed(KeyboardKey.Left): -1 else: 0)
 
     if currentPalette >= MAX_PALETTES: currentPalette = 0
     elif currentPalette < 0: currentPalette = MAX_PALETTES - 1

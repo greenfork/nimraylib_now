@@ -1,6 +1,6 @@
 # ******************************************************************************************
 #
-#    raylib [core] example - Input Gestures Detection
+#    raylib [core] example - Input Gesture Detection
 #
 #    This example has been created using raylib 1.4 (www.raylib.com)
 #    raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
@@ -24,9 +24,9 @@ var touchPosition: Vector2 = (0.0, 0.0)
 var touchArea: Rectangle = (220.0, 10.0, (float)screenWidth - 230, (float)screenHeight - 20)
 var gesturesCount = 0
 var gestureStrings: array[MaxGestureStrings, cstring]
-var currentGesture = Gestures.None
-var lastGesture = Gestures.None
-## SetGesturesEnabled(0b0000000000001001);   // Enable only some gestures to be detected
+var currentGesture = Gesture.None
+var lastGesture = Gesture.None
+## SetGestureEnabled(0b0000000000001001);   // Enable only some gestures to be detected
 setTargetFPS(60)
 ##  Set our game to run at 60 frames-per-second
 ## --------------------------------------------------------------------------------------
@@ -35,10 +35,10 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
   ##  Update
   ## ----------------------------------------------------------------------------------
   lastGesture = currentGesture
-  currentGesture = getGestureDetected().Gestures
+  currentGesture = getGestureDetected().Gesture
   touchPosition = getTouchPosition(0)
   if checkCollisionPointRec(touchPosition, touchArea) and
-      (currentGesture != Gestures.None):
+      (currentGesture != Gesture.None):
     if currentGesture != lastGesture:
       ##  Store gesture string
       case currentGesture
@@ -91,7 +91,7 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
     inc(i)
   drawRectangleLines(10, 29, 200, screenHeight - 50, Gray)
   drawText("DETECTED GESTURES", 50, 15, 10, Gray)
-  if currentGesture != Gestures.None:
+  if currentGesture != Gesture.None:
     drawCircleV(touchPosition, 30, Maroon)
   endDrawing()
 ## ----------------------------------------------------------------------------------

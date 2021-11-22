@@ -30,7 +30,7 @@ model.materials[0].maps[MaterialMapIndex.Albedo.int].texture = texture # set map
   # original C code: model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture
   # MATERIAL_MAP_DIFFUSE is now ALBEDO (Raylib)
 var position: Vector3 = (0.0, 0.0, 0.0) # set model position
-var bounds: BoundingBox = meshBoundingBox(model.meshes[0]) # set model bounds
+var bounds: BoundingBox = getMeshBoundingBox(model.meshes[0]) # set model bounds
   # NOTE: bounds are calculated from the original size of the model,
   # if model is scaled on drawing, bounds must be also scaled
 
@@ -55,7 +55,7 @@ while not windowShouldClose():
           unloadModel(model) # unload previous model
           model = loadModel(droppedFiles[0]) # load new model
           model.materials[0].maps[MaterialMapIndex.Albedo.int].texture = texture # Set current map diffuse texture
-          bounds = meshBoundingBox(model.meshes[0]) # set new model bounds
+          bounds = getMeshBoundingBox(model.meshes[0]) # set new model bounds
           # TODO: Move camera position from target enough distance to visualize model properly
       elif isFileExtension(droppedFiles[0],".png"): # Texture fil formats supported
         # unload current model texture and load new one
@@ -66,10 +66,10 @@ while not windowShouldClose():
     clearDroppedFiles() # Clear internal buffers
 
   # Select model on mouse click
-  if isMouseButtonPressed(LeftButton):
+  if isMouseButtonPressed(MouseButton.Left):
     # Check collision between ray and box
-    if checkCollisionRayBox(getMouseRay(getMousePosition(),camera), bounds):
-      selected = true
+    if getRayCollisionBox(getMouseRay(getMousePosition(),camera), bounds).hit:
+      selected = not selected
     else:
       selected = false
 

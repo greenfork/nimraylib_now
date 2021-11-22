@@ -47,7 +47,7 @@ setTargetFPS(60)
 while not windowShouldClose(): ##  Detect window close button or ESC key
   ##  Update
   ## ----------------------------------------------------------------------------------
-  if isMouseButtonDown(Left_Button):
+  if isMouseButtonDown(MouseButton.Left):
     ##  Create more bunnies
     for i in 0..<100:
       if bunniesCount < MAX_BUNNIES:

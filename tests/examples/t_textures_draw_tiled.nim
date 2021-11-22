@@ -81,7 +81,7 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
   screenWidth = getScreenWidth()
   screenHeight = getScreenHeight()
   ##  Handle mouse
-  if isMouseButtonPressed(Left_Button):
+  if isMouseButtonPressed(MouseButton.Left):
     var mouse: Vector2 = getMousePosition()
     ##  Check which pattern was clicked and set it as the active pattern
     var i = 0
@@ -105,9 +105,9 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
     scale = 10.0
   elif scale <= 0.0:           ##  Change rotation
     scale = 0.25
-  if isKeyPressed(Left):
+  if isKeyPressed(KeyboardKey.Left):
     rotation -= 25.0
-  if isKeyPressed(Right):
+  if isKeyPressed(KeyboardKey.Right):
     rotation += 25.0
   if isKeyPressed(Space):
     rotation = 0.0

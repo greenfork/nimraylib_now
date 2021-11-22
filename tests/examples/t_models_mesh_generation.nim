@@ -94,9 +94,9 @@ proc main() =
     # Update
     #----------------------------------------------------------------------------------
     updateCamera(camera.addr)  # Update internal camera and our camera
-    if isMouseButtonPressed(LEFT_BUTTON) or isKeyPressed(RIGHT):
+    if isMouseButtonPressed(MouseButton.Left) or isKeyPressed(KeyboardKey.Right):
       currentModel = (currentModel + 1) mod models.len  # Cycle between the textures
-    if isKeyPressed(LEFT):
+    if isKeyPressed(KeyboardKey.Left):
       currentModel = currentModel - 1
       if currentModel < 0: currentModel = models.len - 1
     #--------------------------------------------------------------------------------------

@@ -89,7 +89,7 @@ proc finish() =
 proc padDrawXbox() =
   drawTexture(texXboxPad, 0, 0, DARKGRAY)
   # draw buttons: xbox home
-  if (isGamepadButtonDown(0, MIDDLE)): drawCircle(394, 89, 19, YELLOW)
+  if (isGamepadButtonDown(0, GamepadButton.MIDDLE)): drawCircle(394, 89, 19, YELLOW)
 
   # draw buttons: basic
   if (isGamepadButtonDown(0, MIDDLE_RIGHT)): drawCircle(436, 150, 9, YELLOW)
@@ -133,7 +133,7 @@ proc padDrawXbox() =
 proc padDrawPsx() =
   drawTexture(texPs3Pad, 0, 0, DARKGRAY)
   # Draw buttons: ps
-  if (isGamepadButtonDown(0, MIDDLE)): drawCircle(396, 222, 13, YELLOW)
+  if (isGamepadButtonDown(0, GamepadButton.MIDDLE)): drawCircle(396, 222, 13, YELLOW)
 
   # Draw buttons: basic
   if (isGamepadButtonDown(0, MIDDLE_LEFT)): drawRectangle(328, 170, 32, 13, YELLOW)

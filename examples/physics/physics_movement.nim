@@ -70,9 +70,9 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
     body.position = (screenWidth.float / 2.0, screenHeight.float / 2.0)
     body.velocity = (0.0, 0.0)
     setPhysicsBodyRotation(body, 0)
-  if isKeyDown(Right):
+  if isKeyDown(KeyboardKey.Right):
     body.velocity.x = Velocity
-  elif isKeyDown(Left):  ##  Vertical movement input checking if player physics body is grounded
+  elif isKeyDown(KeyboardKey.Left):  ##  Vertical movement input checking if player physics body is grounded
     body.velocity.x = -Velocity
   if isKeyDown(Up) and body.isGrounded:
     body.velocity.y = -(Velocity * 4.0)

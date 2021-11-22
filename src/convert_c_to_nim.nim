@@ -151,6 +151,7 @@ when not defined(nimraylib_now_linkingOverride):
 #  prefix RL_BLEND_
 #  prefix RL_LOG_
 #  prefix RL_SHADER_ATTRIB_
+#  prefix RL_
 #@
 import raylib
 

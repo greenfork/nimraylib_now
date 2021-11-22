@@ -32,7 +32,7 @@ var
   cubePosition = (x: 0.0, y: 1.0, z: 0.0)
   cubeSize = (x: 2.0, y: 2.0, z: 2.0)
   ray = Ray()                                  #  Picking line ray
-  collision = false
+  collision = RayCollision()
 
 camera.setCameraMode Free                      #  Set a free camera mode
 
@@ -44,19 +44,19 @@ while not windowShouldClose():      #  Detect window close button or ESC key
   # ----------------------------------------------------------------------------------
   camera.addr.updateCamera        #  Update camera
 
-  if MouseButton.LeftButton.isMouseButtonPressed():
-    if not collision:
+  if MouseButton.Left.isMouseButtonPressed():
+    if not collision.hit:
       ray = getMouseRay(getMousePosition(), camera)
 
       #  Check collision between ray and box
-      collision = checkCollisionRayBox(
+      collision = getRayCollisionBox(
         ray,
         BoundingBox(
           min: (x: cubePosition.x - cubeSize.x/2, y: cubePosition.y - cubeSize.y/2, z: cubePosition.z - cubeSize.z/2),
           max: (x: cubePosition.x + cubeSize.x/2, y: cubePosition.y + cubeSize.y/2, z: cubePosition.z + cubeSize.z/2)
         )
       )
-    else: collision = false
+    else: collision.hit = false
   # ----------------------------------------------------------------------------------
 
   #  Draw
@@ -67,7 +67,7 @@ while not windowShouldClose():      #  Detect window close button or ESC key
 
   beginMode3D camera
 
-  if collision:
+  if collision.hit:
     drawCube(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, RED)
     drawCubeWires(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, MAROON)
 
@@ -83,7 +83,7 @@ while not windowShouldClose():      #  Detect window close button or ESC key
 
   drawText("Try selecting the box with mouse!", 240, 10, 20, DARKGRAY)
 
-  if collision:
+  if collision.hit:
     drawText("BOX SELECTED", (screenWidth - measureText("BOX SELECTED", 30)) div 2,
       (screenHeight * 0.1).cint, 30, GREEN)
 

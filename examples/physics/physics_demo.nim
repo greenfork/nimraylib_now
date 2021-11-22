@@ -46,10 +46,10 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
   if isKeyPressed(R):
     resetPhysics()
     needsReset = true
-  if isMouseButtonPressed(LeftButton):
+  if isMouseButtonPressed(MouseButton.Left):
     discard createPhysicsBodyPolygon(getMousePosition(), getRandomValue(20, 80).float,
                                      getRandomValue(3, 8), 10.0)
-  elif isMouseButtonPressed(RightButton): ##  Destroy falling physics bodies
+  elif isMouseButtonPressed(MouseButton.Right): ##  Destroy falling physics bodies
     discard createPhysicsBodyCircle(getMousePosition(), getRandomValue(10, 45).float, 10.0)
   var bodiesCount = getPhysicsBodiesCount()
   for i in countdown(bodiesCount, 0):

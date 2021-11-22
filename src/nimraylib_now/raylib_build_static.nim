@@ -84,10 +84,10 @@ elif defined(macosx):
 else:
   {.compile: quoteShell(RaylibSrcPathRelative / "rglfw.c").}
 
-{.compile: quoteShell(RaylibSrcPathRelative / "shapes.c").}
-{.compile: quoteShell(RaylibSrcPathRelative / "textures.c").}
-{.compile: quoteShell(RaylibSrcPathRelative / "text.c").}
+{.compile: quoteShell(RaylibSrcPathRelative / "rshapes.c").}
+{.compile: quoteShell(RaylibSrcPathRelative / "rtextures.c").}
+{.compile: quoteShell(RaylibSrcPathRelative / "rtext.c").}
 {.compile: quoteShell(RaylibSrcPathRelative / "utils.c").}
-{.compile: quoteShell(RaylibSrcPathRelative / "models.c").}
+{.compile: quoteShell(RaylibSrcPathRelative / "rmodels.c").}
 {.compile: quoteShell(RaylibSrcPathRelative / "raudio.c").}
-{.compile: quoteShell(RaylibSrcPathRelative / "core.c").}
+{.compile: quoteShell(RaylibSrcPathRelative / "rcore.c").}

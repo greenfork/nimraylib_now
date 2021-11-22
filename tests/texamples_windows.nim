@@ -321,7 +321,7 @@ block audio_raw_stream:
   initAudioDevice()              #  Initialize audio device
 
   #  Init raw audio stream (sample rate: 22050, sample size: 16bit-short, channels: 1-mono)
-  let stream = initAudioStream(22050, 16, 1)
+  let stream = loadAudioStream(22050, 16, 1)
 
   #  Buffer for the single cycle waveform we are synthesizing
   var data: array[MAX_SAMPLES, uint16]
@@ -359,7 +359,7 @@ block audio_raw_stream:
       #  Sample mouse input.
       mousePosition = getMousePosition()
 
-      if isMouseButtonDown(LEFT_BUTTON): frequency = 40.0 + (mousePosition.y).float
+      if isMouseButtonDown(MouseButton.Left): frequency = 40.0 + (mousePosition.y).float
 
       #  Rewrite the sine wave.
       #  Compute two cycles to allow the buffer padding, simplifying any modulation, resampling, etc.
@@ -426,7 +426,7 @@ block audio_raw_stream:
 
   #  De-Initialization
   # --------------------------------------------------------------------------------------
-  closeAudioStream stream    #  Close raw audio stream and delete buffers from RAM
+  unloadAudioStream stream    #  Close raw audio stream and delete buffers from RAM
   closeAudioDevice()         #  Close audio device (music streaming is automatically stopped)
 
   closeWindow()              #  Close window and OpenGL context
@@ -488,8 +488,8 @@ block core_2d_camera:
     # Update
     #----------------------------------------------------------------------------------
     # Player movement
-    if isKeyDown(RIGHT):  player.x += 2
-    elif isKeyDown(LEFT): player.x -= 2
+    if isKeyDown(KeyboardKey.Right):  player.x += 2
+    elif isKeyDown(KeyboardKey.Left): player.x -= 2
     # Camera target follows player
     camera.target = (x: player.x + 20.0, y: player.y + 20.0)
     # Camera rotation controls
@@ -666,9 +666,9 @@ block core_2d_camera_platformer:
   ## --------------------------------------------------------------------------------------
 
   proc updatePlayer(player: var Player, envItems: var openArray[EnvItem], delta: float) =
-    if isKeyDown(Left):
+    if isKeyDown(KeyboardKey.Left):
       player.position.x -= PLAYER_HOR_SPD * delta
-    if isKeyDown(Right):
+    if isKeyDown(KeyboardKey.Right):
       player.position.x += PLAYER_JUMP_SPD * delta
     if isKeyDown(Space) and player.canJump:
       player.speed = -PLAYER_JUMP_SPD
@@ -1041,7 +1041,7 @@ block core_3d_picking:
     cubePosition = (x: 0.0, y: 1.0, z: 0.0)
     cubeSize = (x: 2.0, y: 2.0, z: 2.0)
     ray = Ray()                                  #  Picking line ray
-    collision = false
+    collision = RayCollision()
 
   camera.setCameraMode Free                      #  Set a free camera mode
 
@@ -1053,19 +1053,19 @@ block core_3d_picking:
     # ----------------------------------------------------------------------------------
     camera.addr.updateCamera        #  Update camera
 
-    if MouseButton.LeftButton.isMouseButtonPressed():
-      if not collision:
+    if MouseButton.Left.isMouseButtonPressed():
+      if not collision.hit:
         ray = getMouseRay(getMousePosition(), camera)
 
         #  Check collision between ray and box
-        collision = checkCollisionRayBox(
+        collision = getRayCollisionBox(
           ray,
           BoundingBox(
             min: (x: cubePosition.x - cubeSize.x/2, y: cubePosition.y - cubeSize.y/2, z: cubePosition.z - cubeSize.z/2),
             max: (x: cubePosition.x + cubeSize.x/2, y: cubePosition.y + cubeSize.y/2, z: cubePosition.z + cubeSize.z/2)
           )
         )
-      else: collision = false
+      else: collision.hit = false
     # ----------------------------------------------------------------------------------
 
     #  Draw
@@ -1076,7 +1076,7 @@ block core_3d_picking:
 
     beginMode3D camera
 
-    if collision:
+    if collision.hit:
       drawCube(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, RED)
       drawCubeWires(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, MAROON)
 
@@ -1092,7 +1092,7 @@ block core_3d_picking:
 
     drawText("Try selecting the box with mouse!", 240, 10, 20, DARKGRAY)
 
-    if collision:
+    if collision.hit:
       drawText("BOX SELECTED", (screenWidth - measureText("BOX SELECTED", 30)) div 2,
         (screenHeight * 0.1).cint, 30, GREEN)
 
@@ -1312,7 +1312,7 @@ block core_input_gamepad:
   proc padDrawXbox() =
     drawTexture(texXboxPad, 0, 0, DARKGRAY)
     # draw buttons: xbox home
-    if (isGamepadButtonDown(0, MIDDLE)): drawCircle(394, 89, 19, YELLOW)
+    if (isGamepadButtonDown(0, GamepadButton.MIDDLE)): drawCircle(394, 89, 19, YELLOW)
 
     # draw buttons: basic
     if (isGamepadButtonDown(0, MIDDLE_RIGHT)): drawCircle(436, 150, 9, YELLOW)
@@ -1356,7 +1356,7 @@ block core_input_gamepad:
   proc padDrawPsx() =
     drawTexture(texPs3Pad, 0, 0, DARKGRAY)
     # Draw buttons: ps
-    if (isGamepadButtonDown(0, MIDDLE)): drawCircle(396, 222, 13, YELLOW)
+    if (isGamepadButtonDown(0, GamepadButton.MIDDLE)): drawCircle(396, 222, 13, YELLOW)
 
     # Draw buttons: basic
     if (isGamepadButtonDown(0, MIDDLE_LEFT)): drawRectangle(328, 170, 32, 13, YELLOW)
@@ -1405,7 +1405,7 @@ block core_input_gamepad:
 block core_input_gestures:
   # ******************************************************************************************
   #
-  #    raylib [core] example - Input Gestures Detection
+  #    raylib [core] example - Input Gesture Detection
   #
   #    This example has been created using raylib 1.4 (www.raylib.com)
   #    raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
@@ -1428,9 +1428,9 @@ block core_input_gestures:
   var touchArea: Rectangle = (220.0, 10.0, (float)screenWidth - 230, (float)screenHeight - 20)
   var gesturesCount = 0
   var gestureStrings: array[MaxGestureStrings, cstring]
-  var currentGesture = Gestures.None
-  var lastGesture = Gestures.None
-  ## SetGesturesEnabled(0b0000000000001001);   // Enable only some gestures to be detected
+  var currentGesture = Gesture.None
+  var lastGesture = Gesture.None
+  ## SetGestureEnabled(0b0000000000001001);   // Enable only some gestures to be detected
   setTargetFPS(60)
   ##  Set our game to run at 60 frames-per-second
   ## --------------------------------------------------------------------------------------
@@ -1439,10 +1439,10 @@ block core_input_gestures:
     ##  Update
     ## ----------------------------------------------------------------------------------
     lastGesture = currentGesture
-    currentGesture = getGestureDetected().Gestures
+    currentGesture = getGestureDetected().Gesture
     touchPosition = getTouchPosition(0)
     if checkCollisionPointRec(touchPosition, touchArea) and
-        (currentGesture != Gestures.None):
+        (currentGesture != Gesture.None):
       if currentGesture != lastGesture:
         ##  Store gesture string
         case currentGesture
@@ -1495,7 +1495,7 @@ block core_input_gestures:
       inc(i)
     drawRectangleLines(10, 29, 200, screenHeight - 50, Gray)
     drawText("DETECTED GESTURES", 50, 15, 10, Gray)
-    if currentGesture != Gestures.None:
+    if currentGesture != Gesture.None:
       drawCircleV(touchPosition, 30, Maroon)
     endDrawing()
   ## ----------------------------------------------------------------------------------
@@ -1536,8 +1536,8 @@ block core_input_keys:
   while not windowShouldClose():    # Detect window close button or ESC key
     #  Update
     # ----------------------------------------------------------------------------------
-    if isKeyDown(Right): ballPosition.x += 2.0
-    if isKeyDown(Left):  ballPosition.x -= 2.0
+    if isKeyDown(KeyboardKey.Right): ballPosition.x += 2.0
+    if isKeyDown(KeyboardKey.Left):  ballPosition.x -= 2.0
     if isKeyDown(Up):    ballPosition.y -= 2.0
     if isKeyDown(Down):  ballPosition.y += 2.0
     # ----------------------------------------------------------------------------------
@@ -1588,11 +1588,11 @@ block core_input_mouse:
     ##  Update
     ## ----------------------------------------------------------------------------------
     ballPosition = getMousePosition()
-    if isMouseButtonPressed(LeftButton):
+    if isMouseButtonPressed(MouseButton.Left):
       ballColor = Maroon
-    elif isMouseButtonPressed(MiddleButton):
+    elif isMouseButtonPressed(MouseButton.Middle):
       ballColor = Lime
-    elif isMouseButtonPressed(RightButton):
+    elif isMouseButtonPressed(MouseButton.Right):
       ballColor = Darkblue
     ## ----------------------------------------------------------------------------------
     ##  Draw
@@ -2684,7 +2684,7 @@ block models_loading:
     # original C code: model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture
     # MATERIAL_MAP_DIFFUSE is now ALBEDO (Raylib)
   var position: Vector3 = (0.0, 0.0, 0.0) # set model position
-  var bounds: BoundingBox = meshBoundingBox(model.meshes[0]) # set model bounds
+  var bounds: BoundingBox = getMeshBoundingBox(model.meshes[0]) # set model bounds
     # NOTE: bounds are calculated from the original size of the model,
     # if model is scaled on drawing, bounds must be also scaled
 
@@ -2709,7 +2709,7 @@ block models_loading:
             unloadModel(model) # unload previous model
             model = loadModel(droppedFiles[0]) # load new model
             model.materials[0].maps[MaterialMapIndex.Albedo.int].texture = texture # Set current map diffuse texture
-            bounds = meshBoundingBox(model.meshes[0]) # set new model bounds
+            bounds = getMeshBoundingBox(model.meshes[0]) # set new model bounds
             # TODO: Move camera position from target enough distance to visualize model properly
         elif isFileExtension(droppedFiles[0],".png"): # Texture fil formats supported
           # unload current model texture and load new one
@@ -2720,10 +2720,10 @@ block models_loading:
       clearDroppedFiles() # Clear internal buffers
 
     # Select model on mouse click
-    if isMouseButtonPressed(LeftButton):
+    if isMouseButtonPressed(MouseButton.Left):
       # Check collision between ray and box
-      if checkCollisionRayBox(getMouseRay(getMousePosition(),camera), bounds):
-        selected = true
+      if getRayCollisionBox(getMouseRay(getMousePosition(),camera), bounds).hit:
+        selected = not selected
       else:
         selected = false
 
@@ -2838,9 +2838,9 @@ block models_mesh_generation:
       # Update
       #----------------------------------------------------------------------------------
       updateCamera(camera.addr)  # Update internal camera and our camera
-      if isMouseButtonPressed(LEFT_BUTTON) or isKeyPressed(RIGHT):
+      if isMouseButtonPressed(MouseButton.Left) or isKeyPressed(KeyboardKey.Right):
         currentModel = (currentModel + 1) mod models.len  # Cycle between the textures
-      if isKeyPressed(LEFT):
+      if isKeyPressed(KeyboardKey.Left):
         currentModel = currentModel - 1
         if currentModel < 0: currentModel = models.len - 1
       #--------------------------------------------------------------------------------------
@@ -3348,10 +3348,10 @@ block physics_demo:
     if isKeyPressed(R):
       resetPhysics()
       needsReset = true
-    if isMouseButtonPressed(LeftButton):
+    if isMouseButtonPressed(MouseButton.Left):
       discard createPhysicsBodyPolygon(getMousePosition(), getRandomValue(20, 80).float,
                                        getRandomValue(3, 8), 10.0)
-    elif isMouseButtonPressed(RightButton): ##  Destroy falling physics bodies
+    elif isMouseButtonPressed(MouseButton.Right): ##  Destroy falling physics bodies
       discard createPhysicsBodyCircle(getMousePosition(), getRandomValue(10, 45).float, 10.0)
     var bodiesCount = getPhysicsBodiesCount()
     for i in countdown(bodiesCount, 0):
@@ -3579,9 +3579,9 @@ block physics_movement:
       body.position = (screenWidth.float / 2.0, screenHeight.float / 2.0)
       body.velocity = (0.0, 0.0)
       setPhysicsBodyRotation(body, 0)
-    if isKeyDown(Right):
+    if isKeyDown(KeyboardKey.Right):
       body.velocity.x = Velocity
-    elif isKeyDown(Left):  ##  Vertical movement input checking if player physics body is grounded
+    elif isKeyDown(KeyboardKey.Left):  ##  Vertical movement input checking if player physics body is grounded
       body.velocity.x = -Velocity
     if isKeyDown(Up) and body.isGrounded:
       body.velocity.y = -(Velocity * 4.0)
@@ -3778,7 +3778,7 @@ block physics_shatter:
     if isKeyPressed(R):
       resetPhysics()
       needsReset = true
-    if isMouseButtonPressed(LeftButton):
+    if isMouseButtonPressed(MouseButton.Left):
       ##  Note: some values need to be stored in variables due to asynchronous changes during main thread
       var count = getPhysicsBodiesCount()
       var i = count - 1
@@ -4366,13 +4366,13 @@ block shaders_hot_reloading:
     setShaderValue(shader, timeLoc, addr(totalTime), Float)
     setShaderValue(shader, mouseLoc, mousePos.addr, Vec2)
     ##  Hot shader reloading
-    if shaderAutoReloading or (isMouseButtonPressed(Left_Button)):
+    if shaderAutoReloading or (isMouseButtonPressed(MouseButton.Left)):
       var currentFragShaderModTime: clong = getFileModTime(textFormat(fragShaderFileName, GLSL_VERSION))
       ##  Check if shader file has been modified
       if currentFragShaderModTime != fragShaderFileModTime:
         ##  Try reloading updated shader
         var updatedShader: Shader = loadShader(nil, textFormat(fragShaderFileName, GLSL_VERSION))
-        if updatedShader.id != rl.getShaderDefault().id:
+        if updatedShader.id != rl.getShaderIdDefault():
           unloadShader(shader)
           shader = updatedShader
           ##  Get shader locations for requiRed uniforms
@@ -4508,15 +4508,15 @@ block shaders_julia_set:
     if isKeyPressed(F1):
       showControls = not showControls
     if not pause:
-      if isKeyPressed(Right):
+      if isKeyPressed(KeyboardKey.Right):
         inc(incrementSpeed)
-      elif isKeyPressed(Left): ##  TODO: The idea is to zoom and move around with mouse
+      elif isKeyPressed(KeyboardKey.Left): ##  TODO: The idea is to zoom and move around with mouse
                                  ##  Probably offset movement should be proportional to zoom level
         dec(incrementSpeed)
-      if isMouseButtonDown(Left_Button) or isMouseButtonDown(Right_Button):
-        if isMouseButtonDown(Left_Button):
+      if isMouseButtonDown(MouseButton.Left) or isMouseButtonDown(MouseButton.Right):
+        if isMouseButtonDown(MouseButton.Left):
           zoom += zoom*0.003
-        if isMouseButtonDown(Right_Button):
+        if isMouseButtonDown(MouseButton.Right):
           zoom -= zoom*0.003
         var mousePos: Vector2 = getMousePosition()
         offsetSpeed.x = mousePos.x - (float)(screenWidth div 2)
@@ -4666,7 +4666,7 @@ block shaders_palette_switch:
   while not windowShouldClose():         #  Detect window close button or ESC key
       #  Update
       # ----------------------------------------------------------------------------------
-      currentPalette += (if isKeyPressed(RIGHT): 1 elif isKeyPressed(LEFT): -1 else: 0)
+      currentPalette += (if isKeyPressed(KeyboardKey.Right): 1 elif isKeyPressed(KeyboardKey.Left): -1 else: 0)
 
       if currentPalette >= MAX_PALETTES: currentPalette = 0
       elif currentPalette < 0: currentPalette = MAX_PALETTES - 1
@@ -5225,123 +5225,6 @@ block text_input_box:
   # --------------------------------------------------------------------------------------
 
 
-block text_rectangle_bound:
-  #*******************************************************************************************
-  #
-  #   raylib [text] example - Draw text inside a rectangle
-  #
-  #   This example has been created using raylib 2.3 (www.raylib.com)
-  #   raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
-  #
-  #   Example contributed by Vlad Adrian (@demizdor) and reviewed by Ramon Santamaria (@raysan5)
-  #
-  #   Copyright (c) 2018 Vlad Adrian (@demizdor) and Ramon Santamaria (@raysan5)
-  #   /Converted in 2*20 by Guevara-chan.
-  #   Adapted in 2021 by greenfork
-  #
-  #*******************************************************************************************
-
-
-  #  Initialization
-  # --------------------------------------------------------------------------------------
-  const screenWidth = 800
-  const screenHeight = 450
-
-  initWindow screenWidth, screenHeight, "raylib [text] example - draw text inside a rectangle"
-
-  let text = "Text cannot escape\tthis container\t...word wrap also works when active so here's" &
-      "a long text for testing.\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod" &
-      "tempor incididunt ut labore et dolore magna aliqua. Nec ullamcorper sit amet risus nullam eget felis eget."
-
-  var
-      resizing = false
-      wordWrap = true
-
-      container: Rectangle = (x: 25.0, y: 25.0, width: (float) screenWidth - 50, height: (float) screenHeight - 250)
-      resizer: Rectangle   = (x: container.x+container.width-17.0, y: container.y+container.height-17.0, width: 14.0, height: 14.0)
-
-  #  Minimum width and heigh for the container rectangle
-  const minWidth  = 60
-  const minHeight = 60
-  const maxWidth  = screenWidth - 50
-  const maxHeight = screenHeight - 160
-
-  var
-      lastMouse: Vector2 = (x: 0.0, y: 0.0) #  Stores last mouse coordinates
-      borderColor = MAROON                 #  Container border color
-      font = getFontDefault()              #  Get default system font
-
-  60.setTargetFPS                       #  Set our game to run at 60 frames-per-second
-  # --------------------------------------------------------------------------------------
-
-  #  Main game loop
-  while not windowShouldClose():        #  Detect window close button or ESC key
-      #  Update
-      # ----------------------------------------------------------------------------------
-      if isKeyPressed(SPACE): wordWrap = not wordWrap
-
-      let mouse = getMousePosition()
-
-      #  Check if the mouse is inside the container and toggle border color
-      if checkCollisionPointRec(mouse, container): borderColor = fade(MAROON, 0.4)
-      elif not resizing: borderColor = MAROON
-
-      #  Container resizing logic
-      if resizing:
-          if isMouseButtonReleased(LEFT_BUTTON): resizing = false
-
-          let width = container.width + (mouse.x - lastMouse.x)
-          container.width = if width > minWidth: (if width < maxWidth: width else: maxWidth) else: minWidth
-
-          let height = container.height + (mouse.y - lastMouse.y)
-          container.height = if height > minHeight: (if height < maxHeight: height else: maxHeight) else: minHeight
-      else:
-          #  Check if we're resizing
-          if isMouseButtonDown(LEFT_BUTTON) and checkCollisionPointRec(mouse, resizer): resizing = true
-
-      #  Move resizer rectangle properly
-      resizer.x = container.x + container.width - 17
-      resizer.y = container.y + container.height - 17
-
-      lastMouse = mouse #  Update mouse
-      # ----------------------------------------------------------------------------------
-
-      #  Draw
-      # ----------------------------------------------------------------------------------
-      beginDrawing()
-
-      clearBackground RAYWHITE
-
-      drawRectangleLinesEx container, 3, borderColor  #  Draw container border
-
-      #  Draw text in container (add some padding)
-      drawTextRec font, text,
-                 (x: container.x + 4.0, y: container.y + 4.0, width: container.width-4.0, height: container.height-4.0),
-                 20.0, 2.0, wordWrap, GRAY
-
-      drawRectangleRec resizer, borderColor          #  Draw the resize box
-
-      #  Draw bottom info
-      drawRectangle 0, screenHeight - 54, screenWidth, 54, GRAY
-      drawRectangleRec (x: 382.0, y: screenHeight - 34.0, width: 12.0, height: 12.0), MAROON
-
-      drawText "Word Wrap: ", 313, screenHeight-115, 20, BLACK
-      if wordWrap: drawText "ON", 447, screenHeight - 115, 20, RED
-      else: drawText "OFF", 447, screenHeight - 115, 20, BLACK
-
-      drawText "Press [SPACE] to toggle word wrap", 218, screenHeight - 86, 20, GRAY
-
-      drawText "Click hold & drag the    to resize the container", 155, screenHeight - 38, 20, RAYWHITE
-
-      endDrawing()
-      # ----------------------------------------------------------------------------------
-
-  #  De-Initialization
-  # --------------------------------------------------------------------------------------
-  closeWindow()        #  Close window and OpenGL context
-  # --------------------------------------------------------------------------------------
-
-
 block textures_background_scrolling:
   # ******************************************************************************************
   #
@@ -5551,7 +5434,7 @@ block textures_bunnymark:
   while not windowShouldClose(): ##  Detect window close button or ESC key
     ##  Update
     ## ----------------------------------------------------------------------------------
-    if isMouseButtonDown(Left_Button):
+    if isMouseButtonDown(MouseButton.Left):
       ##  Create more bunnies
       for i in 0..<100:
         if bunniesCount < MAX_BUNNIES:
@@ -5681,7 +5564,7 @@ block textures_draw_tiled:
     screenWidth = getScreenWidth()
     screenHeight = getScreenHeight()
     ##  Handle mouse
-    if isMouseButtonPressed(Left_Button):
+    if isMouseButtonPressed(MouseButton.Left):
       var mouse: Vector2 = getMousePosition()
       ##  Check which pattern was clicked and set it as the active pattern
       var i = 0
@@ -5705,9 +5588,9 @@ block textures_draw_tiled:
       scale = 10.0
     elif scale <= 0.0:           ##  Change rotation
       scale = 0.25
-    if isKeyPressed(Left):
+    if isKeyPressed(KeyboardKey.Left):
       rotation -= 25.0
-    if isKeyPressed(Right):
+    if isKeyPressed(KeyboardKey.Right):
       rotation += 25.0
     if isKeyPressed(Space):
       rotation = 0.0
@@ -5855,7 +5738,7 @@ block textures_image_generation:
 
 
   const
-    NUM_TEXTURES = 7
+    NUM_TEXTURES = 6
 
 
   ##  Initialization
@@ -5871,7 +5754,6 @@ block textures_image_generation:
       White, Black)
   var checked: Image = genImageChecked(screenWidth, screenHeight, 32, 32, Red, Blue)
   var WhiteNoise: Image = genImageWhiteNoise(screenWidth, screenHeight, 0.5)
-  var perlinNoise: Image = genImagePerlinNoise(screenWidth, screenHeight, 50, 50, 4.0)
   var cellular: Image = genImageCellular(screenWidth, screenHeight, 32)
   var textures: array[NUM_TEXTURES, Texture2D]
   textures[0] = loadTextureFromImage(verticalGradient)
@@ -5879,15 +5761,13 @@ block textures_image_generation:
   textures[2] = loadTextureFromImage(radialGradient)
   textures[3] = loadTextureFromImage(checked)
   textures[4] = loadTextureFromImage(WhiteNoise)
-  textures[5] = loadTextureFromImage(perlinNoise)
-  textures[6] = loadTextureFromImage(cellular)
+  textures[5] = loadTextureFromImage(cellular)
   ##  Unload image data (CPU RAM)
   unloadImage(verticalGradient)
   unloadImage(horizontalGradient)
   unloadImage(radialGradient)
   unloadImage(checked)
   unloadImage(WhiteNoise)
-  unloadImage(perlinNoise)
   unloadImage(cellular)
   var currentTexture = 0
   setTargetFPS(60)
@@ -5896,7 +5776,7 @@ block textures_image_generation:
   while not windowShouldClose():
     ##  Update
     ## ----------------------------------------------------------------------------------
-    if isMouseButtonPressed(Left_Button) or isKeyPressed(Right):
+    if isMouseButtonPressed(MouseButton.Left) or isKeyPressed(KeyboardKey.Right):
       currentTexture = (currentTexture + 1) mod NUM_TEXTURES
       ##  Cycle between the textures
     beginDrawing()
@@ -5917,8 +5797,6 @@ block textures_image_generation:
     of 4:
       drawText("WHITE NOISE", 640, 10, 20, Red)
     of 5:
-      drawText("PERLIN NOISE", 630, 10, 20, Raywhite)
-    of 6:
       drawText("CELLULAR", 670, 10, 20, Raywhite)
     else:
       discard
@@ -6301,9 +6179,9 @@ block textures_mouse_painting:
     ## ----------------------------------------------------------------------------------
     var mousePos: Vector2 = getMousePosition()
     ##  Move between colors with keys
-    if isKeyPressed(Right):
+    if isKeyPressed(KeyboardKey.Right):
       inc(colorSelected)
-    elif isKeyPressed(Left):
+    elif isKeyPressed(KeyboardKey.Left):
       dec(colorSelected)
     if colorSelected >= MAX_COLORS_COUNT:
       colorSelected = MAX_COLORS_COUNT - 1
@@ -6317,7 +6195,7 @@ block textures_mouse_painting:
       else:
         colorMouseHover = -1
       inc(i)
-    if (colorMouseHover >= 0) and isMouseButtonPressed(Left_Button):
+    if (colorMouseHover >= 0) and isMouseButtonPressed(MouseButton.Left):
       colorSelected = colorMouseHover
       colorSelectedPrev = colorSelected
     brushSize += getMouseWheelMove().int * 5
@@ -6330,7 +6208,7 @@ block textures_mouse_painting:
       beginTextureMode(target)
       clearBackground(colors[0])
       endTextureMode()
-    if isMouseButtonDown(Left_Button) or
+    if isMouseButtonDown(MouseButton.Left) or
         (getGestureDetected() == Drag):
       ##  Paint circle into render texture
       ##  NOTE: To avoid discontinuous circles, we could store
@@ -6339,7 +6217,7 @@ block textures_mouse_painting:
       if mousePos.y > 50:
         drawCircle(mousePos.x.int, mousePos.y.int, brushSize.float, colors[colorSelected])
       endTextureMode()
-    if isMouseButtonDown(Right_Button):
+    if isMouseButtonDown(MouseButton.Right):
       colorSelected = 0
       ##  Erase circle from render texture
       beginTextureMode(target)
@@ -6355,9 +6233,9 @@ block textures_mouse_painting:
       btnSaveMouseHover = false
     ##  Image saving logic
     ##  NOTE: Saving painted texture to a default named image
-    if (btnSaveMouseHover and isMouseButtonReleased(Left_Button)) or
+    if (btnSaveMouseHover and isMouseButtonReleased(MouseButton.Left)) or
         isKeyPressed(S):
-      var image: Image = getTextureData(target.texture)
+      var image: Image = loadImageFromTexture(target.texture)
       imageFlipVertical(addr(image))
       discard exportImage(image, "my_amazing_texture_painting.png")
       unloadImage(image)
@@ -6379,7 +6257,7 @@ block textures_mouse_painting:
     )
     ##  Draw drawing circle for reference
     if mousePos.y > 50:
-      if isMouseButtonDown(Right_Button):
+      if isMouseButtonDown(MouseButton.Right):
         drawCircleLines(mousePos.x.int, mousePos.y.int, brushSize.float, Gray)
       else:
         drawCircle(getMouseX().int, getMouseY().int, brushSize.float, colors[colorSelected])
@@ -6807,9 +6685,9 @@ block textures_rectangle:
       if currentFrame > 5:
         currentFrame = 0
       frameRec.x = (currentFrame * (scarfy.width div 6)).float
-    if isKeyPressed(Right):
+    if isKeyPressed(KeyboardKey.Right):
       inc(framesSpeed)
-    elif isKeyPressed(Left):
+    elif isKeyPressed(KeyboardKey.Left):
       dec(framesSpeed)
     if framesSpeed > MAX_FRAME_SPEED:
       framesSpeed = MAX_FRAME_SPEED
@@ -6897,11 +6775,11 @@ block textures_sprite_button:
     btnAction = false
     ##  Check button state
     if checkCollisionPointRec(mousePoint, btnBounds):
-      if isMouseButtonDown(Left_Button):
+      if isMouseButtonDown(MouseButton.Left):
         btnState = 2
       else:
         btnState = 1
-      if isMouseButtonReleased(Left_Button):
+      if isMouseButtonReleased(MouseButton.Left):
         btnAction = true
     else:
       btnState = 0
@@ -6978,7 +6856,7 @@ block textures_sprite_explosion:
     ##  Update
     ## ----------------------------------------------------------------------------------
     ##  Check for mouse button pressed and activate explosion (if not active)
-    if isMouseButtonPressed(Left_Button) and not active:
+    if isMouseButtonPressed(MouseButton.Left) and not active:
       position = getMousePosition()
       active = true
       position.x -= (float)frameWidth div 2
@@ -7113,7 +6991,7 @@ block textures_to_image:
   ##  Image converted to texture, GPU memory (RAM -> VRAM)
   unloadImage(image)
   ##  Unload image data from CPU memory (RAM)
-  image = getTextureData(texture)
+  image = loadImageFromTexture(texture)
   ##  Retrieve image data from GPU memory (VRAM -> RAM)
   unloadTexture(texture)
   ##  Unload texture from GPU memory (VRAM)

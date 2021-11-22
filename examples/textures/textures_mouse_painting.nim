@@ -57,9 +57,9 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
   ## ----------------------------------------------------------------------------------
   var mousePos: Vector2 = getMousePosition()
   ##  Move between colors with keys
-  if isKeyPressed(Right):
+  if isKeyPressed(KeyboardKey.Right):
     inc(colorSelected)
-  elif isKeyPressed(Left):
+  elif isKeyPressed(KeyboardKey.Left):
     dec(colorSelected)
   if colorSelected >= MAX_COLORS_COUNT:
     colorSelected = MAX_COLORS_COUNT - 1
@@ -73,7 +73,7 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
     else:
       colorMouseHover = -1
     inc(i)
-  if (colorMouseHover >= 0) and isMouseButtonPressed(Left_Button):
+  if (colorMouseHover >= 0) and isMouseButtonPressed(MouseButton.Left):
     colorSelected = colorMouseHover
     colorSelectedPrev = colorSelected
   brushSize += getMouseWheelMove().int * 5
@@ -86,7 +86,7 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
     beginTextureMode(target)
     clearBackground(colors[0])
     endTextureMode()
-  if isMouseButtonDown(Left_Button) or
+  if isMouseButtonDown(MouseButton.Left) or
       (getGestureDetected() == Drag):
     ##  Paint circle into render texture
     ##  NOTE: To avoid discontinuous circles, we could store
@@ -95,7 +95,7 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
     if mousePos.y > 50:
       drawCircle(mousePos.x.int, mousePos.y.int, brushSize.float, colors[colorSelected])
     endTextureMode()
-  if isMouseButtonDown(Right_Button):
+  if isMouseButtonDown(MouseButton.Right):
     colorSelected = 0
     ##  Erase circle from render texture
     beginTextureMode(target)
@@ -111,9 +111,9 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
     btnSaveMouseHover = false
   ##  Image saving logic
   ##  NOTE: Saving painted texture to a default named image
-  if (btnSaveMouseHover and isMouseButtonReleased(Left_Button)) or
+  if (btnSaveMouseHover and isMouseButtonReleased(MouseButton.Left)) or
       isKeyPressed(S):
-    var image: Image = getTextureData(target.texture)
+    var image: Image = loadImageFromTexture(target.texture)
     imageFlipVertical(addr(image))
     discard exportImage(image, "my_amazing_texture_painting.png")
     unloadImage(image)
@@ -135,7 +135,7 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
   )
   ##  Draw drawing circle for reference
   if mousePos.y > 50:
-    if isMouseButtonDown(Right_Button):
+    if isMouseButtonDown(MouseButton.Right):
       drawCircleLines(mousePos.x.int, mousePos.y.int, brushSize.float, Gray)
     else:
       drawCircle(getMouseX().int, getMouseY().int, brushSize.float, colors[colorSelected])

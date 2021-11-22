@@ -51,7 +51,7 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
   if isKeyPressed(R):
     resetPhysics()
     needsReset = true
-  if isMouseButtonPressed(LeftButton):
+  if isMouseButtonPressed(MouseButton.Left):
     ##  Note: some values need to be stored in variables due to asynchronous changes during main thread
     var count = getPhysicsBodiesCount()
     var i = count - 1

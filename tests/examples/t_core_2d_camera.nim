@@ -59,8 +59,8 @@ while not windowShouldClose():
   # Update
   #----------------------------------------------------------------------------------
   # Player movement
-  if isKeyDown(RIGHT):  player.x += 2
-  elif isKeyDown(LEFT): player.x -= 2
+  if isKeyDown(KeyboardKey.Right):  player.x += 2
+  elif isKeyDown(KeyboardKey.Left): player.x -= 2
   # Camera target follows player
   camera.target = (x: player.x + 20.0, y: player.y + 20.0)
   # Camera rotation controls

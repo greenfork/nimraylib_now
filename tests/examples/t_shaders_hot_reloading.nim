@@ -58,13 +58,13 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
   setShaderValue(shader, timeLoc, addr(totalTime), Float)
   setShaderValue(shader, mouseLoc, mousePos.addr, Vec2)
   ##  Hot shader reloading
-  if shaderAutoReloading or (isMouseButtonPressed(Left_Button)):
+  if shaderAutoReloading or (isMouseButtonPressed(MouseButton.Left)):
     var currentFragShaderModTime: clong = getFileModTime(textFormat(fragShaderFileName, GLSL_VERSION))
     ##  Check if shader file has been modified
     if currentFragShaderModTime != fragShaderFileModTime:
       ##  Try reloading updated shader
       var updatedShader: Shader = loadShader(nil, textFormat(fragShaderFileName, GLSL_VERSION))
-      if updatedShader.id != rl.getShaderDefault().id:
+      if updatedShader.id != rl.getShaderIdDefault():
         unloadShader(shader)
         shader = updatedShader
         ##  Get shader locations for requiRed uniforms

@@ -54,11 +54,11 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
   btnAction = false
   ##  Check button state
   if checkCollisionPointRec(mousePoint, btnBounds):
-    if isMouseButtonDown(Left_Button):
+    if isMouseButtonDown(MouseButton.Left):
       btnState = 2
     else:
       btnState = 1
-    if isMouseButtonReleased(Left_Button):
+    if isMouseButtonReleased(MouseButton.Left):
       btnAction = true
   else:
     btnState = 0

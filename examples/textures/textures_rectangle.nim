@@ -47,9 +47,9 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
     if currentFrame > 5:
       currentFrame = 0
     frameRec.x = (currentFrame * (scarfy.width div 6)).float
-  if isKeyPressed(Right):
+  if isKeyPressed(KeyboardKey.Right):
     inc(framesSpeed)
-  elif isKeyPressed(Left):
+  elif isKeyPressed(KeyboardKey.Left):
     dec(framesSpeed)
   if framesSpeed > MAX_FRAME_SPEED:
     framesSpeed = MAX_FRAME_SPEED

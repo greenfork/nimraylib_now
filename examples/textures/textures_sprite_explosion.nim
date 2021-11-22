@@ -45,7 +45,7 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
   ##  Update
   ## ----------------------------------------------------------------------------------
   ##  Check for mouse button pressed and activate explosion (if not active)
-  if isMouseButtonPressed(Left_Button) and not active:
+  if isMouseButtonPressed(MouseButton.Left) and not active:
     position = getMousePosition()
     active = true
     position.x -= (float)frameWidth div 2

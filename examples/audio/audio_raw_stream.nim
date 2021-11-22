@@ -28,7 +28,7 @@ initWindow screenWidth, screenHeight, "raylib [audio] example - raw audio stream
 initAudioDevice()              #  Initialize audio device
 
 #  Init raw audio stream (sample rate: 22050, sample size: 16bit-short, channels: 1-mono)
-let stream = initAudioStream(22050, 16, 1)
+let stream = loadAudioStream(22050, 16, 1)
 
 #  Buffer for the single cycle waveform we are synthesizing
 var data: array[MAX_SAMPLES, uint16]
@@ -66,7 +66,7 @@ while not windowShouldClose():  #  Detect window close button or ESC key
     #  Sample mouse input.
     mousePosition = getMousePosition()
 
-    if isMouseButtonDown(LEFT_BUTTON): frequency = 40.0 + (mousePosition.y).float
+    if isMouseButtonDown(MouseButton.Left): frequency = 40.0 + (mousePosition.y).float
 
     #  Rewrite the sine wave.
     #  Compute two cycles to allow the buffer padding, simplifying any modulation, resampling, etc.
@@ -133,7 +133,7 @@ while not windowShouldClose():  #  Detect window close button or ESC key
 
 #  De-Initialization
 # --------------------------------------------------------------------------------------
-closeAudioStream stream    #  Close raw audio stream and delete buffers from RAM
+unloadAudioStream stream    #  Close raw audio stream and delete buffers from RAM
 closeAudioDevice()         #  Close audio device (music streaming is automatically stopped)
 
 closeWindow()              #  Close window and OpenGL context
