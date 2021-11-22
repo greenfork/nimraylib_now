@@ -26,3 +26,4 @@ a.out
 /outputGotten.txt
 /testresults
 /tests/emscripten/*.js
+.ccls-cache/

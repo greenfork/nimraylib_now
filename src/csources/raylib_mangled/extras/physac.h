@@ -245,6 +245,8 @@ PHYSACDEF Vector2 GetPhysicsShapeVertex(PhysicsBody body, int vertex);          
         extern "C" {        // Prevents name mangling of functions
         #endif
         // Functions required to query time on Windows
+        int __stdcall QueryPerformanceCounter(unsigned long long int *lpPerformanceCount);
+        int __stdcall QueryPerformanceFrequency(unsigned long long int *lpFrequency);
         #if defined(__cplusplus)
         }
         #endif
@@ -310,7 +312,7 @@ static unsigned int usedMemory = 0;                         // Total allocated d
 // Timming measure functions
 static void InitTimerHiRes(void);                                                                           // Initializes hi-resolution MONOTONIC timer
 static unsigned long long int GetClockTicks(void);                                                          // Get hi-res MONOTONIC time measure in mseconds
-static double NmrlbNow_GetCurrentTime(void);                                                                         // Get current time measure in milliseconds
+static double GetCurrentTime(void);                                                                         // Get current time measure in milliseconds
 #endif
 
 static void UpdatePhysicsStep(void);                                                                        // Update physics step (dynamics, collisions and position corrections)
@@ -910,7 +912,7 @@ void UpdatePhysics(void)
     static double deltaTimeAccumulator = 0.0;
 
     // Calculate current time (ms)
-    currentTime = NmrlbNow_GetCurrentTime();
+    currentTime = GetCurrentTime();
 
     // Calculate current delta time (ms)
     const double delta = currentTime - startTime;
@@ -960,7 +962,7 @@ static void InitTimerHiRes(void)
 #endif
 
     baseClockTicks = (double)GetClockTicks();      // Get MONOTONIC clock time offset
-    startTime = NmrlbNow_GetCurrentTime();                  // Get current time in milliseconds
+    startTime = GetCurrentTime();                  // Get current time in milliseconds
 }
 
 // Get hi-res MONOTONIC time measure in clock ticks
@@ -986,7 +988,7 @@ static unsigned long long int GetClockTicks(void)
 }
 
 // Get current time in milliseconds
-static double NmrlbNow_GetCurrentTime(void)
+static double GetCurrentTime(void)
 {
     return (double)(GetClockTicks() - baseClockTicks)/frequency*1000;
 }
