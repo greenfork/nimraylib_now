@@ -22,16 +22,9 @@ const physacHeader = currentSourcePath().parentDir()/"physac.h"
 ##        If not defined, the library is in header only mode and can be included in other headers
 ##        or source files without problems. But only ONE file should hold the implementation.
 ##
-##    #define PHYSAC_STATIC (defined by default)
-##        The generated implementation will stay private inside implementation file and all
-##        internal symbols and functions will only be visible inside that file.
-##
 ##    #define PHYSAC_DEBUG
 ##        Show debug traces log messages about physic bodies creation/destruction, physic system errors,
-##        some calculations results and NULL reference exceptions
-##
-##    #define PHYSAC_DEFINE_VECTOR2_TYPE
-##        Forces library to define struct Vector2 data type (float x; float y)
+##        some calculations results and NULL reference exceptions.
 ##
 ##    #define PHYSAC_AVOID_TIMMING_SYSTEM
 ##        Disables internal timming system, used by UpdatePhysics() to launch timmed physic steps,

@@ -5,7 +5,7 @@ const rayguiHeader = currentSourcePath().parentDir()/"raygui.h"
 {.passC: "-DRAYGUI_IMPLEMENTATION".}
 ## ******************************************************************************************
 ##
-##    raygui v2.9-dev - A simple and easy-to-use immediate-mode gui library
+##    raygui v3.0 - A simple and easy-to-use immediate-mode gui library
 ##
 ##    DESCRIPTION:
 ##
@@ -24,8 +24,6 @@ const rayguiHeader = currentSourcePath().parentDir()/"raygui.h"
 ##        - Label
 ##        - Button
 ##        - LabelButton   --> Label
-##        - ImageButton   --> Button
-##        - ImageButtonEx --> Button
 ##        - Toggle
 ##        - ToggleGroup   --> Toggle
 ##        - CheckBox
@@ -52,6 +50,52 @@ const rayguiHeader = currentSourcePath().parentDir()/"raygui.h"
 ##
 ##    It also provides a set of functions for styling the controls based on its properties (size, color).
 ##
+##
+##    GUI STYLE (guiStyle):
+##
+##    raygui uses a global data array for all gui style properties (allocated on data segment by default),
+##    when a new style is loaded, it is loaded over the global style... but a default gui style could always be
+##    recovered with GuiLoadStyleDefault() function, that overwrites the current style to the default one
+##
+##    The global style array size is fixed and depends on the number of controls and properties:
+##
+##        static unsigned int guiStyle[RAYGUI_MAX_CONTROLS*(RAYGUI_MAX_PROPS_BASE + RAYGUI_MAX_PROPS_EXTENDED)];
+##
+##    guiStyle size is by default: 16*(16 + 8) = 384*4 = 1536 bytes = 1.5 KB
+##
+##    Note that the first set of BASE properties (by default guiStyle[0..15]) belong to the generic style
+##    used for all controls, when any of those base values is set, it is automatically populated to all
+##    controls, so, specific control values overwriting generic style should be set after base values.
+##
+##    After the first BASE set we have the EXTENDED properties (by default guiStyle[16..23]), those
+##    properties are actually common to all controls and can not be overwritten individually (like BASE ones)
+##    Some of those properties are: TEXT_SIZE, TEXT_SPACING, LINE_COLOR, BACKGROUND_COLOR
+##
+##    Custom control properties can be defined using the EXTENDED properties for each independent control.
+##
+##    TOOL: rGuiStyler is a visual tool to customize raygui style.
+##
+##
+##    GUI ICONS (guiIcons):
+##
+##    raygui could use a global array containing icons data (allocated on data segment by default),
+##    a custom icons set could be loaded over this array using GuiLoadIcons(), but loaded icons set
+##    must be same RICON_SIZE and no more than RICON_MAX_ICONS will be loaded
+##
+##    Every icon is codified in binary form, using 1 bit per pixel, so, every 16x16 icon
+##    requires 8 integers (16*16/32) to be stored in memory.
+##
+##    When the icon is draw, actually one quad per pixel is drawn if the bit for that pixel is set.
+##
+##    The global icons array size is fixed and depends on the number of icons and size:
+##
+##        static unsigned int guiIcons[RICON_MAX_ICONS*RICON_DATA_ELEMENTS];
+##
+##    guiIcons size is by default: 256*(16*16/32) = 2048*4 = 8192 bytes = 8 KB
+##
+##    TOOL: rGuiIcons is a visual tool to customize raygui icons.
+##
+##
 ##    CONFIGURATION:
 ##
 ##    #define RAYGUI_IMPLEMENTATION
@@ -59,49 +103,56 @@ const rayguiHeader = currentSourcePath().parentDir()/"raygui.h"
 ##        If not defined, the library is in header only mode and can be included in other headers
 ##        or source files without problems. But only ONE file should hold the implementation.
 ##
-##    #define RAYGUI_STATIC (defined by default)
-##        The generated implementation will stay private inside implementation file and all
-##        internal symbols and functions will only be visible inside that file.
-##
 ##    #define RAYGUI_STANDALONE
 ##        Avoid raylib.h header inclusion in this file. Data types defined on raylib are defined
 ##        internally in the library and input management and drawing functions must be provided by
 ##        the user (check library implementation for further details).
 ##
-##    #define RAYGUI_SUPPORT_ICONS
-##        Includes riconsdata.h header defining a set of 128 icons (binary format) to be used on
-##        multiple controls and following raygui styles
+##    #define RAYGUI_NO_RICONS
+##        Avoid including embedded ricons data (256 icons, 16x16 pixels, 1-bit per pixel, 2KB)
+##
+##    #define RAYGUI_CUSTOM_RICONS
+##        Includes custom ricons.h header defining a set of custom icons,
+##        this file can be generated using rGuiIcons tool
 ##
 ##
 ##    VERSIONS HISTORY:
-##        2.9 (17-Mar-2021) Removed tooltip API
+##
+##        3.0 (xx-Sep-2021) Integrated ricons data to avoid external file
+##                          REDESIGNED: GuiTextBoxMulti()
+##                          REMOVED: GuiImageButton*()
+##                          Multiple minor tweaks and bugs corrected
+##        2.9 (17-Mar-2021) REMOVED: Tooltip API
 ##        2.8 (03-May-2020) Centralized rectangles drawing to GuiDrawRectangle()
-##        2.7 (20-Feb-2020) Added possible tooltips API
+##        2.7 (20-Feb-2020) ADDED: Possible tooltips API
 ##        2.6 (09-Sep-2019) ADDED: GuiTextInputBox()
 ##                          REDESIGNED: GuiListView*(), GuiDropdownBox(), GuiSlider*(), GuiProgressBar(), GuiMessageBox()
 ##                          REVIEWED: GuiTextBox(), GuiSpinner(), GuiValueBox(), GuiLoadStyle()
 ##                          Replaced property INNER_PADDING by TEXT_PADDING, renamed some properties
-##                          Added 8 new custom styles ready to use
+##                          ADDED: 8 new custom styles ready to use
 ##                          Multiple minor tweaks and bugs corrected
 ##        2.5 (28-May-2019) Implemented extended GuiTextBox(), GuiValueBox(), GuiSpinner()
-##        2.3 (29-Apr-2019) Added rIcons auxiliar library and support for it, multiple controls reviewed
+##        2.3 (29-Apr-2019) ADDED: rIcons auxiliar library and support for it, multiple controls reviewed
 ##                          Refactor all controls drawing mechanism to use control state
-##        2.2 (05-Feb-2019) Added GuiScrollBar(), GuiScrollPanel(), reviewed GuiListView(), removed Gui*Ex() controls
-##        2.1 (26-Dec-2018) Redesign of GuiCheckBox(), GuiComboBox(), GuiDropdownBox(), GuiToggleGroup() > Use combined text string
-##                          Complete redesign of style system (breaking change)
-##        2.0 (08-Nov-2018) Support controls guiLock and custom fonts, reviewed GuiComboBox(), GuiListView()...
-##        1.9 (09-Oct-2018) Controls review: GuiGrid(), GuiTextBox(), GuiTextBoxMulti(), GuiValueBox()...
+##        2.2 (05-Feb-2019) ADDED: GuiScrollBar(), GuiScrollPanel(), reviewed GuiListView(), removed Gui*Ex() controls
+##        2.1 (26-Dec-2018) REDESIGNED: GuiCheckBox(), GuiComboBox(), GuiDropdownBox(), GuiToggleGroup() > Use combined text string
+##                          REDESIGNED: Style system (breaking change)
+##        2.0 (08-Nov-2018) ADDED: Support controls guiLock and custom fonts
+##                          REVIEWED: GuiComboBox(), GuiListView()...
+##        1.9 (09-Oct-2018) REVIEWED: GuiGrid(), GuiTextBox(), GuiTextBoxMulti(), GuiValueBox()...
 ##        1.8 (01-May-2018) Lot of rework and redesign to align with rGuiStyler and rGuiLayout
 ##        1.5 (21-Jun-2017) Working in an improved styles system
 ##        1.4 (15-Jun-2017) Rewritten all GUI functions (removed useless ones)
-##        1.3 (12-Jun-2017) Redesigned styles system
+##        1.3 (12-Jun-2017) Complete redesign of style system
 ##        1.1 (01-Jun-2017) Complete review of the library
 ##        1.0 (07-Jun-2016) Converted to header-only by Ramon Santamaria.
 ##        0.9 (07-Mar-2016) Reviewed and tested by Albert Martos, Ian Eito, Sergio Martinez and Ramon Santamaria.
 ##        0.8 (27-Aug-2015) Initial release. Implemented by Kevin Gato, Daniel Nicolás and Ramon Santamaria.
 ##
+##
 ##    CONTRIBUTORS:
-##        Ramon Santamaria:   Supervision, review, redesign, update and maintenance...
+##
+##        Ramon Santamaria:   Supervision, review, redesign, update and maintenance
 ##        Vlad Adrian:        Complete rewrite of GuiTextBox() to support extended features (2019)
 ##        Sergio Martinez:    Review, testing (2015) and redesign of multiple controls (2018)
 ##        Adria Arranz:       Testing and Implementation of additional controls (2018)
@@ -114,7 +165,7 @@ const rayguiHeader = currentSourcePath().parentDir()/"raygui.h"
 ##
 ##    LICENSE: zlib/libpng
 ##
-##    Copyright (c) 2014-2020 Ramon Santamaria (@raysan5)
+##    Copyright (c) 2014-2021 Ramon Santamaria (@raysan5)
 ##
 ##    This software is provided "as-is", without any express or implied warranty. In no event
 ##    will the authors be held liable for any damages arising from the use of this software.
@@ -134,20 +185,16 @@ const rayguiHeader = currentSourcePath().parentDir()/"raygui.h"
 ## ********************************************************************************************
 
 const
-  RAYGUI_VERSION* = "2.9-dev"
+  RAYGUI_VERSION* = "3.0"
 
-##  Define functions scope to be used internally (static) or externally (extern) to the module including this file
-##  Allow custom memory allocators
+##  Function specifiers in case library is build/used as a shared library (Windows)
+##  NOTE: Microsoft specifiers to tell compiler that symbols are imported/exported from a .dll
+##  Function specifiers definition
 ## ----------------------------------------------------------------------------------
 ##  Defines and Macros
 ## ----------------------------------------------------------------------------------
-
-const
-  NUM_CONTROLS* = 16
-  NUM_PROPS_DEFAULT* = 16
-  NUM_PROPS_EXTENDED* = 8
-  TEXTEDIT_CURSOR_BLINK_FRAMES* = 20
-
+##  Allow custom memory allocators
+##  TODO: Implement custom TraceLog()
 ## ----------------------------------------------------------------------------------
 ##  Types and Structures Definition
 ##  NOTE: Some types are required for RAYGUI_STANDALONE usage
@@ -179,15 +226,16 @@ type
 
 type
   Control* {.size: sizeof(cint), pure.} = enum
-    DEFAULT = 0, LABEL,          ##  LABELBUTTON
-    BUTTON,                   ##  IMAGEBUTTON
-    TOGGLE,                   ##  TOGGLEGROUP
-    SLIDER,                   ##  SLIDERBAR
-    PROGRESSBAR, CHECKBOX, COMBOBOX, DROPDOWNBOX, TEXTBOX, ##  TEXTBOXMULTI
+    DEFAULT = 0,                ##  Generic control -> populates to all controls when set
+    LABEL,                    ##  Used also for: LABELBUTTON
+    BUTTON, TOGGLE,            ##  Used also for: TOGGLEGROUP
+    SLIDER,                   ##  Used also for: SLIDERBAR
+    PROGRESSBAR, CHECKBOX, COMBOBOX, DROPDOWNBOX, TEXTBOX, ##  Used also for: TEXTBOXMULTI
     VALUEBOX, SPINNER, LISTVIEW, COLORPICKER, SCROLLBAR, STATUSBAR
 
 
 ##  Gui base properties for every control
+##  NOTE: RAYGUI_MAX_PROPS_BASE properties (by default 16 properties)
 
 type
   ControlProperty* {.size: sizeof(cint), pure.} = enum
@@ -199,8 +247,9 @@ type
 
 
 ##  Gui extended properties depend on control
-##  NOTE: We reserve a fixed size of additional properties per control
-##  DEFAULT properties
+##  NOTE: RAYGUI_MAX_PROPS_EXTENDED properties (by default 8 properties)
+##  DEFAULT extended properties
+##  NOTE: Those properties are actually common to all controls
 
 type
   DefaultProperty* {.size: sizeof(cint), pure.} = enum
@@ -211,14 +260,14 @@ type
 ## typedef enum { } GuiLabelProperty;
 ##  Button
 ## typedef enum { } GuiButtonProperty;
-##  Toggle / ToggleGroup
+##  Toggle/ToggleGroup
 
 type
   ToggleProperty* {.size: sizeof(cint), pure.} = enum
     GROUP_PADDING = 16
 
 
-##  Slider / SliderBar
+##  Slider/SliderBar
 
 type
   SliderProperty* {.size: sizeof(cint), pure.} = enum
@@ -253,7 +302,7 @@ type
     ARROW_PADDING = 16, DROPDOWN_ITEMS_PADDING
 
 
-##  TextBox / TextBoxMulti / ValueBox / Spinner
+##  TextBox/TextBoxMulti/ValueBox/Spinner
 
 type
   TextBoxProperty* {.size: sizeof(cint), pure.} = enum
@@ -306,7 +355,7 @@ type
 ## ----------------------------------------------------------------------------------
 ##  Module Functions Declaration
 ## ----------------------------------------------------------------------------------
-##  State modification functions
+##  Global gui state control functions
 
 proc enable*() {.cdecl, importc: "GuiEnable", header: rayguiHeader.}
 ##  Enable gui controls (global state)
@@ -319,6 +368,9 @@ proc lock*() {.cdecl, importc: "GuiLock", header: rayguiHeader.}
 
 proc unlock*() {.cdecl, importc: "GuiUnlock", header: rayguiHeader.}
 ##  Unlock gui controls (global state)
+
+proc isLocked*(): bool {.cdecl, importc: "GuiIsLocked", header: rayguiHeader.}
+##  Check if gui is locked (global state)
 
 proc fade*(alpha: cfloat) {.cdecl, importc: "GuiFade", header: rayguiHeader.}
 ##  Set gui controls alpha (global state), alpha goes from 0.0f to 1.0f
@@ -377,15 +429,6 @@ proc button*(bounds: Rectangle; text: cstring): bool {.cdecl, importc: "GuiButto
 proc labelButton*(bounds: Rectangle; text: cstring): bool {.cdecl,
     importc: "GuiLabelButton", header: rayguiHeader.}
 ##  Label button control, show true when clicked
-
-proc imageButton*(bounds: Rectangle; text: cstring; texture: Texture2D): bool {.cdecl,
-    importc: "GuiImageButton", header: rayguiHeader.}
-##  Image button control, returns true when clicked
-
-proc imageButtonEx*(bounds: Rectangle; text: cstring; texture: Texture2D;
-                   texSource: Rectangle): bool {.cdecl, importc: "GuiImageButtonEx",
-    header: rayguiHeader.}
-##  Image button extended control, returns true when clicked
 
 proc toggle*(bounds: Rectangle; text: cstring; active: bool): bool {.cdecl,
     importc: "GuiToggle", header: rayguiHeader.}
@@ -494,44 +537,18 @@ proc colorBarHue*(bounds: Rectangle; value: cfloat): cfloat {.cdecl,
 
 proc loadStyle*(fileName: cstring) {.cdecl, importc: "GuiLoadStyle",
                                   header: rayguiHeader.}
-##  Load style file (.rgs)
+##  Load style file over global style variable (.rgs)
 
 proc loadStyleDefault*() {.cdecl, importc: "GuiLoadStyleDefault",
                          header: rayguiHeader.}
 ##  Load style default over global style
 ##
 ## typedef GuiStyle (unsigned int *)
-## RAYGUIDEF GuiStyle LoadGuiStyle(const char *fileName);          // Load style from file (.rgs)
-## RAYGUIDEF void UnloadGuiStyle(GuiStyle style);                  // Unload style
+## RAYGUIAPI GuiStyle LoadGuiStyle(const char *fileName);          // Load style from file (.rgs)
+## RAYGUIAPI void UnloadGuiStyle(GuiStyle style);                  // Unload style
 ##
 
 proc iconText*(iconId: cint; text: cstring): cstring {.cdecl, importc: "GuiIconText",
     header: rayguiHeader.}
 ##  Get text with icon id prepended (if supported)
-##  Gui icons functionality
-
-proc drawIcon*(iconId: cint; position: Vector2; pixelSize: cint; color: Color) {.cdecl,
-    importc: "GuiDrawIcon", header: rayguiHeader.}
-proc getIcons*(): ptr cuint {.cdecl, importc: "GuiGetIcons", header: rayguiHeader.}
-##  Get full icons data pointer
-
-proc getIconData*(iconId: cint): ptr cuint {.cdecl, importc: "GuiGetIconData",
-                                        header: rayguiHeader.}
-##  Get icon bit data
-
-proc setIconData*(iconId: cint; data: ptr cuint) {.cdecl, importc: "GuiSetIconData",
-    header: rayguiHeader.}
-##  Set icon bit data
-
-proc setIconPixel*(iconId: cint; x: cint; y: cint) {.cdecl, importc: "GuiSetIconPixel",
-    header: rayguiHeader.}
-##  Set icon pixel value
-
-proc clearIconPixel*(iconId: cint; x: cint; y: cint) {.cdecl,
-    importc: "GuiClearIconPixel", header: rayguiHeader.}
-##  Clear icon pixel value
-
-proc checkIconPixel*(iconId: cint; x: cint; y: cint): bool {.cdecl,
-    importc: "GuiCheckIconPixel", header: rayguiHeader.}
-##  Check icon pixel value
 

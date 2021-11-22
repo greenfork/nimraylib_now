@@ -4,7 +4,7 @@ from os import parentDir, `/`
 const raymathHeader = currentSourcePath().parentDir()/"raymath.h"
 ## *********************************************************************************************
 ##
-##    raymath v1.2 - Math functions to work with Vector3, Matrix and Quaternions
+##    raymath v1.5 - Math functions to work with Vector2, Vector3, Matrix and Quaternions
 ##
 ##    CONFIGURATION:
 ##
@@ -13,13 +13,18 @@ const raymathHeader = currentSourcePath().parentDir()/"raymath.h"
 ##        If not defined, the library is in header only mode and can be included in other headers
 ##        or source files without problems. But only ONE file should hold the implementation.
 ##
-##    #define RAYMATH_HEADER_ONLY
+##    #define RAYMATH_STATIC_INLINE
 ##        Define static inline functions code, so #include header suffices for use.
 ##        This may use up lots of memory.
 ##
-##    #define RAYMATH_STANDALONE
-##        Avoid raylib.h header inclusion in this file.
-##        Vector3 and Matrix data types are defined internally in raymath module.
+##    CONVENTIONS:
+##
+##      - Functions are always self-contained, no function use another raymath function inside,
+##        required code is directly re-implemented inside
+##      - Functions input parameters are always received by value (2 unavoidable exceptions)
+##      - Functions use always a "result" anmed variable for return
+##      - Functions are always defined inline
+##      - Angles are always in radians (DEG2RAD/RAD2DEG macros provided for convenience)
 ##
 ##
 ##    LICENSE: zlib/libpng
@@ -42,13 +47,12 @@ const raymathHeader = currentSourcePath().parentDir()/"raymath.h"
 ##      3. This notice may not be removed or altered from any source distribution.
 ##
 ## ********************************************************************************************
-## #define RAYMATH_STANDALONE      // NOTE: To use raymath as standalone lib, just uncomment this line
-## #define RAYMATH_HEADER_ONLY     // NOTE: To compile functions as static inline, uncomment this line
+##  Function specifiers definition
 ## ----------------------------------------------------------------------------------
 ##  Defines and Macros
 ## ----------------------------------------------------------------------------------
-##  Return float vector for Matrix
-##  Return float vector for Vector3
+##  Get float vector for Matrix
+##  Get float vector for Vector3
 ## ----------------------------------------------------------------------------------
 ##  Types and Structures Definition
 ## ----------------------------------------------------------------------------------
@@ -157,9 +161,9 @@ proc lerp*(v1: Vector2; v2: Vector2; amount: cfloat): Vector2 {.inline, cdecl,
 
 proc reflect*(v: Vector2; normal: Vector2): Vector2 {.inline, cdecl,
     importc: "Vector2Reflect", header: raymathHeader.}
-##  Rotate Vector by float in Degrees.
+##  Rotate vector by angle
 
-proc rotate*(v: Vector2; degs: cfloat): Vector2 {.inline, cdecl,
+proc rotate*(v: Vector2; angle: cfloat): Vector2 {.inline, cdecl,
     importc: "Vector2Rotate", header: raymathHeader.}
 ##  Move Vector towards target
 
@@ -224,6 +228,10 @@ proc dotProduct*(v1: Vector3; v2: Vector3): cfloat {.inline, cdecl,
 
 proc distance*(v1: Vector3; v2: Vector3): cfloat {.inline, cdecl,
     importc: "Vector3Distance", header: raymathHeader.}
+##  Calculate angle between two vectors in XY and XZ
+
+proc angle*(v1: Vector3; v2: Vector3): Vector2 {.inline, cdecl,
+    importc: "Vector3Angle", header: raymathHeader.}
 ##  Negate provided vector (invert direction)
 
 proc negate*(v: Vector3): Vector3 {.inline, cdecl, importc: "Vector3Negate",
@@ -258,11 +266,11 @@ proc lerp*(v1: Vector3; v2: Vector3; amount: cfloat): Vector3 {.inline, cdecl,
 
 proc reflect*(v: Vector3; normal: Vector3): Vector3 {.inline, cdecl,
     importc: "Vector3Reflect", header: raymathHeader.}
-##  Return min value for each pair of components
+##  Get min value for each pair of components
 
 proc min*(v1: Vector3; v2: Vector3): Vector3 {.inline, cdecl,
     importc: "Vector3Min", header: raymathHeader.}
-##  Return max value for each pair of components
+##  Get max value for each pair of components
 
 proc max*(v1: Vector3; v2: Vector3): Vector3 {.inline, cdecl,
     importc: "Vector3Max", header: raymathHeader.}
@@ -271,7 +279,12 @@ proc max*(v1: Vector3; v2: Vector3): Vector3 {.inline, cdecl,
 
 proc barycenter*(p: Vector3; a: Vector3; b: Vector3; c: Vector3): Vector3 {.inline,
     cdecl, importc: "Vector3Barycenter", header: raymathHeader.}
-##  Returns Vector3 as float array
+##  Projects a Vector3 from screen space into object space
+##  NOTE: We are avoiding calling other raymath functions despite available
+
+proc unproject*(source: Vector3; projection: Matrix; view: Matrix): Vector3 {.
+    inline, cdecl, importc: "Vector3Unproject", header: raymathHeader.}
+##  Get Vector3 as float array
 
 proc toFloatV*(v: Vector3): Float3 {.inline, cdecl, importc: "Vector3ToFloatV",
                                         header: raymathHeader.}
@@ -282,7 +295,7 @@ proc toFloatV*(v: Vector3): Float3 {.inline, cdecl, importc: "Vector3ToFloatV",
 
 proc determinant*(mat: Matrix): cfloat {.inline, cdecl,
     importc: "MatrixDeterminant", header: raymathHeader.}
-##  Returns the trace of the matrix (sum of the values along the diagonal)
+##  Get the trace of the matrix (sum of the values along the diagonal)
 
 proc trace*(mat: Matrix): cfloat {.inline, cdecl, importc: "MatrixTrace",
                                      header: raymathHeader.}
@@ -298,7 +311,7 @@ proc invert*(mat: Matrix): Matrix {.inline, cdecl, importc: "MatrixInvert",
 
 proc normalize*(mat: Matrix): Matrix {.inline, cdecl,
     importc: "MatrixNormalize", header: raymathHeader.}
-##  Returns identity matrix
+##  Get identity matrix
 
 proc matrixIdentity*(): Matrix {.inline, cdecl, importc: "MatrixIdentity",
                               header: raymathHeader.}
@@ -310,12 +323,12 @@ proc add*(left: Matrix; right: Matrix): Matrix {.inline, cdecl,
 
 proc subtract*(left: Matrix; right: Matrix): Matrix {.inline, cdecl,
     importc: "MatrixSubtract", header: raymathHeader.}
-##  Returns two matrix multiplication
+##  Get two matrix multiplication
 ##  NOTE: When multiplying matrices... the order matters!
 
 proc multiply*(left: Matrix; right: Matrix): Matrix {.inline, cdecl,
     importc: "MatrixMultiply", header: raymathHeader.}
-##  Returns translation matrix
+##  Get translation matrix
 
 proc translate*(x: cfloat; y: cfloat; z: cfloat): Matrix {.inline, cdecl,
     importc: "MatrixTranslate", header: raymathHeader.}
@@ -324,50 +337,50 @@ proc translate*(x: cfloat; y: cfloat; z: cfloat): Matrix {.inline, cdecl,
 
 proc rotate*(axis: Vector3; angle: cfloat): Matrix {.inline, cdecl,
     importc: "MatrixRotate", header: raymathHeader.}
-##  Returns x-rotation matrix (angle in radians)
+##  Get x-rotation matrix (angle in radians)
 
 proc rotateX*(angle: cfloat): Matrix {.inline, cdecl, importc: "MatrixRotateX",
     header: raymathHeader.}
-##  Returns y-rotation matrix (angle in radians)
+##  Get y-rotation matrix (angle in radians)
 
 proc rotateY*(angle: cfloat): Matrix {.inline, cdecl, importc: "MatrixRotateY",
     header: raymathHeader.}
-##  Returns z-rotation matrix (angle in radians)
+##  Get z-rotation matrix (angle in radians)
 
 proc rotateZ*(angle: cfloat): Matrix {.inline, cdecl, importc: "MatrixRotateZ",
     header: raymathHeader.}
-##  Returns xyz-rotation matrix (angles in radians)
+##  Get xyz-rotation matrix (angles in radians)
 
 proc rotateXYZ*(ang: Vector3): Matrix {.inline, cdecl,
     importc: "MatrixRotateXYZ", header: raymathHeader.}
-##  Returns zyx-rotation matrix (angles in radians)
+##  Get zyx-rotation matrix (angles in radians)
 
 proc rotateZYX*(ang: Vector3): Matrix {.inline, cdecl,
     importc: "MatrixRotateZYX", header: raymathHeader.}
-##  Returns scaling matrix
+##  Get scaling matrix
 
 proc scale*(x: cfloat; y: cfloat; z: cfloat): Matrix {.inline, cdecl,
     importc: "MatrixScale", header: raymathHeader.}
-##  Returns perspective projection matrix
+##  Get perspective projection matrix
 
 proc frustum*(left: cdouble; right: cdouble; bottom: cdouble; top: cdouble;
                    near: cdouble; far: cdouble): Matrix {.inline, cdecl,
     importc: "MatrixFrustum", header: raymathHeader.}
-##  Returns perspective projection matrix
+##  Get perspective projection matrix
 ##  NOTE: Angle should be provided in radians
 
 proc perspective*(fovy: cdouble; aspect: cdouble; near: cdouble; far: cdouble): Matrix {.
     inline, cdecl, importc: "MatrixPerspective", header: raymathHeader.}
-##  Returns orthographic projection matrix
+##  Get orthographic projection matrix
 
 proc ortho*(left: cdouble; right: cdouble; bottom: cdouble; top: cdouble;
                  near: cdouble; far: cdouble): Matrix {.inline, cdecl,
     importc: "MatrixOrtho", header: raymathHeader.}
-##  Returns camera look-at matrix (view matrix)
+##  Get camera look-at matrix (view matrix)
 
 proc lookAt*(eye: Vector3; target: Vector3; up: Vector3): Matrix {.inline, cdecl,
     importc: "MatrixLookAt", header: raymathHeader.}
-##  Returns float array of matrix data
+##  Get float array of matrix data
 
 proc toFloatV*(mat: Matrix): Float16 {.inline, cdecl, importc: "MatrixToFloatV",
     header: raymathHeader.}
@@ -390,7 +403,7 @@ proc subtract*(q1: Quaternion; q2: Quaternion): Quaternion {.inline, cdecl,
 
 proc subtractValue*(q: Quaternion; sub: cfloat): Quaternion {.inline, cdecl,
     importc: "QuaternionSubtractValue", header: raymathHeader.}
-##  Returns identity quaternion
+##  Get identity quaternion
 
 proc quaternionIdentity*(): Quaternion {.inline, cdecl,
                                       importc: "QuaternionIdentity",
@@ -435,30 +448,30 @@ proc slerp*(q1: Quaternion; q2: Quaternion; amount: cfloat): Quaternion {.
 
 proc fromVector3ToVector3*(`from`: Vector3; to: Vector3): Quaternion {.
     inline, cdecl, importc: "QuaternionFromVector3ToVector3", header: raymathHeader.}
-##  Returns a quaternion for a given rotation matrix
+##  Get a quaternion for a given rotation matrix
 
 proc fromMatrix*(mat: Matrix): Quaternion {.inline, cdecl,
     importc: "QuaternionFromMatrix", header: raymathHeader.}
-##  Returns a matrix for a given quaternion
+##  Get a matrix for a given quaternion
 
 proc toMatrix*(q: Quaternion): Matrix {.inline, cdecl,
     importc: "QuaternionToMatrix", header: raymathHeader.}
-##  Returns rotation quaternion for an angle and axis
+##  Get rotation quaternion for an angle and axis
 ##  NOTE: angle must be provided in radians
 
 proc fromAxisAngle*(axis: Vector3; angle: cfloat): Quaternion {.inline,
     cdecl, importc: "QuaternionFromAxisAngle", header: raymathHeader.}
-##  Returns the rotation angle and axis for a given quaternion
+##  Get the rotation angle and axis for a given quaternion
 
 proc toAxisAngle*(q: Quaternion; outAxis: ptr Vector3; outAngle: ptr cfloat) {.
     inline, cdecl, importc: "QuaternionToAxisAngle", header: raymathHeader.}
-##  Returns the quaternion equivalent to Euler angles
+##  Get the quaternion equivalent to Euler angles
 ##  NOTE: Rotation order is ZYX
 
 proc fromEuler*(pitch: cfloat; yaw: cfloat; roll: cfloat): Quaternion {.
     inline, cdecl, importc: "QuaternionFromEuler", header: raymathHeader.}
-##  Return the Euler angles equivalent to quaternion (roll, pitch, yaw)
-##  NOTE: Angles are returned in a Vector3 struct in degrees
+##  Get the Euler angles equivalent to quaternion (roll, pitch, yaw)
+##  NOTE: Angles are returned in a Vector3 struct in radians
 
 proc toEuler*(q: Quaternion): Vector3 {.inline, cdecl,
     importc: "QuaternionToEuler", header: raymathHeader.}
@@ -466,10 +479,6 @@ proc toEuler*(q: Quaternion): Vector3 {.inline, cdecl,
 
 proc transform*(q: Quaternion; mat: Matrix): Quaternion {.inline, cdecl,
     importc: "QuaternionTransform", header: raymathHeader.}
-##  Projects a Vector3 from screen space into object space
-
-proc unproject*(source: Vector3; projection: Matrix; view: Matrix): Vector3 {.
-    inline, cdecl, importc: "Vector3Unproject", header: raymathHeader.}
 
 template `+`*[T: Vector2 | Vector3 | Quaternion | Matrix](v1, v2: T): T = add(v1, v2)
 template `+=`*[T: Vector2 | Vector3 | Quaternion | Matrix](v1: var T, v2: T) = v1 = add(v1, v2)

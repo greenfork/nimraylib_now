@@ -32,20 +32,20 @@ when not defined(nimraylib_now_linkingOverride):
 
 ## *********************************************************************************************
 ##
-##    raylib - A simple and easy-to-use library to enjoy videogames programming (www.raylib.com)
+##    raylib v4.0 - A simple and easy-to-use library to enjoy videogames programming (www.raylib.com)
 ##
 ##    FEATURES:
 ##        - NO external dependencies, all required libraries included with raylib
 ##        - Multiplatform: Windows, Linux, FreeBSD, OpenBSD, NetBSD, DragonFly,
-##                         MacOS, Haiku, UWP, Android, Raspberry Pi, HTML5.
+##                         MacOS, Haiku, Android, Raspberry Pi, DRM native, HTML5.
 ##        - Written in plain C code (C99) in PascalCase/camelCase notation
-##        - Hardware accelerated with OpenGL (1.1, 2.1, 3.3 or ES2 - choose at compile)
+##        - Hardware accelerated with OpenGL (1.1, 2.1, 3.3, 4.3 or ES2 - choose at compile)
 ##        - Unique OpenGL abstraction layer (usable as standalone module): [rlgl]
 ##        - Multiple Fonts formats supported (TTF, XNA fonts, AngelCode fonts)
 ##        - Outstanding texture formats support, including compressed formats (DXT, ETC, ASTC)
 ##        - Full 3d support for 3d Shapes, Models, Billboards, Heightmaps and more!
 ##        - Flexible Materials system, supporting classic maps and PBR maps
-##        - Animated 3D models supported (skeletal bones animation) (IQM, glTF)
+##        - Animated 3D models supported (skeletal bones animation) (IQM)
 ##        - Shaders support, including Model shaders and Postprocessing shaders
 ##        - Powerful math module for Vector, Matrix and Quaternion operations: [raymath]
 ##        - Audio loading and playing with streaming support (WAV, OGG, MP3, FLAC, XM, MOD)
@@ -53,29 +53,28 @@ when not defined(nimraylib_now_linkingOverride):
 ##        - Bindings to multiple programming languages available!
 ##
 ##    NOTES:
-##        One default Font is loaded on InitWindow()->LoadFontDefault() [core, text]
-##        One default Texture2D is loaded on rlglInit() [rlgl] (OpenGL 3.3 or ES2)
-##        One default Shader is loaded on rlglInit()->rlLoadShaderDefault() [rlgl] (OpenGL 3.3 or ES2)
-##        One default RenderBatch is loaded on rlglInit()->rlLoadRenderBatch() [rlgl] (OpenGL 3.3 or ES2)
+##        - One default Font is loaded on InitWindow()->LoadFontDefault() [core, text]
+##        - One default Texture2D is loaded on rlglInit(), 1x1 white pixel R8G8B8A8 [rlgl] (OpenGL 3.3 or ES2)
+##        - One default Shader is loaded on rlglInit()->rlLoadShaderDefault() [rlgl] (OpenGL 3.3 or ES2)
+##        - One default RenderBatch is loaded on rlglInit()->rlLoadRenderBatch() [rlgl] (OpenGL 3.3 or ES2)
 ##
 ##    DEPENDENCIES (included):
-##        [core] rglfw (Camilla Löwy - github.com/glfw/glfw) for window/context management and input (PLATFORM_DESKTOP)
+##        [rcore] rglfw (Camilla Löwy - github.com/glfw/glfw) for window/context management and input (PLATFORM_DESKTOP)
 ##        [rlgl] glad (David Herberth - github.com/Dav1dde/glad) for OpenGL 3.3 extensions loading (PLATFORM_DESKTOP)
-##        [raudio] miniaudio (David Reid - github.com/dr-soft/miniaudio) for audio device/context management
+##        [raudio] miniaudio (David Reid - github.com/mackron/miniaudio) for audio device/context management
 ##
 ##    OPTIONAL DEPENDENCIES (included):
-##        [core] msf_gif (Miles Fogle) for GIF recording
-##        [core] sinfl (Micha Mettke) for DEFLATE decompression algorythm
-##        [core] sdefl (Micha Mettke) for DEFLATE compression algorythm
-##        [textures] stb_image (Sean Barret) for images loading (BMP, TGA, PNG, JPEG, HDR...)
-##        [textures] stb_image_write (Sean Barret) for image writting (BMP, TGA, PNG, JPG)
-##        [textures] stb_image_resize (Sean Barret) for image resizing algorithms
-##        [textures] stb_perlin (Sean Barret) for Perlin noise image generation
-##        [text] stb_truetype (Sean Barret) for ttf fonts loading
-##        [text] stb_rect_pack (Sean Barret) for rectangles packing
-##        [models] par_shapes (Philip Rideout) for parametric 3d shapes generation
-##        [models] tinyobj_loader_c (Syoyo Fujita) for models loading (OBJ, MTL)
-##        [models] cgltf (Johannes Kuhlmann) for models loading (glTF)
+##        [rcore] msf_gif (Miles Fogle) for GIF recording
+##        [rcore] sinfl (Micha Mettke) for DEFLATE decompression algorythm
+##        [rcore] sdefl (Micha Mettke) for DEFLATE compression algorythm
+##        [rtextures] stb_image (Sean Barret) for images loading (BMP, TGA, PNG, JPEG, HDR...)
+##        [rtextures] stb_image_write (Sean Barret) for image writing (BMP, TGA, PNG, JPG)
+##        [rtextures] stb_image_resize (Sean Barret) for image resizing algorithms
+##        [rtext] stb_truetype (Sean Barret) for ttf fonts loading
+##        [rtext] stb_rect_pack (Sean Barret) for rectangles packing
+##        [rmodels] par_shapes (Philip Rideout) for parametric 3d shapes generation
+##        [rmodels] tinyobj_loader_c (Syoyo Fujita) for models loading (OBJ, MTL)
+##        [rmodels] cgltf (Johannes Kuhlmann) for models loading (glTF)
 ##        [raudio] dr_wav (David Reid) for WAV audio file loading
 ##        [raudio] dr_flac (David Reid) for FLAC audio file loading
 ##        [raudio] dr_mp3 (David Reid) for MP3 audio file loading
@@ -109,98 +108,111 @@ when not defined(nimraylib_now_linkingOverride):
 ## ********************************************************************************************
 
 const
-  RAYLIB_VERSION* = "3.7.0"
+  RAYLIB_VERSION* = "4.0"
 
+##  Function specifiers in case library is build/used as a shared library (Windows)
+##  NOTE: Microsoft specifiers to tell compiler that symbols are imported/exported from a .dll
 ## ----------------------------------------------------------------------------------
 ##  Some basic Defines
 ## ----------------------------------------------------------------------------------
 ##  Allow custom memory allocators
 ##  NOTE: MSVC C++ compiler does not support compound literals (C99 feature)
-##  Plain structures in C++ (without constructors) can be initialized from { } initializers.
+##  Plain structures in C++ (without constructors) can be initialized with { }
+##  NOTE: We set some defines with some data types declared by raylib
+##  Other modules (raymath, rlgl) also require some of those types, so,
+##  to be able to use those other modules as standalone (not depending on raylib)
+##  this defines are very useful for internal check and avoid type (re)definitions
+
+const
+  RL_COLOR_TYPE* = true
+  RL_RECTANGLE_TYPE* = true
+  RL_VECTOR2_TYPE* = true
+  RL_VECTOR3_TYPE* = true
+  RL_VECTOR4_TYPE* = true
+  RL_QUATERNION_TYPE* = true
+  RL_MATRIX_TYPE* = true
+
 ##  Some Basic Colors
 ##  NOTE: Custom raylib color palette for amazing visuals on WHITE background
-##  Temporal hacks to avoid breaking old codebases using
-##  deprecated raylib implementation or definitions
 ## ----------------------------------------------------------------------------------
 ##  Structures Definition
 ## ----------------------------------------------------------------------------------
 ##  Boolean type
-##  Vector2 type
+##  Vector2, 2 components
 
 type
   Vector2* {.importc: "Vector2", header: raylibHeader, bycopy.} = object
-    x* {.importc: "x".}: cfloat
-    y* {.importc: "y".}: cfloat
+    x* {.importc: "x".}: cfloat  ##  Vector x component
+    y* {.importc: "y".}: cfloat  ##  Vector y component
 
 
-##  Vector3 type
+##  Vector3, 3 components
 
 type
   Vector3* {.importc: "Vector3", header: raylibHeader, bycopy.} = object
-    x* {.importc: "x".}: cfloat
-    y* {.importc: "y".}: cfloat
-    z* {.importc: "z".}: cfloat
+    x* {.importc: "x".}: cfloat  ##  Vector x component
+    y* {.importc: "y".}: cfloat  ##  Vector y component
+    z* {.importc: "z".}: cfloat  ##  Vector z component
 
 
-##  Vector4 type
+##  Vector4, 4 components
 
 type
   Vector4* {.importc: "Vector4", header: raylibHeader, bycopy.} = object
-    x* {.importc: "x".}: cfloat
-    y* {.importc: "y".}: cfloat
-    z* {.importc: "z".}: cfloat
-    w* {.importc: "w".}: cfloat
+    x* {.importc: "x".}: cfloat  ##  Vector x component
+    y* {.importc: "y".}: cfloat  ##  Vector y component
+    z* {.importc: "z".}: cfloat  ##  Vector z component
+    w* {.importc: "w".}: cfloat  ##  Vector w component
 
 
-##  Quaternion type, same as Vector4
+##  Quaternion, 4 components (Vector4 alias)
 
 type
   Quaternion* = Vector4
 
-##  Matrix type (OpenGL style 4x4 - right handed, column major)
+##  Matrix, 4x4 components, column major, OpenGL style, right handed
 
 type
   Matrix* {.importc: "Matrix", header: raylibHeader, bycopy.} = object
     m0* {.importc: "m0".}: cfloat
     m4* {.importc: "m4".}: cfloat
     m8* {.importc: "m8".}: cfloat
-    m12* {.importc: "m12".}: cfloat
+    m12* {.importc: "m12".}: cfloat ##  Matrix first row (4 components)
     m1* {.importc: "m1".}: cfloat
     m5* {.importc: "m5".}: cfloat
     m9* {.importc: "m9".}: cfloat
-    m13* {.importc: "m13".}: cfloat
+    m13* {.importc: "m13".}: cfloat ##  Matrix second row (4 components)
     m2* {.importc: "m2".}: cfloat
     m6* {.importc: "m6".}: cfloat
     m10* {.importc: "m10".}: cfloat
-    m14* {.importc: "m14".}: cfloat
+    m14* {.importc: "m14".}: cfloat ##  Matrix third row (4 components)
     m3* {.importc: "m3".}: cfloat
     m7* {.importc: "m7".}: cfloat
     m11* {.importc: "m11".}: cfloat
-    m15* {.importc: "m15".}: cfloat
+    m15* {.importc: "m15".}: cfloat ##  Matrix fourth row (4 components)
 
 
-##  Color type, RGBA (32bit)
+##  Color, 4 components, R8G8B8A8 (32bit)
 
 type
   Color* {.importc: "Color", header: raylibHeader, bycopy.} = object
-    r* {.importc: "r".}: uint8
-    g* {.importc: "g".}: uint8
-    b* {.importc: "b".}: uint8
-    a* {.importc: "a".}: uint8
+    r* {.importc: "r".}: uint8  ##  Color red value
+    g* {.importc: "g".}: uint8  ##  Color green value
+    b* {.importc: "b".}: uint8  ##  Color blue value
+    a* {.importc: "a".}: uint8  ##  Color alpha value
 
 
-##  Rectangle type
+##  Rectangle, 4 components
 
 type
   Rectangle* {.importc: "Rectangle", header: raylibHeader, bycopy.} = object
-    x* {.importc: "x".}: cfloat
-    y* {.importc: "y".}: cfloat
-    width* {.importc: "width".}: cfloat
-    height* {.importc: "height".}: cfloat
+    x* {.importc: "x".}: cfloat  ##  Rectangle top-left corner position x
+    y* {.importc: "y".}: cfloat  ##  Rectangle top-left corner position y
+    width* {.importc: "width".}: cfloat ##  Rectangle width
+    height* {.importc: "height".}: cfloat ##  Rectangle height
 
 
-##  Image type, bpp always RGBA (32bit)
-##  NOTE: Data stored in CPU memory (RAM)
+##  Image, pixel data stored in CPU memory (RAM)
 
 type
   Image* {.importc: "Image", header: raylibHeader, bycopy.} = object
@@ -211,8 +223,7 @@ type
     format* {.importc: "format".}: cint ##  Data format (PixelFormat type)
 
 
-##  Texture type
-##  NOTE: Data stored in GPU memory
+##  Texture, tex data stored in GPU memory (VRAM)
 
 type
   Texture* {.importc: "Texture", header: raylibHeader, bycopy.} = object
@@ -223,17 +234,17 @@ type
     format* {.importc: "format".}: cint ##  Data format (PixelFormat type)
 
 
-##  Texture2D type, same as Texture
+##  Texture2D, same as Texture
 
 type
   Texture2D* = Texture
 
-##  TextureCubemap type, actually, same as Texture
+##  TextureCubemap, same as Texture
 
 type
   TextureCubemap* = Texture
 
-##  RenderTexture type, for texture rendering
+##  RenderTexture, fbo for texture rendering
 
 type
   RenderTexture* {.importc: "RenderTexture", header: raylibHeader, bycopy.} = object
@@ -242,12 +253,12 @@ type
     depth* {.importc: "depth".}: Texture ##  Depth buffer attachment texture
 
 
-##  RenderTexture2D type, same as RenderTexture
+##  RenderTexture2D, same as RenderTexture
 
 type
   RenderTexture2D* = RenderTexture
 
-##  N-Patch layout info
+##  NPatchInfo, n-patch layout info
 
 type
   NPatchInfo* {.importc: "NPatchInfo", header: raylibHeader, bycopy.} = object
@@ -259,10 +270,10 @@ type
     layout* {.importc: "layout".}: cint ##  Layout of the n-patch: 3x3, 1x3 or 3x1
 
 
-##  Font character info
+##  GlyphInfo, font characters glyphs info
 
 type
-  CharInfo* {.importc: "CharInfo", header: raylibHeader, bycopy.} = object
+  GlyphInfo* {.importc: "GlyphInfo", header: raylibHeader, bycopy.} = object
     value* {.importc: "value".}: cint ##  Character value (Unicode)
     offsetX* {.importc: "offsetX".}: cint ##  Character offset X when drawing
     offsetY* {.importc: "offsetY".}: cint ##  Character offset Y when drawing
@@ -270,19 +281,19 @@ type
     image* {.importc: "image".}: Image ##  Character image data
 
 
-##  Font type, includes texture and charSet array data
+##  Font, font texture and GlyphInfo array data
 
 type
   Font* {.importc: "Font", header: raylibHeader, bycopy.} = object
     baseSize* {.importc: "baseSize".}: cint ##  Base size (default chars height)
-    charsCount* {.importc: "charsCount".}: cint ##  Number of characters
-    charsPadding* {.importc: "charsPadding".}: cint ##  Padding around the chars
-    texture* {.importc: "texture".}: Texture2D ##  Characters texture atlas
-    recs* {.importc: "recs".}: ptr Rectangle ##  Characters rectangles in texture
-    chars* {.importc: "chars".}: ptr CharInfo ##  Characters info data
+    glyphCount* {.importc: "glyphCount".}: cint ##  Number of glyph characters
+    glyphPadding* {.importc: "glyphPadding".}: cint ##  Padding around the glyph characters
+    texture* {.importc: "texture".}: Texture2D ##  Texture atlas containing the glyphs
+    recs* {.importc: "recs".}: ptr Rectangle ##  Rectangles in texture for the glyphs
+    glyphs* {.importc: "glyphs".}: ptr GlyphInfo ##  Glyphs info data
 
 
-##  Camera type, defines a camera position/orientation in 3d space
+##  Camera, defines position/orientation in 3d space
 
 type
   Camera3D* {.importc: "Camera3D", header: raylibHeader, bycopy.} = object
@@ -295,7 +306,7 @@ type
   Camera* = Camera3D
 
 ##  Camera type fallback, defaults to Camera3D
-##  Camera2D type, defines a 2d camera
+##  Camera2D, defines position/orientation in 2d space
 
 type
   Camera2D* {.importc: "Camera2D", header: raylibHeader, bycopy.} = object
@@ -305,14 +316,13 @@ type
     zoom* {.importc: "zoom".}: cfloat ##  Camera zoom (scaling), should be 1.0f by default
 
 
-##  Vertex data definning a mesh
-##  NOTE: Data stored in CPU memory (and GPU)
+##  Mesh, vertex data and vao/vbo
 
 type
   Mesh* {.importc: "Mesh", header: raylibHeader, bycopy.} = object
     vertexCount* {.importc: "vertexCount".}: cint ##  Number of vertices stored in arrays
     triangleCount* {.importc: "triangleCount".}: cint ##  Number of triangles stored (indexed or not)
-                                                  ##  Default vertex data
+                                                  ##  Vertex attributes data
     vertices* {.importc: "vertices".}: ptr UncheckedArray[cfloat] ##  Vertex position (XYZ - 3 components per vertex) (shader-location = 0)
     texcoords* {.importc: "texcoords".}: ptr UncheckedArray[cfloat] ##  Vertex texture coordinates (UV - 2 components per vertex) (shader-location = 1)
     texcoords2* {.importc: "texcoords2".}: ptr UncheckedArray[cfloat] ##  Vertex second texture coordinates (useful for lightmaps) (shader-location = 5)
@@ -323,22 +333,22 @@ type
                                             ##  Animation vertex data
     animVertices* {.importc: "animVertices".}: ptr UncheckedArray[cfloat] ##  Animated vertex positions (after bones transformations)
     animNormals* {.importc: "animNormals".}: ptr UncheckedArray[cfloat] ##  Animated normals (after bones transformations)
-    boneIds* {.importc: "boneIds".}: ptr UncheckedArray[cint] ##  Vertex bone ids, up to 4 bones influence by vertex (skinning)
+    boneIds* {.importc: "boneIds".}: ptr uint8 ##  Vertex bone ids, max 255 bone ids, up to 4 bones influence by vertex (skinning)
     boneWeights* {.importc: "boneWeights".}: ptr UncheckedArray[cfloat] ##  Vertex bone weight, up to 4 bones influence by vertex (skinning)
                                                    ##  OpenGL identifiers
     vaoId* {.importc: "vaoId".}: cuint ##  OpenGL Vertex Array Object id
     vboId* {.importc: "vboId".}: ptr cuint ##  OpenGL Vertex Buffer Objects id (default vertex data)
 
 
-##  Shader type (generic)
+##  Shader
 
 type
   Shader* {.importc: "Shader", header: raylibHeader, bycopy.} = object
     id* {.importc: "id".}: cuint ##  Shader program id
-    locs* {.importc: "locs".}: ptr UncheckedArray[cint] ##  Shader locations array (MAX_SHADER_LOCATIONS)
+    locs* {.importc: "locs".}: ptr UncheckedArray[cint] ##  Shader locations array (RL_MAX_SHADER_LOCATIONS)
 
 
-##  Material texture map
+##  MaterialMap
 
 type
   MaterialMap* {.importc: "MaterialMap", header: raylibHeader, bycopy.} = object
@@ -347,7 +357,7 @@ type
     value* {.importc: "value".}: cfloat ##  Material map value
 
 
-##  Material type (generic)
+##  Material, includes shader and maps
 
 type
   Material* {.importc: "Material", header: raylibHeader, bycopy.} = object
@@ -356,7 +366,7 @@ type
     params* {.importc: "params".}: array[4, cfloat] ##  Material generic parameters (if required)
 
 
-##  Transformation properties
+##  Transform, vectex transformation data
 
 type
   Transform* {.importc: "Transform", header: raylibHeader, bycopy.} = object
@@ -365,7 +375,7 @@ type
     scale* {.importc: "scale".}: Vector3 ##  Scale
 
 
-##  Bone information
+##  Bone, skeletal animation bone
 
 type
   BoneInfo* {.importc: "BoneInfo", header: raylibHeader, bycopy.} = object
@@ -373,7 +383,7 @@ type
     parent* {.importc: "parent".}: cint ##  Bone parent
 
 
-##  Model type
+##  Model, meshes, materials and animation data
 
 type
   Model* {.importc: "Model", header: raylibHeader, bycopy.} = object
@@ -389,7 +399,7 @@ type
     bindPose* {.importc: "bindPose".}: ptr Transform ##  Bones base transformation (pose)
 
 
-##  Model animation
+##  ModelAnimation
 
 type
   ModelAnimation* {.importc: "ModelAnimation", header: raylibHeader, bycopy.} = object
@@ -399,7 +409,7 @@ type
     framePoses* {.importc: "framePoses".}: ptr UncheckedArray[ptr Transform] ##  Poses array by frame
 
 
-##  Ray type (useful for raycast)
+##  Ray, ray for raycasting
 
 type
   Ray* {.importc: "Ray", header: raylibHeader, bycopy.} = object
@@ -407,17 +417,17 @@ type
     direction* {.importc: "direction".}: Vector3 ##  Ray direction
 
 
-##  Raycast hit information
+##  RayCollision, ray hit information
 
 type
-  RayHitInfo* {.importc: "RayHitInfo", header: raylibHeader, bycopy.} = object
+  RayCollision* {.importc: "RayCollision", header: raylibHeader, bycopy.} = object
     hit* {.importc: "hit".}: bool ##  Did the ray hit something?
     distance* {.importc: "distance".}: cfloat ##  Distance to nearest hit
-    position* {.importc: "position".}: Vector3 ##  Position of nearest hit
+    point* {.importc: "point".}: Vector3 ##  Point of nearest hit
     normal* {.importc: "normal".}: Vector3 ##  Surface normal of hit
 
 
-##  Bounding box type
+##  BoundingBox
 
 type
   BoundingBox* {.importc: "BoundingBox", header: raylibHeader, bycopy.} = object
@@ -425,51 +435,49 @@ type
     max* {.importc: "max".}: Vector3 ##  Maximum vertex box-corner
 
 
-##  Wave type, defines audio wave data
+##  Wave, audio wave data
 
 type
   Wave* {.importc: "Wave", header: raylibHeader, bycopy.} = object
-    sampleCount* {.importc: "sampleCount".}: cuint ##  Total number of samples (considering channels!)
+    frameCount* {.importc: "frameCount".}: cuint ##  Total number of frames (considering channels)
     sampleRate* {.importc: "sampleRate".}: cuint ##  Frequency (samples per second)
     sampleSize* {.importc: "sampleSize".}: cuint ##  Bit depth (bits per sample): 8, 16, 32 (24 not supported)
-    channels* {.importc: "channels".}: cuint ##  Number of channels (1-mono, 2-stereo)
+    channels* {.importc: "channels".}: cuint ##  Number of channels (1-mono, 2-stereo, ...)
     data* {.importc: "data".}: pointer ##  Buffer data pointer
 
   RAudioBuffer* {.importc: "rAudioBuffer", header: raylibHeader, bycopy.} = object
 
 
-##  Audio stream type
-##  NOTE: Useful to create custom audio streams not bound to a specific file
+##  AudioStream, custom audio stream
 
 type
   AudioStream* {.importc: "AudioStream", header: raylibHeader, bycopy.} = object
     buffer* {.importc: "buffer".}: ptr RAudioBuffer ##  Pointer to internal data used by the audio system
     sampleRate* {.importc: "sampleRate".}: cuint ##  Frequency (samples per second)
     sampleSize* {.importc: "sampleSize".}: cuint ##  Bit depth (bits per sample): 8, 16, 32 (24 not supported)
-    channels* {.importc: "channels".}: cuint ##  Number of channels (1-mono, 2-stereo)
+    channels* {.importc: "channels".}: cuint ##  Number of channels (1-mono, 2-stereo, ...)
 
 
-##  Sound source type
+##  Sound
 
 type
   Sound* {.importc: "Sound", header: raylibHeader, bycopy.} = object
     stream* {.importc: "stream".}: AudioStream ##  Audio stream
-    sampleCount* {.importc: "sampleCount".}: cuint ##  Total number of samples
+    frameCount* {.importc: "frameCount".}: cuint ##  Total number of frames (considering channels)
 
 
-##  Music stream type (audio file streaming from memory)
-##  NOTE: Anything longer than ~10 seconds should be streamed
+##  Music, audio stream, anything longer than ~10 seconds should be streamed
 
 type
   Music* {.importc: "Music", header: raylibHeader, bycopy.} = object
     stream* {.importc: "stream".}: AudioStream ##  Audio stream
-    sampleCount* {.importc: "sampleCount".}: cuint ##  Total number of samples
+    frameCount* {.importc: "frameCount".}: cuint ##  Total number of frames (considering channels)
     looping* {.importc: "looping".}: bool ##  Music looping enable
     ctxType* {.importc: "ctxType".}: cint ##  Type of music context (audio filetype)
     ctxData* {.importc: "ctxData".}: pointer ##  Audio context data, depends on type
 
 
-##  Head-Mounted-Display device parameters
+##  VrDeviceInfo, Head-Mounted-Display device parameters
 
 type
   VrDeviceInfo* {.importc: "VrDeviceInfo", header: raylibHeader, bycopy.} = object
@@ -485,7 +493,7 @@ type
     chromaAbCorrection* {.importc: "chromaAbCorrection".}: array[4, cfloat] ##  Chromatic aberration correction parameters
 
 
-##  VR Stereo rendering configuration for simulator
+##  VrStereoConfig, VR stereo rendering configuration for simulator
 
 type
   VrStereoConfig* {.importc: "VrStereoConfig", header: raylibHeader, bycopy.} = object
@@ -525,11 +533,18 @@ type
 
 
 ##  Trace log level
+##  NOTE: Organized by priority level
 
 type
   TraceLogLevel* {.size: sizeof(cint), pure.} = enum
     ALL = 0,                    ##  Display all logs
-    TRACE, DEBUG, INFO, WARNING, ERROR, FATAL, NONE ##  Disable logging
+    TRACE,                    ##  Trace logging, intended for internal use only
+    DEBUG,                    ##  Debug logging, used for internal debugging, it should be disabled on release builds
+    INFO,                     ##  Info logging, used for program execution info
+    WARNING,                  ##  Warning logging, used on recoverable failures
+    ERROR,                    ##  Error logging, used on unrecoverable failures
+    FATAL,                    ##  Fatal logging, used to abort program: exit(EXIT_FAILURE)
+    NONE                      ##  Disable logging
 
 
 ##  Keyboard keys (US keyboard layout)
@@ -538,41 +553,148 @@ type
 
 type
   KeyboardKey* {.size: sizeof(cint), pure.} = enum
-    NULL = 0,                   ##  Alphanumeric keys
-    BACK = 4, VOLUME_UP = 24, VOLUME_DOWN = 25, SPACE = 32, APOSTROPHE = 39, COMMA = 44,
-    MINUS = 45, PERIOD = 46, SLASH = 47, ZERO = 48, ONE = 49, TWO = 50, THREE = 51, FOUR = 52,
-    FIVE = 53, SIX = 54, SEVEN = 55, EIGHT = 56, NINE = 57, SEMICOLON = 59, EQUAL = 61, A = 65, B = 66,
-    C = 67, D = 68, E = 69, F = 70, G = 71, H = 72, I = 73, J = 74, K = 75, L = 76, M = 77, N = 78, O = 79, P = 80,
-    Q = 81, R = 82, S = 83, T = 84, U = 85, V = 86, W = 87, X = 88, Y = 89, Z = 90, ##  Function keys
-    LEFT_BRACKET = 91, BACKSLASH = 92, RIGHT_BRACKET = 93, GRAVE = 96, ##  Keypad keys
-    ESCAPE = 256, ENTER = 257, TAB = 258, BACKSPACE = 259, INSERT = 260, DELETE = 261,
-    RIGHT = 262, LEFT = 263, DOWN = 264, UP = 265, PAGE_UP = 266, PAGE_DOWN = 267, HOME = 268,
-    END = 269, CAPS_LOCK = 280, SCROLL_LOCK = 281, NUM_LOCK = 282, PRINT_SCREEN = 283,
-    PAUSE = 284, F1 = 290, F2 = 291, F3 = 292, F4 = 293, F5 = 294, F6 = 295, F7 = 296, F8 = 297, F9 = 298,
-    F10 = 299, F11 = 300, F12 = 301, KP_0 = 320, KP_1 = 321, KP_2 = 322, KP_3 = 323, KP_4 = 324,
-    KP_5 = 325, KP_6 = 326, KP_7 = 327, KP_8 = 328, KP_9 = 329, KP_DECIMAL = 330, KP_DIVIDE = 331,
-    KP_MULTIPLY = 332, KP_SUBTRACT = 333, KP_ADD = 334, KP_ENTER = 335, KP_EQUAL = 336, ##  Android key buttons
-    LEFT_SHIFT = 340, LEFT_CONTROL = 341, LEFT_ALT = 342, LEFT_SUPER = 343,
-    RIGHT_SHIFT = 344, RIGHT_CONTROL = 345, RIGHT_ALT = 346, RIGHT_SUPER = 347,
-    KB_MENU = 348
+    NULL = 0,                   ##  Key: NULL, used for no key pressed
+           ##  Alphanumeric keys
+    BACK = 4,                   ##  Key: Android back button
+    VOLUME_UP = 24,             ##  Key: Android volume up button
+    VOLUME_DOWN = 25, SPACE = 32,  ##  Key: Space
+    APOSTROPHE = 39,            ##  Key: '
+    COMMA = 44,                 ##  Key: ,
+    MINUS = 45,                 ##  Key: -
+    PERIOD = 46,                ##  Key: .
+    SLASH = 47,                 ##  Key: /
+    ZERO = 48,                  ##  Key: 0
+    ONE = 49,                   ##  Key: 1
+    TWO = 50,                   ##  Key: 2
+    THREE = 51,                 ##  Key: 3
+    FOUR = 52,                  ##  Key: 4
+    FIVE = 53,                  ##  Key: 5
+    SIX = 54,                   ##  Key: 6
+    SEVEN = 55,                 ##  Key: 7
+    EIGHT = 56,                 ##  Key: 8
+    NINE = 57,                  ##  Key: 9
+    SEMICOLON = 59,             ##  Key: ;
+    EQUAL = 61,                 ##  Key: =
+    A = 65,                     ##  Key: A | a
+    B = 66,                     ##  Key: B | b
+    C = 67,                     ##  Key: C | c
+    D = 68,                     ##  Key: D | d
+    E = 69,                     ##  Key: E | e
+    F = 70,                     ##  Key: F | f
+    G = 71,                     ##  Key: G | g
+    H = 72,                     ##  Key: H | h
+    I = 73,                     ##  Key: I | i
+    J = 74,                     ##  Key: J | j
+    K = 75,                     ##  Key: K | k
+    L = 76,                     ##  Key: L | l
+    M = 77,                     ##  Key: M | m
+    N = 78,                     ##  Key: N | n
+    O = 79,                     ##  Key: O | o
+    P = 80,                     ##  Key: P | p
+    Q = 81,                     ##  Key: Q | q
+    R = 82,                     ##  Key: R | r
+    S = 83,                     ##  Key: S | s
+    T = 84,                     ##  Key: T | t
+    U = 85,                     ##  Key: U | u
+    V = 86,                     ##  Key: V | v
+    W = 87,                     ##  Key: W | w
+    X = 88,                     ##  Key: X | x
+    Y = 89,                     ##  Key: Y | y
+    Z = 90,                     ##  Key: Z | z
+    LEFT_BRACKET = 91,          ##  Key: [
+    BACKSLASH = 92,             ##  Key: '\'
+    RIGHT_BRACKET = 93,         ##  Key: ]
+    GRAVE = 96,                 ##  Key: `
+             ##  Function keys
+    ESCAPE = 256,               ##  Key: Esc
+    ENTER = 257,                ##  Key: Enter
+    TAB = 258,                  ##  Key: Tab
+    BACKSPACE = 259,            ##  Key: Backspace
+    INSERT = 260,               ##  Key: Ins
+    DELETE = 261,               ##  Key: Del
+    RIGHT = 262,                ##  Key: Cursor right
+    LEFT = 263,                 ##  Key: Cursor left
+    DOWN = 264,                 ##  Key: Cursor down
+    UP = 265,                   ##  Key: Cursor up
+    PAGE_UP = 266,              ##  Key: Page up
+    PAGE_DOWN = 267,            ##  Key: Page down
+    HOME = 268,                 ##  Key: Home
+    END = 269,                  ##  Key: End
+    CAPS_LOCK = 280,            ##  Key: Caps lock
+    SCROLL_LOCK = 281,          ##  Key: Scroll down
+    NUM_LOCK = 282,             ##  Key: Num lock
+    PRINT_SCREEN = 283,         ##  Key: Print screen
+    PAUSE = 284,                ##  Key: Pause
+    F1 = 290,                   ##  Key: F1
+    F2 = 291,                   ##  Key: F2
+    F3 = 292,                   ##  Key: F3
+    F4 = 293,                   ##  Key: F4
+    F5 = 294,                   ##  Key: F5
+    F6 = 295,                   ##  Key: F6
+    F7 = 296,                   ##  Key: F7
+    F8 = 297,                   ##  Key: F8
+    F9 = 298,                   ##  Key: F9
+    F10 = 299,                  ##  Key: F10
+    F11 = 300,                  ##  Key: F11
+    F12 = 301,                  ##  Key: F12
+    KP_0 = 320,                 ##  Key: Keypad 0
+    KP_1 = 321,                 ##  Key: Keypad 1
+    KP_2 = 322,                 ##  Key: Keypad 2
+    KP_3 = 323,                 ##  Key: Keypad 3
+    KP_4 = 324,                 ##  Key: Keypad 4
+    KP_5 = 325,                 ##  Key: Keypad 5
+    KP_6 = 326,                 ##  Key: Keypad 6
+    KP_7 = 327,                 ##  Key: Keypad 7
+    KP_8 = 328,                 ##  Key: Keypad 8
+    KP_9 = 329,                 ##  Key: Keypad 9
+    KP_DECIMAL = 330,           ##  Key: Keypad .
+    KP_DIVIDE = 331,            ##  Key: Keypad /
+    KP_MULTIPLY = 332,          ##  Key: Keypad *
+    KP_SUBTRACT = 333,          ##  Key: Keypad -
+    KP_ADD = 334,               ##  Key: Keypad +
+    KP_ENTER = 335,             ##  Key: Keypad Enter
+    KP_EQUAL = 336,             ##  Key: Keypad =
+                 ##  Android key buttons
+    LEFT_SHIFT = 340,           ##  Key: Shift left
+    LEFT_CONTROL = 341,         ##  Key: Control left
+    LEFT_ALT = 342,             ##  Key: Alt left
+    LEFT_SUPER = 343,           ##  Key: Super left
+    RIGHT_SHIFT = 344,          ##  Key: Shift right
+    RIGHT_CONTROL = 345,        ##  Key: Control right
+    RIGHT_ALT = 346,            ##  Key: Alt right
+    RIGHT_SUPER = 347,          ##  Key: Super right
+    KB_MENU = 348               ##  Key: KB menu
+               ##  Keypad keys
 
 const
   MENU* = KeyboardKey.R
 
+##  Add backwards compatibility support for deprecated names
 ##  Mouse buttons
 
 type
   MouseButton* {.size: sizeof(cint), pure.} = enum
-    LEFT_BUTTON = 0, RIGHT_BUTTON = 1, MIDDLE_BUTTON = 2
+    LEFT = 0,                   ##  Mouse button left
+    RIGHT = 1,                  ##  Mouse button right
+    MIDDLE = 2,                 ##  Mouse button middle (pressed wheel)
+    SIDE = 3,                   ##  Mouse button side (advanced mouse device)
+    EXTRA = 4,                  ##  Mouse button extra (advanced mouse device)
+    FORWARD = 5,                ##  Mouse button fordward (advanced mouse device)
+    BACK = 6                    ##  Mouse button back (advanced mouse device)
 
 
 ##  Mouse cursor
 
 type
   MouseCursor* {.size: sizeof(cint), pure.} = enum
-    DEFAULT = 0, ARROW = 1, IBEAM = 2, CROSSHAIR = 3, POINTING_HAND = 4, RESIZE_EW = 5, ##  The horizontal resize/move arrow shape
-    RESIZE_NS = 6,              ##  The vertical resize/move arrow shape
-    RESIZE_NWSE = 7,            ##  The top-left to bottom-right diagonal resize/move arrow shape
+    DEFAULT = 0,                ##  Default pointer shape
+    ARROW = 1,                  ##  Arrow shape
+    IBEAM = 2,                  ##  Text writing cursor shape
+    CROSSHAIR = 3,              ##  Cross shape
+    POINTING_HAND = 4,          ##  Pointing hand cursor
+    RESIZE_EW = 5,              ##  Horizontal resize/move arrow shape
+    RESIZE_NS = 6,              ##  Vertical resize/move arrow shape
+    RESIZE_NWSE = 7,            ##  Top-left to bottom-right diagonal resize/move arrow shape
     RESIZE_NESW = 8,            ##  The top-right to bottom-left diagonal resize/move arrow shape
     RESIZE_ALL = 9,             ##  The omni-directional resize/move cursor shape
     NOT_ALLOWED = 10
@@ -580,29 +702,37 @@ type
 
 ##  Gamepad buttons
 
-type                          ##  This is here just for error checking
+type
   GamepadButton* {.size: sizeof(cint), pure.} = enum
-    UNKNOWN = 0,                ##  This is normally a DPAD
-    LEFT_FACE_UP, LEFT_FACE_RIGHT, LEFT_FACE_DOWN, LEFT_FACE_LEFT, ##  This normally corresponds with PlayStation and Xbox controllers
-                                                               ##  XBOX: [Y,X,A,B]
-                                                               ##  PS3: [Triangle,Square,Cross,Circle]
-                                                               ##  No support for 6 button controllers though..
-    RIGHT_FACE_UP, RIGHT_FACE_RIGHT, RIGHT_FACE_DOWN, RIGHT_FACE_LEFT, ##  Triggers
-    LEFT_TRIGGER_1, LEFT_TRIGGER_2, RIGHT_TRIGGER_1, RIGHT_TRIGGER_2, ##  These are buttons in the center of the gamepad
-    MIDDLE_LEFT,              ##  PS3 Select
-    MIDDLE,                   ##  PS Button/XBOX Button
-    MIDDLE_RIGHT,             ##  PS3 Start
-                 ##  These are the joystick press in buttons
-    LEFT_THUMB, RIGHT_THUMB
+    UNKNOWN = 0,                ##  Unknown button, just for error checking
+    LEFT_FACE_UP,             ##  Gamepad left DPAD up button
+    LEFT_FACE_RIGHT,          ##  Gamepad left DPAD right button
+    LEFT_FACE_DOWN,           ##  Gamepad left DPAD down button
+    LEFT_FACE_LEFT,           ##  Gamepad left DPAD left button
+    RIGHT_FACE_UP,            ##  Gamepad right button up (i.e. PS3: Triangle, Xbox: Y)
+    RIGHT_FACE_RIGHT,         ##  Gamepad right button right (i.e. PS3: Square, Xbox: X)
+    RIGHT_FACE_DOWN,          ##  Gamepad right button down (i.e. PS3: Cross, Xbox: A)
+    RIGHT_FACE_LEFT,          ##  Gamepad right button left (i.e. PS3: Circle, Xbox: B)
+    LEFT_TRIGGER_1,           ##  Gamepad top/back trigger left (first), it could be a trailing button
+    LEFT_TRIGGER_2,           ##  Gamepad top/back trigger left (second), it could be a trailing button
+    RIGHT_TRIGGER_1,          ##  Gamepad top/back trigger right (one), it could be a trailing button
+    RIGHT_TRIGGER_2,          ##  Gamepad top/back trigger right (second), it could be a trailing button
+    MIDDLE_LEFT,              ##  Gamepad center buttons, left one (i.e. PS3: Select)
+    MIDDLE,                   ##  Gamepad center buttons, middle one (i.e. PS3: PS, Xbox: XBOX)
+    MIDDLE_RIGHT,             ##  Gamepad center buttons, right one (i.e. PS3: Start)
+    LEFT_THUMB,               ##  Gamepad joystick pressed button left
+    RIGHT_THUMB               ##  Gamepad joystick pressed button right
 
 
 ##  Gamepad axis
 
-type                          ##  Left stick
+type
   GamepadAxis* {.size: sizeof(cint), pure.} = enum
-    LEFT_X = 0, LEFT_Y = 1,        ##  Right stick
-    RIGHT_X = 2, RIGHT_Y = 3,      ##  Pressure levels for the back triggers
-    LEFT_TRIGGER = 4,           ##  [1..-1] (pressure-level)
+    LEFT_X = 0,                 ##  Gamepad left stick X axis
+    LEFT_Y = 1,                 ##  Gamepad left stick Y axis
+    RIGHT_X = 2,                ##  Gamepad right stick X axis
+    RIGHT_Y = 3,                ##  Gamepad right stick Y axis
+    LEFT_TRIGGER = 4,           ##  Gamepad back trigger left, pressure level: [1..-1]
     RIGHT_TRIGGER = 5
 
 
@@ -610,31 +740,74 @@ type                          ##  Left stick
 
 type
   MaterialMapIndex* {.size: sizeof(cint), pure.} = enum
-    ALBEDO = 0,                 ##  MATERIAL_MAP_DIFFUSE
-    METALNESS = 1,              ##  MATERIAL_MAP_SPECULAR
-    NORMAL = 2, ROUGHNESS = 3, OCCLUSION, EMISSION, HEIGHT, BRDG, CUBEMAP, ##  NOTE: Uses GL_TEXTURE_CUBE_MAP
-    IRRADIANCE,               ##  NOTE: Uses GL_TEXTURE_CUBE_MAP
-    PREFILTER                 ##  NOTE: Uses GL_TEXTURE_CUBE_MAP
+    ALBEDO = 0,                 ##  Albedo material (same as: MATERIAL_MAP_DIFFUSE)
+    METALNESS,                ##  Metalness material (same as: MATERIAL_MAP_SPECULAR)
+    NORMAL,                   ##  Normal material
+    ROUGHNESS,                ##  Roughness material
+    OCCLUSION,                ##  Ambient occlusion material
+    EMISSION,                 ##  Emission material
+    HEIGHT,                   ##  Heightmap material
+    CUBEMAP,                  ##  Cubemap material (NOTE: Uses GL_TEXTURE_CUBE_MAP)
+    IRRADIANCE,               ##  Irradiance material (NOTE: Uses GL_TEXTURE_CUBE_MAP)
+    PREFILTER,                ##  Prefilter material (NOTE: Uses GL_TEXTURE_CUBE_MAP)
+    BRDF                      ##  Brdf material
 
 
 ##  Shader location index
 
 type
   ShaderLocationIndex* {.size: sizeof(cint), pure.} = enum
-    VERTEX_POSITION = 0, VERTEX_TEXCOORD01, VERTEX_TEXCOORD02, VERTEX_NORMAL,
-    VERTEX_TANGENT, VERTEX_COLOR, MATRIX_MVP, MATRIX_VIEW, MATRIX_PROJECTION,
-    MATRIX_MODEL, MATRIX_NORMAL, VECTOR_VIEW, COLOR_DIFFUSE, COLOR_SPECULAR,
-    COLOR_AMBIENT, MAP_ALBEDO, ##  SHADER_LOC_MAP_DIFFUSE
-    MAP_METALNESS,            ##  SHADER_LOC_MAP_SPECULAR
-    MAP_NORMAL, MAP_ROUGHNESS, MAP_OCCLUSION, MAP_EMISSION, MAP_HEIGHT, MAP_CUBEMAP,
-    MAP_IRRADIANCE, MAP_PREFILTER, MAP_BRDF
+    VERTEX_POSITION = 0,        ##  Shader location: vertex attribute: position
+    VERTEX_TEXCOORD01,        ##  Shader location: vertex attribute: texcoord01
+    VERTEX_TEXCOORD02,        ##  Shader location: vertex attribute: texcoord02
+    VERTEX_NORMAL,            ##  Shader location: vertex attribute: normal
+    VERTEX_TANGENT,           ##  Shader location: vertex attribute: tangent
+    VERTEX_COLOR,             ##  Shader location: vertex attribute: color
+    MATRIX_MVP,               ##  Shader location: matrix uniform: model-view-projection
+    MATRIX_VIEW,              ##  Shader location: matrix uniform: view (camera transform)
+    MATRIX_PROJECTION,        ##  Shader location: matrix uniform: projection
+    MATRIX_MODEL,             ##  Shader location: matrix uniform: model (transform)
+    MATRIX_NORMAL,            ##  Shader location: matrix uniform: normal
+    VECTOR_VIEW,              ##  Shader location: vector uniform: view
+    COLOR_DIFFUSE,            ##  Shader location: vector uniform: diffuse color
+    COLOR_SPECULAR,           ##  Shader location: vector uniform: specular color
+    COLOR_AMBIENT,            ##  Shader location: vector uniform: ambient color
+    MAP_ALBEDO,               ##  Shader location: sampler2d texture: albedo (same as: SHADER_LOC_MAP_DIFFUSE)
+    MAP_METALNESS,            ##  Shader location: sampler2d texture: metalness (same as: SHADER_LOC_MAP_SPECULAR)
+    MAP_NORMAL,               ##  Shader location: sampler2d texture: normal
+    MAP_ROUGHNESS,            ##  Shader location: sampler2d texture: roughness
+    MAP_OCCLUSION,            ##  Shader location: sampler2d texture: occlusion
+    MAP_EMISSION,             ##  Shader location: sampler2d texture: emission
+    MAP_HEIGHT,               ##  Shader location: sampler2d texture: height
+    MAP_CUBEMAP,              ##  Shader location: samplerCube texture: cubemap
+    MAP_IRRADIANCE,           ##  Shader location: samplerCube texture: irradiance
+    MAP_PREFILTER,            ##  Shader location: samplerCube texture: prefilter
+    MAP_BRDF                  ##  Shader location: sampler2d texture: brdf
 
 
 ##  Shader uniform data type
 
 type
   ShaderUniformDataType* {.size: sizeof(cint), pure.} = enum
-    FLOAT = 0, VEC2, VEC3, VEC4, INT, IVEC2, IVEC3, IVEC4, SAMPLER2D
+    FLOAT = 0,                  ##  Shader uniform type: float
+    VEC2,                     ##  Shader uniform type: vec2 (2 float)
+    VEC3,                     ##  Shader uniform type: vec3 (3 float)
+    VEC4,                     ##  Shader uniform type: vec4 (4 float)
+    INT,                      ##  Shader uniform type: int
+    IVEC2,                    ##  Shader uniform type: ivec2 (2 int)
+    IVEC3,                    ##  Shader uniform type: ivec3 (3 int)
+    IVEC4,                    ##  Shader uniform type: ivec4 (4 int)
+    SAMPLER2D                 ##  Shader uniform type: sampler2d
+
+
+##  Shader attribute data types
+
+type
+  ShaderAttributeDataType* {.size: sizeof(cint), pure.} = enum
+    SHADER_ATTRIB_FLOAT = 0,    ##  Shader attribute type: float
+    SHADER_ATTRIB_VEC2,       ##  Shader attribute type: vec2 (2 float)
+    SHADER_ATTRIB_VEC3,       ##  Shader attribute type: vec3 (3 float)
+    SHADER_ATTRIB_VEC4        ##  Shader attribute type: vec4 (4 float)
 
 
 ##  Pixel formats
@@ -722,27 +895,41 @@ type
     CUSTOM                    ##  Belnd textures using custom src/dst factors (use rlSetBlendMode())
 
 
-##  Gestures
+##  Gesture
 ##  NOTE: It could be used as flags to enable only some gestures
 
 type
-  Gestures* {.size: sizeof(cint), pure.} = enum
-    NONE = 0, TAP = 1, DOUBLETAP = 2, HOLD = 4, DRAG = 8, SWIPE_RIGHT = 16, SWIPE_LEFT = 32,
-    SWIPE_UP = 64, SWIPE_DOWN = 128, PINCH_IN = 256, PINCH_OUT = 512
+  Gesture* {.size: sizeof(cint), pure.} = enum
+    NONE = 0,                   ##  No gesture
+    TAP = 1,                    ##  Tap gesture
+    DOUBLETAP = 2,              ##  Double tap gesture
+    HOLD = 4,                   ##  Hold gesture
+    DRAG = 8,                   ##  Drag gesture
+    SWIPE_RIGHT = 16,           ##  Swipe right gesture
+    SWIPE_LEFT = 32,            ##  Swipe left gesture
+    SWIPE_UP = 64,              ##  Swipe up gesture
+    SWIPE_DOWN = 128,           ##  Swipe down gesture
+    PINCH_IN = 256,             ##  Pinch in gesture
+    PINCH_OUT = 512
 
 
 ##  Camera system modes
 
 type
   CameraMode* {.size: sizeof(cint), pure.} = enum
-    CUSTOM = 0, FREE, ORBITAL, FIRST_PERSON, THIRD_PERSON
+    CUSTOM = 0,                 ##  Custom camera
+    FREE,                     ##  Free camera
+    ORBITAL,                  ##  Orbital camera
+    FIRST_PERSON,             ##  First person camera
+    THIRD_PERSON              ##  Third person camera
 
 
 ##  Camera projection
 
 type
   CameraProjection* {.size: sizeof(cint), pure.} = enum
-    PERSPECTIVE = 0, ORTHOGRAPHIC
+    PERSPECTIVE = 0,            ##  Perspective projection
+    ORTHOGRAPHIC              ##  Orthographic projection
 
 
 ##  N-patch layout
@@ -939,6 +1126,19 @@ proc setClipboardText*(text: cstring) {.cdecl, importc: "SetClipboardText",
 proc getClipboardText*(): cstring {.cdecl, importc: "GetClipboardText",
                                  header: raylibHeader.}
 ##  Get clipboard text content
+##  Custom frame control functions
+##  NOTE: Those functions are intended for advance users that want full control over the frame processing
+##  By default EndDrawing() does this job: draws everything + SwapScreenBuffer() + manage frame timming + PollInputEvents()
+##  To avoid that behaviour and control frame processes manually, enable in config.h: SUPPORT_CUSTOM_FRAME_CONTROL
+
+proc swapScreenBuffer*() {.cdecl, importc: "SwapScreenBuffer", header: raylibHeader.}
+##  Swap back buffer with front buffer (screen drawing)
+
+proc pollInputEvents*() {.cdecl, importc: "PollInputEvents", header: raylibHeader.}
+##  Register all input events
+
+proc waitTime*(ms: cfloat) {.cdecl, importc: "WaitTime", header: raylibHeader.}
+##  Wait for some milliseconds (halt program execution)
 ##  Cursor-related functions
 
 proc showCursor*() {.cdecl, importc: "ShowCursor", header: raylibHeader.}
@@ -958,7 +1158,7 @@ proc disableCursor*() {.cdecl, importc: "DisableCursor", header: raylibHeader.}
 
 proc isCursorOnScreen*(): bool {.cdecl, importc: "IsCursorOnScreen",
                               header: raylibHeader.}
-##  Check if cursor is on the current screen.
+##  Check if cursor is on the screen
 ##  Drawing-related functions
 
 proc clearBackground*(color: Color) {.cdecl, importc: "ClearBackground",
@@ -973,21 +1173,21 @@ proc endDrawing*() {.cdecl, importc: "EndDrawing", header: raylibHeader.}
 
 proc beginMode2D*(camera: Camera2D) {.cdecl, importc: "BeginMode2D",
                                    header: raylibHeader.}
-##  Initialize 2D mode with custom camera (2D)
+##  Begin 2D mode with custom camera (2D)
 
 proc endMode2D*() {.cdecl, importc: "EndMode2D", header: raylibHeader.}
 ##  Ends 2D mode with custom camera
 
 proc beginMode3D*(camera: Camera3D) {.cdecl, importc: "BeginMode3D",
                                    header: raylibHeader.}
-##  Initializes 3D mode with custom camera (3D)
+##  Begin 3D mode with custom camera (3D)
 
 proc endMode3D*() {.cdecl, importc: "EndMode3D", header: raylibHeader.}
 ##  Ends 3D mode and returns to default 2D orthographic mode
 
 proc beginTextureMode*(target: RenderTexture2D) {.cdecl,
     importc: "BeginTextureMode", header: raylibHeader.}
-##  Initializes render texture for drawing
+##  Begin drawing to render texture
 
 proc endTextureMode*() {.cdecl, importc: "EndTextureMode", header: raylibHeader.}
 ##  Ends drawing to render texture
@@ -1001,7 +1201,7 @@ proc endShaderMode*() {.cdecl, importc: "EndShaderMode", header: raylibHeader.}
 
 proc beginBlendMode*(mode: cint) {.cdecl, importc: "BeginBlendMode",
                                 header: raylibHeader.}
-##  Begin blending mode (alpha, additive, multiplied)
+##  Begin blending mode (alpha, additive, multiplied, subtract, custom)
 
 proc endBlendMode*() {.cdecl, importc: "EndBlendMode", header: raylibHeader.}
 ##  End blending mode (reset to default: alpha blending)
@@ -1071,49 +1271,53 @@ proc unloadShader*(shader: Shader) {.cdecl, importc: "UnloadShader",
 
 proc getMouseRay*(mousePosition: Vector2; camera: Camera): Ray {.cdecl,
     importc: "GetMouseRay", header: raylibHeader.}
-##  Returns a ray trace from mouse position
+##  Get a ray trace from mouse position
 
 proc getCameraMatrix*(camera: Camera): Matrix {.cdecl, importc: "GetCameraMatrix",
     header: raylibHeader.}
-##  Returns camera transform matrix (view matrix)
+##  Get camera transform matrix (view matrix)
 
 proc getCameraMatrix2D*(camera: Camera2D): Matrix {.cdecl,
     importc: "GetCameraMatrix2D", header: raylibHeader.}
-##  Returns camera 2d transform matrix
+##  Get camera 2d transform matrix
 
 proc getWorldToScreen*(position: Vector3; camera: Camera): Vector2 {.cdecl,
     importc: "GetWorldToScreen", header: raylibHeader.}
-##  Returns the screen space position for a 3d world space position
+##  Get the screen space position for a 3d world space position
 
 proc getWorldToScreenEx*(position: Vector3; camera: Camera; width: cint; height: cint): Vector2 {.
     cdecl, importc: "GetWorldToScreenEx", header: raylibHeader.}
-##  Returns size position for a 3d world space position
+##  Get size position for a 3d world space position
 
 proc getWorldToScreen2D*(position: Vector2; camera: Camera2D): Vector2 {.cdecl,
     importc: "GetWorldToScreen2D", header: raylibHeader.}
-##  Returns the screen space position for a 2d camera world space position
+##  Get the screen space position for a 2d camera world space position
 
 proc getScreenToWorld2D*(position: Vector2; camera: Camera2D): Vector2 {.cdecl,
     importc: "GetScreenToWorld2D", header: raylibHeader.}
-##  Returns the world space position for a 2d camera screen space position
+##  Get the world space position for a 2d camera screen space position
 ##  Timing-related functions
 
 proc setTargetFPS*(fps: cint) {.cdecl, importc: "SetTargetFPS", header: raylibHeader.}
 ##  Set target FPS (maximum)
 
 proc getFPS*(): cint {.cdecl, importc: "GetFPS", header: raylibHeader.}
-##  Returns current FPS
+##  Get current FPS
 
 proc getFrameTime*(): cfloat {.cdecl, importc: "GetFrameTime", header: raylibHeader.}
-##  Returns time in seconds for last frame drawn (delta time)
+##  Get time in seconds for last frame drawn (delta time)
 
 proc getTime*(): cdouble {.cdecl, importc: "GetTime", header: raylibHeader.}
-##  Returns elapsed time in seconds since InitWindow()
+##  Get elapsed time in seconds since InitWindow()
 ##  Misc. functions
 
 proc getRandomValue*(min: cint; max: cint): cint {.cdecl, importc: "GetRandomValue",
     header: raylibHeader.}
-##  Returns a random value between min and max (both included)
+##  Get a random value between min and max (both included)
+
+proc setRandomSeed*(seed: cuint) {.cdecl, importc: "SetRandomSeed",
+                                header: raylibHeader.}
+##  Set the seed for the random number generator
 
 proc takeScreenshot*(fileName: cstring) {.cdecl, importc: "TakeScreenshot",
                                        header: raylibHeader.}
@@ -1125,7 +1329,7 @@ proc setConfigFlags*(flags: cuint) {.cdecl, importc: "SetConfigFlags",
 
 proc traceLog*(logLevel: cint; text: cstring) {.varargs, cdecl, importc: "TraceLog",
     header: raylibHeader.}
-##  Show trace log messages (LOG_DEBUG, LOG_INFO, LOG_WARNING, LOG_ERROR)
+##  Show trace log messages (LOG_DEBUG, LOG_INFO, LOG_WARNING, LOG_ERROR...)
 
 proc setTraceLogLevel*(logLevel: cint) {.cdecl, importc: "SetTraceLogLevel",
                                       header: raylibHeader.}
@@ -1180,8 +1384,8 @@ proc loadFileText*(fileName: cstring): cstring {.cdecl, importc: "LoadFileText",
     header: raylibHeader.}
 ##  Load text data from file (read), returns a '\0' terminated string
 
-proc unloadFileText*(text: ptr uint8) {.cdecl, importc: "UnloadFileText",
-                                     header: raylibHeader.}
+proc unloadFileText*(text: cstring) {.cdecl, importc: "UnloadFileText",
+                                   header: raylibHeader.}
 ##  Unload file text data allocated by LoadFileText()
 
 proc saveFileText*(fileName: cstring; text: cstring): bool {.cdecl,
@@ -1202,7 +1406,7 @@ proc isFileExtension*(fileName: cstring; ext: cstring): bool {.cdecl,
 
 proc getFileExtension*(fileName: cstring): cstring {.cdecl,
     importc: "GetFileExtension", header: raylibHeader.}
-##  Get pointer to extension for a filename string (includes dot: ".png")
+##  Get pointer to extension for a filename string (includes dot: '.png')
 
 proc getFileName*(filePath: cstring): cstring {.cdecl, importc: "GetFileName",
     header: raylibHeader.}
@@ -1249,6 +1453,7 @@ proc clearDroppedFiles*() {.cdecl, importc: "ClearDroppedFiles", header: raylibH
 proc getFileModTime*(fileName: cstring): clong {.cdecl, importc: "GetFileModTime",
     header: raylibHeader.}
 ##  Get file modification time (last write time)
+##  Compression/Encoding functionality
 
 proc compressData*(data: ptr uint8; dataLength: cint; compDataLength: ptr cint): ptr uint8 {.
     cdecl, importc: "CompressData", header: raylibHeader.}
@@ -1257,6 +1462,14 @@ proc compressData*(data: ptr uint8; dataLength: cint; compDataLength: ptr cint):
 proc decompressData*(compData: ptr uint8; compDataLength: cint; dataLength: ptr cint): ptr uint8 {.
     cdecl, importc: "DecompressData", header: raylibHeader.}
 ##  Decompress data (DEFLATE algorithm)
+
+proc encodeDataBase64*(data: ptr uint8; dataLength: cint; outputLength: ptr cint): cstring {.
+    cdecl, importc: "EncodeDataBase64", header: raylibHeader.}
+##  Encode data to Base64 string
+
+proc decodeDataBase64*(data: ptr uint8; outputLength: ptr cint): ptr uint8 {.cdecl,
+    importc: "DecodeDataBase64", header: raylibHeader.}
+##  Decode Base64 string data
 ##  Persistent storage management
 
 proc saveStorageValue*(position: cuint; value: cint): bool {.cdecl,
@@ -1276,55 +1489,51 @@ proc openURL*(url: cstring) {.cdecl, importc: "OpenURL", header: raylibHeader.}
 
 proc isKeyPressed*(key: cint): bool {.cdecl, importc: "IsKeyPressed",
                                   header: raylibHeader.}
-##  Detect if a key has been pressed once
+##  Check if a key has been pressed once
 
 proc isKeyDown*(key: cint): bool {.cdecl, importc: "IsKeyDown", header: raylibHeader.}
-##  Detect if a key is being pressed
+##  Check if a key is being pressed
 
 proc isKeyReleased*(key: cint): bool {.cdecl, importc: "IsKeyReleased",
                                    header: raylibHeader.}
-##  Detect if a key has been released once
+##  Check if a key has been released once
 
 proc isKeyUp*(key: cint): bool {.cdecl, importc: "IsKeyUp", header: raylibHeader.}
-##  Detect if a key is NOT being pressed
+##  Check if a key is NOT being pressed
 
 proc setExitKey*(key: cint) {.cdecl, importc: "SetExitKey", header: raylibHeader.}
 ##  Set a custom key to exit program (default is ESC)
 
 proc getKeyPressed*(): cint {.cdecl, importc: "GetKeyPressed", header: raylibHeader.}
-##  Get key pressed (keycode), call it multiple times for keys queued
+##  Get key pressed (keycode), call it multiple times for keys queued, returns 0 when the queue is empty
 
 proc getCharPressed*(): cint {.cdecl, importc: "GetCharPressed", header: raylibHeader.}
-##  Get char pressed (unicode), call it multiple times for chars queued
+##  Get char pressed (unicode), call it multiple times for chars queued, returns 0 when the queue is empty
 ##  Input-related functions: gamepads
 
 proc isGamepadAvailable*(gamepad: cint): bool {.cdecl, importc: "IsGamepadAvailable",
     header: raylibHeader.}
-##  Detect if a gamepad is available
-
-proc isGamepadName*(gamepad: cint; name: cstring): bool {.cdecl,
-    importc: "IsGamepadName", header: raylibHeader.}
-##  Check gamepad name (if available)
+##  Check if a gamepad is available
 
 proc getGamepadName*(gamepad: cint): cstring {.cdecl, importc: "GetGamepadName",
     header: raylibHeader.}
-##  Return gamepad internal name id
+##  Get gamepad internal name id
 
 proc isGamepadButtonPressed*(gamepad: cint; button: cint): bool {.cdecl,
     importc: "IsGamepadButtonPressed", header: raylibHeader.}
-##  Detect if a gamepad button has been pressed once
+##  Check if a gamepad button has been pressed once
 
 proc isGamepadButtonDown*(gamepad: cint; button: cint): bool {.cdecl,
     importc: "IsGamepadButtonDown", header: raylibHeader.}
-##  Detect if a gamepad button is being pressed
+##  Check if a gamepad button is being pressed
 
 proc isGamepadButtonReleased*(gamepad: cint; button: cint): bool {.cdecl,
     importc: "IsGamepadButtonReleased", header: raylibHeader.}
-##  Detect if a gamepad button has been released once
+##  Check if a gamepad button has been released once
 
 proc isGamepadButtonUp*(gamepad: cint; button: cint): bool {.cdecl,
     importc: "IsGamepadButtonUp", header: raylibHeader.}
-##  Detect if a gamepad button is NOT being pressed
+##  Check if a gamepad button is NOT being pressed
 
 proc getGamepadButtonPressed*(): cint {.cdecl, importc: "GetGamepadButtonPressed",
                                      header: raylibHeader.}
@@ -1332,11 +1541,11 @@ proc getGamepadButtonPressed*(): cint {.cdecl, importc: "GetGamepadButtonPressed
 
 proc getGamepadAxisCount*(gamepad: cint): cint {.cdecl,
     importc: "GetGamepadAxisCount", header: raylibHeader.}
-##  Return gamepad axis count for a gamepad
+##  Get gamepad axis count for a gamepad
 
 proc getGamepadAxisMovement*(gamepad: cint; axis: cint): cfloat {.cdecl,
     importc: "GetGamepadAxisMovement", header: raylibHeader.}
-##  Return axis movement value for a gamepad axis
+##  Get axis movement value for a gamepad axis
 
 proc setGamepadMappings*(mappings: cstring): cint {.cdecl,
     importc: "SetGamepadMappings", header: raylibHeader.}
@@ -1345,29 +1554,32 @@ proc setGamepadMappings*(mappings: cstring): cint {.cdecl,
 
 proc isMouseButtonPressed*(button: cint): bool {.cdecl,
     importc: "IsMouseButtonPressed", header: raylibHeader.}
-##  Detect if a mouse button has been pressed once
+##  Check if a mouse button has been pressed once
 
 proc isMouseButtonDown*(button: cint): bool {.cdecl, importc: "IsMouseButtonDown",
     header: raylibHeader.}
-##  Detect if a mouse button is being pressed
+##  Check if a mouse button is being pressed
 
 proc isMouseButtonReleased*(button: cint): bool {.cdecl,
     importc: "IsMouseButtonReleased", header: raylibHeader.}
-##  Detect if a mouse button has been released once
+##  Check if a mouse button has been released once
 
 proc isMouseButtonUp*(button: cint): bool {.cdecl, importc: "IsMouseButtonUp",
                                         header: raylibHeader.}
-##  Detect if a mouse button is NOT being pressed
+##  Check if a mouse button is NOT being pressed
 
 proc getMouseX*(): cint {.cdecl, importc: "GetMouseX", header: raylibHeader.}
-##  Returns mouse position X
+##  Get mouse position X
 
 proc getMouseY*(): cint {.cdecl, importc: "GetMouseY", header: raylibHeader.}
-##  Returns mouse position Y
+##  Get mouse position Y
 
 proc getMousePosition*(): Vector2 {.cdecl, importc: "GetMousePosition",
                                  header: raylibHeader.}
-##  Returns mouse position XY
+##  Get mouse position XY
+
+proc getMouseDelta*(): Vector2 {.cdecl, importc: "GetMouseDelta", header: raylibHeader.}
+##  Get mouse delta between frames
 
 proc setMousePosition*(x: cint; y: cint) {.cdecl, importc: "SetMousePosition",
                                       header: raylibHeader.}
@@ -1383,7 +1595,7 @@ proc setMouseScale*(scaleX: cfloat; scaleY: cfloat) {.cdecl, importc: "SetMouseS
 
 proc getMouseWheelMove*(): cfloat {.cdecl, importc: "GetMouseWheelMove",
                                  header: raylibHeader.}
-##  Returns mouse wheel movement Y
+##  Get mouse wheel movement Y
 
 proc setMouseCursor*(cursor: cint) {.cdecl, importc: "SetMouseCursor",
                                   header: raylibHeader.}
@@ -1391,16 +1603,24 @@ proc setMouseCursor*(cursor: cint) {.cdecl, importc: "SetMouseCursor",
 ##  Input-related functions: touch
 
 proc getTouchX*(): cint {.cdecl, importc: "GetTouchX", header: raylibHeader.}
-##  Returns touch position X for touch point 0 (relative to screen size)
+##  Get touch position X for touch point 0 (relative to screen size)
 
 proc getTouchY*(): cint {.cdecl, importc: "GetTouchY", header: raylibHeader.}
-##  Returns touch position Y for touch point 0 (relative to screen size)
+##  Get touch position Y for touch point 0 (relative to screen size)
 
 proc getTouchPosition*(index: cint): Vector2 {.cdecl, importc: "GetTouchPosition",
     header: raylibHeader.}
-##  Returns touch position XY for a touch point index (relative to screen size)
+##  Get touch position XY for a touch point index (relative to screen size)
+
+proc getTouchPointId*(index: cint): cint {.cdecl, importc: "GetTouchPointId",
+                                       header: raylibHeader.}
+##  Get touch point identifier for given index
+
+proc getTouchPointCount*(): cint {.cdecl, importc: "GetTouchPointCount",
+                                header: raylibHeader.}
+##  Get number of touch points
 ## ------------------------------------------------------------------------------------
-##  Gestures and Touch Handling Functions (Module: gestures)
+##  Gestures and Touch Handling Functions (Module: rgestures)
 ## ------------------------------------------------------------------------------------
 
 proc setGesturesEnabled*(flags: cuint) {.cdecl, importc: "SetGesturesEnabled",
@@ -1414,10 +1634,6 @@ proc isGestureDetected*(gesture: cint): bool {.cdecl, importc: "IsGestureDetecte
 proc getGestureDetected*(): cint {.cdecl, importc: "GetGestureDetected",
                                 header: raylibHeader.}
 ##  Get latest detected gesture
-
-proc getTouchPointsCount*(): cint {.cdecl, importc: "GetTouchPointsCount",
-                                 header: raylibHeader.}
-##  Get touch points count
 
 proc getGestureHoldDuration*(): cfloat {.cdecl, importc: "GetGestureHoldDuration",
                                       header: raylibHeader.}
@@ -1439,7 +1655,7 @@ proc getGesturePinchAngle*(): cfloat {.cdecl, importc: "GetGesturePinchAngle",
                                     header: raylibHeader.}
 ##  Get gesture pinch angle
 ## ------------------------------------------------------------------------------------
-##  Camera System Functions (Module: camera)
+##  Camera System Functions (Module: rcamera)
 ## ------------------------------------------------------------------------------------
 
 proc setCameraMode*(camera: Camera; mode: cint) {.cdecl, importc: "SetCameraMode",
@@ -1475,6 +1691,7 @@ proc setCameraMoveControls*(keyFront: cint; keyBack: cint; keyRight: cint;
 
 proc setShapesTexture*(texture: Texture2D; source: Rectangle) {.cdecl,
     importc: "SetShapesTexture", header: raylibHeader.}
+##  Set texture and rectangle to be used on shapes drawing
 ##  Basic shapes drawing functions
 
 proc drawPixel*(posX: cint; posY: cint; color: Color) {.cdecl, importc: "DrawPixel",
@@ -1504,9 +1721,15 @@ proc drawLineBezier*(startPos: Vector2; endPos: Vector2; thick: cfloat; color: C
 proc drawLineBezierQuad*(startPos: Vector2; endPos: Vector2; controlPos: Vector2;
                         thick: cfloat; color: Color) {.cdecl,
     importc: "DrawLineBezierQuad", header: raylibHeader.}
-## Draw line using quadratic bezier curves with a control point
+##  Draw line using quadratic bezier curves with a control point
 
-proc drawLineStrip*(points: ptr Vector2; pointsCount: cint; color: Color) {.cdecl,
+proc drawLineBezierCubic*(startPos: Vector2; endPos: Vector2;
+                         startControlPos: Vector2; endControlPos: Vector2;
+                         thick: cfloat; color: Color) {.cdecl,
+    importc: "DrawLineBezierCubic", header: raylibHeader.}
+##  Draw line using cubic bezier curves with 2 control points
+
+proc drawLineStrip*(points: ptr Vector2; pointCount: cint; color: Color) {.cdecl,
     importc: "DrawLineStrip", header: raylibHeader.}
 ##  Draw lines sequence
 
@@ -1591,7 +1814,7 @@ proc drawRectangleLines*(posX: cint; posY: cint; width: cint; height: cint; colo
     cdecl, importc: "DrawRectangleLines", header: raylibHeader.}
 ##  Draw rectangle outline
 
-proc drawRectangleLinesEx*(rec: Rectangle; lineThick: cint; color: Color) {.cdecl,
+proc drawRectangleLinesEx*(rec: Rectangle; lineThick: cfloat; color: Color) {.cdecl,
     importc: "DrawRectangleLinesEx", header: raylibHeader.}
 ##  Draw rectangle outline with extended parameters
 
@@ -1601,7 +1824,7 @@ proc drawRectangleRounded*(rec: Rectangle; roundness: cfloat; segments: cint;
 ##  Draw rectangle with rounded edges
 
 proc drawRectangleRoundedLines*(rec: Rectangle; roundness: cfloat; segments: cint;
-                               lineThick: cint; color: Color) {.cdecl,
+                               lineThick: cfloat; color: Color) {.cdecl,
     importc: "DrawRectangleRoundedLines", header: raylibHeader.}
 ##  Draw rectangle with rounded edges outline
 
@@ -1613,11 +1836,11 @@ proc drawTriangleLines*(v1: Vector2; v2: Vector2; v3: Vector2; color: Color) {.c
     importc: "DrawTriangleLines", header: raylibHeader.}
 ##  Draw triangle outline (vertex in counter-clockwise order!)
 
-proc drawTriangleFan*(points: ptr Vector2; pointsCount: cint; color: Color) {.cdecl,
+proc drawTriangleFan*(points: ptr Vector2; pointCount: cint; color: Color) {.cdecl,
     importc: "DrawTriangleFan", header: raylibHeader.}
 ##  Draw a triangle fan defined by points (first vertex is the center)
 
-proc drawTriangleStrip*(points: ptr Vector2; pointsCount: cint; color: Color) {.cdecl,
+proc drawTriangleStrip*(points: ptr Vector2; pointCount: cint; color: Color) {.cdecl,
     importc: "DrawTriangleStrip", header: raylibHeader.}
 ##  Draw a triangle strip defined by points
 
@@ -1629,6 +1852,11 @@ proc drawPolyLines*(center: Vector2; sides: cint; radius: cfloat; rotation: cflo
                    color: Color) {.cdecl, importc: "DrawPolyLines",
                                  header: raylibHeader.}
 ##  Draw a polygon outline of n sides
+
+proc drawPolyLinesEx*(center: Vector2; sides: cint; radius: cfloat; rotation: cfloat;
+                     lineThick: cfloat; color: Color) {.cdecl,
+    importc: "DrawPolyLinesEx", header: raylibHeader.}
+##  Draw a polygon outline of n sides with extended parameters
 ##  Basic shapes collision detection functions
 
 proc checkCollisionRecs*(rec1: Rectangle; rec2: Rectangle): bool {.cdecl,
@@ -1661,6 +1889,10 @@ proc checkCollisionLines*(startPos1: Vector2; endPos1: Vector2; startPos2: Vecto
     importc: "CheckCollisionLines", header: raylibHeader.}
 ##  Check the collision between two lines defined by two points each, returns collision point by reference
 
+proc checkCollisionPointLine*(point: Vector2; p1: Vector2; p2: Vector2; threshold: cint): bool {.
+    cdecl, importc: "CheckCollisionPointLine", header: raylibHeader.}
+##  Check if point belongs to line created between two points [p1] and [p2] with defined margin in pixels [threshold]
+
 proc getCollisionRec*(rec1: Rectangle; rec2: Rectangle): Rectangle {.cdecl,
     importc: "GetCollisionRec", header: raylibHeader.}
 ##  Get collision rectangle for two rectangles collision
@@ -1685,7 +1917,15 @@ proc loadImageAnim*(fileName: cstring; frames: ptr cint): Image {.cdecl,
 
 proc loadImageFromMemory*(fileType: cstring; fileData: ptr uint8; dataSize: cint): Image {.
     cdecl, importc: "LoadImageFromMemory", header: raylibHeader.}
-##  Load image from memory buffer, fileType refers to extension: i.e. ".png"
+##  Load image from memory buffer, fileType refers to extension: i.e. '.png'
+
+proc loadImageFromTexture*(texture: Texture2D): Image {.cdecl,
+    importc: "LoadImageFromTexture", header: raylibHeader.}
+##  Load image from GPU texture data
+
+proc loadImageFromScreen*(): Image {.cdecl, importc: "LoadImageFromScreen",
+                                  header: raylibHeader.}
+##  Load image from screen buffer and (screenshot)
 
 proc unloadImage*(image: Image) {.cdecl, importc: "UnloadImage", header: raylibHeader.}
 ##  Unload image from CPU memory (RAM)
@@ -1725,14 +1965,9 @@ proc genImageWhiteNoise*(width: cint; height: cint; factor: cfloat): Image {.cde
     importc: "GenImageWhiteNoise", header: raylibHeader.}
 ##  Generate image: white noise
 
-proc genImagePerlinNoise*(width: cint; height: cint; offsetX: cint; offsetY: cint;
-                         scale: cfloat): Image {.cdecl,
-    importc: "GenImagePerlinNoise", header: raylibHeader.}
-##  Generate image: perlin noise
-
 proc genImageCellular*(width: cint; height: cint; tileSize: cint): Image {.cdecl,
     importc: "GenImageCellular", header: raylibHeader.}
-##  Generate image: cellular algorithm. Bigger tileSize means bigger cells
+##  Generate image: cellular algorithm, bigger tileSize means bigger cells
 ##  Image manipulation functions
 
 proc imageCopy*(image: Image): Image {.cdecl, importc: "ImageCopy",
@@ -1795,7 +2030,7 @@ proc imageResizeCanvas*(image: ptr Image; newWidth: cint; newHeight: cint;
 
 proc imageMipmaps*(image: ptr Image) {.cdecl, importc: "ImageMipmaps",
                                    header: raylibHeader.}
-##  Generate all mipmap levels for a provided image
+##  Compute all mipmap levels for a provided image
 
 proc imageDither*(image: ptr Image; rBpp: cint; gBpp: cint; bBpp: cint; aBpp: cint) {.cdecl,
     importc: "ImageDither", header: raylibHeader.}
@@ -1845,7 +2080,7 @@ proc loadImageColors*(image: Image): ptr Color {.cdecl, importc: "LoadImageColor
     header: raylibHeader.}
 ##  Load color data from image as a Color array (RGBA - 32bit)
 
-proc loadImagePalette*(image: Image; maxPaletteSize: cint; colorsCount: ptr cint): ptr Color {.
+proc loadImagePalette*(image: Image; maxPaletteSize: cint; colorCount: ptr cint): ptr Color {.
     cdecl, importc: "LoadImagePalette", header: raylibHeader.}
 ##  Load colors palette from image as a Color array (RGBA - 32bit)
 
@@ -1860,6 +2095,10 @@ proc unloadImagePalette*(colors: ptr Color) {.cdecl, importc: "UnloadImagePalett
 proc getImageAlphaBorder*(image: Image; threshold: cfloat): Rectangle {.cdecl,
     importc: "GetImageAlphaBorder", header: raylibHeader.}
 ##  Get image alpha border rectangle
+
+proc getImageColor*(image: Image; x: cint; y: cint): Color {.cdecl,
+    importc: "GetImageColor", header: raylibHeader.}
+##  Get image pixel color at (x, y) position
 ##  Image drawing functions
 ##  NOTE: Image software-rendering functions (CPU)
 
@@ -1957,13 +2196,6 @@ proc updateTexture*(texture: Texture2D; pixels: pointer) {.cdecl,
 proc updateTextureRec*(texture: Texture2D; rec: Rectangle; pixels: pointer) {.cdecl,
     importc: "UpdateTextureRec", header: raylibHeader.}
 ##  Update GPU texture rectangle with new data
-
-proc getTextureData*(texture: Texture2D): Image {.cdecl, importc: "GetTextureData",
-    header: raylibHeader.}
-##  Get pixel data from GPU texture and return an Image
-
-proc getScreenData*(): Image {.cdecl, importc: "GetScreenData", header: raylibHeader.}
-##  Get pixel data from screen buffer and return an Image (screenshot)
 ##  Texture configuration functions
 
 proc genTextureMipmaps*(texture: ptr Texture2D) {.cdecl,
@@ -2018,45 +2250,45 @@ proc drawTextureNPatch*(texture: Texture2D; nPatchInfo: NPatchInfo; dest: Rectan
 ##  Draws a texture (or part of it) that stretches or shrinks nicely
 
 proc drawTexturePoly*(texture: Texture2D; center: Vector2; points: ptr Vector2;
-                     texcoords: ptr Vector2; pointsCount: cint; tint: Color) {.cdecl,
+                     texcoords: ptr Vector2; pointCount: cint; tint: Color) {.cdecl,
     importc: "DrawTexturePoly", header: raylibHeader.}
 ##  Draw a textured polygon
 ##  Color/pixel related functions
 
 proc fade*(color: Color; alpha: cfloat): Color {.cdecl, importc: "Fade",
     header: raylibHeader.}
-##  Returns color with alpha applied, alpha goes from 0.0f to 1.0f
+##  Get color with alpha applied, alpha goes from 0.0f to 1.0f
 
 proc colorToInt*(color: Color): cint {.cdecl, importc: "ColorToInt",
                                    header: raylibHeader.}
-##  Returns hexadecimal value for a Color
+##  Get hexadecimal value for a Color
 
 proc colorNormalize*(color: Color): Vector4 {.cdecl, importc: "ColorNormalize",
     header: raylibHeader.}
-##  Returns Color normalized as float [0..1]
+##  Get Color normalized as float [0..1]
 
 proc colorFromNormalized*(normalized: Vector4): Color {.cdecl,
     importc: "ColorFromNormalized", header: raylibHeader.}
-##  Returns Color from normalized values [0..1]
+##  Get Color from normalized values [0..1]
 
 proc colorToHSV*(color: Color): Vector3 {.cdecl, importc: "ColorToHSV",
                                       header: raylibHeader.}
-##  Returns HSV values for a Color, hue [0..360], saturation/value [0..1]
+##  Get HSV values for a Color, hue [0..360], saturation/value [0..1]
 
 proc colorFromHSV*(hue: cfloat; saturation: cfloat; value: cfloat): Color {.cdecl,
     importc: "ColorFromHSV", header: raylibHeader.}
-##  Returns a Color from HSV values, hue [0..360], saturation/value [0..1]
+##  Get a Color from HSV values, hue [0..360], saturation/value [0..1]
 
 proc colorAlpha*(color: Color; alpha: cfloat): Color {.cdecl, importc: "ColorAlpha",
     header: raylibHeader.}
-##  Returns color with alpha applied, alpha goes from 0.0f to 1.0f
+##  Get color with alpha applied, alpha goes from 0.0f to 1.0f
 
 proc colorAlphaBlend*(dst: Color; src: Color; tint: Color): Color {.cdecl,
     importc: "ColorAlphaBlend", header: raylibHeader.}
-##  Returns src alpha-blended into dst color with tint
+##  Get src alpha-blended into dst color with tint
 
-proc getColor*(hexValue: cint): Color {.cdecl, importc: "GetColor",
-                                    header: raylibHeader.}
+proc getColor*(hexValue: cuint): Color {.cdecl, importc: "GetColor",
+                                     header: raylibHeader.}
 ##  Get Color structure from hexadecimal value
 
 proc getPixelColor*(srcPtr: pointer; format: cint): Color {.cdecl,
@@ -2083,7 +2315,7 @@ proc loadFont*(fileName: cstring): Font {.cdecl, importc: "LoadFont",
 ##  Load font from file into GPU memory (VRAM)
 
 proc loadFontEx*(fileName: cstring; fontSize: cint; fontChars: ptr cint;
-                charsCount: cint): Font {.cdecl, importc: "LoadFontEx",
+                glyphCount: cint): Font {.cdecl, importc: "LoadFontEx",
                                        header: raylibHeader.}
 ##  Load font from file with extended parameters
 
@@ -2092,21 +2324,21 @@ proc loadFontFromImage*(image: Image; key: Color; firstChar: cint): Font {.cdecl
 ##  Load font from Image (XNA style)
 
 proc loadFontFromMemory*(fileType: cstring; fileData: ptr uint8; dataSize: cint;
-                        fontSize: cint; fontChars: ptr cint; charsCount: cint): Font {.
+                        fontSize: cint; fontChars: ptr cint; glyphCount: cint): Font {.
     cdecl, importc: "LoadFontFromMemory", header: raylibHeader.}
-##  Load font from memory buffer, fileType refers to extension: i.e. ".ttf"
+##  Load font from memory buffer, fileType refers to extension: i.e. '.ttf'
 
 proc loadFontData*(fileData: ptr uint8; dataSize: cint; fontSize: cint;
-                  fontChars: ptr cint; charsCount: cint; `type`: cint): ptr CharInfo {.
+                  fontChars: ptr cint; glyphCount: cint; `type`: cint): ptr GlyphInfo {.
     cdecl, importc: "LoadFontData", header: raylibHeader.}
 ##  Load font data for further use
 
-proc genImageFontAtlas*(chars: ptr CharInfo; recs: ptr ptr Rectangle; charsCount: cint;
+proc genImageFontAtlas*(chars: ptr GlyphInfo; recs: ptr ptr Rectangle; glyphCount: cint;
                        fontSize: cint; padding: cint; packMethod: cint): Image {.cdecl,
     importc: "GenImageFontAtlas", header: raylibHeader.}
 ##  Generate image font atlas using chars info
 
-proc unloadFontData*(chars: ptr CharInfo; charsCount: cint) {.cdecl,
+proc unloadFontData*(chars: ptr GlyphInfo; glyphCount: cint) {.cdecl,
     importc: "UnloadFontData", header: raylibHeader.}
 ##  Unload font chars info data (RAM)
 
@@ -2126,22 +2358,16 @@ proc drawTextEx*(font: Font; text: cstring; position: Vector2; fontSize: cfloat;
     header: raylibHeader.}
 ##  Draw text using font and additional parameters
 
-proc drawTextRec*(font: Font; text: cstring; rec: Rectangle; fontSize: cfloat;
-                 spacing: cfloat; wordWrap: bool; tint: Color) {.cdecl,
-    importc: "DrawTextRec", header: raylibHeader.}
-##  Draw text using font inside rectangle limits
-
-proc drawTextRecEx*(font: Font; text: cstring; rec: Rectangle; fontSize: cfloat;
-                   spacing: cfloat; wordWrap: bool; tint: Color; selectStart: cint;
-                   selectLength: cint; selectTint: Color; selectBackTint: Color) {.
-    cdecl, importc: "DrawTextRecEx", header: raylibHeader.}
-##  Draw text using font inside rectangle limits with support for text selection
+proc drawTextPro*(font: Font; text: cstring; position: Vector2; origin: Vector2;
+                 rotation: cfloat; fontSize: cfloat; spacing: cfloat; tint: Color) {.
+    cdecl, importc: "DrawTextPro", header: raylibHeader.}
+##  Draw text using Font and pro parameters (rotation)
 
 proc drawTextCodepoint*(font: Font; codepoint: cint; position: Vector2;
                        fontSize: cfloat; tint: Color) {.cdecl,
     importc: "DrawTextCodepoint", header: raylibHeader.}
 ##  Draw one character (codepoint)
-##  Text misc. functions
+##  Text font info functions
 
 proc measureText*(text: cstring; fontSize: cint): cint {.cdecl, importc: "MeasureText",
     header: raylibHeader.}
@@ -2153,8 +2379,41 @@ proc measureTextEx*(font: Font; text: cstring; fontSize: cfloat; spacing: cfloat
 
 proc getGlyphIndex*(font: Font; codepoint: cint): cint {.cdecl,
     importc: "GetGlyphIndex", header: raylibHeader.}
-##  Get index position for a unicode character on font
-##  Text strings management functions (no utf8 strings, only byte chars)
+##  Get glyph index position in font for a codepoint (unicode character), fallback to '?' if not found
+
+proc getGlyphInfo*(font: Font; codepoint: cint): GlyphInfo {.cdecl,
+    importc: "GetGlyphInfo", header: raylibHeader.}
+##  Get glyph font info data for a codepoint (unicode character), fallback to '?' if not found
+
+proc getGlyphAtlasRec*(font: Font; codepoint: cint): Rectangle {.cdecl,
+    importc: "GetGlyphAtlasRec", header: raylibHeader.}
+##  Get glyph rectangle in font atlas for a codepoint (unicode character), fallback to '?' if not found
+##  Text codepoints management functions (unicode characters)
+
+proc loadCodepoints*(text: cstring; count: ptr cint): ptr cint {.cdecl,
+    importc: "LoadCodepoints", header: raylibHeader.}
+##  Load all codepoints from a UTF-8 text string, codepoints count returned by parameter
+
+proc unloadCodepoints*(codepoints: ptr cint) {.cdecl, importc: "UnloadCodepoints",
+    header: raylibHeader.}
+##  Unload codepoints data from memory
+
+proc getCodepointCount*(text: cstring): cint {.cdecl, importc: "GetCodepointCount",
+    header: raylibHeader.}
+##  Get total number of codepoints in a UTF-8 encoded string
+
+proc getCodepoint*(text: cstring; bytesProcessed: ptr cint): cint {.cdecl,
+    importc: "GetCodepoint", header: raylibHeader.}
+##  Get next codepoint in a UTF-8 encoded string, 0x3f('?') is returned on failure
+
+proc codepointToUTF8*(codepoint: cint; byteSize: ptr cint): cstring {.cdecl,
+    importc: "CodepointToUTF8", header: raylibHeader.}
+##  Encode one codepoint into UTF-8 byte array (array length returned as parameter)
+
+proc textCodepointsToUTF8*(codepoints: ptr cint; length: cint): cstring {.cdecl,
+    importc: "TextCodepointsToUTF8", header: raylibHeader.}
+##  Encode text as codepoints array into UTF-8 text string (WARNING: memory must be freed!)
+##  Text strings management functions (no UTF-8 strings, only byte chars)
 ##  NOTE: Some strings allocate memory internally for returned strings, just be careful!
 
 proc textCopy*(dst: cstring; src: cstring): cint {.cdecl, importc: "TextCopy",
@@ -2171,7 +2430,7 @@ proc textLength*(text: cstring): cuint {.cdecl, importc: "TextLength",
 
 proc textFormat*(text: cstring): cstring {.varargs, cdecl, importc: "TextFormat",
                                        header: raylibHeader.}
-##  Text formatting with variables (sprintf style)
+##  Text formatting with variables (sprintf() style)
 
 proc textSubtext*(text: cstring; position: cint; length: cint): cstring {.cdecl,
     importc: "TextSubtext", header: raylibHeader.}
@@ -2179,11 +2438,11 @@ proc textSubtext*(text: cstring; position: cint; length: cint): cstring {.cdecl,
 
 proc textReplace*(text: cstring; replace: cstring; by: cstring): cstring {.cdecl,
     importc: "TextReplace", header: raylibHeader.}
-##  Replace text string (memory must be freed!)
+##  Replace text string (WARNING: memory must be freed!)
 
 proc textInsert*(text: cstring; insert: cstring; position: cint): cstring {.cdecl,
     importc: "TextInsert", header: raylibHeader.}
-##  Insert text in a position (memory must be freed!)
+##  Insert text in a position (WARNING: memory must be freed!)
 
 proc textJoin*(textList: cstringArray; count: cint; delimiter: cstring): cstring {.
     cdecl, importc: "TextJoin", header: raylibHeader.}
@@ -2216,27 +2475,6 @@ proc textToPascal*(text: cstring): cstring {.cdecl, importc: "TextToPascal",
 proc textToInteger*(text: cstring): cint {.cdecl, importc: "TextToInteger",
                                        header: raylibHeader.}
 ##  Get integer value from text (negative values not supported)
-
-proc textToUtf8*(codepoints: ptr cint; length: cint): cstring {.cdecl,
-    importc: "TextToUtf8", header: raylibHeader.}
-##  Encode text codepoint into utf8 text (memory must be freed!)
-##  UTF8 text strings management functions
-
-proc getCodepoints*(text: cstring; count: ptr cint): ptr cint {.cdecl,
-    importc: "GetCodepoints", header: raylibHeader.}
-##  Get all codepoints in a string, codepoints count returned by parameters
-
-proc getCodepointsCount*(text: cstring): cint {.cdecl, importc: "GetCodepointsCount",
-    header: raylibHeader.}
-##  Get total number of characters (codepoints) in a UTF8 encoded string
-
-proc getNextCodepoint*(text: cstring; bytesProcessed: ptr cint): cint {.cdecl,
-    importc: "GetNextCodepoint", header: raylibHeader.}
-##  Returns next codepoint in a UTF8 encoded string; 0x3f('?') is returned on failure
-
-proc codepointToUtf8*(codepoint: cint; byteLength: ptr cint): cstring {.cdecl,
-    importc: "CodepointToUtf8", header: raylibHeader.}
-##  Encode codepoint into utf8 text (char array length returned as parameter)
 ## ------------------------------------------------------------------------------------
 ##  Basic 3d Shapes Drawing Functions (Module: models)
 ## ------------------------------------------------------------------------------------
@@ -2259,7 +2497,7 @@ proc drawTriangle3D*(v1: Vector3; v2: Vector3; v3: Vector3; color: Color) {.cdec
     importc: "DrawTriangle3D", header: raylibHeader.}
 ##  Draw a color-filled triangle (vertex in counter-clockwise order!)
 
-proc drawTriangleStrip3D*(points: ptr Vector3; pointsCount: cint; color: Color) {.cdecl,
+proc drawTriangleStrip3D*(points: ptr Vector3; pointCount: cint; color: Color) {.cdecl,
     importc: "DrawTriangleStrip3D", header: raylibHeader.}
 ##  Draw a triangle strip defined by points
 
@@ -2285,6 +2523,11 @@ proc drawCubeTexture*(texture: Texture2D; position: Vector3; width: cfloat;
     importc: "DrawCubeTexture", header: raylibHeader.}
 ##  Draw cube textured
 
+proc drawCubeTextureRec*(texture: Texture2D; source: Rectangle; position: Vector3;
+                        width: cfloat; height: cfloat; length: cfloat; color: Color) {.
+    cdecl, importc: "DrawCubeTextureRec", header: raylibHeader.}
+##  Draw cube with a region of a texture
+
 proc drawSphere*(centerPos: Vector3; radius: cfloat; color: Color) {.cdecl,
     importc: "DrawSphere", header: raylibHeader.}
 ##  Draw sphere
@@ -2304,10 +2547,20 @@ proc drawCylinder*(position: Vector3; radiusTop: cfloat; radiusBottom: cfloat;
     importc: "DrawCylinder", header: raylibHeader.}
 ##  Draw a cylinder/cone
 
+proc drawCylinderEx*(startPos: Vector3; endPos: Vector3; startRadius: cfloat;
+                    endRadius: cfloat; sides: cint; color: Color) {.cdecl,
+    importc: "DrawCylinderEx", header: raylibHeader.}
+##  Draw a cylinder with base at startPos and top at endPos
+
 proc drawCylinderWires*(position: Vector3; radiusTop: cfloat; radiusBottom: cfloat;
                        height: cfloat; slices: cint; color: Color) {.cdecl,
     importc: "DrawCylinderWires", header: raylibHeader.}
 ##  Draw a cylinder/cone wires
+
+proc drawCylinderWiresEx*(startPos: Vector3; endPos: Vector3; startRadius: cfloat;
+                         endRadius: cfloat; sides: cint; color: Color) {.cdecl,
+    importc: "DrawCylinderWiresEx", header: raylibHeader.}
+##  Draw a cylinder wires with base at startPos and top at endPos
 
 proc drawPlane*(centerPos: Vector3; size: Vector2; color: Color) {.cdecl,
     importc: "DrawPlane", header: raylibHeader.}
@@ -2322,7 +2575,7 @@ proc drawGrid*(slices: cint; spacing: cfloat) {.cdecl, importc: "DrawGrid",
 ## ------------------------------------------------------------------------------------
 ##  Model 3d Loading and Drawing Functions (Module: models)
 ## ------------------------------------------------------------------------------------
-##  Model loading/unloading functions
+##  Model management functions
 
 proc loadModel*(fileName: cstring): Model {.cdecl, importc: "LoadModel",
                                         header: raylibHeader.}
@@ -2338,7 +2591,50 @@ proc unloadModel*(model: Model) {.cdecl, importc: "UnloadModel", header: raylibH
 proc unloadModelKeepMeshes*(model: Model) {.cdecl, importc: "UnloadModelKeepMeshes",
     header: raylibHeader.}
 ##  Unload model (but not meshes) from memory (RAM and/or VRAM)
-##  Mesh loading/unloading functions
+
+proc getModelBoundingBox*(model: Model): BoundingBox {.cdecl,
+    importc: "GetModelBoundingBox", header: raylibHeader.}
+##  Compute model bounding box limits (considers all meshes)
+##  Model drawing functions
+
+proc drawModel*(model: Model; position: Vector3; scale: cfloat; tint: Color) {.cdecl,
+    importc: "DrawModel", header: raylibHeader.}
+##  Draw a model (with texture if set)
+
+proc drawModelEx*(model: Model; position: Vector3; rotationAxis: Vector3;
+                 rotationAngle: cfloat; scale: Vector3; tint: Color) {.cdecl,
+    importc: "DrawModelEx", header: raylibHeader.}
+##  Draw a model with extended parameters
+
+proc drawModelWires*(model: Model; position: Vector3; scale: cfloat; tint: Color) {.
+    cdecl, importc: "DrawModelWires", header: raylibHeader.}
+##  Draw a model wires (with texture if set)
+
+proc drawModelWiresEx*(model: Model; position: Vector3; rotationAxis: Vector3;
+                      rotationAngle: cfloat; scale: Vector3; tint: Color) {.cdecl,
+    importc: "DrawModelWiresEx", header: raylibHeader.}
+##  Draw a model wires (with texture if set) with extended parameters
+
+proc drawBoundingBox*(box: BoundingBox; color: Color) {.cdecl,
+    importc: "DrawBoundingBox", header: raylibHeader.}
+##  Draw bounding box (wires)
+
+proc drawBillboard*(camera: Camera; texture: Texture2D; position: Vector3;
+                   size: cfloat; tint: Color) {.cdecl, importc: "DrawBillboard",
+    header: raylibHeader.}
+##  Draw a billboard texture
+
+proc drawBillboardRec*(camera: Camera; texture: Texture2D; source: Rectangle;
+                      position: Vector3; size: Vector2; tint: Color) {.cdecl,
+    importc: "DrawBillboardRec", header: raylibHeader.}
+##  Draw a billboard texture defined by source
+
+proc drawBillboardPro*(camera: Camera; texture: Texture2D; source: Rectangle;
+                      position: Vector3; up: Vector3; size: Vector2; origin: Vector2;
+                      rotation: cfloat; tint: Color) {.cdecl,
+    importc: "DrawBillboardPro", header: raylibHeader.}
+##  Draw a billboard texture defined by source and rotation
+##  Mesh management functions
 
 proc uploadMesh*(mesh: ptr Mesh; dynamic: bool) {.cdecl, importc: "UploadMesh",
     header: raylibHeader.}
@@ -2349,6 +2645,9 @@ proc updateMeshBuffer*(mesh: Mesh; index: cint; data: pointer; dataSize: cint;
                                     header: raylibHeader.}
 ##  Update mesh vertex data in GPU for a specific buffer index
 
+proc unloadMesh*(mesh: Mesh) {.cdecl, importc: "UnloadMesh", header: raylibHeader.}
+##  Unload mesh data from CPU and GPU
+
 proc drawMesh*(mesh: Mesh; material: Material; transform: Matrix) {.cdecl,
     importc: "DrawMesh", header: raylibHeader.}
 ##  Draw a 3d mesh with material and transform
@@ -2358,54 +2657,21 @@ proc drawMeshInstanced*(mesh: Mesh; material: Material; transforms: ptr Matrix;
                                         header: raylibHeader.}
 ##  Draw multiple mesh instances with material and different transforms
 
-proc unloadMesh*(mesh: Mesh) {.cdecl, importc: "UnloadMesh", header: raylibHeader.}
-##  Unload mesh data from CPU and GPU
-
 proc exportMesh*(mesh: Mesh; fileName: cstring): bool {.cdecl, importc: "ExportMesh",
     header: raylibHeader.}
 ##  Export mesh data to file, returns true on success
-##  Material loading/unloading functions
 
-proc loadMaterials*(fileName: cstring; materialCount: ptr cint): ptr Material {.cdecl,
-    importc: "LoadMaterials", header: raylibHeader.}
-##  Load materials from model file
+proc getMeshBoundingBox*(mesh: Mesh): BoundingBox {.cdecl,
+    importc: "GetMeshBoundingBox", header: raylibHeader.}
+##  Compute mesh bounding box limits
 
-proc loadMaterialDefault*(): Material {.cdecl, importc: "LoadMaterialDefault",
+proc genMeshTangents*(mesh: ptr Mesh) {.cdecl, importc: "GenMeshTangents",
+                                    header: raylibHeader.}
+##  Compute mesh tangents
+
+proc genMeshBinormals*(mesh: ptr Mesh) {.cdecl, importc: "GenMeshBinormals",
                                      header: raylibHeader.}
-##  Load default material (Supports: DIFFUSE, SPECULAR, NORMAL maps)
-
-proc unloadMaterial*(material: Material) {.cdecl, importc: "UnloadMaterial",
-                                        header: raylibHeader.}
-##  Unload material from GPU memory (VRAM)
-
-proc setMaterialTexture*(material: ptr Material; mapType: cint; texture: Texture2D) {.
-    cdecl, importc: "SetMaterialTexture", header: raylibHeader.}
-##  Set texture for a material map type (MATERIAL_MAP_DIFFUSE, MATERIAL_MAP_SPECULAR...)
-
-proc setModelMeshMaterial*(model: ptr Model; meshId: cint; materialId: cint) {.cdecl,
-    importc: "SetModelMeshMaterial", header: raylibHeader.}
-##  Set material for a mesh
-##  Model animations loading/unloading functions
-
-proc loadModelAnimations*(fileName: cstring; animsCount: ptr cint): ptr ModelAnimation {.
-    cdecl, importc: "LoadModelAnimations", header: raylibHeader.}
-##  Load model animations from file
-
-proc updateModelAnimation*(model: Model; anim: ModelAnimation; frame: cint) {.cdecl,
-    importc: "UpdateModelAnimation", header: raylibHeader.}
-##  Update model animation pose
-
-proc unloadModelAnimation*(anim: ModelAnimation) {.cdecl,
-    importc: "UnloadModelAnimation", header: raylibHeader.}
-##  Unload animation data
-
-proc unloadModelAnimations*(animations: ptr ModelAnimation; count: cuint) {.cdecl,
-    importc: "UnloadModelAnimations", header: raylibHeader.}
-##  Unload animation array data
-
-proc isModelAnimationValid*(model: Model; anim: ModelAnimation): bool {.cdecl,
-    importc: "IsModelAnimationValid", header: raylibHeader.}
-##  Check model animation skeleton match
+##  Compute mesh binormals
 ##  Mesh generation functions
 
 proc genMeshPoly*(sides: cint; radius: cfloat): Mesh {.cdecl, importc: "GenMeshPoly",
@@ -2432,6 +2698,10 @@ proc genMeshCylinder*(radius: cfloat; height: cfloat; slices: cint): Mesh {.cdec
     importc: "GenMeshCylinder", header: raylibHeader.}
 ##  Generate cylinder mesh
 
+proc genMeshCone*(radius: cfloat; height: cfloat; slices: cint): Mesh {.cdecl,
+    importc: "GenMeshCone", header: raylibHeader.}
+##  Generate cone/pyramid mesh
+
 proc genMeshTorus*(radius: cfloat; size: cfloat; radSeg: cint; sides: cint): Mesh {.cdecl,
     importc: "GenMeshTorus", header: raylibHeader.}
 ##  Generate torus mesh
@@ -2447,95 +2717,86 @@ proc genMeshHeightmap*(heightmap: Image; size: Vector3): Mesh {.cdecl,
 proc genMeshCubicmap*(cubicmap: Image; cubeSize: Vector3): Mesh {.cdecl,
     importc: "GenMeshCubicmap", header: raylibHeader.}
 ##  Generate cubes-based map mesh from image data
-##  Mesh manipulation functions
+##  Material loading/unloading functions
 
-proc meshBoundingBox*(mesh: Mesh): BoundingBox {.cdecl, importc: "MeshBoundingBox",
-    header: raylibHeader.}
-##  Compute mesh bounding box limits
+proc loadMaterials*(fileName: cstring; materialCount: ptr cint): ptr Material {.cdecl,
+    importc: "LoadMaterials", header: raylibHeader.}
+##  Load materials from model file
 
-proc meshTangents*(mesh: ptr Mesh) {.cdecl, importc: "MeshTangents",
-                                 header: raylibHeader.}
-##  Compute mesh tangents
+proc loadMaterialDefault*(): Material {.cdecl, importc: "LoadMaterialDefault",
+                                     header: raylibHeader.}
+##  Load default material (Supports: DIFFUSE, SPECULAR, NORMAL maps)
 
-proc meshBinormals*(mesh: ptr Mesh) {.cdecl, importc: "MeshBinormals",
-                                  header: raylibHeader.}
-##  Compute mesh binormals
-##  Model drawing functions
+proc unloadMaterial*(material: Material) {.cdecl, importc: "UnloadMaterial",
+                                        header: raylibHeader.}
+##  Unload material from GPU memory (VRAM)
 
-proc drawModel*(model: Model; position: Vector3; scale: cfloat; tint: Color) {.cdecl,
-    importc: "DrawModel", header: raylibHeader.}
-##  Draw a model (with texture if set)
+proc setMaterialTexture*(material: ptr Material; mapType: cint; texture: Texture2D) {.
+    cdecl, importc: "SetMaterialTexture", header: raylibHeader.}
+##  Set texture for a material map type (MATERIAL_MAP_DIFFUSE, MATERIAL_MAP_SPECULAR...)
 
-proc drawModelEx*(model: Model; position: Vector3; rotationAxis: Vector3;
-                 rotationAngle: cfloat; scale: Vector3; tint: Color) {.cdecl,
-    importc: "DrawModelEx", header: raylibHeader.}
-##  Draw a model with extended parameters
+proc setModelMeshMaterial*(model: ptr Model; meshId: cint; materialId: cint) {.cdecl,
+    importc: "SetModelMeshMaterial", header: raylibHeader.}
+##  Set material for a mesh
+##  Model animations loading/unloading functions
 
-proc drawModelWires*(model: Model; position: Vector3; scale: cfloat; tint: Color) {.
-    cdecl, importc: "DrawModelWires", header: raylibHeader.}
-##  Draw a model wires (with texture if set)
+proc loadModelAnimations*(fileName: cstring; animCount: ptr cuint): ptr ModelAnimation {.
+    cdecl, importc: "LoadModelAnimations", header: raylibHeader.}
+##  Load model animations from file
 
-proc drawModelWiresEx*(model: Model; position: Vector3; rotationAxis: Vector3;
-                      rotationAngle: cfloat; scale: Vector3; tint: Color) {.cdecl,
-    importc: "DrawModelWiresEx", header: raylibHeader.}
-##  Draw a model wires (with texture if set) with extended parameters
+proc updateModelAnimation*(model: Model; anim: ModelAnimation; frame: cint) {.cdecl,
+    importc: "UpdateModelAnimation", header: raylibHeader.}
+##  Update model animation pose
 
-proc drawBoundingBox*(box: BoundingBox; color: Color) {.cdecl,
-    importc: "DrawBoundingBox", header: raylibHeader.}
-##  Draw bounding box (wires)
+proc unloadModelAnimation*(anim: ModelAnimation) {.cdecl,
+    importc: "UnloadModelAnimation", header: raylibHeader.}
+##  Unload animation data
 
-proc drawBillboard*(camera: Camera; texture: Texture2D; center: Vector3; size: cfloat;
-                   tint: Color) {.cdecl, importc: "DrawBillboard",
-                                header: raylibHeader.}
-##  Draw a billboard texture
+proc unloadModelAnimations*(animations: ptr ModelAnimation; count: cuint) {.cdecl,
+    importc: "UnloadModelAnimations", header: raylibHeader.}
+##  Unload animation array data
 
-proc drawBillboardRec*(camera: Camera; texture: Texture2D; source: Rectangle;
-                      center: Vector3; size: cfloat; tint: Color) {.cdecl,
-    importc: "DrawBillboardRec", header: raylibHeader.}
-##  Draw a billboard texture defined by source
+proc isModelAnimationValid*(model: Model; anim: ModelAnimation): bool {.cdecl,
+    importc: "IsModelAnimationValid", header: raylibHeader.}
+##  Check model animation skeleton match
 ##  Collision detection functions
 
 proc checkCollisionSpheres*(center1: Vector3; radius1: cfloat; center2: Vector3;
                            radius2: cfloat): bool {.cdecl,
     importc: "CheckCollisionSpheres", header: raylibHeader.}
-##  Detect collision between two spheres
+##  Check collision between two spheres
 
 proc checkCollisionBoxes*(box1: BoundingBox; box2: BoundingBox): bool {.cdecl,
     importc: "CheckCollisionBoxes", header: raylibHeader.}
-##  Detect collision between two bounding boxes
+##  Check collision between two bounding boxes
 
 proc checkCollisionBoxSphere*(box: BoundingBox; center: Vector3; radius: cfloat): bool {.
     cdecl, importc: "CheckCollisionBoxSphere", header: raylibHeader.}
-##  Detect collision between box and sphere
+##  Check collision between box and sphere
 
-proc checkCollisionRaySphere*(ray: Ray; center: Vector3; radius: cfloat): bool {.cdecl,
-    importc: "CheckCollisionRaySphere", header: raylibHeader.}
-##  Detect collision between ray and sphere
+proc getRayCollisionSphere*(ray: Ray; center: Vector3; radius: cfloat): RayCollision {.
+    cdecl, importc: "GetRayCollisionSphere", header: raylibHeader.}
+##  Get collision info between ray and sphere
 
-proc checkCollisionRaySphereEx*(ray: Ray; center: Vector3; radius: cfloat;
-                               collisionPoint: ptr Vector3): bool {.cdecl,
-    importc: "CheckCollisionRaySphereEx", header: raylibHeader.}
-##  Detect collision between ray and sphere, returns collision point
+proc getRayCollisionBox*(ray: Ray; box: BoundingBox): RayCollision {.cdecl,
+    importc: "GetRayCollisionBox", header: raylibHeader.}
+##  Get collision info between ray and box
 
-proc checkCollisionRayBox*(ray: Ray; box: BoundingBox): bool {.cdecl,
-    importc: "CheckCollisionRayBox", header: raylibHeader.}
-##  Detect collision between ray and box
-
-proc getCollisionRayMesh*(ray: Ray; mesh: Mesh; transform: Matrix): RayHitInfo {.cdecl,
-    importc: "GetCollisionRayMesh", header: raylibHeader.}
-##  Get collision info between ray and mesh
-
-proc getCollisionRayModel*(ray: Ray; model: Model): RayHitInfo {.cdecl,
-    importc: "GetCollisionRayModel", header: raylibHeader.}
+proc getRayCollisionModel*(ray: Ray; model: Model): RayCollision {.cdecl,
+    importc: "GetRayCollisionModel", header: raylibHeader.}
 ##  Get collision info between ray and model
 
-proc getCollisionRayTriangle*(ray: Ray; p1: Vector3; p2: Vector3; p3: Vector3): RayHitInfo {.
-    cdecl, importc: "GetCollisionRayTriangle", header: raylibHeader.}
+proc getRayCollisionMesh*(ray: Ray; mesh: Mesh; transform: Matrix): RayCollision {.
+    cdecl, importc: "GetRayCollisionMesh", header: raylibHeader.}
+##  Get collision info between ray and mesh
+
+proc getRayCollisionTriangle*(ray: Ray; p1: Vector3; p2: Vector3; p3: Vector3): RayCollision {.
+    cdecl, importc: "GetRayCollisionTriangle", header: raylibHeader.}
 ##  Get collision info between ray and triangle
 
-proc getCollisionRayGround*(ray: Ray; groundHeight: cfloat): RayHitInfo {.cdecl,
-    importc: "GetCollisionRayGround", header: raylibHeader.}
-##  Get collision info between ray and ground plane (Y-normal plane)
+proc getRayCollisionQuad*(ray: Ray; p1: Vector3; p2: Vector3; p3: Vector3; p4: Vector3): RayCollision {.
+    cdecl, importc: "GetRayCollisionQuad", header: raylibHeader.}
+##  Get collision info between ray and quad
 ## ------------------------------------------------------------------------------------
 ##  Audio Loading and Playing Functions (Module: audio)
 ## ------------------------------------------------------------------------------------
@@ -2562,7 +2823,7 @@ proc loadWave*(fileName: cstring): Wave {.cdecl, importc: "LoadWave",
 
 proc loadWaveFromMemory*(fileType: cstring; fileData: ptr uint8; dataSize: cint): Wave {.
     cdecl, importc: "LoadWaveFromMemory", header: raylibHeader.}
-##  Load wave from memory buffer, fileType refers to extension: i.e. ".wav"
+##  Load wave from memory buffer, fileType refers to extension: i.e. '.wav'
 
 proc loadSound*(fileName: cstring): Sound {.cdecl, importc: "LoadSound",
                                         header: raylibHeader.}
@@ -2572,7 +2833,7 @@ proc loadSoundFromWave*(wave: Wave): Sound {.cdecl, importc: "LoadSoundFromWave"
     header: raylibHeader.}
 ##  Load sound from wave data
 
-proc updateSound*(sound: Sound; data: pointer; samplesCount: cint) {.cdecl,
+proc updateSound*(sound: Sound; data: pointer; sampleCount: cint) {.cdecl,
     importc: "UpdateSound", header: raylibHeader.}
 ##  Update sound buffer with new data
 
@@ -2662,8 +2923,8 @@ proc playMusicStream*(music: Music) {.cdecl, importc: "PlayMusicStream",
                                    header: raylibHeader.}
 ##  Start music playing
 
-proc isMusicPlaying*(music: Music): bool {.cdecl, importc: "IsMusicPlaying",
-                                       header: raylibHeader.}
+proc isMusicStreamPlaying*(music: Music): bool {.cdecl,
+    importc: "IsMusicStreamPlaying", header: raylibHeader.}
 ##  Check if music is playing
 
 proc updateMusicStream*(music: Music) {.cdecl, importc: "UpdateMusicStream",
@@ -2682,6 +2943,10 @@ proc resumeMusicStream*(music: Music) {.cdecl, importc: "ResumeMusicStream",
                                      header: raylibHeader.}
 ##  Resume playing paused music
 
+proc seekMusicStream*(music: Music; position: cfloat) {.cdecl,
+    importc: "SeekMusicStream", header: raylibHeader.}
+##  Seek music to a position (in seconds)
+
 proc setMusicVolume*(music: Music; volume: cfloat) {.cdecl, importc: "SetMusicVolume",
     header: raylibHeader.}
 ##  Set volume for music (1.0 is max level)
@@ -2699,17 +2964,17 @@ proc getMusicTimePlayed*(music: Music): cfloat {.cdecl,
 ##  Get current music time played (in seconds)
 ##  AudioStream management functions
 
-proc initAudioStream*(sampleRate: cuint; sampleSize: cuint; channels: cuint): AudioStream {.
-    cdecl, importc: "InitAudioStream", header: raylibHeader.}
-##  Init audio stream (to stream raw audio pcm data)
+proc loadAudioStream*(sampleRate: cuint; sampleSize: cuint; channels: cuint): AudioStream {.
+    cdecl, importc: "LoadAudioStream", header: raylibHeader.}
+##  Load audio stream (to stream raw audio pcm data)
 
-proc updateAudioStream*(stream: AudioStream; data: pointer; samplesCount: cint) {.
-    cdecl, importc: "UpdateAudioStream", header: raylibHeader.}
-##  Update audio stream buffers with data
-
-proc closeAudioStream*(stream: AudioStream) {.cdecl, importc: "CloseAudioStream",
+proc unloadAudioStream*(stream: AudioStream) {.cdecl, importc: "UnloadAudioStream",
     header: raylibHeader.}
-##  Close audio stream and free memory
+##  Unload audio stream and free memory
+
+proc updateAudioStream*(stream: AudioStream; data: pointer; frameCount: cint) {.cdecl,
+    importc: "UpdateAudioStream", header: raylibHeader.}
+##  Update audio stream buffers with data
 
 proc isAudioStreamProcessed*(stream: AudioStream): bool {.cdecl,
     importc: "IsAudioStreamProcessed", header: raylibHeader.}

@@ -7,15 +7,14 @@ import ./filenames
 # build directory structure:
 # - build/ :: C header files which will be modified and converted to Nim sources
 # - build/raylib_src :: raylib sources which will be used for static build
-# - build/raygui_src :: raygui sources which will be used for static build
 
 removeDir(buildDir)
 createDir(buildDir)
 writeFile(buildDir/".gitkeep", "")
 createDir(raylibBuildDir)
-createDir(rayguiBuildDir)
 copyDir(raylibSrcDir, raylibBuildDir)
-copyDir(rayguiSrcDir, rayguiBuildDir)
+copyFileToDir(raylibSrcDir/"extras"/"physac.h", raylibBuildDir)
+copyFileToDir(raylibSrcDir/"extras"/"raygui.h", raylibBuildDir)
 
 const
   raylibHeaders = [
@@ -34,7 +33,7 @@ when defined(nimraylib_now_mangle):
   # Some strange names that also collide with `windows.h`
   const
     queryPerfFiles = [
-      raylibBuildDir/"gestures.h",
+      raylibBuildDir/"rgestures.h",
       raylibBuildDir/"physac.h",
     ]
 
@@ -64,13 +63,13 @@ when defined(nimraylib_now_mangle):
       re"\b(GetCurrentTime)\b",
     ]
     raylibSources = [
-      raylibBuildDir/"shapes.c",
-      raylibBuildDir/"textures.c",
-      raylibBuildDir/"text.c",
+      raylibBuildDir/"rshapes.c",
+      raylibBuildDir/"rtextures.c",
+      raylibBuildDir/"rtext.c",
       raylibBuildDir/"utils.c",
-      raylibBuildDir/"models.c",
+      raylibBuildDir/"rmodels.c",
       raylibBuildDir/"raudio.c",
-      raylibBuildDir/"core.c",
+      raylibBuildDir/"rcore.c",
     ]
 
   func mangle(line: string): string =

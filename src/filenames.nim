@@ -5,7 +5,6 @@ const
   buildDir*                    = projectDir/"build"
   nimraylibNowDir*             = projectDir/"src"/"nimraylib_now"
   raylibSrcDir*                = projectDir/"raylib"/"src"
-  rayguiSrcDir*                = projectDir/"raygui"/"src"
   raylibBuildDir*              = buildDir/"raylib_src"
   rayguiBuildDir*              = buildDir/"raygui_src"
 
@@ -19,7 +18,7 @@ const
   rlglBuildFile*               = raylibBuildDir/"rlgl.h"
   raymathBuildFile*            = raylibBuildDir/"raymath.h"
   physacBuildFile*             = raylibBuildDir/"physac.h"
-  rayguiBuildFile*             = rayguiBuildDir/"raygui.h"
+  rayguiBuildFile*             = raylibBuildDir/"raygui.h"
 
   manglePrefix*                = "NmrlbNow_"
 

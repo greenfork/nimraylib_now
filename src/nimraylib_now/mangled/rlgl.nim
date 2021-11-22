@@ -4,21 +4,31 @@ from os import parentDir, `/`
 const rlglHeader = currentSourcePath().parentDir()/"rlgl.h"
 ## *********************************************************************************************
 ##
-##    rlgl v3.7 - raylib OpenGL abstraction layer
+##    rlgl v4.0 - A multi-OpenGL abstraction layer with an immediate-mode style API
 ##
-##    rlgl is a wrapper for multiple OpenGL versions (1.1, 2.1, 3.3 Core, ES 2.0) to
-##    pseudo-OpenGL 1.1 style functions (rlVertex, rlTranslate, rlRotate...).
+##    An abstraction layer for multiple OpenGL versions (1.1, 2.1, 3.3 Core, 4.3 Core, ES 2.0)
+##    that provides a pseudo-OpenGL 1.1 immediate-mode style API (rlVertex, rlTranslate, rlRotate...)
 ##
-##    When chosing an OpenGL version greater than OpenGL 1.1, rlgl stores vertex data on internal
-##    VBO buffers (and VAOs if available). It requires calling 3 functions:
-##        rlglInit()  - Initialize internal buffers and auxiliary resources
-##        rlglClose() - De-initialize internal buffers data and other auxiliar resources
+##    When chosing an OpenGL backend different than OpenGL 1.1, some internal buffer are
+##    initialized on rlglInit() to accumulate vertex data.
+##
+##    When an internal state change is required all the stored vertex data is renderer in batch,
+##    additioanlly, rlDrawRenderBatchActive() could be called to force flushing of the batch.
+##
+##    Some additional resources are also loaded for convenience, here the complete list:
+##       - Default batch (RLGL.defaultBatch): RenderBatch system to accumulate vertex data
+##       - Default texture (RLGL.defaultTextureId): 1x1 white pixel R8G8B8A8
+##       - Default shader (RLGL.State.defaultShaderId, RLGL.State.defaultShaderLocs)
+##
+##    Internal buffer (and additional resources) must be manually unloaded calling rlglClose().
+##
 ##
 ##    CONFIGURATION:
 ##
 ##    #define GRAPHICS_API_OPENGL_11
 ##    #define GRAPHICS_API_OPENGL_21
 ##    #define GRAPHICS_API_OPENGL_33
+##    #define GRAPHICS_API_OPENGL_43
 ##    #define GRAPHICS_API_OPENGL_ES2
 ##        Use selected OpenGL graphics backend, should be supported by platform
 ##        Those preprocessor defines are only used on rlgl module, if OpenGL version is
@@ -29,15 +39,52 @@ const rlglHeader = currentSourcePath().parentDir()/"rlgl.h"
 ##        If not defined, the library is in header only mode and can be included in other headers
 ##        or source files without problems. But only ONE file should hold the implementation.
 ##
-##    #define RLGL_STANDALONE
-##        Use rlgl as standalone library (no raylib dependency)
+##    #define RLGL_RENDER_TEXTURES_HINT
+##        Enable framebuffer objects (fbo) support (enabled by default)
+##        Some GPUs could not support them despite the OpenGL version
 ##
-##    #define SUPPORT_GL_DETAILS_INFO
+##    #define RLGL_SHOW_GL_DETAILS_INFO
 ##        Show OpenGL extensions and capabilities detailed logs on init
 ##
+##    #define RLGL_ENABLE_OPENGL_DEBUG_CONTEXT
+##        Enable debug context (only available on OpenGL 4.3)
+##
+##    rlgl capabilities could be customized just defining some internal
+##    values before library inclusion (default values listed):
+##
+##    #define RL_DEFAULT_BATCH_BUFFER_ELEMENTS   8192    // Default internal render batch elements limits
+##    #define RL_DEFAULT_BATCH_BUFFERS              1    // Default number of batch buffers (multi-buffering)
+##    #define RL_DEFAULT_BATCH_DRAWCALLS          256    // Default number of batch draw calls (by state changes: mode, texture)
+##    #define RL_DEFAULT_BATCH_MAX_TEXTURE_UNITS    4    // Maximum number of textures units that can be activated on batch drawing (SetShaderValueTexture())
+##
+##    #define RL_MAX_MATRIX_STACK_SIZE             32    // Maximum size of internal Matrix stack
+##    #define RL_MAX_SHADER_LOCATIONS              32    // Maximum number of shader locations supported
+##    #define RL_CULL_DISTANCE_NEAR              0.01    // Default projection matrix near cull distance
+##    #define RL_CULL_DISTANCE_FAR             1000.0    // Default projection matrix far cull distance
+##
+##    When loading a shader, the following vertex attribute and uniform
+##    location names are tried to be set automatically:
+##
+##    #define RL_DEFAULT_SHADER_ATTRIB_NAME_POSITION     "vertexPosition"    // Binded by default to shader location: 0
+##    #define RL_DEFAULT_SHADER_ATTRIB_NAME_TEXCOORD     "vertexTexCoord"    // Binded by default to shader location: 1
+##    #define RL_DEFAULT_SHADER_ATTRIB_NAME_NORMAL       "vertexNormal"      // Binded by default to shader location: 2
+##    #define RL_DEFAULT_SHADER_ATTRIB_NAME_COLOR        "vertexColor"       // Binded by default to shader location: 3
+##    #define RL_DEFAULT_SHADER_ATTRIB_NAME_TANGENT      "vertexTangent"     // Binded by default to shader location: 4
+##    #define RL_DEFAULT_SHADER_ATTRIB_NAME_TEXCOORD2    "vertexTexCoord2"   // Binded by default to shader location: 5
+##    #define RL_DEFAULT_SHADER_UNIFORM_NAME_MVP         "mvp"               // model-view-projection matrix
+##    #define RL_DEFAULT_SHADER_UNIFORM_NAME_VIEW        "matView"           // view matrix
+##    #define RL_DEFAULT_SHADER_UNIFORM_NAME_PROJECTION  "matProjection"     // projection matrix
+##    #define RL_DEFAULT_SHADER_UNIFORM_NAME_MODEL       "matModel"          // model matrix
+##    #define RL_DEFAULT_SHADER_UNIFORM_NAME_NORMAL      "matNormal"         // normal matrix (transpose(inverse(matModelView))
+##    #define RL_DEFAULT_SHADER_UNIFORM_NAME_COLOR       "colDiffuse"        // color diffuse (base tint color, multiplied by texture color)
+##    #define RL_DEFAULT_SHADER_SAMPLER2D_NAME_TEXTURE0  "texture0"          // texture0 (texture slot active 0)
+##    #define RL_DEFAULT_SHADER_SAMPLER2D_NAME_TEXTURE1  "texture1"          // texture1 (texture slot active 1)
+##    #define RL_DEFAULT_SHADER_SAMPLER2D_NAME_TEXTURE2  "texture2"          // texture2 (texture slot active 2)
+##
 ##    DEPENDENCIES:
-##        raymath     - 3D math functionality (Vector3, Matrix, Quaternion)
-##        GLAD        - OpenGL extensions loading (OpenGL 3.3 Core only)
+##
+##       - OpenGL libraries (depending on platform and OpenGL version selected)
+##       - GLAD OpenGL extensions loading library (only for OpenGL 3.3 Core, 4.3 Core)
 ##
 ##
 ##    LICENSE: zlib/libpng
@@ -61,60 +108,90 @@ const rlglHeader = currentSourcePath().parentDir()/"rlgl.h"
 ##
 ## ********************************************************************************************
 
+const
+  RLGL_VERSION* = "4.0"
+
+##  Function specifiers in case library is build/used as a shared library (Windows)
+##  NOTE: Microsoft specifiers to tell compiler that symbols are imported/exported from a .dll
+##  Function specifiers definition
+##  Support TRACELOG macros
+##  Allow custom memory allocators
 ##  Security check in case no GRAPHICS_API_OPENGL_* defined
 ##  Security check in case multiple GRAPHICS_API_OPENGL_* defined
 ##  OpenGL 2.1 uses most of OpenGL 3.3 Core functionality
 ##  WARNING: Specific parts are checked with #if defines
+##  OpenGL 4.3 uses OpenGL 3.3 Core functionality
+##  Support framebuffer objects by default
+##  NOTE: Some driver implementation do not support it, despite they should
 
 const
-  SUPPORT_RENDER_TEXTURES_HINT* = true
+  RLGL_RENDER_TEXTURES_HINT* = true
 
 ## ----------------------------------------------------------------------------------
 ##  Defines and Macros
 ## ----------------------------------------------------------------------------------
-##  Default internal render batch limits
+##  Default internal render batch elements limits
 ##  Internal Matrix stack
-##  Vertex buffers id limit
-##  Shader and material limits
+##  Shader limits
 ##  Projection matrix culling
 ##  Texture parameters (equivalent to OpenGL defines)
 
 const
-  TEXTURE_WRAP_S* = 0x00002802
-  TEXTURE_WRAP_T* = 0x00002803
-  TEXTURE_MAG_FILTER* = 0x00002800
-  TEXTURE_MIN_FILTER* = 0x00002801
-  TEXTURE_FILTER_NEAREST* = 0x00002600
-  TEXTURE_FILTER_LINEAR* = 0x00002601
-  TEXTURE_FILTER_MIP_NEAREST* = 0x00002700
-  TEXTURE_FILTER_NEAREST_MIP_LINEAR* = 0x00002702
-  TEXTURE_FILTER_LINEAR_MIP_NEAREST* = 0x00002701
-  TEXTURE_FILTER_MIP_LINEAR* = 0x00002703
-  TEXTURE_FILTER_ANISOTROPIC* = 0x00003000
-  TEXTURE_WRAP_REPEAT* = 0x00002901
-  TEXTURE_WRAP_CLAMP* = 0x0000812F
-  TEXTURE_WRAP_MIRROR_REPEAT* = 0x00008370
-  TEXTURE_WRAP_MIRROR_CLAMP* = 0x00008742
+  RL_TEXTURE_WRAP_S* = 0x00002802
+  RL_TEXTURE_WRAP_T* = 0x00002803
+  RL_TEXTURE_MAG_FILTER* = 0x00002800
+  RL_TEXTURE_MIN_FILTER* = 0x00002801
+  NEAREST* = 0x00002600
+  LINEAR* = 0x00002601
+  MIP_NEAREST* = 0x00002700
+  NEAREST_MIP_LINEAR* = 0x00002702
+  LINEAR_MIP_NEAREST* = 0x00002701
+  MIP_LINEAR* = 0x00002703
+  ANISOTROPIC* = 0x00003000
+  RL_TEXTURE_WRAP_REPEAT* = 0x00002901
+  RL_TEXTURE_WRAP_CLAMP* = 0x0000812F
+  RL_TEXTURE_WRAP_MIRROR_REPEAT* = 0x00008370
+  RL_TEXTURE_WRAP_MIRROR_CLAMP* = 0x00008742
 
 ##  Matrix modes (equivalent to OpenGL)
 
 const
-  MODELVIEW* = 0x00001700
-  PROJECTION* = 0x00001701
-  TEXTURE* = 0x00001702
+  RL_MODELVIEW* = 0x00001700
+  RL_PROJECTION* = 0x00001701
+  RL_TEXTURE* = 0x00001702
 
 ##  Primitive assembly draw modes
 
 const
-  LINES* = 0x00000001
-  TRIANGLES* = 0x00000004
-  QUADS* = 0x00000007
+  RL_LINES* = 0x00000001
+  RL_TRIANGLES* = 0x00000004
+  RL_QUADS* = 0x00000007
 
 ##  GL equivalent data types
 
 const
-  UNSIGNED_BYTE* = 0x00001401
-  FLOAT* = 0x00001406
+  RL_UNSIGNED_BYTE* = 0x00001401
+  RL_FLOAT* = 0x00001406
+
+##  Buffer usage hint
+
+const
+  RL_STREAM_DRAW* = 0x000088E0
+  RL_STREAM_READ* = 0x000088E1
+  RL_STREAM_COPY* = 0x000088E2
+  RL_STATIC_DRAW* = 0x000088E4
+  RL_STATIC_READ* = 0x000088E5
+  RL_STATIC_COPY* = 0x000088E6
+  RL_DYNAMIC_DRAW* = 0x000088E8
+  RL_DYNAMIC_READ* = 0x000088E9
+  RL_DYNAMIC_COPY* = 0x000088EA
+
+##  GL Shader type
+
+const
+  RL_FRAGMENT_SHADER* = 0x00008B30
+  RL_VERTEX_SHADER* = 0x00008B31
+  RL_COMPUTE_SHADER* = 0x000091B9
 
 ## ----------------------------------------------------------------------------------
 ##  Types and Structures Definition
@@ -122,18 +199,18 @@ const
 
 type
   GlVersion* {.size: sizeof(cint), pure.} = enum
-    OPENGL_11 = 1, OPENGL_21, OPENGL_33, OPENGL_ES_20
+    OPENGL_11 = 1, OPENGL_21, OPENGL_33, OPENGL_43, OPENGL_ES_20
   FramebufferAttachType* {.size: sizeof(cint), pure.} = enum
-    ATTACHMENT_COLOR_CHANNEL0 = 0, ATTACHMENT_COLOR_CHANNEL1,
-    ATTACHMENT_COLOR_CHANNEL2, ATTACHMENT_COLOR_CHANNEL3,
-    ATTACHMENT_COLOR_CHANNEL4, ATTACHMENT_COLOR_CHANNEL5,
-    ATTACHMENT_COLOR_CHANNEL6, ATTACHMENT_COLOR_CHANNEL7, ATTACHMENT_DEPTH = 100,
-    ATTACHMENT_STENCIL = 200
+    RL_ATTACHMENT_COLOR_CHANNEL0 = 0, RL_ATTACHMENT_COLOR_CHANNEL1,
+    RL_ATTACHMENT_COLOR_CHANNEL2, RL_ATTACHMENT_COLOR_CHANNEL3,
+    RL_ATTACHMENT_COLOR_CHANNEL4, RL_ATTACHMENT_COLOR_CHANNEL5,
+    RL_ATTACHMENT_COLOR_CHANNEL6, RL_ATTACHMENT_COLOR_CHANNEL7,
+    RL_ATTACHMENT_DEPTH = 100, RL_ATTACHMENT_STENCIL = 200
   FramebufferAttachTextureType* {.size: sizeof(cint), pure.} = enum
-    ATTACHMENT_CUBEMAP_POSITIVE_X = 0, ATTACHMENT_CUBEMAP_NEGATIVE_X,
-    ATTACHMENT_CUBEMAP_POSITIVE_Y, ATTACHMENT_CUBEMAP_NEGATIVE_Y,
-    ATTACHMENT_CUBEMAP_POSITIVE_Z, ATTACHMENT_CUBEMAP_NEGATIVE_Z,
-    ATTACHMENT_TEXTURE2D = 100, ATTACHMENT_RENDERBUFFER = 200
+    RL_ATTACHMENT_CUBEMAP_POSITIVE_X = 0, RL_ATTACHMENT_CUBEMAP_NEGATIVE_X,
+    RL_ATTACHMENT_CUBEMAP_POSITIVE_Y, RL_ATTACHMENT_CUBEMAP_NEGATIVE_Y,
+    RL_ATTACHMENT_CUBEMAP_POSITIVE_Z, RL_ATTACHMENT_CUBEMAP_NEGATIVE_Z,
+    RL_ATTACHMENT_TEXTURE2D = 100, RL_ATTACHMENT_RENDERBUFFER = 200
 
 
 
@@ -141,11 +218,8 @@ type
 ##  Dynamic vertex buffers (position + texcoords + colors + indices arrays)
 
 type
-  VertexBuffer* {.importc: "VertexBuffer", header: rlglHeader, bycopy.} = object
-    elementsCount* {.importc: "elementsCount".}: cint ##  Number of elements in the buffer (QUADS)
-    vCounter* {.importc: "vCounter".}: cint ##  Vertex position counter to process (and draw) from full buffer
-    tcCounter* {.importc: "tcCounter".}: cint ##  Vertex texcoord counter to process (and draw) from full buffer
-    cCounter* {.importc: "cCounter".}: cint ##  Vertex color counter to process (and draw) from full buffer
+  VertexBuffer* {.importc: "rlVertexBuffer", header: rlglHeader, bycopy.} = object
+    elementCount* {.importc: "elementCount".}: cint ##  Number of elements in the buffer (QUADS)
     vertices* {.importc: "vertices".}: ptr UncheckedArray[cfloat] ##  Vertex position (XYZ - 3 components per vertex) (shader-location = 0)
     texcoords* {.importc: "texcoords".}: ptr UncheckedArray[cfloat] ##  Vertex texture coordinates (UV - 2 components per vertex) (shader-location = 1)
     colors* {.importc: "colors".}: ptr UncheckedArray[uint8] ##  Vertex colors (RGBA - 4 components per vertex) (shader-location = 3)
@@ -159,35 +233,152 @@ type
 ##  of those state-change happens (this is done in core module)
 
 type
-  DrawCall* {.importc: "DrawCall", header: rlglHeader, bycopy.} = object
+  DrawCall* {.importc: "rlDrawCall", header: rlglHeader, bycopy.} = object
     mode* {.importc: "mode".}: cint ##  Drawing mode: LINES, TRIANGLES, QUADS
     vertexCount* {.importc: "vertexCount".}: cint ##  Number of vertex of the draw
     vertexAlignment* {.importc: "vertexAlignment".}: cint ##  Number of vertex required for index alignment (LINES, TRIANGLES)
                                                       ## unsigned int vaoId;       // Vertex array id to be used on the draw -> Using RLGL.currentBatch->vertexBuffer.vaoId
-                                                      ## unsigned int shaderId;    // Shader id to be used on the draw -> Using RLGL.currentShader.id
+                                                      ## unsigned int shaderId;    // Shader id to be used on the draw -> Using RLGL.currentShaderId
     textureId* {.importc: "textureId".}: cuint ##  Texture id to be used on the draw -> Use to create new draw call if changes
-                                           ## Matrix projection;        // Projection matrix for this draw -> Using RLGL.projection by default
-                                           ## Matrix modelview;         // Modelview matrix for this draw -> Using RLGL.modelview by default
+                                           ## Matrix projection;      // Projection matrix for this draw -> Using RLGL.projection by default
+                                           ## Matrix modelview;       // Modelview matrix for this draw -> Using RLGL.modelview by default
 
 
-##  RenderBatch type
+##  rlRenderBatch type
 
 type
-  RenderBatch* {.importc: "RenderBatch", header: rlglHeader, bycopy.} = object
-    buffersCount* {.importc: "buffersCount".}: cint ##  Number of vertex buffers (multi-buffering support)
+  RenderBatch* {.importc: "rlRenderBatch", header: rlglHeader, bycopy.} = object
+    bufferCount* {.importc: "bufferCount".}: cint ##  Number of vertex buffers (multi-buffering support)
     currentBuffer* {.importc: "currentBuffer".}: cint ##  Current buffer tracking in case of multi-buffering
     vertexBuffer* {.importc: "vertexBuffer".}: ptr VertexBuffer ##  Dynamic buffer(s) for vertex data
     draws* {.importc: "draws".}: ptr DrawCall ##  Draw calls array, depends on textureId
-    drawsCounter* {.importc: "drawsCounter".}: cint ##  Draw calls counter
+    drawCounter* {.importc: "drawCounter".}: cint ##  Draw calls counter
     currentDepth* {.importc: "currentDepth".}: cfloat ##  Current depth value for next draw
+
+
+##  Trace log level
+##  NOTE: Organized by priority level
+
+type
+  TraceLogLevel* {.size: sizeof(cint), pure.} = enum
+    ALL = 0,                    ##  Display all logs
+    TRACE,                    ##  Trace logging, intended for internal use only
+    DEBUG,                    ##  Debug logging, used for internal debugging, it should be disabled on release builds
+    INFO,                     ##  Info logging, used for program execution info
+    WARNING,                  ##  Warning logging, used on recoverable failures
+    ERROR,                    ##  Error logging, used on unrecoverable failures
+    FATAL,                    ##  Fatal logging, used to abort program: exit(EXIT_FAILURE)
+    NONE                      ##  Disable logging
+
+
+##  Texture formats (support depends on OpenGL version)
+
+type
+  PixelFormat* {.size: sizeof(cint), pure.} = enum
+    UNCOMPRESSED_GRAYSCALE = 1, ##  8 bit per pixel (no alpha)
+    UNCOMPRESSED_GRAY_ALPHA,  ##  8*2 bpp (2 channels)
+    UNCOMPRESSED_R5G6B5,      ##  16 bpp
+    UNCOMPRESSED_R8G8B8,      ##  24 bpp
+    UNCOMPRESSED_R5G5B5A1,    ##  16 bpp (1 bit alpha)
+    UNCOMPRESSED_R4G4B4A4,    ##  16 bpp (4 bit alpha)
+    UNCOMPRESSED_R8G8B8A8,    ##  32 bpp
+    UNCOMPRESSED_R32,         ##  32 bpp (1 channel - float)
+    UNCOMPRESSED_R32G32B32,   ##  32*3 bpp (3 channels - float)
+    UNCOMPRESSED_R32G32B32A32, ##  32*4 bpp (4 channels - float)
+    COMPRESSED_DXT1_RGB,      ##  4 bpp (no alpha)
+    COMPRESSED_DXT1_RGBA,     ##  4 bpp (1 bit alpha)
+    COMPRESSED_DXT3_RGBA,     ##  8 bpp
+    COMPRESSED_DXT5_RGBA,     ##  8 bpp
+    COMPRESSED_ETC1_RGB,      ##  4 bpp
+    COMPRESSED_ETC2_RGB,      ##  4 bpp
+    COMPRESSED_ETC2_EAC_RGBA, ##  8 bpp
+    COMPRESSED_PVRT_RGB,      ##  4 bpp
+    COMPRESSED_PVRT_RGBA,     ##  4 bpp
+    COMPRESSED_ASTC_4x4RGBA,  ##  8 bpp
+    COMPRESSED_ASTC_8x8RGBA   ##  2 bpp
+
+
+##  Texture parameters: filter mode
+##  NOTE 1: Filtering considers mipmaps if available in the texture
+##  NOTE 2: Filter is accordingly set for minification and magnification
+
+type
+  TextureFilter* {.size: sizeof(cint), pure.} = enum
+    POINT = 0,                  ##  No filter, just pixel aproximation
+    BILINEAR,                 ##  Linear filtering
+    TRILINEAR,                ##  Trilinear filtering (linear with mipmaps)
+    ANISOTROPIC_4X,           ##  Anisotropic filtering 4x
+    ANISOTROPIC_8X,           ##  Anisotropic filtering 8x
+    ANISOTROPIC_16X           ##  Anisotropic filtering 16x
+
+
+##  Color blending modes (pre-defined)
+
+type
+  BlendMode* {.size: sizeof(cint), pure.} = enum
+    ALPHA = 0,                  ##  Blend textures considering alpha (default)
+    ADDITIVE,                 ##  Blend textures adding colors
+    MULTIPLIED,               ##  Blend textures multiplying colors
+    ADD_COLORS,               ##  Blend textures adding colors (alternative)
+    SUBTRACT_COLORS,          ##  Blend textures subtracting colors (alternative)
+    CUSTOM                    ##  Belnd textures using custom src/dst factors (use SetBlendModeCustom())
+
+
+##  Shader location point type
+
+type
+  ShaderLocationIndex* {.size: sizeof(cint), pure.} = enum
+    VERTEX_POSITION = 0,        ##  Shader location: vertex attribute: position
+    VERTEX_TEXCOORD01,        ##  Shader location: vertex attribute: texcoord01
+    VERTEX_TEXCOORD02,        ##  Shader location: vertex attribute: texcoord02
+    VERTEX_NORMAL,            ##  Shader location: vertex attribute: normal
+    VERTEX_TANGENT,           ##  Shader location: vertex attribute: tangent
+    VERTEX_COLOR,             ##  Shader location: vertex attribute: color
+    MATRIX_MVP,               ##  Shader location: matrix uniform: model-view-projection
+    MATRIX_VIEW,              ##  Shader location: matrix uniform: view (camera transform)
+    MATRIX_PROJECTION,        ##  Shader location: matrix uniform: projection
+    MATRIX_MODEL,             ##  Shader location: matrix uniform: model (transform)
+    MATRIX_NORMAL,            ##  Shader location: matrix uniform: normal
+    VECTOR_VIEW,              ##  Shader location: vector uniform: view
+    COLOR_DIFFUSE,            ##  Shader location: vector uniform: diffuse color
+    COLOR_SPECULAR,           ##  Shader location: vector uniform: specular color
+    COLOR_AMBIENT,            ##  Shader location: vector uniform: ambient color
+    MAP_ALBEDO,               ##  Shader location: sampler2d texture: albedo (same as: RL_SHADER_LOC_MAP_DIFFUSE)
+    MAP_METALNESS,            ##  Shader location: sampler2d texture: metalness (same as: RL_SHADER_LOC_MAP_SPECULAR)
+    MAP_NORMAL,               ##  Shader location: sampler2d texture: normal
+    MAP_ROUGHNESS,            ##  Shader location: sampler2d texture: roughness
+    MAP_OCCLUSION,            ##  Shader location: sampler2d texture: occlusion
+    MAP_EMISSION,             ##  Shader location: sampler2d texture: emission
+    MAP_HEIGHT,               ##  Shader location: sampler2d texture: height
+    MAP_CUBEMAP,              ##  Shader location: samplerCube texture: cubemap
+    MAP_IRRADIANCE,           ##  Shader location: samplerCube texture: irradiance
+    MAP_PREFILTER,            ##  Shader location: samplerCube texture: prefilter
+    MAP_BRDF                  ##  Shader location: sampler2d texture: brdf
+
+
+##  Shader uniform data type
+
+type
+  ShaderUniformDataType* {.size: sizeof(cint), pure.} = enum
+    FLOAT = 0,                  ##  Shader uniform type: float
+    VEC2,                     ##  Shader uniform type: vec2 (2 float)
+    VEC3,                     ##  Shader uniform type: vec3 (3 float)
+    VEC4,                     ##  Shader uniform type: vec4 (4 float)
+    INT,                      ##  Shader uniform type: int
+    IVEC2,                    ##  Shader uniform type: ivec2 (2 int)
+    IVEC3,                    ##  Shader uniform type: ivec3 (3 int)
+    IVEC4,                    ##  Shader uniform type: ivec4 (4 int)
+    SAMPLER2D                 ##  Shader uniform type: sampler2d
 
 
 ##  Shader attribute data types
 
 type
   ShaderAttributeDataType* {.size: sizeof(cint), pure.} = enum
-    SHADER_ATTRIB_FLOAT = 0, SHADER_ATTRIB_VEC2, SHADER_ATTRIB_VEC3,
-    SHADER_ATTRIB_VEC4
+    FLOAT = 0,                  ##  Shader attribute type: float
+    VEC2,                     ##  Shader attribute type: vec2 (2 float)
+    VEC3,                     ##  Shader attribute type: vec3 (3 float)
+    VEC4                      ##  Shader attribute type: vec4 (4 float)
 
 
 ## ------------------------------------------------------------------------------------
@@ -210,7 +401,7 @@ proc translatef*(x: cfloat; y: cfloat; z: cfloat) {.cdecl, importc: "rlTranslate
     header: rlglHeader.}
 ##  Multiply the current matrix by a translation matrix
 
-proc rotatef*(angleDeg: cfloat; x: cfloat; y: cfloat; z: cfloat) {.cdecl,
+proc rotatef*(angle: cfloat; x: cfloat; y: cfloat; z: cfloat) {.cdecl,
     importc: "rlRotatef", header: rlglHeader.}
 ##  Multiply the current matrix by a rotation matrix
 
@@ -347,7 +538,17 @@ proc enableFramebuffer*(id: cuint) {.cdecl, importc: "rlEnableFramebuffer",
 proc disableFramebuffer*() {.cdecl, importc: "rlDisableFramebuffer",
                            header: rlglHeader.}
 ##  Disable render texture (fbo), return to default framebuffer
+
+proc activeDrawBuffers*(count: cint) {.cdecl, importc: "rlActiveDrawBuffers",
+                                    header: rlglHeader.}
+##  Activate multiple draw color buffers
 ##  General render state
+
+proc enableColorBlend*() {.cdecl, importc: "rlEnableColorBlend", header: rlglHeader.}
+##  Enable color blending
+
+proc disableColorBlend*() {.cdecl, importc: "rlDisableColorBlend", header: rlglHeader.}
+##  Disable color blending
 
 proc enableDepthTest*() {.cdecl, importc: "rlEnableDepthTest", header: rlglHeader.}
 ##  Enable depth test
@@ -445,7 +646,7 @@ proc loadExtensions*(loader: pointer) {.cdecl, importc: "rlLoadExtensions",
 ##  Load OpenGL extensions (loader function required)
 
 proc getVersion*(): cint {.cdecl, importc: "rlGetVersion", header: rlglHeader.}
-##  Returns current OpenGL version
+##  Get current OpenGL version
 
 proc getFramebufferWidth*(): cint {.cdecl, importc: "rlGetFramebufferWidth",
                                  header: rlglHeader.}
@@ -455,13 +656,17 @@ proc getFramebufferHeight*(): cint {.cdecl, importc: "rlGetFramebufferHeight",
                                   header: rlglHeader.}
 ##  Get default framebuffer height
 
-proc getShaderDefault*(): Shader {.cdecl, importc: "rlGetShaderDefault",
-                                header: rlglHeader.}
-##  Get default shader
+proc getTextureIdDefault*(): cuint {.cdecl, importc: "rlGetTextureIdDefault",
+                                  header: rlglHeader.}
+##  Get default texture id
 
-proc getTextureDefault*(): Texture2D {.cdecl, importc: "rlGetTextureDefault",
-                                    header: rlglHeader.}
-##  Get default texture
+proc getShaderIdDefault*(): cuint {.cdecl, importc: "rlGetShaderIdDefault",
+                                 header: rlglHeader.}
+##  Get default shader id
+
+proc getShaderLocsDefault*(): ptr cint {.cdecl, importc: "rlGetShaderLocsDefault",
+                                     header: rlglHeader.}
+##  Get default shader locations
 ##  Render batch management
 ##  NOTE: rlgl provides a default render batch to behave like OpenGL 1.1 immediate mode
 ##  but this render batch API is exposed in case of custom batches are required
@@ -507,7 +712,7 @@ proc loadVertexBufferElement*(buffer: pointer; size: cint; dynamic: bool): cuint
     cdecl, importc: "rlLoadVertexBufferElement", header: rlglHeader.}
 ##  Load a new attributes element buffer
 
-proc updateVertexBuffer*(bufferId: cint; data: pointer; dataSize: cint; offset: cint) {.
+proc updateVertexBuffer*(bufferId: cuint; data: pointer; dataSize: cint; offset: cint) {.
     cdecl, importc: "rlUpdateVertexBuffer", header: rlglHeader.}
 ##  Update GPU buffer with new data
 
@@ -554,20 +759,25 @@ proc updateTexture*(id: cuint; offsetX: cint; offsetY: cint; width: cint; height
     header: rlglHeader.}
 ##  Update GPU texture with new data
 
-proc getGlTextureFormats*(format: cint; glInternalFormat: ptr cuint;
-                         glFormat: ptr cuint; glType: ptr cuint) {.cdecl,
+proc getGlTextureFormats*(format: cint; glInternalFormat: ptr cint;
+                         glFormat: ptr cint; glType: ptr cint) {.cdecl,
     importc: "rlGetGlTextureFormats", header: rlglHeader.}
 ##  Get OpenGL internal formats
+
+proc getPixelFormatName*(format: cuint): cstring {.cdecl,
+    importc: "rlGetPixelFormatName", header: rlglHeader.}
+##  Get name string for pixel format
 
 proc unloadTexture*(id: cuint) {.cdecl, importc: "rlUnloadTexture", header: rlglHeader.}
 ##  Unload texture from GPU memory
 
-proc generateMipmaps*(texture: ptr Texture2D) {.cdecl, importc: "rlGenerateMipmaps",
+proc genTextureMipmaps*(id: cuint; width: cint; height: cint; format: cint;
+                       mipmaps: ptr cint) {.cdecl, importc: "rlGenTextureMipmaps",
     header: rlglHeader.}
 ##  Generate mipmap data for selected texture
 
-proc readTexturePixels*(texture: Texture2D): pointer {.cdecl,
-    importc: "rlReadTexturePixels", header: rlglHeader.}
+proc readTexturePixels*(id: cuint; width: cint; height: cint; format: cint): pointer {.
+    cdecl, importc: "rlReadTexturePixels", header: rlglHeader.}
 ##  Read texture pixel data
 
 proc readScreenPixels*(width: cint; height: cint): ptr uint8 {.cdecl,
@@ -599,7 +809,7 @@ proc loadShaderCode*(vsCode: cstring; fsCode: cstring): cuint {.cdecl,
 
 proc compileShader*(shaderCode: cstring; `type`: cint): cuint {.cdecl,
     importc: "rlCompileShader", header: rlglHeader.}
-##  Compile custom shader and return shader id (type: GL_VERTEX_SHADER, GL_FRAGMENT_SHADER)
+##  Compile custom shader and return shader id (type: RL_VERTEX_SHADER, RL_FRAGMENT_SHADER, RL_COMPUTE_SHADER)
 
 proc loadShaderProgram*(vShaderId: cuint; fShaderId: cuint): cuint {.cdecl,
     importc: "rlLoadShaderProgram", header: rlglHeader.}
@@ -629,8 +839,55 @@ proc setUniformSampler*(locIndex: cint; textureId: cuint) {.cdecl,
     importc: "rlSetUniformSampler", header: rlglHeader.}
 ##  Set shader value sampler
 
-proc setShader*(shader: Shader) {.cdecl, importc: "rlSetShader", header: rlglHeader.}
-##  Set shader currently active
+proc setShader*(id: cuint; locs: ptr cint) {.cdecl, importc: "rlSetShader",
+                                       header: rlglHeader.}
+##  Set shader currently active (id and locations)
+##  Compute shader management
+
+proc loadComputeShaderProgram*(shaderId: cuint): cuint {.cdecl,
+    importc: "rlLoadComputeShaderProgram", header: rlglHeader.}
+##  Load compute shader program
+
+proc computeShaderDispatch*(groupX: cuint; groupY: cuint; groupZ: cuint) {.cdecl,
+    importc: "rlComputeShaderDispatch", header: rlglHeader.}
+##  Dispatch compute shader (equivalent to *draw* for graphics pilepine)
+##  Shader buffer storage object management (ssbo)
+
+proc loadShaderBuffer*(size: culonglong; data: pointer; usageHint: cint): cuint {.cdecl,
+    importc: "rlLoadShaderBuffer", header: rlglHeader.}
+##  Load shader storage buffer object (SSBO)
+
+proc unloadShaderBuffer*(ssboId: cuint) {.cdecl, importc: "rlUnloadShaderBuffer",
+                                       header: rlglHeader.}
+##  Unload shader storage buffer object (SSBO)
+
+proc updateShaderBufferElements*(id: cuint; data: pointer; dataSize: culonglong;
+                                offset: culonglong) {.cdecl,
+    importc: "rlUpdateShaderBufferElements", header: rlglHeader.}
+##  Update SSBO buffer data
+
+proc getShaderBufferSize*(id: cuint): culonglong {.cdecl,
+    importc: "rlGetShaderBufferSize", header: rlglHeader.}
+##  Get SSBO buffer size
+
+proc readShaderBufferElements*(id: cuint; dest: pointer; count: culonglong;
+                              offset: culonglong) {.cdecl,
+    importc: "rlReadShaderBufferElements", header: rlglHeader.}
+##  Bind SSBO buffer
+
+proc bindShaderBuffer*(id: cuint; index: cuint) {.cdecl,
+    importc: "rlBindShaderBuffer", header: rlglHeader.}
+##  Copy SSBO buffer data
+##  Buffer management
+
+proc copyBuffersElements*(destId: cuint; srcId: cuint; destOffset: culonglong;
+                         srcOffset: culonglong; count: culonglong) {.cdecl,
+    importc: "rlCopyBuffersElements", header: rlglHeader.}
+##  Copy SSBO buffer data
+
+proc bindImageTexture*(id: cuint; index: cuint; format: cuint; readonly: cint) {.cdecl,
+    importc: "rlBindImageTexture", header: rlglHeader.}
+##  Bind image texture
 ##  Matrix state management
 
 proc getMatrixModelview*(): Matrix {.cdecl, importc: "rlGetMatrixModelview",

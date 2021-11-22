@@ -35,8 +35,10 @@ const
     "DEG2RAD", # already in math module
     "RAD2DEG", # already in math module
     "SpriteFont", # deprecated?
-    "LOC_MAP_DIFFUSE", # deprecated?
-    "LOC_MAP_SPECULAR", # deprecated?
+    "LOC_MAP_DIFFUSE", # deprecated
+    "LOC_MAP_SPECULAR", # deprecated
+    "RL_SHADER_LOC_MAP_DIFFUSE", # deprecated
+    "RL_SHADER_LOC_MAP_SPECULAR", # deprecated
     "MAP_DIFFUSE", # deprecated?
     "MAP_SPECULAR", # deprecated?
     "PHYSAC_PI", # already in math module
@@ -45,6 +47,10 @@ const
     "MATERIAL_MAP_SPECULAR", # deprecated enum value
     "SHADER_LOC_MAP_DIFFUSE", # deprecated enum value
     "SHADER_LOC_MAP_SPECULAR", # deprecated enum value
+    "TRACELOG(level,", # we don't need that
+    "MOUSE_LEFT_BUTTON", # deprecated
+    "MOUSE_RIGHT_BUTTON", # deprecated
+    "MOUSE_MIDDLE_BUTTON", # deprecated
   ]
   allowIfs = [
     "RAYGUI_SUPPORT_ICONS"
@@ -81,7 +87,7 @@ const
 #  prefix LOG_
 #  prefix KEY_
 #  prefix MOUSE_CURSOR_
-#  prefix MOUSE_
+#  prefix MOUSE_BUTTON_
 #  prefix GAMEPAD_BUTTON_
 #  prefix GAMEPAD_AXIS_
 #  prefix FONT_
@@ -138,11 +144,13 @@ when not defined(nimraylib_now_linkingOverride):
 #  header rlglHeader
 #  prefix rlgl
 #  prefix rl
-#  prefix RL_
-#  prefix PIXELFORMAT_
-#  prefix TEXTURE_FILTER_
-#  prefix SHADER_LOC_
-#  prefix SHADER_UNIFORM_
+#  prefix RL_PIXELFORMAT_
+#  prefix RL_TEXTURE_FILTER_
+#  prefix RL_SHADER_LOC_
+#  prefix RL_SHADER_UNIFORM_
+#  prefix RL_BLEND_
+#  prefix RL_LOG_
+#  prefix RL_SHADER_ATTRIB_
 #@
 import raylib
 
@@ -152,7 +160,7 @@ const rlglHeader = currentSourcePath().parentDir()/"rlgl.h"
 #endif
 """
   raymathHeader = c2nimHeaderPreamble & """
-#  def RMDEF static inline
+#  def RMAPI static inline
 #  header raymathHeader
 #  mangle float3 Float3
 #  mangle float16 Float16
@@ -165,7 +173,7 @@ const raymathHeader = currentSourcePath().parentDir()/"raymath.h"
 #endif
 """
   rayguiHeader = c2nimHeaderPreamble & """
-#  def RAYGUIDEF
+#  def RAYGUIAPI
 #  header rayguiHeader
 #  prefix Gui
 #  prefix GUI_
@@ -298,7 +306,7 @@ for (filepath, c2nimheader) in raylibHeaders:
           if enumName == "ConfigFlags": "cuint"
           else: "cint"
         nimEnumConverters.add(
-          fmt("converter {enumName}ToInt*(self: {enumName}): {convertType} = self.{convertType}\n")
+          fmt("converter {enumName}ToInt*(self: {filename}.{enumName}): {convertType} = self.{convertType}\n")
         )
         # Remember to still add this line
         rs.add line & "\n"
@@ -313,7 +321,7 @@ for (filepath, c2nimheader) in raylibHeaders:
             nestLevels.dec
           elif firstWord == "#if" or firstWord == "#ifndef":
             nestLevels.inc
-      elif line.startsWith("RMDEF"):
+      elif line.startsWith("RMAPI"):
         # raymath header file contains implementation and c2nim crashes
         # trying to parse it. Here implementation is stripped away and only
         # definition is left.
