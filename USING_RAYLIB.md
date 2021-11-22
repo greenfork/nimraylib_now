@@ -33,8 +33,8 @@ Currently shared library linking is broken because of name conflicts with
 `windows.h` file. But if you really want to, you can rename all conflicting
 names inside `windows.h` and still use it as a shared library.
 
-Download the latest library from [raylib releases] page for MinGW compiler, for version 3.7.0
-the name is `raylib-3.7.0_win64_mingw-w64.zip`. Extract it and **make sure**
+Download the latest library from [raylib releases] page for MinGW compiler, for version 4.0.0
+the name is `raylib-4.0.0_win64_mingw-w64.zip`. Extract it and **make sure**
 that files `libraylibdll.a` and `raylib.dll` are always in the same directory
 as your game `.exe` file.
 
@@ -44,8 +44,8 @@ Use your package manager, for example for Arch Linux:
 $ sudo pacman -Syu raylib
 ```
 
-Alternatively download the latest library from [raylib releases] page, for version 3.7.0
-the name is `raylib-3.7.0_linux_amd64.tar.gz`. Extract it and put all `.so`
+Alternatively download the latest library from [raylib releases] page, for version 4.0.0
+the name is `raylib-4.0.0_linux_amd64.tar.gz`. Extract it and put all `.so`
 files into `/usr/local/lib`.
 
 ### MacOS
@@ -54,8 +54,8 @@ With brew package manager:
 $ brew install raylib
 ```
 
-Alternatively download the latest library from [raylib releases] page, for version 3.7.0
-the name is `raylib-3.7.0_macos.tar.gz`. Extract it and put all `.dylib`
+Alternatively download the latest library from [raylib releases] page, for version 4.0.0
+the name is `raylib-4.0.0_macos.tar.gz`. Extract it and put all `.dylib`
 files into `/usr/local/lib`.
 
 ## Install Raylib manually

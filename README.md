@@ -51,13 +51,13 @@ Explanation of flags:
 
 ## Current version and upgrading from previous versions
 
-NimraylibNow! v0.13 is a wrapper for [Raylib v3.7.0] and [Raygui v2.9].
+NimraylibNow! v0.14 is a wrapper for [Raylib v4.0.0] and [Raygui v3.0].
 
 See [MIGRATION](MIGRATION.md) for any tips on how to upgrade your code
 from previous versions.
 
-[Raylib v3.7.0]: https://github.com/raysan5/raylib/releases/tag/3.7.0
-[Raygui v2.9]: https://github.com/raysan5/raygui/tree/806b216e2024a13522eb1e17ae7a2641dfd51a98
+[Raylib v4.0.0]: https://github.com/raysan5/raylib/releases/tag/4.0.0
+[Raygui v3.0]: https://github.com/raysan5/raygui/releases/tag/3.0
 
 ## Install NimraylibNow!
 

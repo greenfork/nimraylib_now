@@ -1,6 +1,6 @@
-# Migration guide
+# Changelog
 
-This guide documents migration between different versions of NimraylibNow!
+This guide documents changes between different versions of NimraylibNow!
 and and if necessary simultaneously different versions of Raylib library.
 
 There are not a lot of possibilities to use proper deprecation warnings
@@ -11,7 +11,7 @@ side it should mainly consist of renaming, please try the wonderful tool
 
 Additionally you can consult [Raylib's changelog](https://github.com/raysan5/raylib/blob/master/CHANGELOG).
 
-## From NimraylibNow! v0.13 to v0.14 and Raylib v3.7 to v4.0
+## NimraylibNow! v0.14 and Raylib v4.0
 
 NimraylibNow!-specific changes:
 - rlgl module has a lot of intersecting identifiers with raylib module,
