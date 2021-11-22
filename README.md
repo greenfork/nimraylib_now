@@ -53,7 +53,7 @@ Explanation of flags:
 
 NimraylibNow! v0.14 is a wrapper for [Raylib v4.0.0] and [Raygui v3.0].
 
-See [MIGRATION](MIGRATION.md) for any tips on how to upgrade your code
+See [CHANGELOG](CHANGELOG.md) for any tips on how to upgrade your code
 from previous versions.
 
 [Raylib v4.0.0]: https://github.com/raysan5/raylib/releases/tag/4.0.0
