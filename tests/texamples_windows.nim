@@ -2336,8 +2336,8 @@ block core_window_letterbox:
   ##  Texture scale filter to use
   var colors: array[10, Color]
   for color in colors.mitems:
-    color = Color(r: getRandomValue(100, 250).uint8, g: getRandomValue(100, 250).uint8,
-                  b: getRandomValue(100, 250).uint8, a: 255'u8)
+    color = Color(r: getRandomValue(100, 250).uint8, g: getRandomValue(50, 150).uint8,
+                  b: getRandomValue(10, 100).uint8, a: 255'u8)
   setTargetFPS(60)
   ##  Set our game to run at 60 frames-per-second
   ## --------------------------------------------------------------------------------------
@@ -2351,19 +2351,19 @@ block core_window_letterbox:
     if isKeyPressed(Space):
       ##  Recalculate random colors for the bars
       for color in colors.mitems:
-        color = Color(r: getRandomValue(100, 250).uint8, g: getRandomValue(100, 250).uint8,
-                      b: getRandomValue(100, 250).uint8, a: 255'u8)
+        color = Color(r: getRandomValue(100, 250).uint8, g: getRandomValue(50, 150).uint8,
+                      b: getRandomValue(10, 100).uint8, a: 255'u8)
     var mouse: Vector2 = getMousePosition()
     var virtualMouse: Vector2
     virtualMouse.x = (mouse.x - (getScreenWidth() - (gameScreenWidth * scale)) * 0.5) / scale
     virtualMouse.y = (mouse.y - (getScreenHeight() - (gameScreenHeight * scale)) * 0.5) / scale
     virtualMouse = clampValue(virtualMouse, (0.0, 0.0), (gameScreenWidth.float, gameScreenHeight.float))
     ##  Apply the same transformation as the virtual mouse to the real mouse (i.e. to work with raygui)
-    setMouseOffset(
-      -(getScreenWidth() - (gameScreenWidth * scale)*0.5).cint,
-      -(getScreenHeight() - (gameScreenHeight * scale)*0.5).cint
-    )
-    setMouseScale(1.0/scale, 1.0/scale)
+    # setMouseOffset(
+    #   -((getScreenWidth() - (gameScreenWidth * scale)) * 0.5).cint,
+    #   -((getScreenHeight() - (gameScreenHeight * scale)) * 0.5).cint
+    # )
+    # setMouseScale(1.0/scale, 1.0/scale)
 
     ## ----------------------------------------------------------------------------------
     ##  Draw
