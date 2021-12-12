@@ -365,7 +365,7 @@ proc scale*(x: cfloat; y: cfloat; z: cfloat): Matrix {.inline, cdecl,
 
 proc frustum*(left: cdouble; right: cdouble; bottom: cdouble; top: cdouble;
                    near: cdouble; far: cdouble): Matrix {.inline, cdecl,
-    importc: "MatrixFrustum", header: raymathHeader.}
+    importc: "NmrlbNow_MatrixFrustum", header: raymathHeader.}
 ##  Get perspective projection matrix
 ##  NOTE: Angle should be provided in radians
 

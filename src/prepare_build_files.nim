@@ -61,6 +61,7 @@ when defined(nimraylib_now_mangle):
       re"\b(DrawText)\b",
       re"\b(DrawTextEx)\b",
       re"\b(GetCurrentTime)\b",
+      re"\b(MatrixFrustum)\b",
     ]
     raylibSources = [
       raylibBuildDir/"rshapes.c",

@@ -1237,7 +1237,7 @@ RMAPI Matrix MatrixScale(float x, float y, float z)
 }
 
 // Get perspective projection matrix
-RMAPI Matrix MatrixFrustum(double left, double right, double bottom, double top, double near, double far)
+RMAPI Matrix NmrlbNow_MatrixFrustum(double left, double right, double bottom, double top, double near, double far)
 {
     Matrix result = { 0 };
 
@@ -1279,7 +1279,7 @@ RMAPI Matrix MatrixPerspective(double fovy, double aspect, double near, double f
     double right = top*aspect;
     double left = -right;
 
-    // MatrixFrustum(-right, right, -top, top, near, far);
+    // NmrlbNow_MatrixFrustum(-right, right, -top, top, near, far);
     float rl = (float)(right - left);
     float tb = (float)(top - bottom);
     float fn = (float)(far - near);
