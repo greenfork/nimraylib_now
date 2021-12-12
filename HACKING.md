@@ -6,6 +6,7 @@ $ git clone --recurse-submodules https://github.com/greenfork/nimraylib_now
 $ cd nimraylib_now
 $ nimble install --depsOnly
 $ nimble install c2nim
+$ nimble develop
 ```
 2. Open and modify `src/convert_c_to_nim.nim` file
 3. Run `nimble convert`
