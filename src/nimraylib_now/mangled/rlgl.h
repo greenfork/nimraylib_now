@@ -1,3 +1,5 @@
+#undef near
+#undef far
 /**********************************************************************************************
 *
 *   rlgl v4.0 - A multi-OpenGL abstraction layer with an immediate-mode style API

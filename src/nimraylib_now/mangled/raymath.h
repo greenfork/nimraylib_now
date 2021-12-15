@@ -1,3 +1,5 @@
+#undef near
+#undef far
 /**********************************************************************************************
 *
 *   raymath v1.5 - Math functions to work with Vector2, Vector3, Matrix and Quaternions

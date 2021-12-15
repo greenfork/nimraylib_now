@@ -1,3 +1,5 @@
+#undef near
+#undef far
 /*******************************************************************************************
 *
 *   raygui v3.0 - A simple and easy-to-use immediate-mode gui library
