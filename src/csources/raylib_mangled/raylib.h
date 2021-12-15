@@ -1,3 +1,5 @@
+#undef near
+#undef far
 /**********************************************************************************************
 *
 *   raylib v4.0 - A simple and easy-to-use library to enjoy videogames programming (www.raylib.com)
