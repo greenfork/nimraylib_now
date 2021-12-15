@@ -71,6 +71,10 @@ when defined(nimraylib_now_mangle):
       raylibBuildDir/"raudio.c",
       raylibBuildDir/"rcore.c",
     ]
+    headerPreamble = [
+      "#undef near", # undefine clashing macros (from windows.h)
+      "#undef far", # undefine clashing macros (from windows.h)
+    ].join("\n") & "\n"
 
   func mangle(line: string): string =
     result = line
@@ -79,7 +83,8 @@ when defined(nimraylib_now_mangle):
 
   # Modify raylib files in-place inside build/ directory
   for file in raylibHeaders:
-    let fileContent = readFile(file)
+    var fileContent: string = headerPreamble
+    fileContent.add readFile(file)
     writeFile(file, mangle(fileContent))
   for file in raylibSources:
     let fileContent = readFile(file)
