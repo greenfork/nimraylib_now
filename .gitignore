@@ -27,3 +27,5 @@ a.out
 /testresults
 /tests/emscripten/*.js
 .ccls-cache/
+
+/issue*/
