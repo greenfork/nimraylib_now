@@ -133,6 +133,8 @@ typedef struct tagBITMAPINFOHEADER {
 #if defined(_MSC_VER) || defined(__TINYC__)
     #include "propidl.h"
 #endif
+
+#undef PlaySound
 #endif
 """
 
