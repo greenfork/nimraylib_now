@@ -25,8 +25,6 @@ const
     physacBuildFile,
     rayguiBuildFile,
   ]
-
-const
   queryPerfFiles = [
     raylibBuildDir/"rgestures.h",
     raylibBuildDir/"physac.h",
@@ -42,22 +40,12 @@ for file in queryPerfFiles:
       content.add line & "\n"
   writeFile(file, content)
 
-const
-  raylibSources = [
-    raylibBuildDir/"rshapes.c",
-    raylibBuildDir/"rtextures.c",
-    raylibBuildDir/"rtext.c",
-    raylibBuildDir/"utils.c",
-    raylibBuildDir/"rmodels.c",
-    raylibBuildDir/"raudio.c",
-    raylibBuildDir/"rcore.c",
-  ]
-  raymathPreamble = """
-#undef near // undefine clashing macros (from windows.h)
-#undef far  // undefine clashing macros (from windows.h)
-"""
+# Modify raylib header files in-place inside build/ directory
+#######################################################
+
+block raylib:
   # https://github.com/raysan5/raylib/issues/1217
-  windowsHPreamble = """
+  const windowsHPreamble = """
 #if defined(_WIN32)
 // To avoid conflicting windows.h symbols with raylib, some flags are defined
 // WARNING: Those flags avoid inclusion of some Win32 headers that could be required
@@ -114,15 +102,17 @@ typedef struct tagMSG *LPMSG;
 
 #endif
 """
+  let fileContent = windowsHPreamble & readFile(raylibBuildFile)
+  writeFile(raylibBuildFile, fileContent)
 
-# Modify raylib files in-place inside build/ directory
-for file in raylibHeaders:
-  if file.endsWith("raymath.h"):
-    let fileContent = raymathPreamble & readFile(file)
-    writeFile(file, fileContent)
-  elif file.endsWith("raylib.h"):
-    let fileContent = windowsHPreamble & readFile(file)
-    writeFile(file, fileContent)
+block raymath:
+  const raymathPreamble = """
+#undef near // undefine clashing macros (from windows.h)
+#undef far  // undefine clashing macros (from windows.h)
+"""
+  let fileContent = raymathPreamble & readFile(raymathBuildFile)
+  writeFile(raymathBuildFile, fileContent)
+
 block glfw:
   const
     glfwNativeFile = raylibBuildDir/"external"/"glfw"/"include"/"GLFW"/"glfw3native.h"
@@ -138,8 +128,8 @@ block glfw:
 
 copyDir(raylibBuildDir, cSourcesDir)
 
-# Copy files to build directory for converting to Nim files
-# Copy files to target directory to be used during linking with Nim files
 for file in raylibHeaders:
+  # Copy files to build directory for converting to Nim files
   copyFileToDir(file, buildDir)
+  # Copy files to target directory to be used during linking with Nim files
   copyFileToDir(file, targetDir)
