@@ -39,25 +39,13 @@ task convert, "run with c2nim":
   echo "Running converter\n"
   exec "nim r " & convert_c_to_nimFile
 
-  echo "Running prepare build files -d:nimraylib_now_mangle\n"
-  exec "nim r -d:nimraylib_now_mangle " & prepare_build_filesFile
-  echo "Running converter -d:nimraylib_now_mangle\n"
-  exec "nim r -d:nimraylib_now_mangle " & convert_c_to_nimFile
-
   echo "\nExecuting nim check\n"
-  exec "nim check " & nimraylibNowDir/"mangled"/"raylib.nim"
-  exec "nim check " & nimraylibNowDir/"mangled"/"raygui.nim"
-  exec "nim check " & nimraylibNowDir/"mangled"/"rlgl.nim"
-  exec "nim check " & nimraylibNowDir/"mangled"/"raymath.nim"
-  exec "nim check " & nimraylibNowDir/"mangled"/"physac.nim"
-  exec "nim check " & nimraylibNowDir/"mangled"/"converters.nim"
-
-  exec "nim check " & nimraylibNowDir/"not_mangled"/"raylib.nim"
-  exec "nim check " & nimraylibNowDir/"not_mangled"/"raygui.nim"
-  exec "nim check " & nimraylibNowDir/"not_mangled"/"rlgl.nim"
-  exec "nim check " & nimraylibNowDir/"not_mangled"/"raymath.nim"
-  exec "nim check " & nimraylibNowDir/"not_mangled"/"physac.nim"
-  exec "nim check " & nimraylibNowDir/"not_mangled"/"converters.nim"
+  exec "nim check " & nimraylibNowDir/"raylib.nim"
+  exec "nim check " & nimraylibNowDir/"raygui.nim"
+  exec "nim check " & nimraylibNowDir/"rlgl.nim"
+  exec "nim check " & nimraylibNowDir/"raymath.nim"
+  exec "nim check " & nimraylibNowDir/"physac.nim"
+  exec "nim check " & nimraylibNowDir/"converters.nim"
 
 task prepareTests, "generate tests from examples":
   exec "nim r " & "scripts"/"make_tests_from_examples.nim"

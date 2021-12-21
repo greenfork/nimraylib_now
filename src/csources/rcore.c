@@ -332,7 +332,7 @@ typedef struct {
     pthread_t threadId;             // Event reading thread id
     int fd;                         // File descriptor to the device it is assigned to
     int eventNum;                   // Number of 'event<N>' device
-    NmrlbNow_Rectangle absRange;             // Range of values for absolute pointing devices (touchscreens)
+    Rectangle absRange;             // Range of values for absolute pointing devices (touchscreens)
     int touchSlot;                  // Hold the touch slot number of the currently being sent multitouch block
     bool isMouse;                   // True if device supports relative X Y movements
     bool isTouch;                   // True if device supports absolute X Y movements and has BTN_TOUCH
@@ -795,14 +795,14 @@ void InitWindow(int width, int height, const char *title)
     // Load default font
     // NOTE: External functions (defined in module: text)
     LoadFontDefault();
-    NmrlbNow_Rectangle rec = GetFontDefault().recs[95];
+    Rectangle rec = GetFontDefault().recs[95];
     // NOTE: We setup a 1px padding on char rectangle to avoid pixel bleeding on MSAA filtering
-    SetShapesTexture(GetFontDefault().texture, (NmrlbNow_Rectangle){ rec.x + 1, rec.y + 1, rec.width - 2, rec.height - 2 });
+    SetShapesTexture(GetFontDefault().texture, (Rectangle){ rec.x + 1, rec.y + 1, rec.width - 2, rec.height - 2 });
 #else
     // Set default texture and rectangle to be used for shapes drawing
     // NOTE: rlgl default texture is a 1x1 pixel UNCOMPRESSED_R8G8B8A8
     Texture2D texture = { rlGetTextureIdDefault(), 1, 1, 1, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8 };
-    SetShapesTexture(texture, (NmrlbNow_Rectangle){ 0.0f, 0.0f, 1.0f, 1.0f });
+    SetShapesTexture(texture, (Rectangle){ 0.0f, 0.0f, 1.0f, 1.0f });
 #endif
 #if defined(PLATFORM_DESKTOP)
     if ((CORE.Window.flags & FLAG_WINDOW_HIGHDPI) > 0)
@@ -856,7 +856,7 @@ void InitWindow(int width, int height, const char *title)
 }
 
 // Close window and unload OpenGL context
-void NmrlbNow_CloseWindow(void)
+void CloseWindow(void)
 {
 #if defined(SUPPORT_GIF_RECORDING)
     if (gifRecording)
@@ -1840,7 +1840,7 @@ void SetClipboardText(const char *text)
 }
 
 // Show mouse cursor
-void NmrlbNow_ShowCursor(void)
+void ShowCursor(void)
 {
 #if defined(PLATFORM_DESKTOP)
     glfwSetInputMode(CORE.Window.handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
@@ -1956,7 +1956,7 @@ void EndDrawing(void)
         if (((gifFrameCounter/15)%2) == 1)
         {
             DrawCircle(30, CORE.Window.screen.height - 20, 10, MAROON);
-            NmrlbNow_DrawText("GIF RECORDING", 50, CORE.Window.screen.height - 25, 10, RED);
+            DrawText("GIF RECORDING", 50, CORE.Window.screen.height - 25, 10, RED);
         }
 
         rlDrawRenderBatchActive();  // Update and draw internal render batch
@@ -1972,7 +1972,7 @@ void EndDrawing(void)
         if (((gifFrameCounter/15)%2) == 1)
         {
             DrawCircle(30, CORE.Window.screen.height - 20, 10, MAROON);
-            NmrlbNow_DrawText("EVENTS RECORDING", 50, CORE.Window.screen.height - 25, 10, RED);
+            DrawText("EVENTS RECORDING", 50, CORE.Window.screen.height - 25, 10, RED);
         }
 
         rlDrawRenderBatchActive();  // Update and draw internal render batch
@@ -1984,7 +1984,7 @@ void EndDrawing(void)
         if (((gifFrameCounter/15)%2) == 1)
         {
             DrawCircle(30, CORE.Window.screen.height - 20, 10, LIME);
-            NmrlbNow_DrawText("EVENTS PLAYING", 50, CORE.Window.screen.height - 25, 10, GREEN);
+            DrawText("EVENTS PLAYING", 50, CORE.Window.screen.height - 25, 10, GREEN);
         }
 
         rlDrawRenderBatchActive();  // Update and draw internal render batch
@@ -5300,9 +5300,9 @@ static void AndroidCommandCallback(struct android_app *app, int32_t cmd)
                     // Load default font
                     // NOTE: External function (defined in module: text)
                     LoadFontDefault();
-                    NmrlbNow_Rectangle rec = GetFontDefault().recs[95];
+                    Rectangle rec = GetFontDefault().recs[95];
                     // NOTE: We setup a 1px padding on char rectangle to avoid pixel bleeding on MSAA filtering
-                    SetShapesTexture(GetFontDefault().texture, (NmrlbNow_Rectangle){ rec.x + 1, rec.y + 1, rec.width - 2, rec.height - 2 });
+                    SetShapesTexture(GetFontDefault().texture, (Rectangle){ rec.x + 1, rec.y + 1, rec.width - 2, rec.height - 2 });
                 #endif
 
                     // TODO: GPU assets reload in case of lost focus (lost context)

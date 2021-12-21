@@ -8,11 +8,9 @@ import ../filenames
 
 const
   CurrentDirectory = currentSourcePath().parentDir()
-  # RaylibRootPath {.used.} = raylibSrcDir.parentDir()
-  RaylibSrcPath = raylibMangledCSourcesDir
   # Use relative paths just in case
   # https://github.com/nim-lang/Nim/issues/9370
-  RaylibSrcPathRelative = relativePath(RaylibSrcPath, CurrentDirectory)
+  RaylibSrcPathRelative = relativePath(cSourcesDir, CurrentDirectory)
 
 when defined(emscripten):
   const Platform = "PLATFORM_WEB"
@@ -31,9 +29,9 @@ else:
   {.passC: "-s -O1".}
   {.passC: "-Werror=implicit-function-declaration".}
 
-{.passC: quoteShell("-I" & RaylibSrcPath).}
-{.passC: quoteShell("-I" & RaylibSrcPath / "external"/"glfw"/"include").}
-{.passC: quoteShell("-I" & RaylibSrcPath / "external"/"glfw"/"deps"/"mingw").}
+{.passC: quoteShell("-I" & cSourcesDir).}
+{.passC: quoteShell("-I" & cSourcesDir / "external"/"glfw"/"include").}
+{.passC: quoteShell("-I" & cSourcesDir / "external"/"glfw"/"deps"/"mingw").}
 {.passC: quoteShell("-D" & Platform).}
 {.passC: quoteShell("-D" & Graphics).}
 
@@ -55,7 +53,7 @@ when defined(linux):
 when defined(bsd) and not defined(emscripten):
   {.passC: "-I"/"usr"/"local"/"include".}
   # {.passL: "-L" & RaylibRootPath.}
-  {.passL: quoteShell("-L" & RaylibSrcPath / "src").}
+  {.passL: quoteShell("-L" & cSourcesDir / "src").}
   {.passL: "-L"/"usr"/"local"/"lib".}
   {.passL: "-lX11".}
   {.passL: "-lXrandr".}

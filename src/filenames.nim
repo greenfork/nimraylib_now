@@ -7,22 +7,15 @@ const
   raylibSrcDir*                = projectDir/"raylib"/"src"
   raylibBuildDir*              = buildDir/"raylib_src"
   rayguiBuildDir*              = buildDir/"raygui_src"
+  targetDir*                   = nimraylibNowDir
 
   # Must assume that there's no `projectDir` as if it is installed as a nimble
   # package.
   srcDir*                      = currentSourcePath().parentDir()
   cSourcesDir*                 = srcDir/"csources"
-  raylibMangledCSourcesDir*    = cSourcesDir/"raylib_mangled"
 
   raylibBuildFile*             = raylibBuildDir/"raylib.h"
   rlglBuildFile*               = raylibBuildDir/"rlgl.h"
   raymathBuildFile*            = raylibBuildDir/"raymath.h"
   physacBuildFile*             = raylibBuildDir/"physac.h"
   rayguiBuildFile*             = raylibBuildDir/"raygui.h"
-
-  manglePrefix*                = "NmrlbNow_"
-
-when defined(nimraylib_now_mangle):
-  const targetDir* = nimraylibNowDir/"mangled"
-else:
-  const targetDir* = nimraylibNowDir/"not_mangled"

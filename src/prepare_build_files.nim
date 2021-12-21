@@ -1,5 +1,6 @@
 from os import `/`, parentDir, copyFileToDir, removeDir, createDir, walkDir,
   copyDir
+import strutils
 
 import ./filenames
 
@@ -25,74 +26,44 @@ const
     rayguiBuildFile,
   ]
 
+const
+  queryPerfFiles = [
+    raylibBuildDir/"rgestures.h",
+    raylibBuildDir/"physac.h",
+  ]
 
-when defined(nimraylib_now_mangle):
-  import strutils
-  import regex
+for file in queryPerfFiles:
+  var content: string
+  for line in file.lines:
+    if "int __stdcall QueryPerformanceCounter" in line or
+       "int __stdcall QueryPerformanceFrequency" in line:
+      echo "Ignore: " & line & "\n"
+    else:
+      content.add line & "\n"
+  writeFile(file, content)
 
-  # Some strange names that also collide with `windows.h`
-  const
-    queryPerfFiles = [
-      raylibBuildDir/"rgestures.h",
-      raylibBuildDir/"physac.h",
-    ]
+const
+  raylibSources = [
+    raylibBuildDir/"rshapes.c",
+    raylibBuildDir/"rtextures.c",
+    raylibBuildDir/"rtext.c",
+    raylibBuildDir/"utils.c",
+    raylibBuildDir/"rmodels.c",
+    raylibBuildDir/"raudio.c",
+    raylibBuildDir/"rcore.c",
+  ]
+  headerPreamble = [
+    "#undef near", # undefine clashing macros (from windows.h)
+    "#undef far", # undefine clashing macros (from windows.h)
+  ].join("\n") & "\n"
 
-  for file in queryPerfFiles:
-    var content: string
-    for line in file.lines:
-      if "int __stdcall QueryPerformanceCounter" in line or
-         "int __stdcall QueryPerformanceFrequency" in line:
-        echo "Ignore: " & line & "\n"
-      else:
-        content.add line & "\n"
-    writeFile(file, content)
+# Modify raylib files in-place inside build/ directory
+for file in raylibHeaders:
+  var fileContent: string = headerPreamble
+  fileContent.add readFile(file)
+  writeFile(file, fileContent)
 
-  # Name mangling
-  # On Windows some Raylib names conflict with names defined in `windows.h`
-  # so we mangle them in C source and header files and later return them to
-  # normal names in Nim.
-  # https://github.com/greenfork/nimraylib_now/issues/5
-  const
-    mangleNameRegexes = [
-      re"\b(Rectangle)\b",
-      re"\b(CloseWindow)\b",
-      re"\b(ShowCursor)\b",
-      re"\b(LoadImage)\b",
-      re"\b(DrawText)\b",
-      re"\b(DrawTextEx)\b",
-      re"\b(GetCurrentTime)\b",
-    ]
-    raylibSources = [
-      raylibBuildDir/"rshapes.c",
-      raylibBuildDir/"rtextures.c",
-      raylibBuildDir/"rtext.c",
-      raylibBuildDir/"utils.c",
-      raylibBuildDir/"rmodels.c",
-      raylibBuildDir/"raudio.c",
-      raylibBuildDir/"rcore.c",
-    ]
-    headerPreamble = [
-      "#undef near", # undefine clashing macros (from windows.h)
-      "#undef far", # undefine clashing macros (from windows.h)
-    ].join("\n") & "\n"
-
-  func mangle(line: string): string =
-    result = line
-    for reName in mangleNameRegexes:
-      result = result.replace(reName, manglePrefix & "$1")
-
-  # Modify raylib files in-place inside build/ directory
-  for file in raylibHeaders:
-    var fileContent: string = headerPreamble
-    fileContent.add readFile(file)
-    writeFile(file, mangle(fileContent))
-  for file in raylibSources:
-    let fileContent = readFile(file)
-    writeFile(file, mangle(fileContent))
-
-  # Copy mangled C sources from build/ to src/csources
-  copyDir(raylibBuildDir, raylibMangledCSourcesDir)
-
+copyDir(raylibBuildDir, cSourcesDir)
 
 # Copy files to build directory for converting to Nim files
 # Copy files to target directory to be used during linking with Nim files
