@@ -91,10 +91,7 @@ extern "C" {
  #endif
 // @raysan5: Actually, only HWND handler needs to be defined
 // Including windows.h could suppose symbols re-definition issues (i.e Rectangle type)
-//#include <windows.h>
- typedef void *PVOID;
- typedef PVOID HANDLE;
- typedef HANDLE HWND;
+#include <windows.h>
 #elif defined(GLFW_EXPOSE_NATIVE_COCOA) || defined(GLFW_EXPOSE_NATIVE_NSGL)
  #if defined(__OBJC__)
   #import <Cocoa/Cocoa.h>
