@@ -19,12 +19,18 @@ when not defined(nimraylib_now_linkingOverride):
       else:
         {.passL: "libraylibdll.a".}
     elif defined(macosx):
+      {.passL: "-framework CoreVideo".}
+      {.passL: "-framework IOKit".}
+      {.passL: "-framework Cocoa".}
+      {.passL: "-framework GLUT".}
+      {.passL: "-framework OpenGL".}
       {.passL: "-lraylib".}
     else:
       {.passL: "-lraylib".}
   else:
     include ./raylib_build_static
 
+##  Type required before windows.h inclusion
 ## *********************************************************************************************
 ##
 ##    raylib v4.0 - A simple and easy-to-use library to enjoy videogames programming (www.raylib.com)

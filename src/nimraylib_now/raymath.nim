@@ -2,51 +2,6 @@ import raylib
 
 from os import parentDir, `/`
 const raymathHeader = currentSourcePath().parentDir()/"raymath.h"
-## *********************************************************************************************
-##
-##    raymath v1.5 - Math functions to work with Vector2, Vector3, Matrix and Quaternions
-##
-##    CONFIGURATION:
-##
-##    #define RAYMATH_IMPLEMENTATION
-##        Generates the implementation of the library into the included file.
-##        If not defined, the library is in header only mode and can be included in other headers
-##        or source files without problems. But only ONE file should hold the implementation.
-##
-##    #define RAYMATH_STATIC_INLINE
-##        Define static inline functions code, so #include header suffices for use.
-##        This may use up lots of memory.
-##
-##    CONVENTIONS:
-##
-##      - Functions are always self-contained, no function use another raymath function inside,
-##        required code is directly re-implemented inside
-##      - Functions input parameters are always received by value (2 unavoidable exceptions)
-##      - Functions use always a "result" anmed variable for return
-##      - Functions are always defined inline
-##      - Angles are always in radians (DEG2RAD/RAD2DEG macros provided for convenience)
-##
-##
-##    LICENSE: zlib/libpng
-##
-##    Copyright (c) 2015-2021 Ramon Santamaria (@raysan5)
-##
-##    This software is provided "as-is", without any express or implied warranty. In no event
-##    will the authors be held liable for any damages arising from the use of this software.
-##
-##    Permission is granted to anyone to use this software for any purpose, including commercial
-##    applications, and to alter it and redistribute it freely, subject to the following restrictions:
-##
-##      1. The origin of this software must not be misrepresented; you must not claim that you
-##      wrote the original software. If you use this software in a product, an acknowledgment
-##      in the product documentation would be appreciated but is not required.
-##
-##      2. Altered source versions must be plainly marked as such, and must not be misrepresented
-##      as being the original software.
-##
-##      3. This notice may not be removed or altered from any source distribution.
-##
-## ********************************************************************************************
 ##  Function specifiers definition
 ## ----------------------------------------------------------------------------------
 ##  Defines and Macros

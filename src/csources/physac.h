@@ -1,5 +1,3 @@
-#undef near
-#undef far
 /**********************************************************************************************
 *
 *   Physac v1.1 - 2D Physics library for videogames

@@ -1,5 +1,7 @@
-#undef near
-#undef far
+// Type required before windows.h inclusion
+#if defined(_WIN32)
+typedef struct tagMSG *LPMSG;
+#endif
 /**********************************************************************************************
 *
 *   raylib v4.0 - A simple and easy-to-use library to enjoy videogames programming (www.raylib.com)

@@ -75,6 +75,48 @@ when defined(windows) and not defined(emscripten):
   {.passL: "-lopengl32".}
   {.passL: "-lwinmm".}
 
+  # Magic defines that will remove colliding names from windows.h,
+  # see https://github.com/raysan5/raylib/issues/1217.
+  {.passC: "-DNOGDICAPMASKS".}     # CC_*, LC_*, PC_*, CP_*, TC_*, RC_
+  {.passC: "-DNOVIRTUALKEYCODES".} # VK_*
+  {.passC: "-DNOWINMESSAGES".}     # WM_*, EM_*, LB_*, CB_*
+  {.passC: "-DNOWINSTYLES".}       # WS_*, CS_*, ES_*, LBS_*, SBS_*, CBS_*
+  {.passC: "-DNOSYSMETRICS".}      # SM_*
+  {.passC: "-DNOMENUS".}           # MF_*
+  {.passC: "-DNOICONS".}           # IDI_*
+  {.passC: "-DNOKEYSTATES".}       # MK_*
+  {.passC: "-DNOSYSCOMMANDS".}     # SC_*
+  {.passC: "-DNORASTEROPS".}       # Binary and Tertiary raster ops
+  {.passC: "-DNOSHOWWINDOW".}      # SW_*
+  {.passC: "-DOEMRESOURCE".}       # OEM Resource values
+  {.passC: "-DNOATOM".}            # Atom Manager routines
+  {.passC: "-DNOCLIPBOARD".}       # Clipboard routines
+  {.passC: "-DNOCOLOR".}           # Screen colors
+  {.passC: "-DNOCTLMGR".}          # Control and Dialog routines
+  {.passC: "-DNODRAWTEXT".}        # DrawText() and DT_*
+  {.passC: "-DNOGDI".}             # All GDI defines and routines
+  {.passC: "-DNOKERNEL".}          # All KERNEL defines and routines
+  {.passC: "-DNOUSER".}            # All USER defines and routines
+  {.passC: "-DNOMB".}              # MB_* and MessageBox()
+  {.passC: "-DNOMEMMGR".}          # GMEM_*, LMEM_*, GHND, LHND, associated routines
+  {.passC: "-DNOMETAFILE".}        # typedef METAFILEPICT
+  {.passC: "-DNOMINMAX".}          # Macros min(a,b) and max(a,b)
+  {.passC: "-DNOMSG".}             # typedef MSG and associated routines
+  {.passC: "-DNOOPENFILE".}        # OpenFile(), OemToAnsi, AnsiToOem, and OF_*
+  {.passC: "-DNOSCROLL".}          # SB_* and scrolling routines
+  {.passC: "-DNOSERVICE".}         # All Service Controller routines, SERVICE_ equates, etc.
+  {.passC: "-DNOSOUND".}           # Sound driver routines
+  {.passC: "-DNOTEXTMETRIC".}      # typedef TEXTMETRIC and associated routines
+  {.passC: "-DNOWH".}              # SetWindowsHook and WH_*
+  {.passC: "-DNOWINOFFSETS".}      # GWL_*, GCL_*, associated routines
+  {.passC: "-DNOCOMM".}            # COMM driver routines
+  {.passC: "-DNOKANJI".}           # Kanji support stuff.
+  {.passC: "-DNOHELP".}            # Help engine interface.
+  {.passC: "-DNOPROFILER".}        # Profiler interface.
+  {.passC: "-DNODEFERWINDOWPOS".}  # DeferWindowPos routines
+  {.passC: "-DNOMCX".}             # Modem Configuration Extensions
+
+
 when defined(emscripten):
   {.passL: "-s USE_GLFW=3".}
 elif defined(macosx):

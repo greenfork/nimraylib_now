@@ -52,16 +52,25 @@ const
     raylibBuildDir/"raudio.c",
     raylibBuildDir/"rcore.c",
   ]
-  headerPreamble = [
-    "#undef near", # undefine clashing macros (from windows.h)
-    "#undef far", # undefine clashing macros (from windows.h)
-  ].join("\n") & "\n"
+  raymathPreamble = """
+#undef near // undefine clashing macros (from windows.h)
+#undef far  // undefine clashing macros (from windows.h)
+"""
+  windowsHPreamble = """
+// Type required before windows.h inclusion
+#if defined(_WIN32)
+typedef struct tagMSG *LPMSG;
+#endif
+"""
 
 # Modify raylib files in-place inside build/ directory
 for file in raylibHeaders:
-  var fileContent: string = headerPreamble
-  fileContent.add readFile(file)
-  writeFile(file, fileContent)
+  if file.endsWith("raymath.h"):
+    var fileContent: string = raymathPreamble & readFile(file)
+    writeFile(file, fileContent)
+  elif file.endsWith("raylib.h"):
+    var fileContent: string = windowsHPreamble & readFile(file)
+    writeFile(file, fileContent)
 
 copyDir(raylibBuildDir, cSourcesDir)
 

@@ -1,5 +1,5 @@
-#undef near
-#undef far
+#undef near // undefine clashing macros (from windows.h)
+#undef far  // undefine clashing macros (from windows.h)
 /**********************************************************************************************
 *
 *   raymath v1.5 - Math functions to work with Vector2, Vector3, Matrix and Quaternions
