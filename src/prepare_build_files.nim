@@ -105,8 +105,6 @@ const
 #define NODEFERWINDOWPOS  // DeferWindowPos routines
 #define NOMCX             // Modem Configuration Extensions
 
-#define STRICT
-
 // Type required before windows.h inclusion
 typedef struct tagMSG *LPMSG;
 
