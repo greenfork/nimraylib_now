@@ -137,13 +137,6 @@ typedef struct tagMSG *LPMSG;
 #undef PlaySound
 #endif
 """
-  glfwNativeReplaceWhat = """
-//#include <windows.h>
- typedef void *PVOID;
- typedef PVOID HANDLE;
- typedef HANDLE HWND;
-"""
-  glfwNativeReplaceWith = "#include <windows.h>\n"
 
 # Modify raylib files in-place inside build/ directory
 for file in raylibHeaders:
@@ -154,7 +147,15 @@ for file in raylibHeaders:
     let fileContent = windowsHPreamble & readFile(file)
     writeFile(file, fileContent)
 block glfw:
-  const glfwNativeFile = raylibBuildDir/"external"/"glfw"/"include"/"GLFW"/"glfw3native.h"
+  const
+    glfwNativeFile = raylibBuildDir/"external"/"glfw"/"include"/"GLFW"/"glfw3native.h"
+    glfwNativeReplaceWhat = """
+//#include <windows.h>
+ typedef void *PVOID;
+ typedef PVOID HANDLE;
+ typedef HANDLE HWND;
+"""
+    glfwNativeReplaceWith = "#include <windows.h>\n"
   let fileContent = readFile(glfwNativeFile)
   writeFile(glfwNativeFile, fileContent.replace(glfwNativeReplaceWhat, glfwNativeReplaceWith))
 
