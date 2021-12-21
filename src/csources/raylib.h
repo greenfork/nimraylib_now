@@ -72,6 +72,8 @@ typedef struct tagBITMAPINFOHEADER {
 // Some required types defined for MSVC/TinyC compiler
 #if defined(_MSC_VER) || defined(__TINYC__)
     #include "propidl.h"
+#else
+    #include <oleidl.h>
 #endif
 #endif
 /**********************************************************************************************
