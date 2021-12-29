@@ -165,7 +165,8 @@ const rlglHeader = currentSourcePath().parentDir()/"rlgl.h"
 #  header raymathHeader
 #  mangle float3 Float3
 #  mangle float16 Float16
-#  mangle "('Vector'[23]/'Matrix'/'Quaternion'){(!('One'/'Zero'/'Identity').)+}" "$1"
+#  mangle "('Vector'[23]){(!('One'/'Zero').)+}" "$1"
+#  mangle "('Matrix'/'Quaternion'){(!'Identity'.)+}" "$1"
 #@
 import raylib
 
