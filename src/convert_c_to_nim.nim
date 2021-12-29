@@ -165,6 +165,7 @@ const rlglHeader = currentSourcePath().parentDir()/"rlgl.h"
 #  header raymathHeader
 #  mangle float3 Float3
 #  mangle float16 Float16
+#  mangle "('Vector'[23]/'Matrix'/'Quaternion'){(!('One'/'Zero'/'Identity').)+}" "$1"
 #@
 import raylib
 
@@ -389,8 +390,6 @@ template `-`*[T: Vector2 | Vector3](v1: T): T = negate(v1)
       # beginScissorMode*(x: cint; y: cint; width: cint; height: cint)
       reArgumentType = re": [[:word:]]+;"
       reArgumentTypeEnd = re": [[:word:]]+\)"
-      # proc vector2Zero*(
-      reMathTypeProc = re"^proc ((vector[23]|matrix|quaternion)[^*]+)\*.*"
 
       # These cannot be determined automatically, only through manual inspection.
       uncheckedArrayReplacements = [
@@ -478,19 +477,6 @@ template `-`*[T: Vector2 | Vector3](v1: T): T = negate(v1)
         else:
           assert false, "regex for begin proc didn't work:\n" & nextTwentyLines
         rs.add line & "\n"
-        i.inc
-      elif filename == "raymath" and line.match(reMathTypeProc, m):
-        let
-          procName = m.groupFirstCapture(0, line)
-          mathType = m.groupFirstCapture(1, line)
-        if procName in ["vector2Zero", "vector3Zero", "vector2One", "vector3One",
-                        "matrixIdentity", "quaternionIdentity"]:
-          # Some procs take no arguments and hence can't be overloaded.
-          rs.add line & "\n"
-        else:
-          var newProcName = procName[mathType.len..^1]
-          newProcName[0] = newProcName[0].toLowerAscii
-          rs.add line.replace(procName, newProcName) & "\n"
         i.inc
       elif filename == "raylib" and line == "  MENU = R":
         # This is a duplicated enum value. Nim forbids duplicated values for
