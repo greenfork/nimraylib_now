@@ -1,5 +1,4 @@
-import common, std/[algorithm, streams]
-import strutils except indent
+import common, std/[algorithm, streams, strutils, sugar]
 
 const
   extraTypes = {
@@ -22,6 +21,7 @@ const
   MaxMeshVertexBuffers* = 7 ## Maximum vertex buffers (VBO) per mesh
 """
   helpers = """
+
 type va_list* {.importc: "va_list", header: "<stdarg.h>".} = object ## Only used by TraceLogCallback
 proc vprintf*(format: cstring, args: va_list) {.cdecl, importc: "vprintf", header: "<stdio.h>".}
 
@@ -75,68 +75,123 @@ const
   Magenta* = Color(r: 255, g: 0, b: 255, a: 255)
   RayWhite* = Color(r: 245, g: 245, b: 245, a: 255)
 """
+  enumInFuncReturn = [
+    ("GetKeyPressed", 0),
+    ("GetGamepadButtonPressed", 14),
+    ("GetGestureDetected", 25)
+  ]
   enumInFuncParams = [
     # KeyboardKey
-    ("IsKeyPressed", "KeyboardKey", @["key"]),
-    ("IsKeyDown", "KeyboardKey", @["key"]),
-    ("IsKeyReleased", "KeyboardKey", @["key"]),
-    ("IsKeyUp", "KeyboardKey", @["key"]),
-    ("SetExitKey", "KeyboardKey", @["key"]),
-    ("GetKeyPressed", "KeyboardKey", @["returnType"]),
-    ("SetCameraPanControl", "KeyboardKey", @["keyPan"]),
-    ("SetCameraAltControl", "KeyboardKey", @["keyAlt"]),
-    ("SetCameraSmoothZoomControl", "KeyboardKey", @["keySmoothZoom"]),
-    ("SetCameraMoveControls", "KeyboardKey", @["keyFront", "keyBack", "keyRight", "keyLeft", "keyUp", "keyDown"]),
+    ("IsKeyPressed", "key"),
+    ("IsKeyDown", "key"),
+    ("IsKeyReleased", "key"),
+    ("IsKeyUp", "key"),
+    ("SetExitKey", "key"),
+    ("SetCameraPanControl", "keyPan"),
+    ("SetCameraAltControl", "keyAlt"),
+    ("SetCameraSmoothZoomControl", "keySmoothZoom"),
+    ("SetCameraMoveControls", "keyFront"),
+    ("SetCameraMoveControls", "keyBack"),
+    ("SetCameraMoveControls", "keyRight"),
+    ("SetCameraMoveControls", "keyLeft"),
+    ("SetCameraMoveControls", "keyUp"),
+    ("SetCameraMoveControls", "keyDown"),
     # GamepadButton
-    ("IsGamepadButtonPressed", "GamepadButton", @["button"]),
-    ("IsGamepadButtonDown", "GamepadButton", @["button"]),
-    ("IsGamepadButtonReleased", "GamepadButton", @["button"]),
-    ("IsGamepadButtonUp", "GamepadButton", @["button"]),
-    ("GetGamepadButtonPressed", "GamepadButton", @["returnType"]),
+    ("IsGamepadButtonPressed", "button"),
+    ("IsGamepadButtonDown", "button"),
+    ("IsGamepadButtonReleased", "button"),
+    ("IsGamepadButtonUp", "button"),
     # GamepadAxis
-    ("GetGamepadAxisMovement", "GamepadAxis", @["axis"]),
+    ("GetGamepadAxisMovement", "axis"),
     # MouseCursor
-    ("SetMouseCursor", "MouseCursor", @["cursor"]),
+    ("SetMouseCursor", "cursor"),
     # MouseButton
-    ("IsMouseButtonPressed", "MouseButton", @["button"]),
-    ("IsMouseButtonDown", "MouseButton", @["button"]),
-    ("IsMouseButtonReleased", "MouseButton", @["button"]),
-    ("IsMouseButtonUp", "MouseButton", @["button"]),
+    ("IsMouseButtonPressed", "button"),
+    ("IsMouseButtonDown", "button"),
+    ("IsMouseButtonReleased", "button"),
+    ("IsMouseButtonUp", "button"),
     # Gesture
-    ("SetGesturesEnabled", "Flag[Gesture]", @["flags"]),
-    ("IsGestureDetected", "Gesture", @["gesture"]),
-    ("GetGestureDetected", "Gesture", @["returnType"]),
+    ("SetGesturesEnabled", "flags"),
+    ("IsGestureDetected", "gesture"),
     # ConfigFlags
-    ("SetConfigFlags", "Flag[ConfigFlags]", @["flags"]),
-    ("IsWindowState", "ConfigFlags", @["flag"]),
-    ("SetWindowState", "Flag[ConfigFlags]", @["flags"]),
-    ("ClearWindowState", "Flag[ConfigFlags]", @["flags"]),
+    ("SetConfigFlags", "flags"),
+    ("SetWindowState", "flags"),
+    ("ClearWindowState", "flags"),
+    ("IsWindowState", "flag"),
     # TraceLogLevel
-    ("TraceLog", "TraceLogLevel", @["logLevel"]),
-    ("SetTraceLogLevel", "TraceLogLevel", @["logLevel"]),
+    ("TraceLog", "logLevel"),
+    ("SetTraceLogLevel", "logLevel"),
     # CameraMode
-    ("SetCameraMode", "CameraMode", @["mode"]),
+    ("SetCameraMode", "mode"),
     # BlendMode
-    ("BeginBlendMode", "BlendMode", @["mode"]),
+    ("BeginBlendMode", "mode"),
     # MaterialMapIndex
-    ("SetMaterialTexture", "MaterialMapIndex", @["mapType"]),
+    ("SetMaterialTexture", "mapType"),
     # ShaderUniformDataType
-    ("SetShaderValue", "ShaderUniformDataType", @["uniformType"]),
-    ("SetShaderValueV", "ShaderUniformDataType", @["uniformType"]),
+    ("SetShaderValue", "uniformType"),
+    ("SetShaderValueV", "uniformType"),
     # PixelFormat
-    ("LoadImageRaw", "PixelFormat", @["format"]),
-    ("ImageFormat", "PixelFormat", @["newFormat"]),
-    ("GetPixelColor", "PixelFormat", @["format"]),
-    ("SetPixelColor", "PixelFormat", @["format"]),
-    ("GetPixelDataSize", "PixelFormat", @["format"]),
+    ("LoadImageRaw", "format"),
+    ("ImageFormat", "newFormat"),
+    ("GetPixelColor", "format"),
+    ("SetPixelColor", "format"),
+    ("GetPixelDataSize", "format"),
     # TextureFilter
-    ("SetTextureFilter", "TextureFilter", @["filter"]),
+    ("SetTextureFilter", "filter"),
     # TextureWrap
-    ("SetTextureWrap", "TextureWrap", @["wrap"]),
+    ("SetTextureWrap", "wrap"),
     # CubemapLayout
-    ("LoadTextureCubemap", "CubemapLayout", @["layout"]),
+    ("LoadTextureCubemap", "layout"),
     # FontType
-    ("LoadFontData", "FontType", @["type"]),
+    ("LoadFontData", "type")
+  ]
+  enumInFuncs = [
+    "KeyboardKey",
+    "KeyboardKey",
+    "KeyboardKey",
+    "KeyboardKey",
+    "KeyboardKey",
+    "KeyboardKey",
+    "KeyboardKey",
+    "KeyboardKey",
+    "KeyboardKey",
+    "KeyboardKey",
+    "KeyboardKey",
+    "KeyboardKey",
+    "KeyboardKey",
+    "KeyboardKey",
+    "GamepadButton",
+    "GamepadButton",
+    "GamepadButton",
+    "GamepadButton",
+    "GamepadAxis",
+    "MouseCursor",
+    "MouseButton",
+    "MouseButton",
+    "MouseButton",
+    "MouseButton",
+    "Flag[Gesture]",
+    "Gesture",
+    "Flag[ConfigFlags]",
+    "Flag[ConfigFlags]",
+    "Flag[ConfigFlags]",
+    "ConfigFlags",
+    "TraceLogLevel",
+    "TraceLogLevel",
+    "CameraMode",
+    "BlendMode",
+    "MaterialMapIndex",
+    "ShaderUniformDataType",
+    "ShaderUniformDataType",
+    "PixelFormat",
+    "PixelFormat",
+    "PixelFormat",
+    "PixelFormat",
+    "PixelFormat",
+    "TextureFilter",
+    "TextureWrap",
+    "CubemapLayout",
+    "FontType"
   ]
   excludedFuncs = [
     # Text strings management functions
@@ -158,9 +213,6 @@ const
     # Misc
     "GetRandomValue",
     "SetRandomSeed",
-    "MemAlloc",
-    "MemRealloc",
-    "MemFree",
     "OpenURL",
     # Files management functions
     "LoadFileData",
@@ -186,70 +238,49 @@ const
     "CompressData",
     "DecompressData",
     "EncodeDataBase64",
-    "DecodeDataBase64"
+    "DecodeDataBase64",
+    # Text codepoints management functions (unicode characters)
+    "LoadCodepoints",
+    "UnloadCodepoints",
+    "GetCodepointCount",
+    "GetCodepoint",
+    "CodepointToUTF8",
+    "TextCodepointsToUTF8",
   ]
-  raylibDestructors = """
-
-proc `=destroy`*(x: var Image) =
-  if x.data != nil: unloadImage(x)
-proc `=copy`*(dest: var Image; source: Image) =
-  if dest.data != source.data:
-    `=destroy`(dest)
-    wasMoved(dest)
-    dest = imageCopy(source)
-
-proc `=destroy`*(x: var Texture) =
-  if x.id > 0: unloadTexture(x)
-proc `=copy`*(dest: var Texture; source: Texture) {.error.}
-
-proc `=destroy`*(x: var RenderTexture) =
-  if x.id > 0: unloadRenderTexture(x)
-proc `=copy`*(dest: var RenderTexture; source: RenderTexture) {.error.}
-
-proc `=destroy`*(x: var Font) =
-  if x.texture.id > 0: unloadFont(x)
-proc `=copy`*(dest: var Font; source: Font) {.error.}
-
-proc `=destroy`*(x: var Mesh) =
-  if x.vboId != nil: unloadMesh(x)
-proc `=copy`*(dest: var Mesh; source: Mesh) {.error.}
-
-proc `=destroy`*(x: var Shader) =
-  if x.id > 0: unloadShader(x)
-proc `=copy`*(dest: var Shader; source: Shader) {.error.}
-
-proc `=destroy`*(x: var Material) =
-  if x.maps != nil: unloadMaterial(x)
-proc `=copy`*(dest: var Material; source: Material) {.error.}
-
-proc `=destroy`*(x: var Model) =
-  if x.meshes != nil: unloadModel(x)
-proc `=copy`*(dest: var Model; source: Model) {.error.}
-
-proc `=destroy`*(x: var ModelAnimation) =
-  if x.framePoses != nil: unloadModelAnimation(x)
-proc `=copy`*(dest: var ModelAnimation; source: ModelAnimation) {.error.}
-
-proc `=destroy`*(x: var Wave) =
-  if x.data != nil: unloadWave(x)
-proc `=copy`*(dest: var Wave; source: Wave) =
-  if dest.data != source.data:
-    `=destroy`(dest)
-    wasMoved(dest)
-    dest = waveCopy(source)
-
-proc `=destroy`*(x: var AudioStream) =
-  if x.buffer != nil: unloadAudioStream(x)
-proc `=copy`*(dest: var AudioStream; source: AudioStream) {.error.}
-
-proc `=destroy`*(x: var Sound) =
-  if x.stream.buffer != nil: unloadSound(x)
-proc `=copy`*(dest: var Sound; source: Sound) {.error.}
-
-proc `=destroy`*(x: var Music) =
-  if x.stream.buffer != nil: unloadMusicStream(x)
-proc `=copy`*(dest: var Music; source: Music) {.error.}
-"""
+  allocFuncs = [
+    "MemAlloc",
+    "MemRealloc",
+    "MemFree"
+  ]
+  privateFuncs = [
+    "GetMonitorName",
+    "GetClipboardText",
+    "GetDroppedFiles",
+    "GetGamepadName",
+    "LoadModelAnimations",
+    "UnloadModelAnimations",
+    "LoadWaveSamples",
+    "UnloadWaveSamples",
+    "LoadImagePalette",
+    "UnloadImagePalette",
+    "LoadImageColors",
+    "UnloadImageColors",
+    "LoadFontData",
+    "UnloadFontData",
+    "LoadMaterials",
+    "DrawLineStrip",
+    "DrawTriangleFan",
+    "DrawTriangleStrip",
+    "LoadImageFromMemory",
+    "DrawTexturePoly",
+    "LoadFontEx",
+    "LoadFontFromMemory",
+    "GenImageFontAtlas",
+    "DrawTriangleStrip3D",
+    "DrawMeshInstanced",
+    "LoadWaveFromMemory",
+    "LoadMusicStreamFromMemory"
+  ]
 
 proc removeEnumPrefix(enm, val: string): string =
   # Remove prefixes from enum fields.
@@ -304,29 +335,6 @@ proc getSpecialPattern(x, y: string, replacements: openarray[(string, string, st
       return pattern
 
 proc genBindings(t: Topmost, fname: string; header, middle, footer: string) =
-  template ident(x: string) =
-    buf.setLen 0
-    let isKeyw = isKeyword(x)
-    if isKeyw:
-      buf.add '`'
-    buf.add x
-    if isKeyw:
-      buf.add '`'
-    otp.write buf
-  template lit(x: string) = otp.write x
-  template spaces =
-    buf.setLen 0
-    addIndent(buf, indent)
-    otp.write buf
-  template scope(body: untyped) =
-    inc indent, indWidth
-    body
-    dec indent, indWidth
-  template doc(x: untyped) =
-    if x.description != "":
-      lit " ## "
-      lit x.description
-
   var buf = newStringOfCap(50)
   var indent = 0
   var otp: FileStream
@@ -351,7 +359,7 @@ proc genBindings(t: Topmost, fname: string; header, middle, footer: string) =
             if kind != "":
               lit kind
             else:
-              let many = hasMany(name) or (obj.name, name) in {"Model": "meshMaterial", "Model": "bindPose"}
+              let many = isPlural(name) or (obj.name, name) in {"Model": "meshMaterial", "Model": "bindPose"}
               const replacements = [
                 ("ModelAnimation", "framePoses", "ptr UncheckedArray[ptr UncheckedArray[$1]]"),
                 ("Mesh", "vboId", "ptr array[MaxMeshVertexBuffers, $1]"),
@@ -360,7 +368,7 @@ proc genBindings(t: Topmost, fname: string; header, middle, footer: string) =
               ]
               let tmp = getSpecialPattern(obj.name, name, replacements)
               if tmp != "": pat = tmp
-              let kind = convertType(fld.`type`, pat, many)
+              let kind = convertType(fld.`type`, pat, many, false)
               lit kind
             doc fld
         # Add a type alias or a missing type after the respective type.
@@ -396,7 +404,14 @@ proc genBindings(t: Topmost, fname: string; header, middle, footer: string) =
       if fnc.name in excludedFuncs: continue
       lit "\nproc "
       ident uncapitalizeAscii(fnc.name) # Follow Nim's naming convention for proc names.
-      lit "*("
+      let isPrivate = fnc.name in privateFuncs
+      let isAlloc = fnc.name in allocFuncs
+      if isPrivate:
+        lit "Priv("
+      elif isAlloc:
+        lit "("
+      else:
+        lit "*("
       var hasVarargs = false
       for i, (param, kind) in fnc.params.pairs:
         if param == "" and kind == "": # , ...) {
@@ -406,36 +421,36 @@ proc genBindings(t: Topmost, fname: string; header, middle, footer: string) =
           ident param
           lit ": "
           block outer:
-            for (name, kind, params) in enumInFuncParams.items:
-              if name == fnc.name and param in params:
-                lit kind
+            for j, (name, param1) in enumInFuncParams.pairs:
+              if name == fnc.name and param1 == param:
+                lit enumInFuncs[j]
                 break outer
-            let many = (fnc.name, param) notin {"LoadImageAnim": "frames"} and hasMany(param)
+            let many = (fnc.name, param) != ("LoadImageAnim", "frames") and isPlural(param)
             const
               replacements = [
                 ("GenImageFontAtlas", "recs", "ptr ptr UncheckedArray[$1]")
               ]
             let pat = getSpecialPattern(fnc.name, param, replacements)
-            let kind = convertType(kind, pat, many)
+            let kind = convertType(kind, pat, many, not isPrivate)
             lit kind
       lit ")"
       if fnc.returnType != "void":
         lit ": "
         block outer:
-          for (name, kind, params) in enumInFuncParams.items:
-            if name == fnc.name and "returnType" in params:
-              lit kind
+          for (name, idx) in enumInFuncReturn.items:
+            if name == fnc.name:
+              lit enumInFuncs[idx]
               break outer
-          let many = hasMany(fnc.name) or fnc.name == "LoadImagePalette"
-          let kind = convertType(fnc.returnType, "", many)
-          ident kind
+          let many = isPlural(fnc.name) or fnc.name == "LoadImagePalette"
+          let kind = convertType(fnc.returnType, "", many, not isPrivate)
+          lit kind
       lit " {.importc: \""
       ident fnc.name
       lit "\""
       if hasVarargs:
         lit ", varargs"
       lit ", rlapi.}"
-      if fnc.description != "":
+      if not (isAlloc or isPrivate) and fnc.description != "":
         scope:
           spaces
           lit "## "
@@ -450,10 +465,9 @@ const
   outputname = "../raylib.nim"
 
 proc main =
-  proc cmp(x, y: ValueInfo): int = cmp(x.value, y.value)
   var t = parseApi(raylibApi)
   # Some enums are unsorted!
-  for enm in mitems(t.enums): sort(enm.values, cmp)
-  genBindings(t, outputname, raylibHeader, helpers, raylibDestructors)
+  for enm in mitems(t.enums): sort(enm.values, (x, y) => cmp(x.value, y.value))
+  genBindings(t, outputname, raylibHeader, helpers, readFile("raylib_wrap.nim"))
 
 main()
