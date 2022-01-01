@@ -1,4 +1,5 @@
-import eminim, std/[algorithm, strutils, strscans, strformat, streams, parsejson]
+import eminim, std/[algorithm, strscans, strformat, streams, parsejson]
+import strutils except indent
 
 const
   indWidth* = 2
@@ -105,7 +106,7 @@ proc toNimType*(x: string): string =
     "Float16"
   else: x
 
-proc convertType*(s: string, pattern: string, many: bool): string =
+proc convertType*(s: string, pattern: string, many, isVar: bool): string =
   ## Converts a C type to the equivalent Nim type.
   ## Should work with function parameters, return, and struct fields types.
   ## If a `pattern` is provided, it substitutes the found base type and returns it.
@@ -164,7 +165,9 @@ proc convertType*(s: string, pattern: string, many: bool): string =
     elif many:
       result = "ptr UncheckedArray[" & result & "]"
     else:
-      result = "ptr " & result
+      if isVar:
+        result = "var " & result
+      else: result = "ptr " & result
   elif isDoublePointer:
     if isVoid:
       result = "ptr pointer"
@@ -173,7 +176,7 @@ proc convertType*(s: string, pattern: string, many: bool): string =
     else:
       result = "ptr ptr " & result
 
-proc hasMany*(x: string): bool {.inline.} =
+proc isPlural*(x: string): bool {.inline.} =
   ## Tries to determine if an identifier is plural
   let x = strip(x, false, chars = Digits)
   x.endsWith("es") or (not x.endsWith("ss") and x.endsWith('s')) or
@@ -226,3 +229,27 @@ proc allSequential*(x: seq[ValueInfo]): bool =
 proc uncapitalizeAscii*(s: string): string =
   if s.len == 0: result = ""
   else: result = toLowerAscii(s[0]) & substr(s, 1)
+
+# used internally by the genBindings procs
+template ident*(x: string) =
+  buf.setLen 0
+  let isKeyw = isKeyword(x)
+  if isKeyw:
+    buf.add '`'
+  buf.add x
+  if isKeyw:
+    buf.add '`'
+  otp.write buf
+template lit*(x: string) = otp.write x
+template spaces* =
+  buf.setLen 0
+  addIndent(buf, indent)
+  otp.write buf
+template scope*(body: untyped) =
+  inc indent, indWidth
+  body
+  dec indent, indWidth
+template doc*(x: untyped) =
+  if x.description != "":
+    lit " ## "
+    lit x.description
