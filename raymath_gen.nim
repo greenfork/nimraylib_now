@@ -1,5 +1,4 @@
-import common, std/[algorithm, streams, strformat]
-import strutils except indent
+import common, std/[algorithm, strutils, streams, strformat]
 
 const
   raymathHeader = """
@@ -8,7 +7,7 @@ from raylib import Vector2, Vector3, Vector4, Quaternion, Matrix
 const lext = when defined(windows): ".dll" elif defined(macosx): ".dylib" else: ".so"
 {.pragma: rmapi, cdecl, dynlib: "libraylib" & lext.}
 """
-  excluded = [
+  excludedTypes = [
     "Vector2",
     "Vector3",
     "Vector4",
@@ -40,29 +39,6 @@ template `-`*[T: Vector2 | Vector3](v1: T): T = negate(v1)
 """
 
 proc genBindings(t: Topmost, fname: string, header, footer: string) =
-  template ident(x: string) =
-    buf.setLen 0
-    let isKeyw = isKeyword(x)
-    if isKeyw:
-      buf.add '`'
-    buf.add x
-    if isKeyw:
-      buf.add '`'
-    otp.write buf
-  template lit(x: string) = otp.write x
-  template spaces =
-    buf.setLen 0
-    addIndent(buf, indent)
-    otp.write buf
-  template scope(body: untyped) =
-    inc indent, indWidth
-    body
-    dec indent, indWidth
-  template doc(x: untyped) =
-    if x.description != "":
-      lit " ## "
-      lit x.description
-
   var buf = newStringOfCap(50)
   var indent = 0
   var otp: FileStream
@@ -73,7 +49,7 @@ proc genBindings(t: Topmost, fname: string, header, footer: string) =
     lit "\ntype"
     scope:
       for obj in items(t.structs):
-        if obj.name in excluded: continue
+        if obj.name in excludedTypes: continue
         spaces
         ident capitalizeAscii(obj.name)
         lit "* {.bycopy.} = object"
@@ -113,7 +89,7 @@ proc genBindings(t: Topmost, fname: string, header, footer: string) =
       if fnc.returnType != "void":
         lit ": "
         let kind = convertType(fnc.returnType, "", false)
-        ident kind
+        lit kind
       lit " {.importc: \""
       ident fnc.name
       lit "\""
