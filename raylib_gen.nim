@@ -1,4 +1,4 @@
-import common, std/[algorithm, streams, strutils, sugar]
+import common, std/[streams, strutils]
 
 const
   extraTypes = {
@@ -7,20 +7,13 @@ const
     "Texture": "TextureCubemap* = Texture ## TextureCubemap, same as Texture",
     "RenderTexture": "RenderTexture2D* = RenderTexture ## RenderTexture2D, same as RenderTexture",
     "Camera3D": "Camera* = Camera3D ## Camera type fallback, defaults to Camera3D",
-    "AudioStream": "RAudioBuffer* {.importc: \"rAudioBuffer\", bycopy.} = object"
+    "AudioStream": """RAudioBuffer* {.importc: "rAudioBuffer", header: "raylib.h", bycopy.} = object"""
   }
   raylibHeader = """
-const lext = when defined(windows): ".dll" elif defined(macosx): ".dylib" else: ".so"
-{.pragma: rlapi, cdecl, dynlib: "libraylib" & lext.}
+{.passL: "-lraylib -lGL -lm -lpthread -ldl -lrt -lX11 -DPLATFORM_DESKTOP".}
 
 const
-  RaylibVersion* = "4.0"
-
-  MaxShaderLocations* = 32 ## Maximum number of shader locations supported
-  MaxMaterialMaps* = 12 ## Maximum number of shader maps supported
-  MaxMeshVertexBuffers* = 7 ## Maximum vertex buffers (VBO) per mesh
-"""
-  helpers = """
+  RaylibVersion* = "4.1-dev"
 
 type va_list* {.importc: "va_list", header: "<stdarg.h>".} = object ## Only used by TraceLogCallback
 proc vprintf*(format: cstring, args: va_list) {.cdecl, importc: "vprintf", header: "<stdio.h>".}
@@ -35,7 +28,20 @@ type
       cdecl.} ## FileIO: Save binary data
   LoadFileTextCallback* = proc (fileName: cstring): cstring {.cdecl.} ## FileIO: Load text data
   SaveFileTextCallback* = proc (fileName: cstring; text: cstring): bool {.cdecl.} ## FileIO: Save text data
+"""
+  extraDistinct = """
 
+  MaterialMapDiffuse* = MaterialMapAlbedo
+  MaterialMapSpecular* = MaterialMapMetalness
+
+  ShaderLocMapDiffuse* = ShaderLocMapAlbedo
+  ShaderLocMapSpecular* = ShaderLocMapMetalness
+  # Taken from raylib/src/config.h
+  MaxShaderLocations* = ShaderLocationIndex(32) ## Maximum number of shader locations supported
+  MaxMaterialMaps* = MaterialMapIndex(12) ## Maximum number of shader maps supported
+  MaxMeshVertexBuffers* = 7 ## Maximum vertex buffers (VBO) per mesh
+
+type
   Enums = ConfigFlags|Gesture
   Flag*[E: Enums] = distinct uint32
 
@@ -44,10 +50,10 @@ proc flag*[E: Enums](e: varargs[E]): Flag[E] {.inline.} =
   for val in items(e):
     res = res or uint32(val)
   Flag[E](res)
+"""
+  helpers = """
 
 const
-  Menu* = KeyboardKey.R ## Key: Android menu button
-
   LightGray* = Color(r: 200, g: 200, b: 200, a: 255)
   Gray* = Color(r: 130, g: 130, b: 130, a: 255)
   DarkGray* = Color(r: 80, g: 80, b: 80, a: 255)
@@ -282,52 +288,7 @@ const
     "LoadMusicStreamFromMemory"
   ]
 
-proc removeEnumPrefix(enm, val: string): string =
-  # Remove prefixes from enum fields.
-  const
-    enumPrefixes = {
-      "ConfigFlags": "FLAG_",
-      "TraceLogLevel": "LOG_",
-      "KeyboardKey": "KEY_",
-      "MouseButton": "MOUSE_BUTTON_",
-      "MouseCursor": "MOUSE_CURSOR_",
-      "GamepadButton": "GAMEPAD_BUTTON_",
-      "GamepadAxis": "GAMEPAD_AXIS_",
-      "MaterialMapIndex": "MATERIAL_MAP_",
-      "ShaderLocationIndex": "SHADER_LOC_",
-      "ShaderUniformDataType": "SHADER_UNIFORM_",
-      "ShaderAttributeDataType": "SHADER_ATTRIB_",
-      "PixelFormat": "PIXELFORMAT_",
-      "TextureFilter": "TEXTURE_FILTER_",
-      "TextureWrap": "TEXTURE_WRAP_",
-      "CubemapLayout": "CUBEMAP_LAYOUT_",
-      "FontType": "FONT_",
-      "BlendMode": "BLEND_",
-      "Gesture": "GESTURE_",
-      "CameraMode": "CAMERA_",
-      "CameraProjection": "CAMERA_",
-      "NPatchLayout": "NPATCH_"
-    }
-  result = val
-  for x, prefix in enumPrefixes.items:
-    if enm == x:
-      removePrefix(result, prefix)
-      return
-
-proc replaceCintField(obj, fld: string): string =
-  # Replace `int32` with the respective enum type.
-  const enumReplacements = [
-    ("Camera3D", "projection", "CameraProjection"),
-    ("Image", "format", "PixelFormat"),
-    ("Texture", "format", "PixelFormat"),
-    ("NPatchInfo", "layout", "NPatchLayout")
-  ]
-  result = ""
-  for x, y, kind in enumReplacements.items:
-    if obj == x and fld == y:
-      return kind
-
-proc getSpecialPattern(x, y: string, replacements: openarray[(string, string, string)]): string =
+proc getReplacement(x, y: string, replacements: openarray[(string, string, string)]): string =
   # Manual replacements for some fields
   result = ""
   for a, b, pattern in replacements.items:
@@ -341,13 +302,35 @@ proc genBindings(t: Topmost, fname: string; header, middle, footer: string) =
   try:
     otp = openFileStream(fname, fmWrite)
     lit header
+    # Generate enum definitions
+    lit "\ntype"
+    scope:
+      for enm in items(t.enums):
+        spaces
+        ident enm.name
+        lit "* = distinct int32"
+        doc enm
+    lit "\n\nconst"
+    scope:
+      for enm in items(t.enums):
+        for i, val in pairs(enm.values):
+          spaces
+          ident camelCaseAscii(val.name)
+          lit "* = "
+          ident enm.name
+          lit "("
+          lit $val.value
+          lit ")"
+          doc val
+        lit "\n"
+    lit extraDistinct
     # Generate type definitions
     lit "\ntype"
     scope:
       for obj in items(t.structs):
         spaces
         ident obj.name
-        lit "* {.bycopy.} = object"
+        lit "* {.header: \"raylib.h\", bycopy.} = object"
         doc obj
         scope:
           for fld in items(obj.fields):
@@ -355,7 +338,13 @@ proc genBindings(t: Topmost, fname: string; header, middle, footer: string) =
             var (name, pat) = transFieldName(fld.name)
             ident name
             lit "*: "
-            let kind = replaceCintField(obj.name, name)
+            const replacements = [
+              ("Camera3D", "projection", "CameraProjection"),
+              ("Image", "format", "PixelFormat"),
+              ("Texture", "format", "PixelFormat"),
+              ("NPatchInfo", "layout", "NPatchLayout")
+            ]
+            let kind = getReplacement(obj.name, name, replacements)
             if kind != "":
               lit kind
             else:
@@ -366,7 +355,7 @@ proc genBindings(t: Topmost, fname: string; header, middle, footer: string) =
                 ("Material", "maps", "ptr array[MaxMaterialMaps, $1]"),
                 ("Shader", "locs", "ptr array[MaxShaderLocations, $1]")
               ]
-              let tmp = getSpecialPattern(obj.name, name, replacements)
+              let tmp = getReplacement(obj.name, name, replacements)
               if tmp != "": pat = tmp
               let kind = convertType(fld.`type`, pat, many, false)
               lit kind
@@ -377,29 +366,9 @@ proc genBindings(t: Topmost, fname: string; header, middle, footer: string) =
             spaces
             lit extra
         lit "\n"
-      # Generate enums definitions
-      for enm in items(t.enums):
-        spaces
-        ident enm.name
-        lit "* {.size: sizeof(cint).} = enum"
-        doc enm
-        scope:
-          let allSeq = allSequential(enm.values)
-          for i, val in pairs(enm.values):
-            if i-1>=0 and enm.values[i-1].value == val.value: # omit duplicate!
-              continue
-            spaces
-            # Follow Nim's naming convention for enum fields.
-            let name = removeEnumPrefix(enm.name, val.name)
-            ident camelCaseAscii(name)
-            # Set the int value if the enum has holes and it doesn't start at 0.
-            if not allSeq or (i == 0 and val.value != 0):
-              lit " = "
-              lit $val.value
-            doc val
-          lit "\n"
     lit middle
     # Generate functions
+    lit "\n{.push callconv: cdecl, header: \"raylib.h\".}"
     for fnc in items(t.functions):
       if fnc.name in excludedFuncs: continue
       lit "\nproc "
@@ -430,7 +399,7 @@ proc genBindings(t: Topmost, fname: string; header, middle, footer: string) =
               replacements = [
                 ("GenImageFontAtlas", "recs", "ptr ptr UncheckedArray[$1]")
               ]
-            let pat = getSpecialPattern(fnc.name, param, replacements)
+            let pat = getReplacement(fnc.name, param, replacements)
             let kind = convertType(kind, pat, many, not isPrivate)
             lit kind
       lit ")"
@@ -449,13 +418,13 @@ proc genBindings(t: Topmost, fname: string; header, middle, footer: string) =
       lit "\""
       if hasVarargs:
         lit ", varargs"
-      lit ", rlapi.}"
+      lit ".}"
       if not (isAlloc or isPrivate) and fnc.description != "":
         scope:
           spaces
           lit "## "
           lit fnc.description
-    lit "\n"
+    lit "\n{.pop.}\n"
     lit footer
   finally:
     if otp != nil: otp.close()
@@ -466,8 +435,6 @@ const
 
 proc main =
   var t = parseApi(raylibApi)
-  # Some enums are unsorted!
-  for enm in mitems(t.enums): sort(enm.values, (x, y) => cmp(x.value, y.value))
   genBindings(t, outputname, raylibHeader, helpers, readFile("raylib_wrap.nim"))
 
 main()
