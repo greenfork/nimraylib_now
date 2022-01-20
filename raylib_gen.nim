@@ -37,8 +37,8 @@ type
   ShaderLocMapDiffuse* = ShaderLocMapAlbedo
   ShaderLocMapSpecular* = ShaderLocMapMetalness
   # Taken from raylib/src/config.h
-  MaxShaderLocations* = ShaderLocationIndex(32) ## Maximum number of shader locations supported
-  MaxMaterialMaps* = MaterialMapIndex(12) ## Maximum number of shader maps supported
+  MaxShaderLocations* = 32 ## Maximum number of shader locations supported
+  MaxMaterialMaps* = 12 ## Maximum number of shader maps supported
   MaxMeshVertexBuffers* = 7 ## Maximum vertex buffers (VBO) per mesh
 
 type
@@ -236,6 +236,7 @@ const
     "GetDirectoryPath",
     "GetPrevDirectoryPath",
     "GetWorkingDirectory",
+    "GetApplicationDirectory",
     "GetDirectoryFiles",
     "ClearDirectoryFiles",
     "ChangeDirectory",
@@ -295,7 +296,7 @@ proc getReplacement(x, y: string, replacements: openarray[(string, string, strin
     if x == a and y == b:
       return pattern
 
-proc genBindings(t: Topmost, fname: string; header, middle, footer: string) =
+proc genBindings(t: TopLevel, fname: string; header, middle: string) =
   var buf = newStringOfCap(50)
   var indent = 0
   var otp: FileStream
@@ -325,6 +326,8 @@ proc genBindings(t: Topmost, fname: string; header, middle, footer: string) =
         lit "\n"
     lit extraDistinct
     # Generate type definitions
+    var procProperties: seq[(string, string, string)] = @[]
+    var procArrays: seq[(string, string, string)] = @[]
     lit "\ntype"
     scope:
       for obj in items(t.structs):
@@ -337,7 +340,9 @@ proc genBindings(t: Topmost, fname: string; header, middle, footer: string) =
             spaces
             var (name, pat) = transFieldName(fld.name)
             ident name
-            lit "*: "
+            let isPrivate = (obj.name, name) notin
+                {"Wave": "frameCount", "Sound": "frameCount", "Music": "frameCount"} and
+                name.endsWith("Count")
             const replacements = [
               ("Camera3D", "projection", "CameraProjection"),
               ("Image", "format", "PixelFormat"),
@@ -346,9 +351,11 @@ proc genBindings(t: Topmost, fname: string; header, middle, footer: string) =
             ]
             let kind = getReplacement(obj.name, name, replacements)
             if kind != "":
+              lit "*: "
               lit kind
             else:
-              let many = isPlural(name) or (obj.name, name) in {"Model": "meshMaterial", "Model": "bindPose"}
+              let many = name notin ["mipmaps", "channels"] and isPlural(name) or
+                  (obj.name, name) in {"Model": "meshMaterial", "Model": "bindPose", "Mesh": "vboId"}
               const replacements = [
                 ("ModelAnimation", "framePoses", "ptr UncheckedArray[ptr UncheckedArray[$1]]"),
                 ("Mesh", "vboId", "ptr array[MaxMeshVertexBuffers, $1]"),
@@ -357,8 +364,19 @@ proc genBindings(t: Topmost, fname: string; header, middle, footer: string) =
               ]
               let tmp = getReplacement(obj.name, name, replacements)
               if tmp != "": pat = tmp
-              let kind = convertType(fld.`type`, pat, many, false)
+              var baseKind = ""
+              let kind = convertType(fld.`type`, pat, many, false, baseKind)
+              var isArray = many and not endsWith(name.normalize, "data") and
+                  (obj.name, name) notin {"Material": "params", "VrDeviceInfo": "lensDistortionValues"}
+              if isPrivate or isArray:
+                lit ": "
+              else:
+                lit "*: "
               lit kind
+              if isPrivate:
+                procProperties.add (obj.name, name, kind)
+              if isArray:
+                procArrays.add (obj.name, name, baseKind)
             doc fld
         # Add a type alias or a missing type after the respective type.
         for name, extra in extraTypes.items:
@@ -366,6 +384,13 @@ proc genBindings(t: Topmost, fname: string; header, middle, footer: string) =
             spaces
             lit extra
         lit "\n"
+      for obj, name, _ in procArrays.items:
+        spaces
+        lit obj
+        lit capitalizeAscii(name)
+        lit "* = distinct "
+        ident obj
+      lit "\n"
     lit middle
     # Generate functions
     lit "\n{.push callconv: cdecl, header: \"raylib.h\".}"
@@ -382,25 +407,26 @@ proc genBindings(t: Topmost, fname: string; header, middle, footer: string) =
       else:
         lit "*("
       var hasVarargs = false
-      for i, (param, kind) in fnc.params.pairs:
-        if param == "" and kind == "": # , ...) {
+      for i, param in fnc.params.pairs:
+        if param.name == "" and param.`type` == "": # , ...) {
           hasVarargs = true
         else:
           if i > 0: lit ", "
-          ident param
+          ident param.name
           lit ": "
           block outer:
             for j, (name, param1) in enumInFuncParams.pairs:
-              if name == fnc.name and param1 == param:
+              if name == fnc.name and param1 == param.name:
                 lit enumInFuncs[j]
                 break outer
-            let many = (fnc.name, param) != ("LoadImageAnim", "frames") and isPlural(param)
+            let many = (fnc.name, param.name) != ("LoadImageAnim", "frames") and isPlural(param.name)
             const
               replacements = [
                 ("GenImageFontAtlas", "recs", "ptr ptr UncheckedArray[$1]")
               ]
-            let pat = getReplacement(fnc.name, param, replacements)
-            let kind = convertType(kind, pat, many, not isPrivate)
+            let pat = getReplacement(fnc.name, param.name, replacements)
+            var baseKind = ""
+            let kind = convertType(param.`type`, pat, many, not isPrivate, baseKind)
             lit kind
       lit ")"
       if fnc.returnType != "void":
@@ -411,7 +437,8 @@ proc genBindings(t: Topmost, fname: string; header, middle, footer: string) =
               lit enumInFuncs[idx]
               break outer
           let many = isPlural(fnc.name) or fnc.name == "LoadImagePalette"
-          let kind = convertType(fnc.returnType, "", many, not isPrivate)
+          var baseKind = ""
+          let kind = convertType(fnc.returnType, "", many, not isPrivate, baseKind)
           lit kind
       lit " {.importc: \""
       ident fnc.name
@@ -425,7 +452,20 @@ proc genBindings(t: Topmost, fname: string; header, middle, footer: string) =
           lit "## "
           lit fnc.description
     lit "\n{.pop.}\n"
-    lit footer
+    lit readFile("raylib_types.nim")
+    lit "\n"
+    for obj, field, kind in procProperties.items:
+      lit "proc "
+      ident field
+      lit "*(x: "
+      ident obj
+      lit "): "
+      lit kind
+      lit " {.inline.} = x."
+      ident field
+      lit "\n"
+    lit readFile("raylib_wrap.nim")
+    lit readFile("raylib_fields.nim")
   finally:
     if otp != nil: otp.close()
 
@@ -435,6 +475,6 @@ const
 
 proc main =
   var t = parseApi(raylibApi)
-  genBindings(t, outputname, raylibHeader, helpers, readFile("raylib_wrap.nim"))
+  genBindings(t, outputname, raylibHeader, helpers)
 
 main()
