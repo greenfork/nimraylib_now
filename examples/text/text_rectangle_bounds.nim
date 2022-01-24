@@ -10,7 +10,6 @@
 ##   Copyright (c) 2018 Vlad Adrian (@demizdor) and Ramon Santamaria (@raysan5)
 ##   Converted in 2022 by LEPINE Florent @Ryback08
 ##
-##   @Todo - Solution on line 164 must be checked
 ##
 ##   Original C version :
 ##   https://github.com/raysan5/raylib/blob/master/examples/text/text_rectangle_bounds.c
@@ -85,30 +84,28 @@ while not windowShouldClose():        # Detect window close button or ESC key
   lastMouse = mouse #  Update mouse
 
   ## Draw
-  beginDrawing()
-  clearBackground(RAYWHITE)
-  drawRectangleLinesEx(container, 3.0, borderColor)  # Draw container border
+  beginDrawing():
+    clearBackground(RAYWHITE)
+    drawRectangleLinesEx(container, 3.0, borderColor)  # Draw container border
 
-  # Draw text in container (add some padding)
-  drawTextBoxed(font, text, (container.x + 4.0, container.y + 4.0, container.width - 4.0, container.height - 4.0).Rectangle , 20.0, 2.0, wordWrap, GRAY)
+    # Draw text in container (add some padding)
+    drawTextBoxed(font, text, (container.x + 4.0, container.y + 4.0, container.width - 4.0, container.height - 4.0).Rectangle , 20.0, 2.0, wordWrap, GRAY)
+    
+    drawRectangleRec(resizer, borderColor) # Draw the resize box
+
+    # Draw bottom info
+    drawRectangle(0, screenHeight - 54, screenWidth, 54, GRAY)
+    drawRectangleRec((382.0, screenHeight.float - 34.0, 12.0, 12.0).Rectangle, MAROON);
+
+    drawText("Word Wrap: ", 313, screenHeight-115, 20, BLACK)
+    if wordWrap:
+      drawText("ON", 447, screenHeight - 115, 20, RED)
+    else :
+      drawText("OFF", 447, screenHeight - 115, 20, BLACK)
+
+    drawText("Press [SPACE] to toggle word wrap", 218, screenHeight - 86, 20, GRAY)
+    drawText("Click hold & drag the    to resize the container", 155, screenHeight - 38, 20, RAYWHITE)
   
-  drawRectangleRec(resizer, borderColor) # Draw the resize box
-
-  # Draw bottom info
-  drawRectangle(0, screenHeight - 54, screenWidth, 54, GRAY)
-  drawRectangleRec((382.0, screenHeight.float - 34.0, 12.0, 12.0).Rectangle, MAROON);
-
-  drawText("Word Wrap: ", 313, screenHeight-115, 20, BLACK)
-  if wordWrap:
-    drawText("ON", 447, screenHeight - 115, 20, RED)
-  else :
-    drawText("OFF", 447, screenHeight - 115, 20, BLACK)
-
-  drawText("Press [SPACE] to toggle word wrap", 218, screenHeight - 86, 20, GRAY)
-  drawText("Click hold & drag the    to resize the container", 155, screenHeight - 38, 20, RAYWHITE)
-  
-
-  endDrawing()
 #De-Initialization
 closeWindow() #Close window and OpenGL context
 
@@ -160,15 +157,9 @@ proc drawTextBoxedSelectable(font: Font, text: string, rec :Rectangle , fontSize
     
     var glyphWidth: float = 0.0
     if codepoint != '\n'.int :
-    
-      ## font.glyphs[index].advanceX didn't want compile ?? 
-      ## Solution : modify raylib.nim  => glyphs* {.importc: "glyphs".}: ptr UncheckedArray[GlyphInfo] ##  Glyphs info data
-      ## like this post https://forum.nim-lang.org/t/5393#33783 
       glyphWidth = if (font.glyphs[index].advanceX == 0): font.recs[index].width*scaleFactor else: font.glyphs[index].advanceX.float*scaleFactor
       if (i + 1 < length): glyphWidth = glyphWidth + spacing
     
-
-
     ## NOTE: When wordWrap is ON we first measure how much of the text we can draw before going outside of the rec container
     ## We store this info in startLine and endLine, then we change states, draw the text between those two variables
     ## and change states again and again recursively until the end of the text (or until we get outside of the container).
