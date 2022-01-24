@@ -53,17 +53,17 @@ while not windowShouldClose():
     useTft = false
 
   # Draw  
-  beginDrawing()
-  clearBackground(White)
-  drawText("Hold SPACE to use TTF generated font", 20, 20, 20, LIGHTGRAY)
+  beginDrawing():
+    clearBackground(White)
+    drawText("Hold SPACE to use TTF generated font", 20, 20, 20, LIGHTGRAY)
 
-  if not useTft:
-    drawTextEx(fontBm, msg.cstring, Vector2(x: 20.0, y: 100.0), toFloat(fontBm.baseSize), 2, MAROON)
-    drawText("Using BMFont (Angelcode) imported", 20, getScreenHeight() - 30, 20, GRAY)
-  else:
-    drawTextEx(fontTtf, msg.cstring, (20.0, 100.0).Vector2, fontTtf.baseSize.float, 2, LIME)
-    drawText("Using TTF font generated", 20, getScreenHeight() - 30, 20, GRAY)
-  endDrawing()
+    if not useTft:
+      drawTextEx(fontBm, msg.cstring, Vector2(x: 20.0, y: 100.0), toFloat(fontBm.baseSize), 2, MAROON)
+      drawText("Using BMFont (Angelcode) imported", 20, getScreenHeight() - 30, 20, GRAY)
+    else:
+      drawTextEx(fontTtf, msg.cstring, (20.0, 100.0).Vector2, fontTtf.baseSize.float, 2, LIME)
+      drawText("Using TTF font generated", 20, getScreenHeight() - 30, 20, GRAY)
+
 
 # De-Initialization
 unloadFont(fontBm)    # AngelCode Font unloading
