@@ -16,6 +16,9 @@ requires "regex"
 
 from os import `/`
 
+task newconvert, "":
+  exec "nim r src"/"generate_bindings.nim"
+
 task convert, "run with c2nim":
   let
     common_files_setupFile = "src"/"common_files_setup.nim"
