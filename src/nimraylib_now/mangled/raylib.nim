@@ -290,7 +290,7 @@ type
     glyphPadding* {.importc: "glyphPadding".}: cint ##  Padding around the glyph characters
     texture* {.importc: "texture".}: Texture2D ##  Texture atlas containing the glyphs
     recs* {.importc: "recs".}: ptr UncheckedArray[Rectangle] ##  Rectangles in texture for the glyphs
-    glyphs* {.importc: "glyphs".}: ptr UncheckedArray[GlyphInfo]  ##  Glyphs info data
+    glyphs* {.importc: "glyphs".}: ptr UncheckedArray[GlyphInfo] ##  Glyphs info data
 
 
 ##  Camera, defines position/orientation in 3d space
