@@ -27,7 +27,7 @@ const
   raymathBuildFile*            = raylibBuildDir/"raymath.h"
   physacBuildFile*             = raylibBuildDir/"physac.h"
   rayguiBuildFile*             = raylibBuildDir/"raygui.h"
-  raylibHeaderFiles* = [
+  raylibHeaderBuildFiles* = [
     raylibBuildFile,
     rlglBuildFile,
     raymathBuildFile,
@@ -78,83 +78,89 @@ export {filename}
 """
     writeFile(nimraylibNowDir/filename & ".nim", content)
 
-proc prepareBuildFiles(mangled: bool) =
-  copyDir(raylibSrcDir, raylibBuildDir)
-  copyFileToDir(raylibSrcDir/"extras"/"physac.h", raylibBuildDir)
-  copyFileToDir(raylibSrcDir/"extras"/"raygui.h", raylibBuildDir)
+proc prepareCSources =
+  copyDir(raylibSrcDir, raylibMangledCSourcesDir)
+  copyFileToDir(raylibSrcDir/"extras"/"physac.h", raylibMangledCSourcesDir)
+  copyFileToDir(raylibSrcDir/"extras"/"raygui.h", raylibMangledCSourcesDir)
 
-  if mangled:
-    # Some strange names that also collide with `windows.h`
-    const
-      queryPerfFiles = [
-        raylibBuildDir/"rgestures.h",
-        raylibBuildDir/"physac.h",
-      ]
+  # Some strange names that also collide with `windows.h`
+  const queryPerfFiles = [
+    raylibMangledCSourcesDir/"rgestures.h",
+    raylibMangledCSourcesDir/"physac.h",
+  ]
 
-    for file in queryPerfFiles:
-      var content: string
-      for line in file.lines:
-        if "int __stdcall QueryPerformanceCounter" in line or
-           "int __stdcall QueryPerformanceFrequency" in line:
-          echo "Ignore: " & line & "\n"
-        else:
-          content.add line & "\n"
-      writeFile(file, content)
+  for file in queryPerfFiles:
+    var content: string
+    for line in file.lines:
+      if "int __stdcall QueryPerformanceCounter" in line or
+         "int __stdcall QueryPerformanceFrequency" in line:
+        echo "Ignore: " & line & "\n"
+      else:
+        content.add line & "\n"
+    writeFile(file, content)
 
-    # Name mangling
-    # On Windows some Raylib names conflict with names defined in `windows.h`
-    # so we mangle them in C source and header files and later return them to
-    # normal names in Nim.
-    # https://github.com/greenfork/nimraylib_now/issues/5
-    const
-      mangleNameRegexes = [
-        re"\b(Rectangle)\b",
-        re"\b(CloseWindow)\b",
-        re"\b(ShowCursor)\b",
-        re"\b(LoadImage)\b",
-        re"\b(DrawText)\b",
-        re"\b(DrawTextEx)\b",
-        re"\b(GetCurrentTime)\b",
-      ]
-      raylibSources = [
-        raylibBuildDir/"rshapes.c",
-        raylibBuildDir/"rtextures.c",
-        raylibBuildDir/"rtext.c",
-        raylibBuildDir/"utils.c",
-        raylibBuildDir/"rmodels.c",
-        raylibBuildDir/"raudio.c",
-        raylibBuildDir/"rcore.c",
-      ]
-      headerPreamble = [
-        "#undef near", # undefine clashing macros (from windows.h)
-        "#undef far", # undefine clashing macros (from windows.h)
-      ].join("\n") & "\n"
+  # Name mangling
+  # On Windows some Raylib names conflict with names defined in `windows.h`
+  # so we mangle them in C source and header files and later return them to
+  # normal names in Nim.
+  # https://github.com/greenfork/nimraylib_now/issues/5
+  const
+    mangleNameRegexes = [
+      re"\b(Rectangle)\b",
+      re"\b(CloseWindow)\b",
+      re"\b(ShowCursor)\b",
+      re"\b(LoadImage)\b",
+      re"\b(DrawText)\b",
+      re"\b(DrawTextEx)\b",
+      re"\b(GetCurrentTime)\b",
+    ]
+    raylibSources = [
+      raylibMangledCSourcesDir/"rshapes.c",
+      raylibMangledCSourcesDir/"rtextures.c",
+      raylibMangledCSourcesDir/"rtext.c",
+      raylibMangledCSourcesDir/"utils.c",
+      raylibMangledCSourcesDir/"rmodels.c",
+      raylibMangledCSourcesDir/"raudio.c",
+      raylibMangledCSourcesDir/"rcore.c",
+    ]
+    raylibHeaders = [
+      raylibMangledCSourcesDir/"raylib.h",
+      raylibMangledCSourcesDir/"rlgl.h",
+      raylibMangledCSourcesDir/"raymath.h",
+      raylibMangledCSourcesDir/"physac.h",
+      raylibMangledCSourcesDir/"raygui.h"
+    ]
+    headerPreamble = [
+      "#undef near", # undefine clashing macros (from windows.h)
+      "#undef far", # undefine clashing macros (from windows.h)
+    ].join("\n") & "\n"
 
-    func mangle(line: string): string =
-      result = line
-      for reName in mangleNameRegexes:
-        result = result.replace(reName, manglePrefix & "$1")
+  func mangle(line: string): string =
+    result = line
+    for reName in mangleNameRegexes:
+      result = result.replace(reName, manglePrefix & "$1")
 
-    # Modify raylib files in-place inside build/ directory
-    for file in raylibHeaderFiles:
-      var fileContent: string = headerPreamble
-      fileContent.add readFile(file)
-      writeFile(file, mangle(fileContent))
-    for file in raylibSources:
-      let fileContent = readFile(file)
-      writeFile(file, mangle(fileContent))
+  for file in raylibHeaders:
+    var fileContent: string = headerPreamble
+    fileContent.add readFile(file)
+    writeFile(file, mangle(fileContent))
+  for file in raylibSources:
+    let fileContent = readFile(file)
+    writeFile(file, mangle(fileContent))
 
-    # Copy mangled C sources from build/ to src/csources
-    copyDir(raylibBuildDir, raylibMangledCSourcesDir)
-
-
-  # Copy files to build directory for converting to Nim files
-  for file in raylibHeaderFiles:
-    copyFileToDir(file, buildDir)
+  # Copy mangled C sources from build/ to src/csources
+  copyDir(raylibBuildDir, raylibMangledCSourcesDir)
 
 proc convertToNim(targetDir: string, mangled: bool) =
+  # Prepare build files
+  if mangled:
+    copyDir(raylibMangledCSourcesDir, raylibBuildDir)
+  else:
+    copyDir(raylibSrcDir, raylibBuildDir)
+    copyFileToDir(raylibSrcDir/"extras"/"physac.h", raylibBuildDir)
+    copyFileToDir(raylibSrcDir/"extras"/"raygui.h", raylibBuildDir)
   # Copy files to target directory to be used during linking with Nim files
-  for file in raylibHeaderFiles:
+  for file in raylibHeaderBuildFiles:
     copyFileToDir(file, targetDir)
 
   # Formatting of identifiers
@@ -731,9 +737,8 @@ converter tupleToRectangle*(self: tuple[x,y,width,height: float]): Rectangle =
 proc main =
   genDirStructure()
   genSkeleton()
-  prepareBuildFiles(mangled = false)
+  prepareCSources()
   convertToNim(targetDir = nimraylibNowDir/"not_mangled", mangled = false)
-  prepareBuildFiles(mangled = true)
   convertToNim(targetDir = nimraylibNowDir/"mangled", mangled = true)
 
 when isMainModule:
