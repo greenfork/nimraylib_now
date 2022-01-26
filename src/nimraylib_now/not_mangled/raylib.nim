@@ -19,11 +19,6 @@ when not defined(nimraylib_now_linkingOverride):
       else:
         {.passL: "libraylibdll.a".}
     elif defined(macosx):
-      {.passL: "-framework CoreVideo".}
-      {.passL: "-framework IOKit".}
-      {.passL: "-framework Cocoa".}
-      {.passL: "-framework GLUT".}
-      {.passL: "-framework OpenGL".}
       {.passL: "-lraylib".}
     else:
       {.passL: "-lraylib".}
