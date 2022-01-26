@@ -550,6 +550,11 @@ template `-`*[T: Vector2 | Vector3](v1: T): T = negate(v1)
 
         # These cannot be determined automatically, only through manual inspection.
         uncheckedArrayReplacements = [
+          # In Font
+          ("recs* {.importc: \"recs\".}: ptr Rectangle",
+           "recs* {.importc: \"recs\".}: ptr UncheckedArray[Rectangle]"),
+          ("glyphs* {.importc: \"glyphs\".}: ptr GlyphInfo",
+           "glyphs* {.importc: \"glyphs\".}: ptr UncheckedArray[GlyphInfo]"),
           # In Shader
           ("locs* {.importc: \"locs\".}: ptr cint",
            "locs* {.importc: \"locs\".}: ptr UncheckedArray[cint]"),
