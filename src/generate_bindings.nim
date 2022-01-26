@@ -51,15 +51,14 @@ proc genDirStructure =
 
 proc genSkeleton =
   copyFileToDir(templatesDir/"static_build.nim", nimraylibNowDir)
-  const
-    alternatingNimFiles = [
-      "physac",
-      "raygui",
-      "raylib",
-      "raymath",
-      "rlgl",
-      "converters",
-    ]
+  const alternatingNimFiles = [
+    "physac",
+    "raygui",
+    "raylib",
+    "raymath",
+    "rlgl",
+    "converters",
+  ]
 
   for filename in alternatingNimFiles:
     let content = fmt"""
