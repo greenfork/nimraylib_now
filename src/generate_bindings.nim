@@ -151,7 +151,7 @@ proc prepareCSources =
   # Copy mangled C sources from build/ to src/csources
   copyDir(raylibBuildDir, raylibMangledCSourcesDir)
 
-proc convertToNim(targetDir: string, mangled: bool) =
+proc prepareBuildFiles(targetDir: string, mangled: bool) =
   # Prepare build files
   if mangled:
     copyDir(raylibMangledCSourcesDir, raylibBuildDir)
@@ -163,6 +163,7 @@ proc convertToNim(targetDir: string, mangled: bool) =
   for file in raylibHeaderBuildFiles:
     copyFileToDir(file, targetDir)
 
+proc convertToNim(targetDir: string, mangled: bool) =
   # Formatting of identifiers
   func fmtConst(s: string): string =
     s.toLowerAscii.capitalizeAscii
@@ -741,7 +742,9 @@ proc main =
   genDirStructure()
   genSkeleton()
   prepareCSources()
+  prepareBuildFiles(targetDir = nimraylibNowDir/"not_mangled", mangled = false)
   convertToNim(targetDir = nimraylibNowDir/"not_mangled", mangled = false)
+  prepareBuildFiles(targetDir = nimraylibNowDir/"mangled", mangled = true)
   convertToNim(targetDir = nimraylibNowDir/"mangled", mangled = true)
 
 when isMainModule:
