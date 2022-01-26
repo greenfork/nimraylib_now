@@ -408,9 +408,9 @@ const physacHeader = currentSourcePath().parentDir()/"physac.h"
             echo "Reached end of header part: " & line
             break
           echo "Ignore: " & line # skip all self-header module definitions
-        elif ignoreLines.anyIt(it in line):
+        elif ignoreLines.anyIt(it in line) and filename == "raygui":
           echo "Ignore: " & line
-        elif line.match(reDefineColor, m):
+        elif line.match(reDefineColor, m) and filename == "raylib":
           # Colors are defined with #define, we want to turn them into consts
           # and remove from original C file
           let
@@ -421,7 +421,7 @@ const physacHeader = currentSourcePath().parentDir()/"physac.h"
             alpha = m.groupFirstCapture(4, line)
           nimColorNames.add fmt"const {colorName.fmtConst}* = " &
             fmt("Color(r: {red}, g: {green}, b: {blue}, a: {alpha})\n")
-        elif line.match(reEmptyStructDef, m):
+        elif line.match(reEmptyStructDef, m) and filename in ["physac", "raylib"]:
           # c2nim can't parse it without {} in the middle
           # this seems as a forward declaration of a struct but no further
           # declaration actually happens
@@ -434,8 +434,6 @@ const physacHeader = currentSourcePath().parentDir()/"physac.h"
             # Due to circular dependency, it is necessary for these 2 types to
             # be defined in the same `type` block
             physicsBodyDataMoveDefinition = true
-          else:
-            rs.add line & "\n"
         elif physicsBodyDataMoveDefinition and line.match(reStructDefEnd, m) and
            m.groupFirstCapture(0, line) == "PhysicsBodyData":
           # This rewrite allows c2nim to generate correct code
@@ -478,7 +476,7 @@ const physacHeader = currentSourcePath().parentDir()/"physac.h"
               nestLevels.dec
             elif firstWord == "#if" or firstWord == "#ifndef":
               nestLevels.inc
-        elif line.startsWith("RMAPI"):
+        elif line.startsWith("RMAPI") and filename == "raymath":
           # raymath header file contains implementation and c2nim crashes
           # trying to parse it. Here implementation is stripped away and only
           # definition is left.
@@ -491,7 +489,7 @@ const physacHeader = currentSourcePath().parentDir()/"physac.h"
           rs.add line & "\n"
         i.inc
 
-      if nimColorNames.len > 0:
+      if nimColorNames.len > 0 and filename == "raylib":
         rs.add fmt"""
 #ifdef C2NIM
 #@
@@ -620,7 +618,7 @@ template `-`*[T: Vector2 | Vector3](v1: T): T = negate(v1)
           )
           rs.add line & "\n"
           i.inc
-        elif "proc begin" in line:
+        elif "proc begin" in line and filename in ["raylib", "rlgl"]:
           # Collect all the proc pairs for future templates
           # Let's hope that 20 lines is enough for begin and end procs
           let
