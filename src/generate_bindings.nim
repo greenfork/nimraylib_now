@@ -115,28 +115,28 @@ proc prepareCSources =
       raylibMangledCSourcesDir/"rmodels.c",
       raylibMangledCSourcesDir/"raudio.c",
       raylibMangledCSourcesDir/"rcore.c",
-    ]
-    raylibHeaders = [
+
       raylibMangledCSourcesDir/"raylib.h",
       raylibMangledCSourcesDir/"rlgl.h",
       raylibMangledCSourcesDir/"raymath.h",
       raylibMangledCSourcesDir/"physac.h",
       raylibMangledCSourcesDir/"raygui.h"
     ]
-    headerPreamble = [
-      "#undef near", # undefine clashing macros (from windows.h)
-      "#undef far", # undefine clashing macros (from windows.h)
-    ].join("\n") & "\n"
 
   func mangle(line: string): string =
     result = line
     for reName in mangleNameRegexes:
       result = result.replace(reName, manglePrefix & "$1")
 
-  for file in raylibHeaders:
-    var fileContent: string = headerPreamble
-    fileContent.add readFile(file)
-    writeFile(file, mangle(fileContent))
+  # `near` and `far` are used in raymath as variables but they are also defined
+  # as macros in windows.h
+  block nearfar:
+    var fileContent = [
+      "#undef near", # undefine clashing macros (from windows.h)
+      "#undef far", # undefine clashing macros (from windows.h)
+    ].join("\n") & "\n"
+    fileContent.add readFile(raylibMangledCSourcesDir/"raymath.h")
+    writeFile(raylibMangledCSourcesDir/"raymath.h", fileContent)
   for file in raylibSources:
     let fileContent = readFile(file)
     writeFile(file, mangle(fileContent))
