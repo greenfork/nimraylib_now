@@ -8,26 +8,26 @@ from os import `/`, extractFilename, changeFileExt, findExe
 from osproc import execCmd
 
 const
-  projectDir*                  = currentSourcePath().parentDir().parentDir()
-  buildDir*                    = projectDir/"build"
-  nimraylibNowDir*             = projectDir/"src"/"nimraylib_now"
-  raylibSrcDir*                = projectDir/"raylib"/"src"
-  raylibBuildDir*              = buildDir/"raylib_src"
-  rayguiBuildDir*              = buildDir/"raygui_src"
+  projectDir                  = currentSourcePath().parentDir().parentDir()
+  buildDir                    = projectDir/"build"
+  nimraylibNowDir             = projectDir/"src"/"nimraylib_now"
+  raylibSrcDir                = projectDir/"raylib"/"src"
+  raylibBuildDir              = buildDir/"raylib_src"
+  rayguiBuildDir              = buildDir/"raygui_src"
 
   # Must assume that there's no `projectDir` as if it is installed as a nimble
   # package.
-  srcDir*                      = currentSourcePath().parentDir()
-  cSourcesDir*                 = srcDir/"csources"
-  raylibMangledCSourcesDir*    = cSourcesDir/"raylib_mangled"
+  srcDir                      = currentSourcePath().parentDir()
+  cSourcesDir                 = srcDir/"csources"
+  raylibMangledCSourcesDir    = cSourcesDir/"raylib_mangled"
 
-  manglePrefix*                = "NmrlbNow_"
-  raylibBuildFile*             = raylibBuildDir/"raylib.h"
-  rlglBuildFile*               = raylibBuildDir/"rlgl.h"
-  raymathBuildFile*            = raylibBuildDir/"raymath.h"
-  physacBuildFile*             = raylibBuildDir/"physac.h"
-  rayguiBuildFile*             = raylibBuildDir/"raygui.h"
-  raylibHeaderBuildFiles* = [
+  manglePrefix                = "NmrlbNow_"
+  raylibBuildFile             = raylibBuildDir/"raylib.h"
+  rlglBuildFile               = raylibBuildDir/"rlgl.h"
+  raymathBuildFile            = raylibBuildDir/"raymath.h"
+  physacBuildFile             = raylibBuildDir/"physac.h"
+  rayguiBuildFile             = raylibBuildDir/"raygui.h"
+  raylibHeaderBuildFiles = [
     raylibBuildFile,
     rlglBuildFile,
     raymathBuildFile,
