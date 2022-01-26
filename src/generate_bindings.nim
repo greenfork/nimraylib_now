@@ -11,6 +11,7 @@ const
   projectDir                  = currentSourcePath().parentDir().parentDir()
   buildDir                    = projectDir/"build"
   nimraylibNowDir             = projectDir/"src"/"nimraylib_now"
+  templatesDir                = projectDir/"src"/"templates"
   raylibSrcDir                = projectDir/"raylib"/"src"
   raylibBuildDir              = buildDir/"raylib_src"
   rayguiBuildDir              = buildDir/"raygui_src"
@@ -49,14 +50,7 @@ proc genDirStructure =
   createDir(raylibBuildDir)
 
 proc genSkeleton =
-  copyFileToDir(
-    projectDir/"src"/"raylib_build_static_template.nim",
-    nimraylibNowDir
-  )
-  moveFile(
-    nimraylibNowDir/"raylib_build_static_template.nim",
-    nimraylibNowDir/"raylib_build_static.nim"
-  )
+  copyFileToDir(templatesDir/"static_build.nim", nimraylibNowDir)
   const
     alternatingNimFiles = [
       "physac",
@@ -291,7 +285,7 @@ when not defined(nimraylib_now_linkingOverride):
     else:
       {.passL: "-lraylib".}
   else:
-    include ../raylib_build_static
+    include ../static_build
 
 @#
 #endif
@@ -513,30 +507,7 @@ const physacHeader = currentSourcePath().parentDir()/"physac.h"
 
     block postprocessing:
       const
-        raymathShortcuts = """
-template `+`*[T: Vector2 | Vector3 | Quaternion | Matrix](v1, v2: T): T = add(v1, v2)
-template `+=`*[T: Vector2 | Vector3 | Quaternion | Matrix](v1: var T, v2: T) = v1 = add(v1, v2)
-template `+`*[T: Vector2 | Vector3 | Quaternion](v1: T, value: cfloat): T = addValue(v1, value)
-template `+=`*[T: Vector2 | Vector3 | Quaternion](v1: var T, value: cfloat) = v1 = addValue(v1, value)
-
-template `-`*[T: Vector2 | Vector3 | Quaternion | Matrix](v1, v2: T): T = subtract(v1, v2)
-template `-=`*[T: Vector2 | Vector3 | Quaternion | Matrix](v1: var T, v2: T) = v1 = subtract(v1, v2)
-template `-`*[T: Vector2 | Vector3 | Quaternion](v1: T, value: cfloat): T = subtractValue(v1, value)
-template `-=`*[T: Vector2 | Vector3 | Quaternion](v1: var T, value: cfloat) = v1 = subtractValue(v1, value)
-
-template `*`*[T: Vector2 | Vector3 | Quaternion | Matrix](v1, v2: T): T = multiply(v1, v2)
-template `*=`*[T: Vector2 | Vector3 | Quaternion | Matrix](v1: var T, v2: T) = v1 = multiply(v1, v2)
-template `*`*[T: Vector2 | Vector3 | Quaternion](v1: T, value: cfloat): T = scale(v1, value)
-template `*=`*[T: Vector2 | Vector3 | Quaternion](v1: var T, value: cfloat) = v1 = scale(v1, value)
-
-template `/`*[T: Vector2 | Vector3 | Quaternion | Matrix](v1, v2: T): T = divide(v1, v2)
-template `/=`*[T: Vector2 | Vector3 | Quaternion | Matrix](v1: var T, v2: T) = v1 = divide(v1, v2)
-template `/`*[T: Vector2 | Vector3 | Quaternion](v1: T, value: cfloat): T = scale(v1, 1.0/value)
-template `/=`*[T: Vector2 | Vector3 | Quaternion](v1: var T, value: cfloat) = v1 = scale(v1, 1.0/value)
-
-template `-`*[T: Vector2 | Vector3](v1: T): T = negate(v1)
-"""
-
+        raymathShortcuts = slurp(templatesDir/"raymath_shortcuts.nim")
         # proc beginTextureMode*(target: RenderTexture2D) {.cdecl,
         #     importc: "BeginTextureMode", header: raylibHeader.}
         # ##  Initializes render texture for drawing
@@ -692,50 +663,7 @@ template {signatureWithBody} =
 
   # Write converters
 
-  const
-    baseConverters = """
-import ./raylib
-import ./rlgl
-import ./raygui
-
-converter toCint*(self: int): cint = self.cint
-converter toInt*(self: cint): int = self.int
-
-# Conversions from tuple to object for Vector2, Vector3, Vector4,
-# Matrix and Rectangle. Quaternion is same as Vector4, so works too.
-converter tupleToColor*(self: tuple[r,g,b,a: int]): Color =
-  Color(r: self.r.uint8, g: self.g.uint8, b: self.b.uint8, a: self.a.uint8)
-
-converter tupleToColor*(self: tuple[r,g,b: int]): Color =
-  Color(r: self.r.uint8, g: self.g.uint8, b: self.b.uint8, a: 255)
-
-converter tupleToVector2*(self: tuple[x,y: float]): Vector2 =
-  Vector2(x: self.x.cfloat, y: self.y.cfloat)
-
-converter tupleToVector3*(self: tuple[x,y,z: float]): Vector3 =
-  Vector3(x: self.x.cfloat, y: self.y.cfloat, z: self.z.cfloat)
-
-converter tupleToVector4*(self: tuple[x,y,z,w: float]): Vector4 =
-  Vector4(x: self.x.cfloat, y: self.y.cfloat, z: self.z.cfloat, w: self.w.cfloat)
-
-converter tupleToMatrix*(self:
-  tuple[m0,m4,m8, m12,
-        m1,m5,m9, m13,
-        m2,m6,m10,m14,
-        m3,m7,m11,m15: float]
-): Matrix =
-  Matrix(
-    m0: self.m0.cfloat, m4: self.m4.cfloat, m8:  self.m8.cfloat,  m12: self.m12.cfloat,
-    m1: self.m1.cfloat, m5: self.m5.cfloat, m9:  self.m9.cfloat,  m13: self.m13.cfloat,
-    m2: self.m2.cfloat, m6: self.m6.cfloat, m10: self.m10.cfloat, m14: self.m14.cfloat,
-    m3: self.m3.cfloat, m7: self.m7.cfloat, m11: self.m11.cfloat, m15: self.m15.cfloat,
-  )
-
-converter tupleToRectangle*(self: tuple[x,y,width,height: float]): Rectangle =
-  Rectangle(x: self.x.cfloat, y: self.y.cfloat, width: self.width.cfloat, height: self.height.cfloat)
-
-"""
-
+  const baseConverters = slurp(templatesDir/"base_converters.nim")
   writeFile(targetDir/"converters.nim", baseConverters & nimEnumConverters)
 
 proc main =
