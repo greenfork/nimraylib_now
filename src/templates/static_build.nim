@@ -1,15 +1,11 @@
 ## Static compilation of Raylib
 ## Conversion of raylib/src/Makefile
 
-# Add the ability to do all the linking manually.
 from os import parentDir, relativePath, `/`, quoteShell
-
-import ../filenames
 
 const
   CurrentDirectory = currentSourcePath().parentDir()
-  # RaylibRootPath {.used.} = raylibSrcDir.parentDir()
-  RaylibSrcPath = raylibMangledCSourcesDir
+  RaylibSrcPath = CurrentDirectory.parentDir() / "csources" / "raylib_mangled"
   # Use relative paths just in case
   # https://github.com/nim-lang/Nim/issues/9370
   RaylibSrcPathRelative = relativePath(RaylibSrcPath, CurrentDirectory)

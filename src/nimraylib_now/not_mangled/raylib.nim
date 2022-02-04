@@ -19,16 +19,11 @@ when not defined(nimraylib_now_linkingOverride):
       else:
         {.passL: "libraylibdll.a".}
     elif defined(macosx):
-      {.passL: "-framework CoreVideo".}
-      {.passL: "-framework IOKit".}
-      {.passL: "-framework Cocoa".}
-      {.passL: "-framework GLUT".}
-      {.passL: "-framework OpenGL".}
       {.passL: "-lraylib".}
     else:
       {.passL: "-lraylib".}
   else:
-    include ../raylib_build_static
+    include ../static_build
 
 ## *********************************************************************************************
 ##
@@ -406,7 +401,7 @@ type
     boneCount* {.importc: "boneCount".}: cint ##  Number of bones
     frameCount* {.importc: "frameCount".}: cint ##  Number of animation frames
     bones* {.importc: "bones".}: ptr BoneInfo ##  Bones information (skeleton)
-    framePoses* {.importc: "framePoses".}: ptr UncheckedArray[ptr Transform] ##  Poses array by frame
+    framePoses* {.importc: "framePoses".}: ptr UncheckedArray[ptr UncheckedArray[Transform]] ##  Poses array by frame
 
 
 ##  Ray, ray for raycasting

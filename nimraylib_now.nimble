@@ -5,8 +5,8 @@ author = "Dmitry Matveyev"
 description = "The Ultimate Raylib gaming library wrapper"
 license = "MIT"
 srcDir = "src"
-skipFiles = @["convert_c_to_nim.nim", "prepare_build_files.nim",
-  "common_files_setup.nim", "raylib_build_static_template.nim"]
+skipFiles = @["generate_bindings.nim"]
+skipDirs = @["templates"]
 backend = "c"
 
 # Dependencies
@@ -14,37 +14,13 @@ backend = "c"
 requires "nim >= 1.4.2"
 requires "regex"
 
-from os import `/`
+from os import `/`, parentDir
 
-task convert, "run with c2nim":
-  let
-    common_files_setupFile = "src"/"common_files_setup.nim"
-    convert_c_to_nimFile = "src"/"convert_c_to_nim.nim"
-    prepare_build_filesFile = "src"/"prepare_build_files.nim"
+task genbindings, "generate bindings":
+  exec "nim r src"/"generate_bindings.nim"
 
-    nimraylibNowDir = "src"/"nimraylib_now"
-
-    raylibFile = "src"/"nimraylib_now"/"raylib.nim"
-    rayguiFile = "src"/"nimraylib_now"/"raygui.nim"
-    rlglFile = "src"/"nimraylib_now"/"rlgl.nim"
-    raymathFile = "src"/"nimraylib_now"/"raymath.nim"
-    physacFile = "src"/"nimraylib_now"/"physac.nim"
-    convertersFile = "src"/"nimraylib_now"/"converters.nim"
-
-  echo "Running clear target directories\n"
-  exec "nim r " & common_files_setupFile
-
-  echo "Running prepare build files\n"
-  exec "nim r " & prepare_build_filesFile
-  echo "Running converter\n"
-  exec "nim r " & convert_c_to_nimFile
-
-  echo "Running prepare build files -d:nimraylib_now_mangle\n"
-  exec "nim r -d:nimraylib_now_mangle " & prepare_build_filesFile
-  echo "Running converter -d:nimraylib_now_mangle\n"
-  exec "nim r -d:nimraylib_now_mangle " & convert_c_to_nimFile
-
-  echo "\nExecuting nim check\n"
+task checkbindings, "nim check all generated bindings":
+  const nimraylibNowDir = currentSourcePath().parentDir()/"src"/"nimraylib_now"
   exec "nim check " & nimraylibNowDir/"mangled"/"raylib.nim"
   exec "nim check " & nimraylibNowDir/"mangled"/"raygui.nim"
   exec "nim check " & nimraylibNowDir/"mangled"/"rlgl.nim"

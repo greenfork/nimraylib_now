@@ -37,7 +37,6 @@ converter tupleToMatrix*(self:
 
 converter tupleToRectangle*(self: tuple[x,y,width,height: float]): Rectangle =
   Rectangle(x: self.x.cfloat, y: self.y.cfloat, width: self.width.cfloat, height: self.height.cfloat)
-
 converter ConfigFlagsToInt*(self: raylib.ConfigFlags): cuint = self.cuint
 converter TraceLogLevelToInt*(self: raylib.TraceLogLevel): cint = self.cint
 converter KeyboardKeyToInt*(self: raylib.KeyboardKey): cint = self.cint

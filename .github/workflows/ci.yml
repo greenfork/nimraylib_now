@@ -53,8 +53,10 @@ jobs:
 
       - name: Install c2nim
         run: nimble install --accept c2nim
-      - name: Run converter and check files
-        run: nimble convert
+      - name: Generate bindings
+        run: nimble genbindings
+      - name: Check generated bindings
+        run: nimble checkbindings
 
       - name: Generate tests
         run: nimble prepareTests
