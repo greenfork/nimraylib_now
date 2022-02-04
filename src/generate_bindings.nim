@@ -534,7 +534,7 @@ const physacHeader = currentSourcePath().parentDir()/"physac.h"
            "meshMaterial* {.importc: \"meshMaterial\".}: ptr UncheckedArray[cint]"),
           # In ModelAnimation
           ("framePoses* {.importc: \"framePoses\".}: ptr ptr Transform",
-           "framePoses* {.importc: \"framePoses\".}: ptr UncheckedArray[ptr Transform]"),
+           "framePoses* {.importc: \"framePoses\".}: ptr UncheckedArray[ptr UncheckedArray[Transform]]"),
           # In Mesh
           ("vertices* {.importc: \"vertices\".}: ptr cfloat",
            "vertices* {.importc: \"vertices\".}: ptr UncheckedArray[cfloat]"),

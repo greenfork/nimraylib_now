@@ -401,7 +401,7 @@ type
     boneCount* {.importc: "boneCount".}: cint ##  Number of bones
     frameCount* {.importc: "frameCount".}: cint ##  Number of animation frames
     bones* {.importc: "bones".}: ptr BoneInfo ##  Bones information (skeleton)
-    framePoses* {.importc: "framePoses".}: ptr UncheckedArray[ptr Transform] ##  Poses array by frame
+    framePoses* {.importc: "framePoses".}: ptr UncheckedArray[ptr UncheckedArray[Transform]] ##  Poses array by frame
 
 
 ##  Ray, ray for raycasting
