@@ -5,7 +5,8 @@ author = "Dmitry Matveyev"
 description = "The Ultimate Raylib gaming library wrapper"
 license = "MIT"
 srcDir = "src"
-skipFiles = @["generate_bindings"]
+skipFiles = @["generate_bindings.nim"]
+skipDirs = @["templates"]
 backend = "c"
 
 # Dependencies
