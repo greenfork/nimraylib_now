@@ -660,6 +660,12 @@ template {signatureWithBody} =
   const baseConverters = slurp(templatesDir/"base_converters.nim")
   writeFile(targetDir/"converters.nim", baseConverters & nimEnumConverters)
 
+  # Write destructors
+
+  const destructors = slurp(templatesDir/"destructors.nim")
+  var raylibFile = open(targetDir/"raylib.nim", fmAppend)
+  write(raylibFile, destructors)
+
 proc main =
   genDirStructure()
   genSkeleton()

@@ -1,3 +1,12 @@
+# Some other unload functions which are not present in destructors:
+# * unloadVrStereoConfig*(config: VrStereoConfig)
+# * unloadFileData*(data: ptr uint8)
+# * unloadFileText*(text: cstring)
+# * unloadImageColors*(colors: ptr Color)
+# * unloadImagePalette*(colors: ptr Color)
+# * unloadFontData*(chars: ptr GlyphInfo; glyphCount: cint)
+# * unloadCodepoints*(codepoints: ptr cint)
+# * unloadWaveSamples*(samples: ptr cfloat)
 
 proc `=destroy`*(x: var Image) =
   if x.data != nil: unloadImage(x)
