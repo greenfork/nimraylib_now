@@ -25,15 +25,12 @@ var image: Image = loadImage("resources/raylib_logo.png")
 ##  Load image data into CPU memory (RAM)
 var texture: Texture2D = loadTextureFromImage(image)
 ##  Image converted to texture, GPU memory (RAM -> VRAM)
-unloadImage(image)
 ##  Unload image data from CPU memory (RAM)
 image = loadImageFromTexture(texture)
 ##  Retrieve image data from GPU memory (VRAM -> RAM)
-unloadTexture(texture)
 ##  Unload texture from GPU memory (VRAM)
 texture = loadTextureFromImage(image)
 ##  Recreate texture from retrieved image data (RAM -> VRAM)
-unloadImage(image)
 ##  Unload retrieved image data from CPU memory (RAM)
 ## ---------------------------------------------------------------------------------------
 ##  Main game loop
@@ -53,8 +50,6 @@ while not windowShouldClose(): ##  Detect window close button or ESC key
 ## ----------------------------------------------------------------------------------
 ##  De-Initialization
 ## --------------------------------------------------------------------------------------
-unloadTexture(texture)
-##  Texture unloading
-closeWindow()
 ##  Close window and OpenGL context
 ## --------------------------------------------------------------------------------------
+closeWindow()
