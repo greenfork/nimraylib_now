@@ -379,9 +379,11 @@ choosing X11 version of glfw.
 Or similar errors which point to missing `libwinpthread-1.dll` file mean that
 you do not have path set correctly and MinGW can't find correct library files.
 
-Make sure to include MinGW's bin folder in your PATH. The path to MinGW's bin
-folder looks something like this by default:
-`C:\Program Files\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin`.
+Based on [this answer in stack-overflow](https://stackoverflow.com/a/71207932) you can do the following to fix the problem:
+- Install [MSYS2](https://www.msys2.org/) x64
+- Open MSYS2 MinGW x64 command prompt
+- Run `pacman -S base-devel mingw-w64-x86_64-toolchain` to install the GCC toolchain (all components)
+- Add `c:\msys64\mingw64\bin` to the System PATH
 
 ## Community
 
