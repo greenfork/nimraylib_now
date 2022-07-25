@@ -387,6 +387,14 @@ linked statically.
 
 To do this just pass in the `--passL:-static` to nim when compiling your file.
 
+If you still want dynamic linking:
+
+- If minGW is not in PATH
+- Add nim's minGW toolchain to your PATH (You have to add the bin directory with .dll files not the one where nim.exe is located)
+
+If you already a version of minGW (that is already on PATH and seperate from nim)
+- Copy over `libwinpthread-1.dll` from nim's version of minGW into the bin directory of your version of minGW
+
 ## Community
 
 Find us at `#raylib-nim` channel
