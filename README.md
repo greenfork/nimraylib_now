@@ -385,7 +385,7 @@ basic nim applications. It does not however have libwinpthread-1.dll, which caus
 We can solve this by instructing nim to create binaries with the libraries 
 linked statically.
 
-To do this just pass in the `-passL:-static` to nim when compiling your file.
+To do this just pass in the `--passL:-static` to nim when compiling your file.
 
 ## Community
 
