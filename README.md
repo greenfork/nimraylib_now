@@ -377,13 +377,23 @@ choosing X11 version of glfw.
 
 ### Windows error: The application was unable to start correctly (0x00000007b)
 Or similar errors which point to missing `libwinpthread-1.dll` file mean that
-you do not have path set correctly and MinGW can't find correct library files.
+windows can't find correct library files.
 
-Based on [this answer in stack-overflow](https://stackoverflow.com/a/71207932) you can do the following to fix the problem:
-- Install [MSYS2](https://www.msys2.org/) x64
-- Open MSYS2 MinGW x64 command prompt
-- Run `pacman -S base-devel mingw-w64-x86_64-toolchain` to install the GCC toolchain (all components)
-- Add `c:\msys64\mingw64\bin` to the System PATH
+This is because, by default, nim creates binaries that are dynamically linked.
+Normally, this is fine since windows already has the libraries required for most
+basic nim applications. It does not however have libwinpthread-1.dll, which causes an error here.
+We can solve this by instructing nim to create binaries with the libraries 
+linked statically.
+
+To do this just pass in the `--passL:-static` to nim when compiling your file.
+
+If you still want dynamic linking:
+
+- If minGW is not in PATH
+- Add nim's minGW toolchain to your PATH (You have to add the bin directory with .dll files not the one where nim.exe is located)
+
+If you already a version of minGW (that is already on PATH and seperate from nim)
+- Copy over `libwinpthread-1.dll` from nim's version of minGW into the bin directory of your version of minGW
 
 ## Community
 
