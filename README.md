@@ -382,18 +382,18 @@ windows can't find correct library files.
 This is because, by default, nim creates binaries that are dynamically linked.
 Normally, this is fine since windows already has the libraries required for most
 basic nim applications. It does not however have libwinpthread-1.dll, which causes an error here.
-We can solve this by instructing nim to create binaries with the libraries 
+We can solve this by instructing nim to create binaries with the libraries
 linked statically.
 
 To do this just pass in the `--passL:-static` to nim when compiling your file.
 
 If you still want dynamic linking:
 
-- If minGW is not in PATH
-- Add nim's minGW toolchain to your PATH (You have to add the bin directory with .dll files not the one where nim.exe is located)
+- If MinGW is not in PATH
+- Add Nim's minGW toolchain to your PATH (You have to add the bin directory with .dll files not the one where nim.exe is located)
 
-If you already a version of minGW (that is already on PATH and seperate from nim)
-- Copy over `libwinpthread-1.dll` from nim's version of minGW into the bin directory of your version of minGW
+If you already have a version of MinGW (that is already on PATH and seperate from Nim)
+- Copy over `libwinpthread-1.dll` from nim's version of MinGW into the bin directory of your version of MinGW
 
 ## Community
 
