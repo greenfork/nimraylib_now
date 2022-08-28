@@ -28,3 +28,7 @@ testContent &= exampleContent.replace(
 
 let testName = "t_" & extractFilename(exampleFile)
 writeFile(emscriptenTestDir/testName, testContent)
+
+var configContent = readFile(emscriptenTestDir/"config.nims")
+configContent = configContent.replace("--define:nimraylib_now_web_resources", "")
+writeFile(emscriptenTestDir/"config.nims", configContent)
