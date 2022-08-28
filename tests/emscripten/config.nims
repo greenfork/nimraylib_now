@@ -17,3 +17,5 @@ else:
 --gc:orc # GC:orc is friendlier with crazy platforms.
 --exceptions:goto # Goto exceptions are friendlier with crazy platforms.
 --define:noSignalHandler # Emscripten doesn't support signal handlers.
+
+--define:nimraylib_now_web_resources

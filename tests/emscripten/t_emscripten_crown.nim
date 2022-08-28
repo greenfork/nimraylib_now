@@ -37,9 +37,15 @@ var
 
 camera.setCameraMode(Orbital)  # Several modes available, see CameraMode
 
+initAudioDevice() #  Initialize audio device
+let music = loadMusicStream("resources/ambient.ogg") #  Load WAV audio file
+music.playMusicStream()
+
 proc UpdateGameWindow() {.cdecl.} =
+
   if not pause:
     camera.addr.updateCamera   # Rotate camera
+    music.updateMusicStream()
 
   if isKeyPressed(Space):      # Pressing Space will stop/resume animation
     pause = not pause
@@ -125,6 +131,8 @@ proc main() =
 
   emscriptenSetMainLoop(UpdateGameWindow, 0, 1)
 
+  music.unloadMusicStream() # Unload music stream buffers from RAM
+  closeAudioDevice() # Close audio device
   closeWindow()
 
 when isMainModule: main()

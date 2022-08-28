@@ -229,10 +229,8 @@ block audio_music_stream:
 
   initWindow screenWidth, screenHeight, "raylib [audio] example - music playing (streaming)"
 
-  initAudioDevice()      #  Initialize audio device
-
-  let music = loadMusicStream("resources/guitar_noodling.ogg")         #  Load WAV audio file
-
+  initAudioDevice() # Initialize audio device
+  let music = loadMusicStream("resources/guitar_noodling.ogg") # Load WAV audio file
   playMusicStream(music)
 
   var
@@ -285,9 +283,9 @@ block audio_music_stream:
 
   music.unloadMusicStream() # Unload music stream buffers from RAM
 
-  closeAudioDevice()     #  Close audio device
+  closeAudioDevice() # Close audio device
 
-  closeWindow()          #  Close window and OpenGL context
+  closeWindow() # Close window and OpenGL context
   # --------------------------------------------------------------------------------------
 
 
