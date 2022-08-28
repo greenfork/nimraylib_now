@@ -11,6 +11,15 @@ side it should mainly consist of renaming, please try the wonderful tool
 
 Additionally you can consult [Raylib's changelog](https://github.com/raysan5/raylib/blob/master/CHANGELOG).
 
+## NimraylibNow! v0.15, Raylib v4.2 and Raygui v3.2
+
+NimraylibNow!-specific changes:
+- Emscripten support is improved: added TOTAL_MEMORY option and it now allows
+  using resources from your file system. See [Emscripten example readme](/examples/emscripten/README.md),
+  "Compile options" section.
+
+Raylib-specific changes - consult [Raylib's changelog](https://github.com/raysan5/raylib/blob/master/CHANGELOG) file.
+
 ## NimraylibNow! v0.14 and Raylib v4.0
 
 NimraylibNow!-specific changes:

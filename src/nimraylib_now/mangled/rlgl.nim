@@ -89,7 +89,7 @@ const rlglHeader = currentSourcePath().parentDir()/"rlgl.h"
 ##
 ##    LICENSE: zlib/libpng
 ##
-##    Copyright (c) 2014-2021 Ramon Santamaria (@raysan5)
+##    Copyright (c) 2014-2022 Ramon Santamaria (@raysan5)
 ##
 ##    This software is provided "as-is", without any express or implied warranty. In no event
 ##    will the authors be held liable for any damages arising from the use of this software.
@@ -304,7 +304,7 @@ type
 
 type
   TextureFilter* {.size: sizeof(cint), pure.} = enum
-    POINT = 0,                  ##  No filter, just pixel aproximation
+    POINT = 0,                  ##  No filter, just pixel approximation
     BILINEAR,                 ##  Linear filtering
     TRILINEAR,                ##  Trilinear filtering (linear with mipmaps)
     ANISOTROPIC_4X,           ##  Anisotropic filtering 4x
@@ -321,7 +321,8 @@ type
     MULTIPLIED,               ##  Blend textures multiplying colors
     ADD_COLORS,               ##  Blend textures adding colors (alternative)
     SUBTRACT_COLORS,          ##  Blend textures subtracting colors (alternative)
-    CUSTOM                    ##  Belnd textures using custom src/dst factors (use SetBlendModeCustom())
+    ALPHA_PREMULTIPLY,        ##  Blend premultiplied textures considering alpha
+    CUSTOM                    ##  Blend textures using custom src/dst factors (use rlSetBlendFactors())
 
 
 ##  Shader location point type
@@ -648,9 +649,17 @@ proc loadExtensions*(loader: pointer) {.cdecl, importc: "rlLoadExtensions",
 proc getVersion*(): cint {.cdecl, importc: "rlGetVersion", header: rlglHeader.}
 ##  Get current OpenGL version
 
+proc setFramebufferWidth*(width: cint) {.cdecl, importc: "rlSetFramebufferWidth",
+                                      header: rlglHeader.}
+##  Set current framebuffer width
+
 proc getFramebufferWidth*(): cint {.cdecl, importc: "rlGetFramebufferWidth",
                                  header: rlglHeader.}
 ##  Get default framebuffer width
+
+proc setFramebufferHeight*(height: cint) {.cdecl, importc: "rlSetFramebufferHeight",
+                                        header: rlglHeader.}
+##  Set current framebuffer height
 
 proc getFramebufferHeight*(): cint {.cdecl, importc: "rlGetFramebufferHeight",
                                   header: rlglHeader.}
@@ -716,6 +725,10 @@ proc updateVertexBuffer*(bufferId: cuint; data: pointer; dataSize: cint; offset:
     cdecl, importc: "rlUpdateVertexBuffer", header: rlglHeader.}
 ##  Update GPU buffer with new data
 
+proc updateVertexBufferElements*(id: cuint; data: pointer; dataSize: cint; offset: cint) {.
+    cdecl, importc: "rlUpdateVertexBufferElements", header: rlglHeader.}
+##  Update vertex buffer elements with new data
+
 proc unloadVertexArray*(vaoId: cuint) {.cdecl, importc: "rlUnloadVertexArray",
                                      header: rlglHeader.}
 proc unloadVertexBuffer*(vboId: cuint) {.cdecl, importc: "rlUnloadVertexBuffer",
@@ -759,8 +772,8 @@ proc updateTexture*(id: cuint; offsetX: cint; offsetY: cint; width: cint; height
     header: rlglHeader.}
 ##  Update GPU texture with new data
 
-proc getGlTextureFormats*(format: cint; glInternalFormat: ptr cint;
-                         glFormat: ptr cint; glType: ptr cint) {.cdecl,
+proc getGlTextureFormats*(format: cint; glInternalFormat: ptr cuint;
+                         glFormat: ptr cuint; glType: ptr cuint) {.cdecl,
     importc: "rlGetGlTextureFormats", header: rlglHeader.}
 ##  Get OpenGL internal formats
 

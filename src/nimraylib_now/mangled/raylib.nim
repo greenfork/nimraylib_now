@@ -27,7 +27,7 @@ when not defined(nimraylib_now_linkingOverride):
 
 ## *********************************************************************************************
 ##
-##    raylib v4.0 - A simple and easy-to-use library to enjoy videogames programming (www.raylib.com)
+##    raylib v4.2 - A simple and easy-to-use library to enjoy videogames programming (www.raylib.com)
 ##
 ##    FEATURES:
 ##        - NO external dependencies, all required libraries included with raylib
@@ -60,8 +60,8 @@ when not defined(nimraylib_now_linkingOverride):
 ##
 ##    OPTIONAL DEPENDENCIES (included):
 ##        [rcore] msf_gif (Miles Fogle) for GIF recording
-##        [rcore] sinfl (Micha Mettke) for DEFLATE decompression algorythm
-##        [rcore] sdefl (Micha Mettke) for DEFLATE compression algorythm
+##        [rcore] sinfl (Micha Mettke) for DEFLATE decompression algorithm
+##        [rcore] sdefl (Micha Mettke) for DEFLATE compression algorithm
 ##        [rtextures] stb_image (Sean Barret) for images loading (BMP, TGA, PNG, JPEG, HDR...)
 ##        [rtextures] stb_image_write (Sean Barret) for image writing (BMP, TGA, PNG, JPG)
 ##        [rtextures] stb_image_resize (Sean Barret) for image resizing algorithms
@@ -83,7 +83,7 @@ when not defined(nimraylib_now_linkingOverride):
 ##    raylib is licensed under an unmodified zlib/libpng license, which is an OSI-certified,
 ##    BSD-like license that allows static linking with closed source software:
 ##
-##    Copyright (c) 2013-2021 Ramon Santamaria (@raysan5)
+##    Copyright (c) 2013-2022 Ramon Santamaria (@raysan5)
 ##
 ##    This software is provided "as-is", without any express or implied warranty. In no event
 ##    will the authors be held liable for any damages arising from the use of this software.
@@ -103,7 +103,7 @@ when not defined(nimraylib_now_linkingOverride):
 ## ********************************************************************************************
 
 const
-  RAYLIB_VERSION* = "4.0"
+  RAYLIB_VERSION* = "4.2"
 
 ##  Function specifiers in case library is build/used as a shared library (Windows)
 ##  NOTE: Microsoft specifiers to tell compiler that symbols are imported/exported from a .dll
@@ -111,6 +111,7 @@ const
 ##  Some basic Defines
 ## ----------------------------------------------------------------------------------
 ##  Allow custom memory allocators
+##  NOTE: Require recompiling raylib sources
 ##  NOTE: MSVC C++ compiler does not support compound literals (C99 feature)
 ##  Plain structures in C++ (without constructors) can be initialized with { }
 ##  NOTE: We set some defines with some data types declared by raylib
@@ -320,7 +321,7 @@ type
                                                   ##  Vertex attributes data
     vertices* {.importc: "vertices".}: ptr UncheckedArray[cfloat] ##  Vertex position (XYZ - 3 components per vertex) (shader-location = 0)
     texcoords* {.importc: "texcoords".}: ptr UncheckedArray[cfloat] ##  Vertex texture coordinates (UV - 2 components per vertex) (shader-location = 1)
-    texcoords2* {.importc: "texcoords2".}: ptr UncheckedArray[cfloat] ##  Vertex second texture coordinates (useful for lightmaps) (shader-location = 5)
+    texcoords2* {.importc: "texcoords2".}: ptr UncheckedArray[cfloat] ##  Vertex texture second coordinates (UV - 2 components per vertex) (shader-location = 5)
     normals* {.importc: "normals".}: ptr UncheckedArray[cfloat] ##  Vertex normals (XYZ - 3 components per vertex) (shader-location = 2)
     tangents* {.importc: "tangents".}: ptr UncheckedArray[cfloat] ##  Vertex tangents (XYZW - 4 components per vertex) (shader-location = 4)
     colors* {.importc: "colors".}: ptr UncheckedArray[uint8] ##  Vertex colors (RGBA - 4 components per vertex) (shader-location = 3)
@@ -440,7 +441,14 @@ type
     channels* {.importc: "channels".}: cuint ##  Number of channels (1-mono, 2-stereo, ...)
     data* {.importc: "data".}: pointer ##  Buffer data pointer
 
+
+##  Opaque structs declaration
+##  NOTE: Actual structs are defined internally in raudio module
+
+type
   RAudioBuffer* {.importc: "rAudioBuffer", header: raylibHeader, bycopy.} = object
+
+  RAudioProcessor* {.importc: "rAudioProcessor", header: raylibHeader, bycopy.} = object
 
 
 ##  AudioStream, custom audio stream
@@ -448,6 +456,7 @@ type
 type
   AudioStream* {.importc: "AudioStream", header: raylibHeader, bycopy.} = object
     buffer* {.importc: "buffer".}: ptr RAudioBuffer ##  Pointer to internal data used by the audio system
+    processor* {.importc: "processor".}: ptr RAudioProcessor ##  Pointer to internal data processor, useful for audio effects
     sampleRate* {.importc: "sampleRate".}: cuint ##  Frequency (samples per second)
     sampleSize* {.importc: "sampleSize".}: cuint ##  Bit depth (bits per sample): 8, 16, 32 (24 not supported)
     channels* {.importc: "channels".}: cuint ##  Number of channels (1-mono, 2-stereo, ...)
@@ -502,6 +511,15 @@ type
     scaleIn* {.importc: "scaleIn".}: array[2, cfloat] ##  VR distortion scale in
 
 
+##  File path list
+
+type
+  FilePathList* {.importc: "FilePathList", header: raylibHeader, bycopy.} = object
+    capacity* {.importc: "capacity".}: cuint ##  Filepaths max entries
+    count* {.importc: "count".}: cuint ##  Filepaths entries count
+    paths* {.importc: "paths".}: cstringArray ##  Filepaths entries
+
+
 ## ----------------------------------------------------------------------------------
 ##  Enumerators Definition
 ## ----------------------------------------------------------------------------------
@@ -524,6 +542,7 @@ type
     WINDOW_UNFOCUSED = 0x00000800, ##  Set to window non focused
     WINDOW_TOPMOST = 0x00001000, ##  Set to window always on top
     WINDOW_HIGHDPI = 0x00002000, ##  Set to support HighDPI
+    WINDOW_MOUSE_PASSTHROUGH = 0x00004000, ##  Set to support mouse passthrough, only supported when FLAG_WINDOW_UNDECORATED
     INTERLACED_HINT = 0x00010000
 
 
@@ -839,7 +858,7 @@ type
 
 type
   TextureFilter* {.size: sizeof(cint), pure.} = enum
-    POINT = 0,                  ##  No filter, just pixel aproximation
+    POINT = 0,                  ##  No filter, just pixel approximation
     BILINEAR,                 ##  Linear filtering
     TRILINEAR,                ##  Trilinear filtering (linear with mipmaps)
     ANISOTROPIC_4X,           ##  Anisotropic filtering 4x
@@ -887,7 +906,8 @@ type
     MULTIPLIED,               ##  Blend textures multiplying colors
     ADD_COLORS,               ##  Blend textures adding colors (alternative)
     SUBTRACT_COLORS,          ##  Blend textures subtracting colors (alternative)
-    CUSTOM                    ##  Belnd textures using custom src/dst factors (use rlSetBlendMode())
+    ALPHA_PREMULTIPLY,        ##  Blend premultiplied textures considering alpha
+    CUSTOM                    ##  Blend textures using custom src/dst factors (use rlSetBlendMode())
 
 
 ##  Gesture
@@ -1017,7 +1037,7 @@ proc isWindowState*(flag: cuint): bool {.cdecl, importc: "IsWindowState",
 
 proc setWindowState*(flags: cuint) {.cdecl, importc: "SetWindowState",
                                   header: raylibHeader.}
-##  Set window configuration state using flags
+##  Set window configuration state using flags (only PLATFORM_DESKTOP)
 
 proc clearWindowState*(flags: cuint) {.cdecl, importc: "ClearWindowState",
                                     header: raylibHeader.}
@@ -1059,6 +1079,10 @@ proc setWindowSize*(width: cint; height: cint) {.cdecl, importc: "SetWindowSize"
     header: raylibHeader.}
 ##  Set window dimensions
 
+proc setWindowOpacity*(opacity: cfloat) {.cdecl, importc: "SetWindowOpacity",
+                                       header: raylibHeader.}
+##  Set window opacity [0.0f..1.0f] (only PLATFORM_DESKTOP)
+
 proc getWindowHandle*(): pointer {.cdecl, importc: "GetWindowHandle",
                                 header: raylibHeader.}
 ##  Get native window handle
@@ -1069,6 +1093,13 @@ proc getScreenWidth*(): cint {.cdecl, importc: "GetScreenWidth", header: raylibH
 proc getScreenHeight*(): cint {.cdecl, importc: "GetScreenHeight",
                              header: raylibHeader.}
 ##  Get current screen height
+
+proc getRenderWidth*(): cint {.cdecl, importc: "GetRenderWidth", header: raylibHeader.}
+##  Get current render width (it considers HiDPI)
+
+proc getRenderHeight*(): cint {.cdecl, importc: "GetRenderHeight",
+                             header: raylibHeader.}
+##  Get current render height (it considers HiDPI)
 
 proc getMonitorCount*(): cint {.cdecl, importc: "GetMonitorCount",
                              header: raylibHeader.}
@@ -1084,11 +1115,11 @@ proc getMonitorPosition*(monitor: cint): Vector2 {.cdecl,
 
 proc getMonitorWidth*(monitor: cint): cint {.cdecl, importc: "GetMonitorWidth",
     header: raylibHeader.}
-##  Get specified monitor width (max available by monitor)
+##  Get specified monitor width (current video mode used by monitor)
 
 proc getMonitorHeight*(monitor: cint): cint {.cdecl, importc: "GetMonitorHeight",
     header: raylibHeader.}
-##  Get specified monitor height (max available by monitor)
+##  Get specified monitor height (current video mode used by monitor)
 
 proc getMonitorPhysicalWidth*(monitor: cint): cint {.cdecl,
     importc: "GetMonitorPhysicalWidth", header: raylibHeader.}
@@ -1121,6 +1152,14 @@ proc setClipboardText*(text: cstring) {.cdecl, importc: "SetClipboardText",
 proc getClipboardText*(): cstring {.cdecl, importc: "GetClipboardText",
                                  header: raylibHeader.}
 ##  Get clipboard text content
+
+proc enableEventWaiting*() {.cdecl, importc: "EnableEventWaiting",
+                           header: raylibHeader.}
+##  Enable waiting for events on EndDrawing(), no automatic event polling
+
+proc disableEventWaiting*() {.cdecl, importc: "DisableEventWaiting",
+                            header: raylibHeader.}
+##  Disable waiting for events on EndDrawing(), automatic events polling
 ##  Custom frame control functions
 ##  NOTE: Those functions are intended for advance users that want full control over the frame processing
 ##  By default EndDrawing() does this job: draws everything + SwapScreenBuffer() + manage frame timming + PollInputEvents()
@@ -1132,8 +1171,8 @@ proc swapScreenBuffer*() {.cdecl, importc: "SwapScreenBuffer", header: raylibHea
 proc pollInputEvents*() {.cdecl, importc: "PollInputEvents", header: raylibHeader.}
 ##  Register all input events
 
-proc waitTime*(ms: cfloat) {.cdecl, importc: "WaitTime", header: raylibHeader.}
-##  Wait for some milliseconds (halt program execution)
+proc waitTime*(seconds: cdouble) {.cdecl, importc: "WaitTime", header: raylibHeader.}
+##  Wait for some time (halt program execution)
 ##  Cursor-related functions
 
 proc showCursor*() {.cdecl, importc: "NmrlbNow_ShowCursor", header: raylibHeader.}
@@ -1280,6 +1319,10 @@ proc getWorldToScreen*(position: Vector3; camera: Camera): Vector2 {.cdecl,
     importc: "GetWorldToScreen", header: raylibHeader.}
 ##  Get the screen space position for a 3d world space position
 
+proc getScreenToWorld2D*(position: Vector2; camera: Camera2D): Vector2 {.cdecl,
+    importc: "GetScreenToWorld2D", header: raylibHeader.}
+##  Get the world space position for a 2d camera screen space position
+
 proc getWorldToScreenEx*(position: Vector3; camera: Camera; width: cint; height: cint): Vector2 {.
     cdecl, importc: "GetWorldToScreenEx", header: raylibHeader.}
 ##  Get size position for a 3d world space position
@@ -1287,10 +1330,6 @@ proc getWorldToScreenEx*(position: Vector3; camera: Camera; width: cint; height:
 proc getWorldToScreen2D*(position: Vector2; camera: Camera2D): Vector2 {.cdecl,
     importc: "GetWorldToScreen2D", header: raylibHeader.}
 ##  Get the screen space position for a 2d camera world space position
-
-proc getScreenToWorld2D*(position: Vector2; camera: Camera2D): Vector2 {.cdecl,
-    importc: "GetScreenToWorld2D", header: raylibHeader.}
-##  Get the world space position for a 2d camera screen space position
 ##  Timing-related functions
 
 proc setTargetFPS*(fps: cint) {.cdecl, importc: "SetTargetFPS", header: raylibHeader.}
@@ -1339,6 +1378,9 @@ proc memRealloc*(`ptr`: pointer; size: cint): pointer {.cdecl, importc: "MemReal
 
 proc memFree*(`ptr`: pointer) {.cdecl, importc: "MemFree", header: raylibHeader.}
 ##  Internal memory free
+
+proc openURL*(url: cstring) {.cdecl, importc: "OpenURL", header: raylibHeader.}
+##  Open URL with default system browser (if available)
 ##  Set custom callbacks
 ##  WARNING: Callbacks setup is intended for advance users
 
@@ -1375,6 +1417,10 @@ proc saveFileData*(fileName: cstring; data: pointer; bytesToWrite: cuint): bool 
     importc: "SaveFileData", header: raylibHeader.}
 ##  Save data to file from byte array (write), returns true on success
 
+proc exportDataAsCode*(data: cstring; size: cuint; fileName: cstring): bool {.cdecl,
+    importc: "ExportDataAsCode", header: raylibHeader.}
+##  Export data to code (.h), returns true on success
+
 proc loadFileText*(fileName: cstring): cstring {.cdecl, importc: "LoadFileText",
     header: raylibHeader.}
 ##  Load text data from file (read), returns a '\0' terminated string
@@ -1398,6 +1444,10 @@ proc directoryExists*(dirPath: cstring): bool {.cdecl, importc: "DirectoryExists
 proc isFileExtension*(fileName: cstring; ext: cstring): bool {.cdecl,
     importc: "IsFileExtension", header: raylibHeader.}
 ##  Check file extension (including point: .png, .wav)
+
+proc getFileLength*(fileName: cstring): cint {.cdecl, importc: "GetFileLength",
+    header: raylibHeader.}
+##  Get file length in bytes (NOTE: GetFileSize() conflicts with windows.h)
 
 proc getFileExtension*(fileName: cstring): cstring {.cdecl,
     importc: "GetFileExtension", header: raylibHeader.}
@@ -1423,60 +1473,62 @@ proc getWorkingDirectory*(): cstring {.cdecl, importc: "GetWorkingDirectory",
                                     header: raylibHeader.}
 ##  Get current working directory (uses static string)
 
-proc getDirectoryFiles*(dirPath: cstring; count: ptr cint): cstringArray {.cdecl,
-    importc: "GetDirectoryFiles", header: raylibHeader.}
-##  Get filenames in a directory path (memory should be freed)
-
-proc clearDirectoryFiles*() {.cdecl, importc: "ClearDirectoryFiles",
-                            header: raylibHeader.}
-##  Clear directory files paths buffers (free memory)
+proc getApplicationDirectory*(): cstring {.cdecl,
+                                        importc: "GetApplicationDirectory",
+                                        header: raylibHeader.}
+##  Get the directory if the running application (uses static string)
 
 proc changeDirectory*(dir: cstring): bool {.cdecl, importc: "ChangeDirectory",
                                         header: raylibHeader.}
 ##  Change working directory, return true on success
 
+proc isPathFile*(path: cstring): bool {.cdecl, importc: "IsPathFile",
+                                    header: raylibHeader.}
+##  Check if a given path is a file or a directory
+
+proc loadDirectoryFiles*(dirPath: cstring): FilePathList {.cdecl,
+    importc: "LoadDirectoryFiles", header: raylibHeader.}
+##  Load directory filepaths
+
+proc loadDirectoryFilesEx*(basePath: cstring; filter: cstring; scanSubdirs: bool): FilePathList {.
+    cdecl, importc: "LoadDirectoryFilesEx", header: raylibHeader.}
+##  Load directory filepaths with extension filtering and recursive directory scan
+
+proc unloadDirectoryFiles*(files: FilePathList) {.cdecl,
+    importc: "UnloadDirectoryFiles", header: raylibHeader.}
+##  Unload filepaths
+
 proc isFileDropped*(): bool {.cdecl, importc: "IsFileDropped", header: raylibHeader.}
 ##  Check if a file has been dropped into window
 
-proc getDroppedFiles*(count: ptr cint): cstringArray {.cdecl,
-    importc: "GetDroppedFiles", header: raylibHeader.}
-##  Get dropped files names (memory should be freed)
+proc loadDroppedFiles*(): FilePathList {.cdecl, importc: "LoadDroppedFiles",
+                                      header: raylibHeader.}
+##  Load dropped filepaths
 
-proc clearDroppedFiles*() {.cdecl, importc: "ClearDroppedFiles", header: raylibHeader.}
-##  Clear dropped files paths buffer (free memory)
+proc unloadDroppedFiles*(files: FilePathList) {.cdecl,
+    importc: "UnloadDroppedFiles", header: raylibHeader.}
+##  Unload dropped filepaths
 
 proc getFileModTime*(fileName: cstring): clong {.cdecl, importc: "GetFileModTime",
     header: raylibHeader.}
 ##  Get file modification time (last write time)
 ##  Compression/Encoding functionality
 
-proc compressData*(data: ptr uint8; dataLength: cint; compDataLength: ptr cint): ptr uint8 {.
+proc compressData*(data: ptr uint8; dataSize: cint; compDataSize: ptr cint): ptr uint8 {.
     cdecl, importc: "CompressData", header: raylibHeader.}
-##  Compress data (DEFLATE algorithm)
+##  Compress data (DEFLATE algorithm), memory must be MemFree()
 
-proc decompressData*(compData: ptr uint8; compDataLength: cint; dataLength: ptr cint): ptr uint8 {.
+proc decompressData*(compData: ptr uint8; compDataSize: cint; dataSize: ptr cint): ptr uint8 {.
     cdecl, importc: "DecompressData", header: raylibHeader.}
-##  Decompress data (DEFLATE algorithm)
+##  Decompress data (DEFLATE algorithm), memory must be MemFree()
 
-proc encodeDataBase64*(data: ptr uint8; dataLength: cint; outputLength: ptr cint): cstring {.
+proc encodeDataBase64*(data: ptr uint8; dataSize: cint; outputSize: ptr cint): cstring {.
     cdecl, importc: "EncodeDataBase64", header: raylibHeader.}
-##  Encode data to Base64 string
+##  Encode data to Base64 string, memory must be MemFree()
 
-proc decodeDataBase64*(data: ptr uint8; outputLength: ptr cint): ptr uint8 {.cdecl,
+proc decodeDataBase64*(data: ptr uint8; outputSize: ptr cint): ptr uint8 {.cdecl,
     importc: "DecodeDataBase64", header: raylibHeader.}
-##  Decode Base64 string data
-##  Persistent storage management
-
-proc saveStorageValue*(position: cuint; value: cint): bool {.cdecl,
-    importc: "SaveStorageValue", header: raylibHeader.}
-##  Save integer value to storage file (to defined position), returns true on success
-
-proc loadStorageValue*(position: cuint): cint {.cdecl, importc: "LoadStorageValue",
-    header: raylibHeader.}
-##  Load integer value from storage file (from defined position)
-
-proc openURL*(url: cstring) {.cdecl, importc: "OpenURL", header: raylibHeader.}
-##  Open URL with default system browser (if available)
+##  Decode Base64 string data, memory must be MemFree()
 ## ------------------------------------------------------------------------------------
 ##  Input Handling Functions (Module: core)
 ## ------------------------------------------------------------------------------------
@@ -1590,7 +1642,11 @@ proc setMouseScale*(scaleX: cfloat; scaleY: cfloat) {.cdecl, importc: "SetMouseS
 
 proc getMouseWheelMove*(): cfloat {.cdecl, importc: "GetMouseWheelMove",
                                  header: raylibHeader.}
-##  Get mouse wheel movement Y
+##  Get mouse wheel movement for X or Y, whichever is larger
+
+proc getMouseWheelMoveV*(): Vector2 {.cdecl, importc: "GetMouseWheelMoveV",
+                                   header: raylibHeader.}
+##  Get mouse wheel movement for both X and Y
 
 proc setMouseCursor*(cursor: cint) {.cdecl, importc: "SetMouseCursor",
                                   header: raylibHeader.}
@@ -2312,7 +2368,7 @@ proc loadFont*(fileName: cstring): Font {.cdecl, importc: "LoadFont",
 proc loadFontEx*(fileName: cstring; fontSize: cint; fontChars: ptr cint;
                 glyphCount: cint): Font {.cdecl, importc: "LoadFontEx",
                                        header: raylibHeader.}
-##  Load font from file with extended parameters
+##  Load font from file with extended parameters, use NULL for fontChars and 0 for glyphCount to load the default character set
 
 proc loadFontFromImage*(image: Image; key: Color; firstChar: cint): Font {.cdecl,
     importc: "LoadFontFromImage", header: raylibHeader.}
@@ -2338,7 +2394,11 @@ proc unloadFontData*(chars: ptr GlyphInfo; glyphCount: cint) {.cdecl,
 ##  Unload font chars info data (RAM)
 
 proc unloadFont*(font: Font) {.cdecl, importc: "UnloadFont", header: raylibHeader.}
-##  Unload Font from GPU memory (VRAM)
+##  Unload font from GPU memory (VRAM)
+
+proc exportFontAsCode*(font: Font; fileName: cstring): bool {.cdecl,
+    importc: "ExportFontAsCode", header: raylibHeader.}
+##  Export font as code file, returns true on success
 ##  Text drawing functions
 
 proc drawFPS*(posX: cint; posY: cint) {.cdecl, importc: "DrawFPS", header: raylibHeader.}
@@ -2362,6 +2422,12 @@ proc drawTextCodepoint*(font: Font; codepoint: cint; position: Vector2;
                        fontSize: cfloat; tint: Color) {.cdecl,
     importc: "DrawTextCodepoint", header: raylibHeader.}
 ##  Draw one character (codepoint)
+
+proc drawTextCodepoints*(font: Font; codepoints: ptr cint; count: cint;
+                        position: Vector2; fontSize: cfloat; spacing: cfloat;
+                        tint: Color) {.cdecl, importc: "DrawTextCodepoints",
+                                     header: raylibHeader.}
+##  Draw multiple character (codepoint)
 ##  Text font info functions
 
 proc measureText*(text: cstring; fontSize: cint): cint {.cdecl, importc: "MeasureText",
@@ -2663,10 +2729,6 @@ proc getMeshBoundingBox*(mesh: Mesh): BoundingBox {.cdecl,
 proc genMeshTangents*(mesh: ptr Mesh) {.cdecl, importc: "GenMeshTangents",
                                     header: raylibHeader.}
 ##  Compute mesh tangents
-
-proc genMeshBinormals*(mesh: ptr Mesh) {.cdecl, importc: "GenMeshBinormals",
-                                     header: raylibHeader.}
-##  Compute mesh binormals
 ##  Mesh generation functions
 
 proc genMeshPoly*(sides: cint; radius: cfloat): Mesh {.cdecl, importc: "GenMeshPoly",
@@ -2777,10 +2839,6 @@ proc getRayCollisionBox*(ray: Ray; box: BoundingBox): RayCollision {.cdecl,
     importc: "GetRayCollisionBox", header: raylibHeader.}
 ##  Get collision info between ray and box
 
-proc getRayCollisionModel*(ray: Ray; model: Model): RayCollision {.cdecl,
-    importc: "GetRayCollisionModel", header: raylibHeader.}
-##  Get collision info between ray and model
-
 proc getRayCollisionMesh*(ray: Ray; mesh: Mesh; transform: Matrix): RayCollision {.
     cdecl, importc: "GetRayCollisionMesh", header: raylibHeader.}
 ##  Get collision info between ray and mesh
@@ -2795,6 +2853,10 @@ proc getRayCollisionQuad*(ray: Ray; p1: Vector3; p2: Vector3; p3: Vector3; p4: V
 ## ------------------------------------------------------------------------------------
 ##  Audio Loading and Playing Functions (Module: audio)
 ## ------------------------------------------------------------------------------------
+
+type
+  AudioCallback* = proc (bufferData: pointer; frames: cuint) {.cdecl.}
+
 ##  Audio device management functions
 
 proc initAudioDevice*() {.cdecl, importc: "InitAudioDevice", header: raylibHeader.}
@@ -2882,9 +2944,9 @@ proc setSoundPitch*(sound: Sound; pitch: cfloat) {.cdecl, importc: "SetSoundPitc
     header: raylibHeader.}
 ##  Set pitch for a sound (1.0 is base level)
 
-proc waveFormat*(wave: ptr Wave; sampleRate: cint; sampleSize: cint; channels: cint) {.
-    cdecl, importc: "WaveFormat", header: raylibHeader.}
-##  Convert wave data to desired format
+proc setSoundPan*(sound: Sound; pan: cfloat) {.cdecl, importc: "SetSoundPan",
+    header: raylibHeader.}
+##  Set pan for a sound (0.5 is center)
 
 proc waveCopy*(wave: Wave): Wave {.cdecl, importc: "WaveCopy", header: raylibHeader.}
 ##  Copy a wave to a new wave
@@ -2893,9 +2955,13 @@ proc waveCrop*(wave: ptr Wave; initSample: cint; finalSample: cint) {.cdecl,
     importc: "WaveCrop", header: raylibHeader.}
 ##  Crop a wave to defined samples range
 
+proc waveFormat*(wave: ptr Wave; sampleRate: cint; sampleSize: cint; channels: cint) {.
+    cdecl, importc: "WaveFormat", header: raylibHeader.}
+##  Convert wave data to desired format
+
 proc loadWaveSamples*(wave: Wave): ptr cfloat {.cdecl, importc: "LoadWaveSamples",
     header: raylibHeader.}
-##  Load samples data from wave as a floats array
+##  Load samples data from wave as a 32bit float data array
 
 proc unloadWaveSamples*(samples: ptr cfloat) {.cdecl, importc: "UnloadWaveSamples",
     header: raylibHeader.}
@@ -2950,6 +3016,10 @@ proc setMusicPitch*(music: Music; pitch: cfloat) {.cdecl, importc: "SetMusicPitc
     header: raylibHeader.}
 ##  Set pitch for a music (1.0 is base level)
 
+proc setMusicPan*(music: Music; pan: cfloat) {.cdecl, importc: "SetMusicPan",
+    header: raylibHeader.}
+##  Set pan for a music (0.5 is center)
+
 proc getMusicTimeLength*(music: Music): cfloat {.cdecl,
     importc: "GetMusicTimeLength", header: raylibHeader.}
 ##  Get music time length (in seconds)
@@ -3003,9 +3073,25 @@ proc setAudioStreamPitch*(stream: AudioStream; pitch: cfloat) {.cdecl,
     importc: "SetAudioStreamPitch", header: raylibHeader.}
 ##  Set pitch for audio stream (1.0 is base level)
 
+proc setAudioStreamPan*(stream: AudioStream; pan: cfloat) {.cdecl,
+    importc: "SetAudioStreamPan", header: raylibHeader.}
+##  Set pan for audio stream (0.5 is centered)
+
 proc setAudioStreamBufferSizeDefault*(size: cint) {.cdecl,
     importc: "SetAudioStreamBufferSizeDefault", header: raylibHeader.}
 ##  Default size for new audio streams
+
+proc setAudioStreamCallback*(stream: AudioStream; callback: AudioCallback) {.cdecl,
+    importc: "SetAudioStreamCallback", header: raylibHeader.}
+##  Audio thread callback to request new data
+
+proc attachAudioStreamProcessor*(stream: AudioStream; processor: AudioCallback) {.
+    cdecl, importc: "AttachAudioStreamProcessor", header: raylibHeader.}
+##  Attach audio stream processor to stream
+
+proc detachAudioStreamProcessor*(stream: AudioStream; processor: AudioCallback) {.
+    cdecl, importc: "DetachAudioStreamProcessor", header: raylibHeader.}
+##  Detach audio stream processor from stream
 
 const Lightgray* = Color(r: 200, g: 200, b: 200, a: 255)
 const Gray* = Color(r: 130, g: 130, b: 130, a: 255)

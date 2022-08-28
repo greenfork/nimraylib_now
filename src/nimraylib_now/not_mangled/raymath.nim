@@ -22,14 +22,14 @@ const raymathHeader = currentSourcePath().parentDir()/"raymath.h"
 ##      - Functions are always self-contained, no function use another raymath function inside,
 ##        required code is directly re-implemented inside
 ##      - Functions input parameters are always received by value (2 unavoidable exceptions)
-##      - Functions use always a "result" anmed variable for return
+##      - Functions use always a "result" variable for return
 ##      - Functions are always defined inline
 ##      - Angles are always in radians (DEG2RAD/RAD2DEG macros provided for convenience)
 ##
 ##
 ##    LICENSE: zlib/libpng
 ##
-##    Copyright (c) 2015-2021 Ramon Santamaria (@raysan5)
+##    Copyright (c) 2015-2022 Ramon Santamaria (@raysan5)
 ##
 ##    This software is provided "as-is", without any express or implied warranty. In no event
 ##    will the authors be held liable for any damages arising from the use of this software.
@@ -86,6 +86,14 @@ proc normalize*(value: cfloat; start: cfloat; `end`: cfloat): cfloat {.inline, c
 proc remap*(value: cfloat; inputStart: cfloat; inputEnd: cfloat; outputStart: cfloat;
            outputEnd: cfloat): cfloat {.inline, cdecl, importc: "Remap",
                                      header: raymathHeader.}
+##  Wrap input value from min to max
+
+proc wrap*(value: cfloat; min: cfloat; max: cfloat): cfloat {.inline, cdecl,
+    importc: "Wrap", header: raymathHeader.}
+##  Check whether two given floats are almost equal
+
+proc floatEquals*(x: cfloat; y: cfloat): cint {.inline, cdecl, importc: "FloatEquals",
+    header: raymathHeader.}
 ## ----------------------------------------------------------------------------------
 ##  Module Functions Definition - Vector2 math
 ## ----------------------------------------------------------------------------------
@@ -129,7 +137,11 @@ proc dotProduct*(v1: Vector2; v2: Vector2): cfloat {.inline, cdecl,
 
 proc distance*(v1: Vector2; v2: Vector2): cfloat {.inline, cdecl,
     importc: "Vector2Distance", header: raymathHeader.}
-##  Calculate angle from two vectors in X-axis
+##  Calculate square distance between two vectors
+
+proc distanceSqr*(v1: Vector2; v2: Vector2): cfloat {.inline, cdecl,
+    importc: "Vector2DistanceSqr", header: raymathHeader.}
+##  Calculate angle from two vectors
 
 proc angle*(v1: Vector2; v2: Vector2): cfloat {.inline, cdecl,
     importc: "Vector2Angle", header: raymathHeader.}
@@ -153,6 +165,10 @@ proc divide*(v1: Vector2; v2: Vector2): Vector2 {.inline, cdecl,
 
 proc normalize*(v: Vector2): Vector2 {.inline, cdecl,
     importc: "Vector2Normalize", header: raymathHeader.}
+##  Transforms a Vector2 by a given Matrix
+
+proc transform*(v: Vector2; mat: Matrix): Vector2 {.inline, cdecl,
+    importc: "Vector2Transform", header: raymathHeader.}
 ##  Calculate linear interpolation between two vectors
 
 proc lerp*(v1: Vector2; v2: Vector2; amount: cfloat): Vector2 {.inline, cdecl,
@@ -169,6 +185,23 @@ proc rotate*(v: Vector2; angle: cfloat): Vector2 {.inline, cdecl,
 
 proc moveTowards*(v: Vector2; target: Vector2; maxDistance: cfloat): Vector2 {.
     inline, cdecl, importc: "Vector2MoveTowards", header: raymathHeader.}
+##  Invert the given vector
+
+proc invert*(v: Vector2): Vector2 {.inline, cdecl, importc: "Vector2Invert",
+                                       header: raymathHeader.}
+##  Clamp the components of the vector between
+##  min and max values specified by the given vectors
+
+proc clamp*(v: Vector2; min: Vector2; max: Vector2): Vector2 {.inline, cdecl,
+    importc: "Vector2Clamp", header: raymathHeader.}
+##  Clamp the magnitude of the vector between two min and max values
+
+proc clampValue*(v: Vector2; min: cfloat; max: cfloat): Vector2 {.inline, cdecl,
+    importc: "Vector2ClampValue", header: raymathHeader.}
+##  Check whether two given vectors are almost equal
+
+proc equals*(p: Vector2; q: Vector2): cint {.inline, cdecl,
+    importc: "Vector2Equals", header: raymathHeader.}
 ## ----------------------------------------------------------------------------------
 ##  Module Functions Definition - Vector3 math
 ## ----------------------------------------------------------------------------------
@@ -228,9 +261,13 @@ proc dotProduct*(v1: Vector3; v2: Vector3): cfloat {.inline, cdecl,
 
 proc distance*(v1: Vector3; v2: Vector3): cfloat {.inline, cdecl,
     importc: "Vector3Distance", header: raymathHeader.}
-##  Calculate angle between two vectors in XY and XZ
+##  Calculate square distance between two vectors
 
-proc angle*(v1: Vector3; v2: Vector3): Vector2 {.inline, cdecl,
+proc distanceSqr*(v1: Vector3; v2: Vector3): cfloat {.inline, cdecl,
+    importc: "Vector3DistanceSqr", header: raymathHeader.}
+##  Calculate angle between two vectors
+
+proc angle*(v1: Vector3; v2: Vector3): cfloat {.inline, cdecl,
     importc: "Vector3Angle", header: raymathHeader.}
 ##  Negate provided vector (invert direction)
 
@@ -258,6 +295,10 @@ proc transform*(v: Vector3; mat: Matrix): Vector3 {.inline, cdecl,
 
 proc rotateByQuaternion*(v: Vector3; q: Quaternion): Vector3 {.inline, cdecl,
     importc: "Vector3RotateByQuaternion", header: raymathHeader.}
+##  Rotates a vector around an axis
+
+proc rotateByAxisAngle*(v: Vector3; axis: Vector3; angle: cfloat): Vector3 {.
+    inline, cdecl, importc: "Vector3RotateByAxisAngle", header: raymathHeader.}
 ##  Calculate linear interpolation between two vectors
 
 proc lerp*(v1: Vector3; v2: Vector3; amount: cfloat): Vector3 {.inline, cdecl,
@@ -288,6 +329,32 @@ proc unproject*(source: Vector3; projection: Matrix; view: Matrix): Vector3 {.
 
 proc toFloatV*(v: Vector3): Float3 {.inline, cdecl, importc: "Vector3ToFloatV",
                                         header: raymathHeader.}
+##  Invert the given vector
+
+proc invert*(v: Vector3): Vector3 {.inline, cdecl, importc: "Vector3Invert",
+                                       header: raymathHeader.}
+##  Clamp the components of the vector between
+##  min and max values specified by the given vectors
+
+proc clamp*(v: Vector3; min: Vector3; max: Vector3): Vector3 {.inline, cdecl,
+    importc: "Vector3Clamp", header: raymathHeader.}
+##  Clamp the magnitude of the vector between two values
+
+proc clampValue*(v: Vector3; min: cfloat; max: cfloat): Vector3 {.inline, cdecl,
+    importc: "Vector3ClampValue", header: raymathHeader.}
+##  Check whether two given vectors are almost equal
+
+proc equals*(p: Vector3; q: Vector3): cint {.inline, cdecl,
+    importc: "Vector3Equals", header: raymathHeader.}
+##  Compute the direction of a refracted ray where v specifies the
+##  normalized direction of the incoming ray, n specifies the
+##  normalized normal vector of the interface of two optical media,
+##  and r specifies the ratio of the refractive index of the medium
+##  from where the ray comes to the refractive index of the medium
+##  on the other side of the surface
+
+proc refract*(v: Vector3; n: Vector3; r: cfloat): Vector3 {.inline, cdecl,
+    importc: "Vector3Refract", header: raymathHeader.}
 ## ----------------------------------------------------------------------------------
 ##  Module Functions Definition - Matrix math
 ## ----------------------------------------------------------------------------------
@@ -307,10 +374,6 @@ proc transpose*(mat: Matrix): Matrix {.inline, cdecl,
 
 proc invert*(mat: Matrix): Matrix {.inline, cdecl, importc: "MatrixInvert",
                                       header: raymathHeader.}
-##  Normalize provided matrix
-
-proc normalize*(mat: Matrix): Matrix {.inline, cdecl,
-    importc: "MatrixNormalize", header: raymathHeader.}
 ##  Get identity matrix
 
 proc matrixIdentity*(): Matrix {.inline, cdecl, importc: "MatrixIdentity",
@@ -337,25 +400,30 @@ proc translate*(x: cfloat; y: cfloat; z: cfloat): Matrix {.inline, cdecl,
 
 proc rotate*(axis: Vector3; angle: cfloat): Matrix {.inline, cdecl,
     importc: "MatrixRotate", header: raymathHeader.}
-##  Get x-rotation matrix (angle in radians)
+##  Get x-rotation matrix
+##  NOTE: Angle must be provided in radians
 
 proc rotateX*(angle: cfloat): Matrix {.inline, cdecl, importc: "MatrixRotateX",
     header: raymathHeader.}
-##  Get y-rotation matrix (angle in radians)
+##  Get y-rotation matrix
+##  NOTE: Angle must be provided in radians
 
 proc rotateY*(angle: cfloat): Matrix {.inline, cdecl, importc: "MatrixRotateY",
     header: raymathHeader.}
-##  Get z-rotation matrix (angle in radians)
+##  Get z-rotation matrix
+##  NOTE: Angle must be provided in radians
 
 proc rotateZ*(angle: cfloat): Matrix {.inline, cdecl, importc: "MatrixRotateZ",
     header: raymathHeader.}
-##  Get xyz-rotation matrix (angles in radians)
+##  Get xyz-rotation matrix
+##  NOTE: Angle must be provided in radians
 
-proc rotateXYZ*(ang: Vector3): Matrix {.inline, cdecl,
+proc rotateXYZ*(angle: Vector3): Matrix {.inline, cdecl,
     importc: "MatrixRotateXYZ", header: raymathHeader.}
-##  Get zyx-rotation matrix (angles in radians)
+##  Get zyx-rotation matrix
+##  NOTE: Angle must be provided in radians
 
-proc rotateZYX*(ang: Vector3): Matrix {.inline, cdecl,
+proc rotateZYX*(angle: Vector3): Matrix {.inline, cdecl,
     importc: "MatrixRotateZYX", header: raymathHeader.}
 ##  Get scaling matrix
 
@@ -367,7 +435,7 @@ proc frustum*(left: cdouble; right: cdouble; bottom: cdouble; top: cdouble;
                    near: cdouble; far: cdouble): Matrix {.inline, cdecl,
     importc: "MatrixFrustum", header: raymathHeader.}
 ##  Get perspective projection matrix
-##  NOTE: Angle should be provided in radians
+##  NOTE: Fovy angle must be provided in radians
 
 proc perspective*(fovy: cdouble; aspect: cdouble; near: cdouble; far: cdouble): Matrix {.
     inline, cdecl, importc: "MatrixPerspective", header: raymathHeader.}
@@ -457,7 +525,7 @@ proc fromMatrix*(mat: Matrix): Quaternion {.inline, cdecl,
 proc toMatrix*(q: Quaternion): Matrix {.inline, cdecl,
     importc: "QuaternionToMatrix", header: raymathHeader.}
 ##  Get rotation quaternion for an angle and axis
-##  NOTE: angle must be provided in radians
+##  NOTE: Angle must be provided in radians
 
 proc fromAxisAngle*(axis: Vector3; angle: cfloat): Quaternion {.inline,
     cdecl, importc: "QuaternionFromAxisAngle", header: raymathHeader.}
@@ -479,6 +547,10 @@ proc toEuler*(q: Quaternion): Vector3 {.inline, cdecl,
 
 proc transform*(q: Quaternion; mat: Matrix): Quaternion {.inline, cdecl,
     importc: "QuaternionTransform", header: raymathHeader.}
+##  Check whether two given quaternions are almost equal
+
+proc equals*(p: Quaternion; q: Quaternion): cint {.inline, cdecl,
+    importc: "QuaternionEquals", header: raymathHeader.}
 
 template `+`*[T: Vector2 | Vector3 | Quaternion | Matrix](v1, v2: T): T = add(v1, v2)
 template `+=`*[T: Vector2 | Vector3 | Quaternion | Matrix](v1: var T, v2: T) = v1 = add(v1, v2)

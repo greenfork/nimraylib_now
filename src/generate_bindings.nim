@@ -13,8 +13,9 @@ const
   nimraylibNowDir             = projectDir/"src"/"nimraylib_now"
   templatesDir                = projectDir/"src"/"templates"
   raylibSrcDir                = projectDir/"raylib"/"src"
+  rayguiSrcDir                = projectDir/"raygui"/"src"
+  physacSrcDir                = projectDir/"physac"/"src"
   raylibBuildDir              = buildDir/"raylib_src"
-  rayguiBuildDir              = buildDir/"raygui_src"
 
   # Must assume that there's no `projectDir` as if it is installed as a nimble
   # package.
@@ -73,8 +74,8 @@ export {filename}
 
 proc prepareCSources =
   copyDir(raylibSrcDir, raylibMangledCSourcesDir)
-  copyFileToDir(raylibSrcDir/"extras"/"physac.h", raylibMangledCSourcesDir)
-  copyFileToDir(raylibSrcDir/"extras"/"raygui.h", raylibMangledCSourcesDir)
+  copyFileToDir(physacSrcDir/"physac.h", raylibMangledCSourcesDir)
+  copyFileToDir(rayguiSrcDir/"raygui.h", raylibMangledCSourcesDir)
 
   # Some strange names that also collide with `windows.h`
   const queryPerfFiles = [
@@ -150,8 +151,8 @@ proc prepareBuildFiles(targetDir: string, mangled: bool) =
     copyDir(raylibMangledCSourcesDir, raylibBuildDir)
   else:
     copyDir(raylibSrcDir, raylibBuildDir)
-    copyFileToDir(raylibSrcDir/"extras"/"physac.h", raylibBuildDir)
-    copyFileToDir(raylibSrcDir/"extras"/"raygui.h", raylibBuildDir)
+    copyFileToDir(physacSrcDir/"physac.h", raylibBuildDir)
+    copyFileToDir(rayguiSrcDir/"raygui.h", raylibBuildDir)
   # Copy files to target directory to be used during linking with Nim files
   for file in raylibHeaderBuildFiles:
     copyFileToDir(file, targetDir)

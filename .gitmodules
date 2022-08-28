@@ -4,3 +4,6 @@
 [submodule "raylib"]
 	path = raylib
 	url = https://github.com/raysan5/raylib.git
+[submodule "physac"]
+	path = physac
+	url = https://github.com/raysan5/physac.git

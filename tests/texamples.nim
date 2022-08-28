@@ -2695,25 +2695,25 @@ block models_loading:
     # Load new models/textures on drag&drop
     if isFileDropped():
       var count: cint = 0
-      var droppedFiles = getDroppedFiles(count.addr)
+      var droppedFiles = loadDroppedFiles()
 
-      if count == 1: # only support one file dropped
+      if droppedFiles.count == 1: # only support one file dropped
         # Model file formats supported
-        if isFileExtension(fileName=droppedFiles[0], ext=".obj") or
-          isFileExtension(fileName=droppedFiles[0], ext=".gltf") or
-          isFileExtension(fileName=droppedFiles[0], ext=".iqm"):
+        if isFileExtension(fileName=droppedFiles.paths[0], ext=".obj") or
+          isFileExtension(fileName=droppedFiles.paths[0], ext=".gltf") or
+          isFileExtension(fileName=droppedFiles.paths[0], ext=".iqm"):
             unloadModel(model) # unload previous model
-            model = loadModel(droppedFiles[0]) # load new model
+            model = loadModel(droppedFiles.paths[0]) # load new model
             model.materials[0].maps[MaterialMapIndex.Albedo.int].texture = texture # Set current map diffuse texture
             bounds = getMeshBoundingBox(model.meshes[0]) # set new model bounds
             # TODO: Move camera position from target enough distance to visualize model properly
-        elif isFileExtension(droppedFiles[0],".png"): # Texture fil formats supported
+        elif isFileExtension(droppedFiles.paths[0],".png"): # Texture fil formats supported
           # unload current model texture and load new one
           unloadTexture(texture)
-          texture = loadTexture(droppedFiles[0])
+          texture = loadTexture(droppedFiles.paths[0])
           model.materials[0].maps[MaterialMapIndex.Albedo.int].texture = texture
 
-      clearDroppedFiles() # Clear internal buffers
+      unloadDroppedFiles(droppedFiles) # Clear internal buffers
 
     # Select model on mouse click
     if isMouseButtonPressed(MouseButton.Left):

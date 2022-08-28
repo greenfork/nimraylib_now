@@ -2079,6 +2079,14 @@ bool GuiSpinner(NmrlbNow_Rectangle bounds, const char *text, int *value, int min
         }
     }
 
+#if defined(RAYGUI_NO_RICONS)
+    if (GuiButton(leftButtonBound, "<")) tempValue--;
+    if (GuiButton(rightButtonBound, ">")) tempValue++;
+#else
+    if (GuiButton(leftButtonBound, GuiIconText(RICON_ARROW_LEFT_FILL, NULL))) tempValue--;
+    if (GuiButton(rightButtonBound, GuiIconText(RICON_ARROW_RIGHT_FILL, NULL))) tempValue++;
+#endif
+
     if (!editMode)
     {
         if (tempValue < minValue) tempValue = minValue;
@@ -2098,13 +2106,7 @@ bool GuiSpinner(NmrlbNow_Rectangle bounds, const char *text, int *value, int min
     GuiSetStyle(BUTTON, BORDER_WIDTH, GuiGetStyle(SPINNER, BORDER_WIDTH));
     GuiSetStyle(BUTTON, TEXT_ALIGNMENT, GUI_TEXT_ALIGN_CENTER);
 
-#if defined(RAYGUI_NO_RICONS)
-    if (GuiButton(leftButtonBound, "<")) tempValue--;
-    if (GuiButton(rightButtonBound, ">")) tempValue++;
-#else
-    if (GuiButton(leftButtonBound, GuiIconText(RICON_ARROW_LEFT_FILL, NULL))) tempValue--;
-    if (GuiButton(rightButtonBound, GuiIconText(RICON_ARROW_RIGHT_FILL, NULL))) tempValue++;
-#endif
+
 
     GuiSetStyle(BUTTON, TEXT_ALIGNMENT, tempTextAlign);
     GuiSetStyle(BUTTON, BORDER_WIDTH, tempBorderWidth);
@@ -2183,6 +2185,9 @@ bool GuiValueBox(NmrlbNow_Rectangle bounds, const char *text, int *value, int mi
             }
 
             if (valueHasChanged) *value = TextToInteger(textValue);
+
+            if (*value > maxValue) *value = maxValue;
+            else if (*value < minValue) *value = minValue;
 
             if (IsKeyPressed(KEY_ENTER) || (!CheckCollisionPointRec(mousePoint, bounds) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))) pressed = true;
         }
@@ -2349,7 +2354,7 @@ bool GuiTextBoxMulti(NmrlbNow_Rectangle bounds, char *text, int textSize, bool e
             {
                 int glyphWidth = 0;
                 if (glyphInfo.advanceX != 0) glyphWidth += glyphInfo.advanceX;
-                else glyphWidth += (atlasRec.width + glyphInfo.offsetX);
+                else glyphWidth += (int)(atlasRec.width + glyphInfo.offsetX);
 
                 // Jump line if the end of the text box area has been reached
                 if ((cursorPos.x + (glyphWidth*scaleFactor)) > (textAreaBounds.x + textAreaBounds.width))
@@ -2382,7 +2387,7 @@ bool GuiTextBoxMulti(NmrlbNow_Rectangle bounds, char *text, int textSize, bool e
 
             int glyphWidth = 0;
             if (glyphInfo.advanceX != 0) glyphWidth += glyphInfo.advanceX;
-            else glyphWidth += (atlasRec.width + glyphInfo.offsetX);
+            else glyphWidth += (int)(atlasRec.width + glyphInfo.offsetX);
 
             cursorPos.x += (glyphWidth*scaleFactor + (float)GuiGetStyle(DEFAULT, TEXT_SPACING));
             //if (i > lastSpacePos) lastSpaceWidth += (atlasRec.width + (float)GuiGetStyle(DEFAULT, TEXT_SPACING));
