@@ -27,6 +27,11 @@ else:
   {.passC: "-s -O1".}
   {.passC: "-Werror=implicit-function-declaration".}
 
+when defined(emscripten) and defined(nimraylib_now_web_resources):
+  const NimraylibNowWebResourcesPath {.strdefine.}: string = "resources"
+  {.passL: "-s FORCE_FILESYSTEM=1".}
+  {.passL: "--preload-file " & NimraylibNowWebResourcesPath.}
+
 {.passC: quoteShell("-I" & RaylibSrcPath).}
 {.passC: quoteShell("-I" & RaylibSrcPath / "external"/"glfw"/"include").}
 {.passC: quoteShell("-I" & RaylibSrcPath / "external"/"glfw"/"deps"/"mingw").}

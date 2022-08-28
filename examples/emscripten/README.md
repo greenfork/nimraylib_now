@@ -23,6 +23,8 @@ $ nimhttpd
   and edit it if needed.
 - Replace `while not windowShouldClose():` used for native compilation
   with `emscriptenSetMainLoop` and a callback as in the example.
+- Music may not play if the window is not in focus, click on the game window to
+  make it focused.
 
 ## Compile options
 
@@ -33,3 +35,15 @@ Use `NimraylibNowTotalMemory` define to override the memory size, the default is
 ```
 -d:NimraylibNowTotalMemory=64000
 ```
+
+### nimraylib_now_web_resources and NimraylibNowWebResourcesPath
+
+`config.nims` contains a `nimraylib_now_web_resources` define which includes
+files under "resources" directory into the virtual file system so that
+these files can be used inside your game, see [packaging](https://emscripten.org/docs/porting/files/packaging_files.html).
+
+In order to disable it, remove `--define:nimraylib_now_web_resources` from your
+config file.
+
+In order to change the path to "assets", add `--define:NimraylibNowWebResourcesPath=assets`
+to your config file.
