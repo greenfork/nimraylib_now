@@ -23,3 +23,13 @@ $ nimhttpd
   and edit it if needed.
 - Replace `while not windowShouldClose():` used for native compilation
   with `emscriptenSetMainLoop` and a callback as in the example.
+
+## Compile options
+
+### NimraylibNowTotalMemory
+
+Use `NimraylibNowTotalMemory` define to override the memory size, the default is
+134217728:
+```
+-d:NimraylibNowTotalMemory=64000
+```

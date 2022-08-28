@@ -74,6 +74,10 @@ when defined(windows) and not defined(emscripten):
   {.passL: "-lwinmm".}
 
 when defined(emscripten):
+  const NimraylibNowTotalMemory {.intdefine.}: int = 134217728
+  {.passL: "-s TOTAL_MEMORY=" & $NimraylibNowTotalMemory}
+
+when defined(emscripten):
   {.passL: "-s USE_GLFW=3".}
 elif defined(macosx):
   {.compile(quoteShell(RaylibSrcPathRelative / "rglfw.c"), "-x objective-c").}
