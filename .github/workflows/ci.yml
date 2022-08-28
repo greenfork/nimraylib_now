@@ -8,8 +8,8 @@ jobs:
         os: [windows-latest, ubuntu-18.04, macos-latest]
         nim-version: ['1.4.2']
         include:
-          - os: ubuntu-latest
-            nim-version: devel
+          - os: ubuntu-22.04
+            nim-version: '1.6.6'
     runs-on: ${{ matrix.os }}
     steps:
       - name: Check out repository code
