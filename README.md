@@ -396,6 +396,10 @@ If you still want dynamic linking:
 If you already have a version of MinGW (that is already on PATH and seperate from Nim)
 - Copy over `libwinpthread-1.dll` from nim's version of MinGW into the bin directory of your version of MinGW
 
+### NixOS: GLX: Failed to load GLX
+
+Use `steam-run` to execute the final binary.
+
 ## Community
 
 Find us at `#raylib-nim` channel
