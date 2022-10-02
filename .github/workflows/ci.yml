@@ -35,7 +35,7 @@ jobs:
       - name: Install shared Raylib library on MacOS
         if: ${{ runner.os == 'macOS' }}
         run: |
-          /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
           brew install raylib
 
       - name: Install emsdk dependency
