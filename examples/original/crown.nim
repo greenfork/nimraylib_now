@@ -104,10 +104,10 @@ while not windowShouldClose():
         let
           text = "I AM NIM"
           fontSize = 60
-          textWidth = measureText(text, fontSize)
+          textWidth = measureText(cstring(text), fontSize)
           verticalPos = (getScreenHeight().float * 0.4).int
         drawText(
-          text,
+          cstring(text),
           (getScreenWidth() - textWidth) div 2,  # center
           (getScreenHeight() + verticalPos) div 2,
           fontSize,
@@ -117,6 +117,6 @@ while not windowShouldClose():
         let text =
           if pause: "Press Space to continue"
           else: "Press Space to pause"
-        drawText(text, 10, 10, 20, Black)
+        drawText(cstring(text), 10, 10, 20, Black)
 
 closeWindow()
