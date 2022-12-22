@@ -401,7 +401,7 @@ If you already have a version of MinGW (that is already on PATH and seperate fro
 There are two options:
 - Install Raylib shared library via the package manager, use `nim build -d:nimraylib_now_shared` to use a shared library.
 - Use `steam-run` to execute the final binary.
-- See [USING_RAYLIB][https://github.com/greenfork/nimraylib_now/blob/master/USING_RAYLIB.md] for manual Raylib installation option.
+- See [USING_RAYLIB](/USING_RAYLIB.md) for manual Raylib installation option.
 
 ## Community
 
