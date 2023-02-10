@@ -28,3 +28,4 @@ a.out
 /tests/emscripten/*.js
 .ccls-cache/
 /issue*/
+/notes
