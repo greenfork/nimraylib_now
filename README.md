@@ -1,3 +1,23 @@
+# End of life
+
+The project will no longer be maintained. Reasons:
+
+- I personally don't do any game development for some time now.
+
+- The approach of automatic bindings generation was very new and easy to
+  maintain. Unfortunately as the Nim language progresses, it adds a lot of
+  features that help with automatic memory management, boundary detection and
+  other quality of life things. It is not feasible to automatically generate
+  these things, so the whole approach doesn't look very lucrative to continue
+  with. Proper Nim bindings will require lots of manual code to accomodate all
+  the fascinating language features.
+
+The successor bindings can be considered <https://github.com/planetis-m/naylib>,
+feel free to take a look at them! Other projects can also emerge but as of
+2023-04-15 these bindings look like the most promising ones.
+
+Feel free to fork this repository and do anything with the code, happy hacking!
+
 # NimraylibNow! - The Ultimate Raylib wrapper for Nim
 
 The most idiomatic and up-to-date wrapper for [Raylib] gaming C library.
